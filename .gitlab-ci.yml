@@ -11,4 +11,4 @@ push to github:
   script:
     - apk add --update git
     - git remote add githubremote https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/sinergise/EOBrowser.git
-    - git push githubremote github:master
+    - git push githubremote origin/github:master
