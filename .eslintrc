@@ -1,0 +1,6 @@
+{
+  "extends": "react-app",
+  "rules": {
+    "no-extend-native": ["error", { "exceptions": ["Object", "Array"] }]
+  }
+}

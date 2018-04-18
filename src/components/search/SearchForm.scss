@@ -1,0 +1,70 @@
+@import '../../variables.scss';
+
+.searchForm {
+  padding: 10px;
+
+  .checkboxGroup {
+    column-count: 2;
+    -moz-column-count: 2;
+    label {
+      display: block;
+    }
+  }
+
+  .searchDatasourceSelect a {
+    display: block;
+    cursor: pointer;
+    margin-bottom: 5px;
+    color: #fff;
+    background: rgba(255,255,255,.1);
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+
+    &:hover {
+      background: rgba(255,255,255,.15);
+    }
+    &.active, &.active:hover {
+      background: rgba(255,255,255,.2);
+    }
+  }
+
+  & > label,
+  & > label + * {
+    margin-bottom: 5px;
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  &.probaFormPicker label,
+  &.probaFormPicker label + * {
+    width: 150px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .btn {
+    display: block;
+    text-align: center;
+    margin: 10px;
+  }
+}
+
+.probaPanel {
+  margin-top: 10px;
+  border-top: 1px dashed #aaa;
+  padding-top: 10px;
+
+  label, b, .react-toggle {
+    width: 140px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 10px;
+  }
+  select {
+    width: calc(100% - 160px);
+  }
+  .react-toggle {
+    width: auto;
+  }
+}

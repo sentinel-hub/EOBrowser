@@ -1,0 +1,570 @@
+@import '../variables';
+@import 'DatePicker';
+
+#tools {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  background: $mainLight;
+  z-index: 1;
+  width: $toolsWidth;
+  color: $textColor;
+  box-shadow: 0 2px 5px #000;
+  transition: all ease $toolsTransitionSpeed;
+
+  &.hidden {
+    margin-left: -120%;
+  }
+
+  footer {
+    text-align: center;
+    padding: 5px;
+    background: $mainMedium;
+
+    .btn {
+      margin: 3px;
+    }
+  }
+
+  footer.imageDownload {
+    text-align: left;
+    padding: 10px;
+
+    div {
+      &.container {
+        margin: 10px;
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .left {
+        float: left;
+        width: 50%;
+      }
+
+      .right {
+        float: right;
+        width: 50%;
+
+        > * {
+          float: right;
+        }
+      }
+
+      .clearBoth {
+        clear: both;
+      }
+    }
+  }
+
+  .layerDatasourcePicker a {
+    display: block;
+    color: #ddd;
+    opacity: 0.5;
+    font-size: 13px;
+    padding-left: 65px;
+    padding-top: 10px;
+    min-height: 46px;
+    border-bottom: 1px solid #555;
+    clear: both;
+    cursor: pointer;
+
+    .icon {
+      float: left;
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      line-height: 40px;
+      margin-left: -55px;
+      margin-top: -5px;
+      border-radius: 50px;
+      display: block;
+      background: $mainMedium;
+      border: 3px solid transparent;
+    }
+    &:hover {
+      opacity: 0.8;
+    }
+    &.active:hover,
+    &.active {
+      color: #fff;
+      opacity: 1;
+
+      .icon {
+        border: 3px solid $primaryCol;
+      }
+      small {
+        color: #eee;
+      }
+    }
+    small {
+      color: #ccc;
+      display: block;
+    }
+  }
+
+  .scriptBtnPanel {
+    text-align: center;
+    padding: 5px;
+  }
+}
+
+.radioGroup {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 5px;
+}
+.compareTogglePanel {
+  padding: 8px 5px 0;
+  text-align: center;
+}
+
+.comparisonHeader {
+  border-bottom: 2px solid $primaryCol;
+  padding: 5px;
+
+  a i {
+    margin-right: 5px;
+  }
+}
+
+.normalMode .pinItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+
+  & > div:first-child {
+    color: #fff;
+  }
+}
+
+.pinItem {
+  padding: 5px;
+  clear: both;
+  border-top: 1px solid #aaa;
+  user-select: none;
+  img.preview {
+    float: left;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    border: 2px solid #555;
+  }
+
+  .removePin,
+  .zoomToPin {
+    float: right;
+  }
+  &.compareCursor {
+    cursor: grab;
+  }
+  &.gu-mirror {
+    color: #fff; 
+    background: $mainDark; 
+    box-shadow: 0 3px 5px #000; 
+    cursor: -webkit-grabbing !important;
+  }
+  & > div:first-child {
+    padding: 5px 0;
+  }
+  &:first-child {
+    border: none;
+  }
+  & > * {
+    margin-right: 5px;
+  }
+
+  .comparePanel {
+    border-top: 1px dashed #777;
+    padding: 5px 0;
+    font-size: 0.9em;
+
+    & > * {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    &.opacity .rc-slider-handle-1 {
+      display: none;
+    }
+  }
+
+  .rc-slider + span {
+    width: 30px;
+    text-align: right;
+  }
+}
+.leaflet-pane {
+  z-index: auto;
+}
+.ReactTabs__TabList {
+  margin: -38px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    float: left;
+    list-style: none;
+    cursor: pointer;
+    color: #aaa;
+    padding: 6px 12px;
+    border-bottom: 4px solid transparent;
+
+    img,
+    i {
+      font-size: 17px;
+      fill: #aaa;
+      width: 17px;
+      height: 17px;
+      margin: 0 6px 5px 0;
+    }
+
+    &.ReactTabs__Tab--selected {
+      color: #fff;
+      border-color: $primaryCol;
+    }
+  }
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
+.tab-panel,
+.ReactTabs__TabPanel {
+  overflow: auto;
+}
+
+.sectionHeader {
+  padding: 5px;
+  background: $mainDark;
+  cursor: pointer;
+  border-bottom: 1px solid #666;
+  box-sizing: border-box;
+
+  &:hover {
+    background: $mainMedium;
+  }
+
+  .sectionTitle {
+    font-weight: bold;
+    display: block;
+
+    a {
+      margin-right: 5px;
+    }
+  }
+}
+
+.floatItem {
+  position: relative;
+  /*top: 16px;*/
+  /*left: 384px;*/
+  background: $mainLight;
+  padding: 0;
+  color: #fff;
+  margin: 0;
+  /*height: 36px;*/
+  height: $controlsHeight;
+  border: none;
+  overflow: visible;
+  box-shadow: 0 2px 5px #000;
+
+  > i {
+    width: $controlsHeight;
+    height: $controlsHeight;
+    background: $mainDark;
+    color: #fff;
+    text-align: center;
+    line-height: $controlsHeight - 2px;
+
+    & + span {
+      font-size: 15px;
+      padding: 0 16px;
+    }
+  }
+}
+
+.visualizationInfoPanel {
+  text-align: left;
+  margin: 10px;
+  color: #fff;
+  border-bottom: 1px solid $primaryCol;
+  padding-bottom: 10px;
+  text-transform: uppercase;
+
+  .timelapsePreviewBox {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    margin: -257px;
+    width: 512px;
+    height: 512px;
+    z-index: 100;
+    display: none;
+    border: 2px dashed #fff;
+    box-shadow: 0 0 2px 0 #000;
+  }
+  a:hover .timelapsePreviewBox {
+    display: block;
+  }
+
+  .btn.small {
+    padding: 3px 6px;
+    opacity: 0.8;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  b {
+    text-transform: none;
+    margin-left: 10px;
+    font-weight: normal;
+    color: $textColor;
+
+    &.leaveMeAlone {
+      margin-left: 0;
+    }
+  }
+  .tileActions {
+    float: right;
+    a {
+      margin-left: 5px;
+      cursor: pointer;
+    }
+  }
+}
+
+div.searchHolder i {
+  margin-right: 0;
+}
+
+div.rc-slider {
+  display: inline-block;
+  width: 200px;
+
+  .rc-slider-handle {
+    border-color: $primaryCol;
+  }
+  .rc-slider-track {
+    background: $primaryCol;
+  }
+}
+
+.cloudHolder {
+  position: absolute;
+  left: 0px;
+  top: 37px;
+  background: $mainMedium;
+  padding: 6px;
+  z-index: 3;
+
+  &:after {
+    content: '';
+    position: absolute;
+    left: 45px;
+    top: -4px;
+    border-bottom: 4px solid $mainMedium;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+  }
+}
+
+#cloudFloat {
+  margin-left: 180px;
+}
+
+.effectsPanel {
+  padding: 10px;
+
+  .notification {
+    max-width: none;
+    margin: 5px 0;
+    padding: 5px 0;
+    text-align: left;
+    opacity: 0.7;
+  }
+  label {
+    clear: both;
+    margin-bottom: 10px;
+    display: block;
+
+    span {
+      display: inline-block;
+      margin-bottom: 5px;
+    }
+  }
+  .react-toggle,
+  .gainSlider {
+    float: right;
+    clear: both;
+    .rc-slider {
+      width: 120px;
+    }
+    span {
+      display: inline-block;
+      font-size: 0.9em;
+      margin-left: 5px;
+      width: 30px;
+    }
+  }
+}
+.react-toggle {
+  vertical-align: middle;
+  margin-left: 10px;
+}
+.react-toggle--checked .react-toggle-track,
+.react-toggle.react-toggle--checked:hover .react-toggle-track {
+  background: $primaryCol;
+}
+
+.react-toggle--focus .react-toggle-thumb {
+  box-shadow: 0px 0px 2px 3px $primaryCol;
+}
+
+.react-toggle:active .react-toggle-thumb {
+  box-shadow: 0px 0px 5px 5px $primaryCol;
+}
+.react-toggle.react-toggle--focus .react-toggle-thumb {
+  box-shadow: 0 0 3px $primaryCol;
+}
+.react-toggle--checked .react-toggle-thumb {
+  border-color: $primaryCol;
+}
+
+#searchBox {
+  display: inline-block;
+  margin-right: $basicMargin;
+  /*left: auto;*/
+  /*right: 80px;*/
+}
+#toggleSettings {
+  display: block;
+  position: absolute;
+  left: 20px;
+  top: 16px;
+  color: #fff;
+  background: $mainMedium;
+  border-radius: 40px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: all ease 0.4s;
+
+  &.hidden {
+    left: 16px;
+    top: 11px;
+  }
+
+  i {
+    margin: 5px;
+    display: block;
+    width: 24px;
+    height: 24px;
+    font-size: 15px;
+    line-height: 24px;
+    transition: all ease 0.4s;
+  }
+
+  i.fa-cogs {
+    margin: 10px;
+    font-size: 20px;
+  }
+
+  &.open {
+    box-shadow: 0 2px 10px #000;
+    left: 15px;
+    top: 15px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+  }
+}
+@media screen and (max-width: 1100px) {
+  #searchBox {
+    /*top: 66px;*/
+  }
+}
+
+@media screen and (max-width: 700px) {
+  #tools {
+    /*width: calc(100% - 80px);*/
+    width: calc(100% - 72px);
+  }
+  .floatItem {
+    z-index: 1;
+    box-shadow: none;
+    /*top: 76px;*/
+    /*left: auto;*/
+    /*right: 10px;*/
+    border: 1px solid $mainMedium;
+    & > i {
+      cursor: pointer;
+    }
+    & > span {
+      width: 0;
+      height: 0;
+      display: block;
+      overflow: hidden;
+    }
+    &.active > span {
+      width: auto;
+      height: auto;
+      overflow: visible;
+      position: absolute;
+      right: 100%;
+      top: 0;
+      bottom: 0;
+      line-height: 28px;
+      text-align: center;
+      background: $mainLight;
+      white-space: nowrap;
+      padding: 2px 5px;
+      box-shadow: 0 2px 10px #000;
+    }
+    .cloudHolder {
+      left: auto;
+      right: 15px;
+      box-shadow: 0 2px 10px #000;
+    }
+  }
+  #dateFloat {
+    margin-top: 40px;
+  }
+  #cloudFloat {
+    margin-left: auto;
+    margin-top: 90px;
+  }
+  #searchBox {
+    /*left: auto;*/
+    /*z-index: 2;*/
+    /*right: 12px;*/
+    /*top: 70px;*/
+  }
+
+  .tabs-menu > li > a > * {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 15px;
+    margin-right: 5px;
+  }
+  .colorsContainer div {
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    line-height: 30px;
+  }
+  .colHolder,
+  .colHolder div {
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+  }
+}
+@media screen and (min-width: 700px) {
+  #cloudSliderVal {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 5px;
+    width: 60px;
+  }
+}

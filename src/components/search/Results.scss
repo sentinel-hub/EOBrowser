@@ -1,0 +1,127 @@
+@import '../../variables';
+
+$textCol: #eee;
+
+.resultsPanel {
+  padding: 10px;
+  color: $textCol;
+
+  .showLinkPanel {
+    padding: 10px;
+    color: $textColor;
+    text-align: center;
+    width: calc(100% - 20px);
+
+    input {
+      border: none;
+      border-bottom: 1px solid #fff;
+      padding: 5px;
+      background: none;
+      color: #eee;
+      width: calc(100% - 15px);
+      margin-bottom: 15px;
+    }
+  }
+
+  .resultsInnerPanel > .btn {
+    display: block;
+    text-align: center;
+  }
+  .resultsHeading {
+    border-bottom: 2px solid $primaryCol;
+    padding: 5px 0;
+    margin-top: 10px;
+
+    & > a {
+      float: right;
+    }
+  }
+}
+
+.resultItem {
+  margin-bottom: 15px;
+  position: relative;
+  transition: all ease 0.4s;
+  padding: 10px;
+  background: rgba(255, 255, 255, .05);
+  align-items: center;
+
+  .addToPin {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
+  .pathLinkIcon {
+    float: right;
+    margin-left: 6px;
+    padding: 4px;
+    border-radius: 30px;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+
+    &.active {
+      background: $primaryCol;
+      color: #fff;
+    }
+  }
+  .scihubLink {
+    display: block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .noImage {
+    text-align: center;
+    font-style: italic;
+    justify-content: center;
+    opacity: .6;
+    max-width: none !important;
+  }
+
+  & > * {
+    width: calc(100% - 140px);
+    margin-right: 5px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  & > :first-child {
+    width: 130px;
+  }
+
+  .details {
+    padding: 15px 0 15px 15px;
+    box-sizing: border-box;
+
+    & > div {
+      margin-bottom: 6px;
+
+      & > :first-child {
+        width: 20px;
+        display: inline-block;
+        margin-right: 5px;
+      }
+      sup {
+        vertical-align: top;
+        padding-left: 2px;
+      }
+    }
+    svg path {
+      fill: $textCol;
+    }
+  }
+}
+.rodal .resultsPanel {
+  height: calc(100% - 20px);
+  overflow: auto;
+}
+
+.myClass {
+  text-align: center;
+  padding: 5px;
+}
+.myClass .sgButton {
+  margin: 0 3px;
+}
