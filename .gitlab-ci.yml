@@ -10,5 +10,5 @@ push to github:
     - github
   script:
     - apk add --update git
-    - git remote add githubremote https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/sinergise/EOBrowser.git || echo "Already exists, ignoring."
-    - git push githubremote origin/github:master
+    - git remote add githubsh https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/sentinel-hub/EOBrowser.git || echo "Already exists, ignoring."
+    - git push githubsh origin/github:master
