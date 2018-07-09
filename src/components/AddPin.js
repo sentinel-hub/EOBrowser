@@ -18,7 +18,7 @@ class AddPin extends Component {
       ...item,
       lat: pin ? pin.lat : lat,
       lng: pin ? pin.lng : lng,
-      _id: uniquePinId()
+      _id: uniquePinId(),
     };
     Store.addPinResult(savePin);
     Store.setTabIndex(3);

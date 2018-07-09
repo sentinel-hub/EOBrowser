@@ -8,7 +8,7 @@ import NotificationPanel from './NotificationPanel';
 const ATM_FILTERS = {
   null: 'None',
   DOS1: 'DOS1',
-  ATMCOR: 'Statistical'
+  ATMCOR: 'Statistical',
 };
 class EffectsPanel extends React.Component {
   constructor(props) {
@@ -17,12 +17,12 @@ class EffectsPanel extends React.Component {
     this.state = {
       atmFilterValues: Object.keys(ATM_FILTERS).map(key => ({
         value: key,
-        text: ATM_FILTERS[key]
+        text: ATM_FILTERS[key],
       })),
       gain: this.logToLinear(gain, 0.01, 100),
       gainLbl: gain,
       gamma: this.logToLinear(gamma, 0.1, 10),
-      gammaLbl: gamma
+      gammaLbl: gamma,
     };
   }
 
@@ -30,13 +30,11 @@ class EffectsPanel extends React.Component {
     gain: this.logToLinear(1, 0.01, 100),
     gainLbl: 1,
     gamma: this.logToLinear(1, 0.1, 10),
-    gammaLbl: 1
+    gammaLbl: 1,
   });
 
   logToLinear = (e, min, max) => {
-    return (
-      (Math.log(e) - Math.log(min)) / (Math.log(max) - Math.log(min)) * max
-    );
+    return (Math.log(e) - Math.log(min)) / (Math.log(max) - Math.log(min)) * max;
   };
 
   updateGain = () => {
@@ -56,7 +54,7 @@ class EffectsPanel extends React.Component {
   changeGamma = e => {
     this.setState({
       gamma: e,
-      gammaLbl: this.calcLog(e, 0.1, 10)
+      gammaLbl: this.calcLog(e, 0.1, 10),
     });
   };
 
@@ -67,7 +65,7 @@ class EffectsPanel extends React.Component {
   changeGain = e => {
     this.setState({
       gain: e,
-      gainLbl: this.calcLog(e, 0.01, 100)
+      gainLbl: this.calcLog(e, 0.01, 100),
     });
   };
 
@@ -94,9 +92,7 @@ class EffectsPanel extends React.Component {
             <span>Atmospheric correction</span>
             <div className="gainSlider">
               <select value={atmFilter} onChange={this.updateAtmFilter}>
-                {atmFilterValues.map(obj => (
-                  <option value={obj.value}>{obj.text}</option>
-                ))}
+                {atmFilterValues.map(obj => <option value={obj.value}>{obj.text}</option>)}
               </select>
             </div>
           </label>
@@ -130,10 +126,7 @@ class EffectsPanel extends React.Component {
             <span>{this.state.gammaLbl}</span>
           </div>
         </label>
-        <NotificationPanel
-          msg="Effects are disabled for some preconfigured products"
-          type="warning"
-        />
+        <NotificationPanel msg="Effects are disabled for some preconfigured products" type="warning" />
       </div>
     );
   }

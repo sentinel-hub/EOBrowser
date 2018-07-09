@@ -4,6 +4,7 @@ import FileSaver from 'file-saver';
 import copernicus from '../assets/copernicus.png';
 import SHlogo from '../assets/shLogo.png';
 import Store from '../store';
+import { getMapDOMSize } from './coords';
 
 const canvas = document.createElement('canvas');
 
@@ -40,7 +41,8 @@ export function createCanvasBlob(obj) {
         ctx.lineTo(10, canvas.height - 20);
         ctx.font = '11px Arial';
         const scaleBar = document.querySelector('.leaflet-control-scale-line');
-        const scale = scaleBar.offsetWidth * width / window.innerWidth;
+        const mapDOMSize = getMapDOMSize();
+        const scale = scaleBar.offsetWidth * width / mapDOMSize.width;
         ctx.lineTo(scale + 10, canvas.height - 20);
         ctx.lineTo(scale + 10, canvas.height - 40);
         ctx.stroke();
@@ -65,19 +67,15 @@ function getImgObject(customObject = {}) {
   const { imageW, imageH, imgWmsUrl, imageExt, presets } = Store.current;
 
   const { name: cName, preset: cPreset, time: cTime, url: cUrl } = customObject;
-  const presetName = presets[datasource].find(
-    p => p.id === (cPreset || preset)
-  );
-  const title = `${cName || name}, ${
-    presetName ? presetName.name : cPreset || preset
-  } on ${cTime || time}`;
+  const presetName = presets[datasource].find(p => p.id === (cPreset || preset));
+  const title = `${cName || name}, ${presetName ? presetName.name : cPreset || preset} on ${cTime || time}`;
   // use custom object or default for rendering image
   return {
     url: cUrl || imgWmsUrl,
     title,
     width: imageW,
     height: imageH,
-    imageExt
+    imageExt,
   };
 }
 export async function downloadCanvas(customObj) {
@@ -105,7 +103,7 @@ export async function downloadCanvas(customObj) {
 
             element.removeAttribute('href');
             element.removeEventListener('click', clickHandler);
-          })
+          }),
         );
         document.body.removeChild(element);
         resolve();
@@ -160,7 +158,7 @@ export function downloadZipIt(layerUrls) {
         const defaultObj = getImgObject({ url: src, preset });
         createCanvasBlob(defaultObj).then(blob => {
           zip.file(`${defaultObj.title}.${defaultObj.imageExt}`, blob, {
-            binary: true
+            binary: true,
           });
           count++;
           if (count === layerUrls.length) {
@@ -184,7 +182,7 @@ export function downloadZipIt(layerUrls) {
           if (!err) {
             const defaultObj = getImgObject({ url: src, preset });
             zip.file(`${defaultObj.title}.${imageExt}`, data, {
-              binary: true
+              binary: true,
             });
             count++;
             if (count === layerUrls.length) {

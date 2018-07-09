@@ -3,10 +3,7 @@ import { connect } from 'react-redux';
 import URI from 'urijs';
 import Store from '../store';
 import { getPixelSize } from '../utils/coords';
-import {
-  downloadZipIt,
-  downloadOne
-} from '../utils/downloadZip';
+import { downloadZipIt, downloadOne } from '../utils/downloadZip';
 import styled from 'styled-components';
 import Toggle from 'react-toggle';
 import Button from './Button';
@@ -46,40 +43,41 @@ class AnalyticalPanel extends Component {
       channels,
       presets,
       selectedResult: { datasource, preset },
-      instances
+      instances,
     } = props;
     const mChannels = (channels[datasource] || []).map(obj => ({
       value: obj.name,
-      text: obj.name
+      text: obj.name,
     }));
     const mPresets = Object.keys(presets[datasource]).map(key => ({
       value: presets[datasource][key].id,
-      text: presets[datasource][key].name
+      text: presets[datasource][key].name,
     }));
     const activeInstance = instances.find(ins => ins.name === datasource);
     this.state = {
       isDownloading: false,
       layers: [...mChannels, ...mPresets],
       downloadLayers: { [preset !== 'CUSTOM' ? preset : 'custom']: true },
-      isIPT: activeInstance.baseUrl.includes('eocloud')
+      isIPT: activeInstance.baseUrls.WMS.includes('eocloud'),
     };
     if (preset === 'CUSTOM') {
       this.state.layers.push({ value: 'custom', text: 'Custom script' });
     }
   }
   getFirstPreset = () => {
-    const { presets, selectedResult: { datasource } } = this.props;
+    const {
+      presets,
+      selectedResult: { datasource },
+    } = this.props;
     const first = presets[datasource][0];
     return first.id;
   };
   updateImgFormat = e => {
     // cant get data-attr to work, so will do a find for now
-    const selected = Store.current.imageFormats.find(
-      img => img.value === e.target.value
-    );
+    const selected = Store.current.imageFormats.find(img => img.value === e.target.value);
     Store.setImageFormat({
       imageFormat: e.target.value,
-      imageExt: selected.ext
+      imageExt: selected.ext,
     });
   };
 
@@ -96,9 +94,7 @@ class AnalyticalPanel extends Component {
     const standardRegexp = /^B[0-9][0-9A]/i;
     Store.generateImageLink();
     this.setState({ isDownloading: true });
-    const layerArr = Object.keys(this.state.downloadLayers).filter(
-      key => this.state.downloadLayers[key]
-    );
+    const layerArr = Object.keys(this.state.downloadLayers).filter(key => this.state.downloadLayers[key]);
 
     const layerUrls = layerArr.filter(l => l).map(layer => {
       const fullLayer = this.state.layers.find(l => l.value === layer);
@@ -113,7 +109,7 @@ class AnalyticalPanel extends Component {
       }
       return {
         src: oldImgUrl.toString(),
-        preset: fullLayer.text
+        preset: fullLayer.text,
       };
     });
     if (layerUrls.length === 1) {
@@ -139,22 +135,20 @@ class AnalyticalPanel extends Component {
 
   isAllFalse = () => {
     const { downloadLayers } = this.state;
-    return Object.keys(downloadLayers).find(
-      key => this.state.downloadLayers[key]
-    );
+    return Object.keys(downloadLayers).find(key => this.state.downloadLayers[key]);
   };
 
   updateLayer = (key, checked) => {
     this.setState({
-      downloadLayers: { ...this.state.downloadLayers, [key]: checked }
+      downloadLayers: { ...this.state.downloadLayers, [key]: checked },
     });
   };
 
   calculateSize = resolution => {
     const { height, width, res } = getPixelSize();
-    return `Resolution: ${res * resolution} m/px | Size: ${Math.floor(
-      width / resolution
-    )} x ${Math.floor(height / resolution)} px`;
+    return `Resolution: ${res * resolution} m/px | Size: ${Math.floor(width / resolution)} x ${Math.floor(
+      height / resolution,
+    )} px`;
   };
 
   render() {
@@ -165,7 +159,7 @@ class AnalyticalPanel extends Component {
       selectedCrs,
       availableCrs,
       imageFormat,
-      showLogo
+      showLogo,
     } = Store.current;
     const isPngOrJpg = imageFormat.includes('jpg' || 'png');
     const { isIPT, layers, downloadLayers, error, isDownloading } = this.state;
@@ -183,34 +177,24 @@ class AnalyticalPanel extends Component {
             Show {isPngOrJpg ? 'captions' : 'logo'} [?]
           </label>
           <div className="pull-right">
-            <Toggle
-              checked={showLogo}
-              icons={false}
-              onChange={() => Store.setLogo(!showLogo)}
-            />
+            <Toggle checked={showLogo} icons={false} onChange={() => Store.setLogo(!showLogo)} />
           </div>
         </div>
         <div style={{ clear: 'both', height: 10 }} />
         <div className="row">
           <label>Image format:</label>
           <select value={imageFormat} onChange={this.updateImgFormat}>
-            {imageFormats
-              .filter(imf => (isIPT ? !imf.value.includes('application') : imf))
-              .map(obj => (
-                <option key={obj.text} data-ext={obj.ext} value={obj.value}>
-                  {obj.text}
-                </option>
-              ))}
+            {imageFormats.filter(imf => (isIPT ? !imf.value.includes('application') : imf)).map(obj => (
+              <option key={obj.text} data-ext={obj.ext} value={obj.value}>
+                {obj.text}
+              </option>
+            ))}
           </select>
         </div>
         <div className="row">
           <label>Image resolution:</label>
           <div>
-            <select
-              style={{ width: '100%' }}
-              value={resolution}
-              onChange={this.updateResolution}
-            >
+            <select style={{ width: '100%' }} value={resolution} onChange={this.updateResolution}>
               {resolutions.map(obj => (
                 <option key={obj.text} value={obj.value}>
                   {obj.text}

@@ -1,46 +1,53 @@
 import React, { Component } from 'react';
-import keyBy from 'lodash/keyBy';
 import Store from '../../store';
 import moment from 'moment';
 import 'react-toggle/style.css';
 import RCSlider from 'rc-slider';
+import CCSlider from '../CCSlider';
 import AlertContainer from 'react-alert';
 import gifshot from 'gifshot';
 import FileSaver from 'file-saver';
-import { queryDates, getCurrentBboxUrl, fetchBlobObjs } from './timelapseUtils';
-import DatePicker from '../DatePicker';
-import { queryActiveMonth } from '../../utils/ajax';
+import { fetchDates, getCurrentBboxUrl, fetchBlobObj, getCC } from './timelapseUtils';
+import DayPicker from '../DayPicker';
 import Button from '../Button';
 import './Timelapse.scss';
 
 export default class Timelapse extends Component {
-  MAX_COUNT = 200;
+  MAX_COUNT = 300;
   fetchedImages = [];
   state = {
-    maxCC: 50,
-    dates: [],
+    ccWithDates: [],
+    maxCCAllowed: 0.5,
+    allDates: [],
+    selectedDates: [],
+    tooCloudy: [],
     isSelectAllChecked: true,
     sliderValue: 0,
     intervalSpeed: 1,
     dateRange: {
-      from: moment()
+      from: moment(Store.current.selectedResult.time)
         .subtract(1, 'months')
         .format('YYYY-MM-DD'),
-      to: moment().format('YYYY-MM-DD')
+      to: Store.current.selectedResult.time,
     },
     isPlaying: false,
-    selectedDates: [],
     imgUrl: getCurrentBboxUrl(),
-    progress: null,
-    preparing: false
+    gifCreationProgress: null,
+    preparingGifCreation: false,
+    loadingCloudCoverage: false,
+    loadingDates: false,
+    allImagesLoading: false,
   };
+
+  layerName = Store.current.selectedResult.name;
+  canWeFilterByClouds = Store.current.cloudCoverageLayers[this.layerName] !== undefined;
 
   alertOptions = {
     offset: 14,
     position: 'top center',
     theme: 'dark',
     time: 4000,
-    transition: 'scale'
+    transition: 'scale',
   };
   componentDidMount() {
     this.searchDates();
@@ -52,10 +59,8 @@ export default class Timelapse extends Component {
 
   componentDidUpdate(prevProps, oldState) {
     const didPlayStopChange = oldState.isPlaying !== this.state.isPlaying;
-    const didSelectedDatesChange =
-      oldState.selectedDates !== this.state.selectedDates;
-    const didIntervalSpeedChange =
-      oldState.intervalSpeed !== this.state.intervalSpeed;
+    const didDateSelectionChange = oldState.selectedDates !== this.state.selectedDates;
+    const didIntervalSpeedChange = oldState.intervalSpeed !== this.state.intervalSpeed;
 
     if (didPlayStopChange) {
       if (this.state.isPlaying) {
@@ -64,54 +69,86 @@ export default class Timelapse extends Component {
         this.stopGifPreviewLoop();
       }
     }
-
-    if (didSelectedDatesChange) {
+    if (didDateSelectionChange || this.state.tooCloudy !== oldState.tooCloudy) {
       if (this.state.selectedDates.length === 0) {
         this.stopGifPreviewLoop();
         this.resetSlider();
       } else {
-        this.state.isPlaying &&
-          this.startGifPreviewLoop(this.state.intervalSpeed);
+        this.state.isPlaying && this.startGifPreviewLoop(this.state.intervalSpeed);
       }
+      const isSelectAllChecked =
+        this.state.selectedDates.length === this.state.allDates.length - this.state.tooCloudy.length;
+      this.setState({
+        isSelectAllChecked,
+      });
     }
     if (didIntervalSpeedChange) {
-      this.state.isPlaying &&
-        this.startGifPreviewLoop(this.state.intervalSpeed);
+      this.state.isPlaying && this.startGifPreviewLoop(this.state.intervalSpeed);
+    }
+    if (this.state.sliderValue !== oldState.sliderValue) {
+      const datesForGif = this.datesForGif(this.state.selectedDates, this.state.tooCloudy);
+      const currDate = datesForGif[this.state.sliderValue];
+      this.scrollToImage(currDate);
     }
   }
-
+  datesForGif = (selectedDates, tooCloudy) => {
+    return selectedDates.filter(date => !tooCloudy.includes(date));
+  };
   showAlert = errMsg => {
     this.alertContainer.show(errMsg, { type: 'info' });
   };
 
-  maxCcHandler = e => {
-    this.setState({ maxCC: e.target.value });
-  };
-
   searchDates = () => {
     this.stopGifPreviewLoop();
+    this.fetchedImages = [];
     this.setState({
-      loading: true,
+      allDates: [],
+      tooCloudy: [],
       selectedDates: [],
-      dates: []
+      ccWithDates: [],
+      loadingDates: true,
     });
-
-    queryDates(this.state.dateRange, this.MAX_COUNT, this.state.maxCC)
+    fetchDates(this.state.dateRange, this.MAX_COUNT, this.state.maxCC)
       .then(res => {
         const dates = res.reverse();
         if (dates.length === this.MAX_COUNT) {
           this.showAlert(`Maximum number of images is ${this.MAX_COUNT}`);
         }
-        this.setState({
-          dates,
-          selectedDates: dates,
-          isSelectAllChecked: true
-        });
         this.fetchImages(dates);
       })
       .catch(e => {
-        this.setState({ error: 'Error querying dates.', loading: false });
+        this.setState({ error: 'Error querying dates.' });
+      })
+      .then(() => {
+        this.setState({
+          loadingDates: false,
+        });
       });
+
+    if (this.canWeFilterByClouds) {
+      this.setState({
+        loadingCloudCoverage: true,
+      });
+      getCC(this.state.dateRange)
+        .then(data => {
+          this.setState(
+            {
+              ccWithDates: data,
+            },
+            this.updateFilterAndCheckedState(),
+          );
+        })
+        .catch(err => {
+          this.setState({
+            error: 'Error fetching cloudcoverage ',
+          });
+        })
+        .then(() => {
+          this.setState({
+            loadingCloudCoverage: false,
+          });
+        });
+    }
   };
 
   updateDate = (key, date) => {
@@ -123,57 +160,39 @@ export default class Timelapse extends Component {
     });
   };
 
-  fetchImages = dates => {
-    const imgUrlArr = dates.map(date => {
+  fetchImages = datesArray => {
+    this.setState({ allImagesLoading: true });
+    const imgUrlArr = datesArray.map(date => {
       return {
         url: `${getCurrentBboxUrl()}&SHOWLOGO=FALSE&time=${date}/${date}`,
-        date: date
+        date: date,
       };
     });
+    const allImagesPromises = imgUrlArr.map(imgUrl => {
+      return fetchBlobObj(imgUrl)
+        .then(response => {
+          const dateToBeAdded = response.date;
+          this.fetchedImages[dateToBeAdded] = response;
 
-    fetchBlobObjs(imgUrlArr)
-      .then(fetchedImages => {
-        const succeededImgs = fetchedImages.filter(img => img.success);
-        this.fetchedImages = keyBy(succeededImgs, 'date');
-        const successfulDates = succeededImgs.map(d => d.date);
-        if (successfulDates.length !== dates.length) {
-          this.showAlert('Not all images retrieved, please try again');
-        }
-        this.setState({
-          dates: successfulDates,
-          selectedDates: successfulDates,
-          loading: false,
-          error: null
+          this.setState(oldState => {
+            const allDates = [...oldState.allDates, dateToBeAdded].sort((a, b) => new Date(a) - new Date(b));
+            const selectedDates = [...oldState.selectedDates, dateToBeAdded].sort(
+              (a, b) => new Date(a) - new Date(b),
+            );
+            this.updateFilterAndCheckedState();
+            return {
+              allDates,
+              selectedDates,
+            };
+          });
+        })
+        .catch(err => {
+          console.log(err);
         });
-      })
-      .catch(err => {
-        console.log(err);
-        this.fetchedImages = [];
-        this.setState({
-          error: 'Error getting all images.',
-          loading: false,
-          dates: []
-        });
-      });
-  };
+    });
 
-  toggleDateSelection = date => {
-    this.setState(prevState => {
-      const mustRemove = prevState.selectedDates.includes(date);
-      let selectedDates;
-      if (mustRemove) {
-        selectedDates = prevState.selectedDates.filter(d => d !== date);
-      } else {
-        selectedDates = [...prevState.selectedDates, date].sort(
-          (a, b) => new Date(a) - new Date(b)
-        );
-      }
-      const isSelectAllChecked =
-        selectedDates.length === prevState.dates.length;
-      return {
-        selectedDates,
-        isSelectAllChecked
-      };
+    Promise.all(allImagesPromises).then(() => {
+      this.setState({ allImagesLoading: false });
     });
   };
 
@@ -182,35 +201,33 @@ export default class Timelapse extends Component {
     FileSaver.saveAs(blob, `${name.replace(' ', '_')}-timelapse.gif`);
   };
 
-  createGif = () => {
-    if (this.state.selectedDates.length === 0) return;
-    this.setState({ error: null, preparing: true });
+  createGif = datesForGif => {
+    if (datesForGif.length === 0) return;
+    this.setState({ error: null, preparingGifCreation: true });
     gifshot.createGIF(
       {
-        images: this.state.selectedDates.map(date =>
-          this.getDataUrlFromDate(date)
-        ),
+        images: datesForGif.map(date => this.getDataUrlFromDate(date)),
         gifWidth: 512,
         interval: 1 / this.state.intervalSpeed,
         //frameDuration: 5,
         gifHeight: 512,
         numWorkers: 4,
-        sampleInterval: 20,
+        // sampleInterval: 20,
         progressCallback: progress => {
-          this.setState({ progress: progress });
-        }
+          this.setState({ gifCreationProgress: progress });
+        },
       },
       obj => {
         if (obj.error) {
-          this.setState({ error: obj.error, preparing: false });
+          this.setState({ error: obj.error, preparingGifCreation: false });
         } else {
           this.setState({
-            preparing: false,
-            progress: null
+            preparingGifCreation: false,
+            gifCreationProgress: null,
           });
           this.triggerUserDownload(obj.image);
         }
-      }
+      },
     );
   };
 
@@ -236,13 +253,12 @@ export default class Timelapse extends Component {
 
   gifPreviewLoopTick = () => {
     this.setState(oldState => {
-      const sliderValue =
-        oldState.sliderValue === oldState.selectedDates.length - 1
-          ? 0
-          : oldState.sliderValue + 1;
+      const datesForGif = this.datesForGif(oldState.selectedDates, oldState.tooCloudy);
+      const sliderValue = (oldState.sliderValue + 1) % datesForGif.length;
+
       return {
         sliderValue,
-        currDate: oldState.selectedDates[sliderValue]
+        currDate: datesForGif[sliderValue],
       };
     });
   };
@@ -255,132 +271,195 @@ export default class Timelapse extends Component {
     this.setState({ intervalSpeed: e.target.value });
   };
 
-  isSelectAllCheckedChange = () => {
+  isSelectAllCheckedChange = wasChecked => {
     this.setState(oldState => {
-      if (!oldState.isSelectAllChecked) {
+      if (!wasChecked) {
+        const selectedDates = oldState.allDates.filter(date => {
+          if (!this.canWeFilterByClouds) {
+            return true;
+          }
+          const ccDate = oldState.ccWithDates.find(dateCC => dateCC.date === date);
+          if (ccDate === undefined) {
+            return false;
+          }
+          if (ccDate.basicStats.mean === 'NaN') return true;
+          return ccDate.basicStats.mean <= oldState.maxCCAllowed;
+        });
         return {
-          selectedDates: oldState.dates,
-          isSelectAllChecked: true
+          selectedDates,
         };
       } else {
         return {
           selectedDates: [],
-          isSelectAllChecked: false
         };
       }
     });
   };
 
   getDataUrlFromDate = date => {
+    if (this.fetchedImages[date] === undefined) return;
     return this.fetchedImages[date].objectUrl;
   };
 
+  toggleDateSelection = date => {
+    this.setState(prevState => {
+      let selectedDates;
+      if (prevState.selectedDates.includes(date)) {
+        selectedDates = prevState.selectedDates.filter(d => d !== date);
+      } else {
+        selectedDates = [...prevState.selectedDates, date].sort((a, b) => new Date(a) - new Date(b));
+      }
+
+      return {
+        selectedDates,
+      };
+    });
+  };
+
+  setMaxCCAlowed = valuePercent => {
+    this.setState(
+      {
+        maxCCAllowed: valuePercent / 100.0,
+      },
+      this.updateFilterAndCheckedState(),
+    );
+  };
+
+  scrollToImage = currentDate => {
+    const currentNode = this.refs[currentDate];
+    if (currentNode !== undefined) {
+      currentNode.scrollIntoView({ block: 'center', behavior: 'auto' });
+    }
+  };
+
+  setCurrentImgonClick = date => {
+    this.setState(oldState => {
+      const datesForGif = this.datesForGif(oldState.selectedDates, oldState.tooCloudy);
+      const indexOfDate = datesForGif.findIndex(el => el === date);
+      return {
+        sliderValue: indexOfDate,
+      };
+    });
+  };
+
+  updateFilterAndCheckedState = () => {
+    this.setState(oldState => {
+      const tooCloudy =
+        this.canWeFilterByClouds && !oldState.loadingCloudCoverage
+          ? oldState.allDates.filter(date => {
+              const ccDate = oldState.ccWithDates.find(d => d.date === date);
+              if (ccDate === undefined || ccDate.basicStats.mean === 'NaN') {
+                return false;
+              }
+
+              return ccDate.basicStats.mean > oldState.maxCCAllowed;
+            })
+          : [];
+
+      return {
+        tooCloudy,
+      };
+    });
+  };
   render() {
     const {
       dateRange: { from, to },
       selectedDates,
+      tooCloudy,
       sliderValue,
       isPlaying,
       error,
       loading,
-      preparing,
+      preparingGifCreation,
       intervalSpeed,
-      progress,
-      maxCC
+      gifCreationProgress,
+      maxCCAllowed,
+      allDates,
+      loadingCloudCoverage,
+      allImagesLoading,
     } = this.state;
-    const { datasource } = this.props;
+
+    const datesForGif = selectedDates.filter(date => !tooCloudy.includes(date));
+    const isSelectAllChecked = datesForGif.length === allDates.length - tooCloudy.length;
+
     return (
       <div>
-        <AlertContainer
-          ref={a => (this.alertContainer = a)}
-          {...this.alertOptions}
-        />
+        <AlertContainer ref={a => (this.alertContainer = a)} {...this.alertOptions} />
         <div className="wrapHolder">
           <h1>Timelapse</h1>
           <div className="wrap">
             <div className="side">
               <div className="head">
                 <div className="date-range">
-                  <DatePicker
-                    className="inlineDatepicker"
-                    onNavClick={(from, to) =>
-                      queryActiveMonth({ from, to, datasource })
-                    }
-                    defaultValue={from}
-                    onExpand={() =>
-                      queryActiveMonth({ singleDate: from, datasource })
-                    }
-                    onSelect={e => this.updateDate('from', e)}
-                  />
+                  <DayPicker onSelect={e => this.updateDate('from', e)} selectedDay={from} />
                   <span className="datePickerSeparator">-</span>
-                  <DatePicker
-                    className="inlineDatepicker"
-                    onNavClick={(from, to) =>
-                      queryActiveMonth({ from, to, datasource })
-                    }
-                    defaultValue={to}
-                    onExpand={() =>
-                      queryActiveMonth({ singleDate: to, datasource })
-                    }
-                    onSelect={e => this.updateDate('to', e)}
-                  />
+                  <DayPicker onSelect={e => this.updateDate('to', e)} selectedDay={to} />
                 </div>
 
-                <div className="maxCC">
-                  <i className="fa fa-cloud " />
-                  <span>
-                    <div className="react-flex react-flex-v2--align-items-center react-flex-v2--row react-flex-v2--display-inline-flex">
-                      <input
-                        className="react-date-field__input"
-                        type="text"
-                        placeholder={20}
-                        min={0}
-                        max={100}
-                        style={{ maxWidth: '25px' }}
-                        defaultValue={maxCC}
-                        onChange={this.maxCcHandler}
-                      />
-                    </div>%
-                  </span>
+                {!allImagesLoading ? (
+                  <Button
+                    className={'centeredFa'}
+                    disabled={loading}
+                    onClick={() => !loading && this.searchDates()}
+                    text={''}
+                    icon={'search'}
+                  />
+                ) : (
+                  <div className="loader" />
+                )}
+              </div>
+              <div className="filter-tools">
+                {this.canWeFilterByClouds ? (
+                  <div className="ccslider">
+                    <CCSlider
+                      sliderWidth={100}
+                      onChange={this.setMaxCCAlowed}
+                      cloudCoverPercentage={Math.round(maxCCAllowed * 100)}
+                    />
+                  </div>
+                ) : null}
+
+                <div className="checkbox left-checkbox">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={isSelectAllChecked}
+                      value={isSelectAllChecked}
+                      onChange={() => this.isSelectAllCheckedChange(isSelectAllChecked)}
+                    />Select All
+                  </label>
                 </div>
-                <Button
-                  className={'centeredFa'}
-                  disabled={loading}
-                  onClick={() => !loading && this.searchDates()}
-                  text={''}
-                  icon={'search'}
-                />
               </div>
-              <div className="checkbox left-checkbox">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={this.state.isSelectAllChecked}
-                    value={this.state.isSelectAllChecked}
-                    onChange={this.isSelectAllCheckedChange}
-                  />Select All
-                </label>
-              </div>
+
               <div className="images">
-                {loading ? (
+                {loadingCloudCoverage ? (
                   <span className="loader" />
                 ) : error ? (
                   <div style={{ color: 'red' }}>{error}</div>
                 ) : (
-                  this.state.dates.map(date => {
+                  allDates.map(date => {
+                    const currDate = datesForGif[sliderValue];
                     return (
-                      <span
-                        className={selectedDates.includes(date) && 'active'}
-                        onClick={() => this.toggleDateSelection(date)}
-                        key={date.valueOf()}
-                        id={date}
+                      <div
+                        className={
+                          tooCloudy.includes(date)
+                            ? 'cloudy'
+                            : date === currDate
+                              ? 'active current-date'
+                              : selectedDates.includes(date)
+                                ? 'active'
+                                : 'false'
+                        }
+                        key={`${date}`}
                       >
+                        <span onClick={() => this.toggleDateSelection(date)} ref={date} id={date} />
                         <img
                           src={this.getDataUrlFromDate(date)}
-                          alt="timelapse"
+                          alt=""
+                          onClick={() => this.setCurrentImgonClick(date)}
                         />
                         <i>{date}</i>
-                      </span>
+                      </div>
                     );
                   })
                 )}
@@ -389,24 +468,26 @@ export default class Timelapse extends Component {
             <div className="content">
               <Preview
                 error={error}
-                loading={loading}
-                currDate={selectedDates[sliderValue]}
+                loading={loadingCloudCoverage}
+                currDate={datesForGif[sliderValue]}
                 getDataUrlFromDate={this.getDataUrlFromDate}
-                progress={progress}
-                preparing={preparing}
+                gifCreationProgress={gifCreationProgress}
+                preparingGifCreation={preparingGifCreation}
+                noData={datesForGif.length === 0}
               />
-              {selectedDates.length !== 0 && !loading ? (
+
+              {datesForGif.length !== 0 && !loading ? (
                 <Controls
                   togglePlay={() => this.togglePlay(!isPlaying)}
                   isPlaying={isPlaying}
                   intervalSpeed={intervalSpeed}
                   updateIntervalSpeed={this.updateIntervalSpeed}
                   sliderValue={sliderValue}
-                  selectedDates={selectedDates}
-                  createGIF={this.createGif}
+                  selectedDates={datesForGif}
+                  createGIF={() => this.createGif(datesForGif)}
                   stopGifPreviewLoop={this.stopGifPreviewLoop}
                   changeSliderValue={this.changeSliderValue}
-                  preparing={preparing}
+                  preparingGifCreation={preparingGifCreation}
                 />
               ) : null}
             </div>
@@ -421,23 +502,28 @@ export default class Timelapse extends Component {
 }
 
 const Preview = ({
-  progress,
+  gifCreationProgress,
   error,
   getDataUrlFromDate,
   currDate,
-  preparing,
-  loading
+  preparingGifCreation,
+  loading,
+  noData,
 }) => (
   <div className="preview">
-    {preparing ? (
-      <ProgressBar progress={progress} />
+    {preparingGifCreation ? (
+      <GifProgressBar progress={gifCreationProgress} />
     ) : error ? (
       <div className="error">An error occured: {error}</div>
-    ) : currDate && !loading ? (
-      <img src={getDataUrlFromDate(currDate)} alt="" />
-    ) : (
+    ) : loading ? (
       <div className="loader" />
-    )}
+    ) : noData ? (
+      <p>No images selected</p>
+    ) : currDate ? (
+      <div>
+        <img src={getDataUrlFromDate(currDate)} alt="" />
+      </div>
+    ) : null}
   </div>
 );
 
@@ -449,10 +535,10 @@ const Controls = ({
   sliderValue,
   selectedDates,
   createGIF,
-  preparing,
+  preparingGifCreation,
   changeSliderValue,
   stopGifPreviewLoop,
-  loading
+  loading,
 }) => (
   <div className="controls">
     <a className="ctrl" onClick={togglePlay}>
@@ -478,20 +564,21 @@ const Controls = ({
       onBeforeChange={() => stopGifPreviewLoop()}
       onChange={changeSliderValue}
       value={sliderValue}
+      tipFormatter={value => selectedDates[value]}
     />
     <small>
       {sliderValue + 1} / {selectedDates.length}: {selectedDates[sliderValue]}
     </small>
 
     <Button
-      disabled={preparing}
+      disabled={preparingGifCreation}
       onClick={() => createGIF()}
-      text={preparing ? 'Preparing...' : 'Download'}
+      text={preparingGifCreation ? 'Preparing...' : 'Download'}
     />
   </div>
 );
 
-const ProgressBar = ({ progress }) => (
+const GifProgressBar = ({ progress }) => (
   <div className="myProgress">
     <div className="myBar" style={{ width: `${progress * 100}%` }} />
   </div>

@@ -1,351 +1,457 @@
 import React from 'react';
 import moment from 'moment';
-import DatePicker from '../DatePicker';
+import { connect } from 'react-redux';
+import { Checkbox, CheckboxGroup } from 'react-checkbox-group';
+
+import { DateUtils } from 'react-day-picker';
+import DayPicker from '../DayPicker';
+
 import './SearchForm.scss';
 import Store from '../../store';
 import Button from '../Button';
+import CCSlider from '../CCSlider';
 import NotificationPanel from '../NotificationPanel';
-import ProbaLayer from './ProbaPanel';
-import { connect } from 'react-redux';
-import {
-  queryIndex,
-  reflect,
-  queryActiveMonth,
-  loadGetCapabilities
-} from '../../utils/ajax';
-import { Checkbox, CheckboxGroup } from 'react-checkbox-group';
-import isEmpty from 'lodash/isEmpty';
+import { fetchSearchResultsFromIndexService, loadGetCapabilities } from '../../utils/ajax';
+import { DATASOURCES, DATASOURCE_GROUPS, FILTER_CLOUD_COVERAGE_PERCENT } from '../../store/config';
 
-const DEFAULT_INSTANCE = {
-  id: 'DEFAULT_INSTANCE',
-  name: 'All EO Browser instances'
-};
+const NO_CONFIGURATION_SELECTED = '-- no user configuration instance --';
 
-const DS_CACHE = {};
+const PRESELECTED_DATASOURCES = DATASOURCES.filter(
+  ds => ds.search.preselected && DATASOURCE_GROUPS.find(dsg => dsg.id === ds.group).search.preselected,
+);
+
 class SearchForm extends React.Component {
   constructor(props) {
     super(props);
+
+    let initialDsgQueryParams = {};
+    for (let dsg of DATASOURCE_GROUPS) {
+      let qp = {};
+      for (let filter in dsg.search.filters || {}) {
+        qp[filter] = dsg.search.filters[filter];
+      }
+      initialDsgQueryParams[dsg.id] = qp;
+    }
+
     this.state = {
-      visibleInstances: this.props.instances.filter(inst => !inst.userId),
-      query: {
+      visibleDatasources: DATASOURCES,
+      queryParams: {
         cloudCoverPercentage: 100,
         timeFrom: moment().subtract(1, 'months'),
         timeTo: moment(),
-        additionalData: ''
+        additionalData: '',
       },
+      dsgQueryParams: initialDsgQueryParams,
       firstSearch: true,
-      selectedInstances: this.props.datasources
+      selectedDatasources: PRESELECTED_DATASOURCES,
+      selectedCheckboxes: [],
     };
+    Store.setDatasources(PRESELECTED_DATASOURCES.map(ds => ds.name));
   }
 
-  onSearchFormUpdate = ({ queryParams, datasources, isUserInstance }) => {
-    const { timeFrom, timeTo, cloudCoverPercentage } = queryParams;
-    Store.setDateFrom(timeFrom);
-    Store.setDate(timeTo);
-    Store.setMaxcc(cloudCoverPercentage);
-  };
+  componentDidMount() {
+    this.updateCheckboxes(PRESELECTED_DATASOURCES);
+  }
 
-  loadMore = ds => {
-    Store.setSearchingIsOn(true);
-    let query = Store.current.searchParams[ds];
-    query.firstSearch = false;
-    query.multiplyOffset++;
-    queryIndex(false, ds, query).then(
-      res => {
-        Store.setSearchingIsOn(false);
-        Store.setSearchResults(res.results, ds, res.params);
-        this.props.onFinishSearch(Store.current.searchResults);
-      },
-      e => {
-        Store.setSearchingIsOn(false);
-        console.error(e.message);
+  updateCheckboxes = selectedDatasources => {
+    // Checkboxes must be selected for:
+    //  - all selected datasources
+    //  - the groups these selected datasources are in
+    //  - the datasources which are in groups which are NOT selected (so that clicking a group shows pre-populated set of datasources)
+    const groupsWithSelectedDatasources = DATASOURCE_GROUPS.filter(
+      dsg => !!selectedDatasources.find(ds => ds.group === dsg.id),
+    ).map(dsg => `dsg-${dsg.id}`);
+
+    const datasourcesWithinUnselectedGroups = DATASOURCE_GROUPS.reduce((prevValue, dsg) => {
+      if (groupsWithSelectedDatasources.includes(`dsg-${dsg.id}`)) {
+        return prevValue; // group is selected, do not add its children
       }
-    );
+      const dsgDatasources = DATASOURCES.filter(ds => ds.group === dsg.id);
+      if (dsgDatasources.length <= 1) {
+        return prevValue; // only one child datasource, no checkbox for it
+      }
+      return prevValue.concat(dsgDatasources.filter(ds => ds.search.preselected).map(ds => `ds-${ds.id}`));
+    }, []);
+
+    const selectedCheckboxes = selectedDatasources
+      .map(ds => `ds-${ds.id}`)
+      .concat(groupsWithSelectedDatasources, datasourcesWithinUnselectedGroups);
+    this.setState({
+      selectedCheckboxes,
+    });
   };
 
-  doSearch = queryParams => {
-    const {selectedInstances, userInstance} = this.state
-    const { queryBounds, timeFrom, timeTo } = queryParams;
-    const datasources = !userInstance || userInstance === DEFAULT_INSTANCE.name
-                  ? selectedInstances
-                  : [userInstance]
-    Store.setDatasources(datasources)
+  doSearch = (selectedDatasources, timeFrom, timeTo, dsgQueryParams, selectedConfiguration) => {
+    Store.setDatasources(selectedDatasources.map(ds => ds.name));
     Store.clearSearchResults();
     Store.setSearchingIsOn(true);
     this.setState({ searchError: null });
     Store.setDate(timeTo);
     Store.setDateFrom(timeFrom);
-    let query = {
-      ...queryParams,
-      firstSearch: true,
-      multiplyOffset: 0,
-      queryBounds
-    };
-    let querySources = datasources.map(ds => queryIndex(false, ds, query));
-    Promise.all(querySources.map(reflect))
+    const querySources = selectedDatasources.map(ds => {
+      const dsQueryParams = {
+        ...dsgQueryParams[ds.group],
+        timeFrom,
+        timeTo,
+        firstSearch: true,
+        multiplyOffset: 0,
+      };
+      return fetchSearchResultsFromIndexService(selectedConfiguration || ds.name, ds.name, dsQueryParams);
+    });
+    Promise.all(querySources)
       .then(obj => {
         this.setState({ loading: false });
-        let success = obj.filter(x => x.success).map(x => x.data);
-        success.forEach(i => {
+        obj.forEach(i => {
           Store.setSearchResults(i.results, i.datasource, i.params);
           if (i.results.length > 0) {
             Store.setTabIndex(1);
           }
         });
         this.setState({
-          queryParams,
           searchError: '',
-          firstSearch: false
+          firstSearch: false,
         });
         Store.setSearchingIsOn(false);
         document.getElementById('react-tabs-3').scrollTop = 0; //we need to reset scroll to top once we perform search
         this.props.onFinishSearch(Store.current.searchResults);
       })
       .catch(e => {
-        this.setState({ searchError: e.message, isSearching: false });
+        this.setState({ searchError: e.message || e, isSearching: false });
         Store.setSearchingIsOn(false);
         this.props.onFinishSearch();
       });
   };
 
-  componentWillUpdate(nextProps, nextState) {
-    if (this.props.user && !nextProps.user) {
-      this.setState({
-        visibleInstances: this.props.instances.filter(inst => !inst.userId)
-      });
-    }
-  }
   componentWillReceiveProps(nextProps) {
-    if (this.state.datasource !== nextProps.datasource) {
-      this.setState({
-        datasource: nextProps.datasource
-      });
-    }
     if (this.state.firstSearch !== nextProps.firstSearch) {
       this.setState({ firstSearch: nextProps.firstSearch });
-    }
-    if (this.state.mapZoom !== nextProps.mapZoom) {
-      this.setState({ mapZoom: nextProps.mapZoom });
     }
   }
 
   setTimeFrom(e) {
-    this.setState({ query: { ...this.state.query, timeFrom: moment(e) } });
+    this.setState(oldState => {
+      let oldTimeTo = oldState.queryParams.timeTo;
+      if (DateUtils.isDayAfter(new Date(e), new Date(oldTimeTo))) {
+        oldTimeTo = DateUtils.addMonths(new Date(e), 1);
+      }
+      return {
+        queryParams: {
+          ...oldState.queryParams,
+          timeFrom: moment(e),
+          timeTo: moment(oldTimeTo),
+        },
+      };
+    });
   }
 
   setTimeTo(e) {
-    this.setState({ query: { ...this.state.query, timeTo: moment(e) } });
+    this.setState(oldState => {
+      let oldTimeFrom = oldState.queryParams.timeFrom;
+      if (DateUtils.isDayBefore(new Date(e), new Date(oldTimeFrom))) {
+        oldTimeFrom = DateUtils.addMonths(new Date(e), -1);
+      }
+      return {
+        queryParams: {
+          ...oldState.queryParams,
+          timeTo: moment(e),
+          timeFrom: moment(oldTimeFrom),
+        },
+      };
+    });
   }
 
-  changeUserInstance = async (e, userId) => {
-    const { value } = e.target;
-    if (value === DEFAULT_INSTANCE.name) {
-      const visibleInstances = this.props.instances.filter(
-        inst => !inst.userId
-      );
+  changeSelectedConfiguration = async e => {
+    const selectedConfiguration = e.target.value;
+
+    if (selectedConfiguration === NO_CONFIGURATION_SELECTED) {
       this.setState({
-        userInstance: value,
-        visibleInstances
+        selectedConfiguration: selectedConfiguration,
+        visibleDatasources: DATASOURCES,
+        selectedDatasources: PRESELECTED_DATASOURCES,
       });
-      visibleInstances &&
-        Store.setDatasources([
-          visibleInstances.find(inst => inst.name.includes('L1C')).name
-        ]);
-      return;
-    }
-    const instance = this.props.instances.find(inst => inst.name === value);
-    let cachedInstance = DS_CACHE[value];
-    if (!cachedInstance) {
+      Store.setDatasources(PRESELECTED_DATASOURCES.map(ds => ds.name));
+      this.updateCheckboxes(PRESELECTED_DATASOURCES);
+    } else {
+      const instance = this.props.instances.find(inst => inst.name === selectedConfiguration);
       const instData = await loadGetCapabilities(instance, true);
-      cachedInstance = instData;
+      const datasourcesUsedByConfiguration = instData
+        ? this.props.instances.filter(inst => instData.datasets.map(ds => ds.name).includes(inst.id))
+        : [];
+      this.setState(
+        {
+          selectedConfiguration: selectedConfiguration,
+          selectedCheckboxes: datasourcesUsedByConfiguration.map(ds => `ds-${ds.id}`),
+          selectedDatasources: datasourcesUsedByConfiguration,
+          visibleDatasources: datasourcesUsedByConfiguration,
+        },
+        Store.setDatasources(datasourcesUsedByConfiguration.map(ds => ds.name)),
+      );
+      this.updateCheckboxes(datasourcesUsedByConfiguration);
     }
-    const visibleInstances = cachedInstance
-      ? this.props.instances.filter(inst =>
-          cachedInstance.datasets.map(ds => ds.name).includes(inst.id)
-        )
-      : [];
-    this.setState(
-      {
-        userInstance: value,
-        visibleInstances,
-        selectedInstances: visibleInstances
-          ? visibleInstances.map(ds => ds.name)
-          : []
-      },
-      Store.setDatasources([value])
-    );
   };
 
   changeDSSelection = vals => {
-    this.setState({ selectedInstances: vals }, Store.setDatasources(vals));
+    // We are saving two things to state:
+    // - which checkboxes are checked (selectedCheckboxes), both for datasources and data source groups
+    // - which datasources are selected (they are checked and their data source group is checked)
+
+    const directlySelectedDatasources = DATASOURCES.filter(
+      ds => vals.includes(`ds-${ds.id}`) && vals.includes(`dsg-${ds.group}`),
+    );
+    const selectedDatasourceGroupsWithSingleDS = DATASOURCE_GROUPS.filter(
+      dsg => vals.includes(`dsg-${dsg.id}`) && DATASOURCES.filter(ds => ds.group === dsg.id).length === 1,
+    );
+    const selectedDatasourcesThroughGroups = DATASOURCES.filter(ds =>
+      selectedDatasourceGroupsWithSingleDS.find(dsg => dsg.id === ds.group),
+    );
+    const selectedDatasources = directlySelectedDatasources.concat(selectedDatasourcesThroughGroups);
+    this.setState(
+      {
+        selectedCheckboxes: vals,
+        selectedDatasources,
+      },
+      Store.setDatasources(selectedDatasources.map(ds => ds.name)),
+    );
   };
 
+  rememberDsgQueryParam(dsgId, parameterName, newValue) {
+    this.setState(oldState => {
+      const stateUpdate = {
+        dsgQueryParams: {
+          ...oldState.dsgQueryParams,
+        },
+      };
+      stateUpdate.dsgQueryParams[dsgId][parameterName] = newValue;
+      return stateUpdate;
+    });
+  }
+
+  renderFilter(filter, dsgId) {
+    const key = `${dsgId}-${filter}`;
+    const currentValue = this.state.dsgQueryParams[dsgId][filter];
+    switch (filter) {
+      case FILTER_CLOUD_COVERAGE_PERCENT:
+        return this.renderCloudCoverageFilter(key, dsgId, filter, currentValue);
+      default:
+        return <div key={key}>Filter rendering not implemented.</div>;
+    }
+  }
+
+  renderCloudCoverageFilter(key, dsgId, filter, currentValue) {
+    return (
+      <div key={key} className="filter cloudCoverage">
+        <label>Max. cloud coverage:</label>
+        <CCSlider
+          sliderWidth={120}
+          cloudCoverPercentage={currentValue}
+          onChange={value => {
+            this.rememberDsgQueryParam(dsgId, filter, value);
+          }}
+        />
+      </div>
+    );
+  }
+
+  renderDataSourceGroup(dataSourceGroup) {
+    const { selectedCheckboxes, visibleDatasources } = this.state;
+
+    const visibleDatasourcesWithinThisGroup = visibleDatasources.filter(
+      ds => ds.group === dataSourceGroup.id,
+    );
+    if (visibleDatasourcesWithinThisGroup.length === 0) {
+      return null;
+    }
+
+    return (
+      <div key={`dsg-${dataSourceGroup.id}`} className="dataSourceGroup">
+        <label
+          key={`checkbox-${dataSourceGroup.id}`}
+          title={
+            visibleDatasourcesWithinThisGroup.length === 1
+              ? visibleDatasourcesWithinThisGroup[0].search.tooltip
+              : ''
+          }
+        >
+          <Checkbox value={`dsg-${dataSourceGroup.id}`} />&nbsp;{dataSourceGroup.label}
+        </label>
+
+        {selectedCheckboxes.includes(`dsg-${dataSourceGroup.id}`) && (
+          <div>
+            {visibleDatasourcesWithinThisGroup.length > 1 && (
+              <div className="datasources">
+                {visibleDatasourcesWithinThisGroup.map(ds => (
+                  <label key={ds.id} title={ds.search.tooltip}>
+                    <Checkbox value={`ds-${ds.id}`} />&nbsp;{ds.search.label}
+                  </label>
+                ))}
+              </div>
+            )}
+
+            {dataSourceGroup.search.filters && (
+              <div className="filters">
+                {Object.keys(dataSourceGroup.search.filters).map(filter =>
+                  this.renderFilter(filter, dataSourceGroup.id),
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   render() {
-    let {
-      instances,
-      mapZoom,
-      datasources,
-      probaLayer,
-      probaLayers,
-      mainLoaded,
-      user,
-      isSearching: loading
-    } = this.props;
+    let { instances, mapZoom, datasourcesNames, mainLoaded, user, isSearching } = this.props;
     if (!instances) {
       return null;
     }
 
     const {
-      query,
-      selectedInstances,
+      queryParams,
+      selectedCheckboxes,
+      selectedDatasources,
       firstSearch,
-      userInstance,
-      visibleInstances
+      selectedConfiguration,
+      dsgQueryParams,
     } = this.state;
-    const userInstances = [
-      DEFAULT_INSTANCE,
-      ...instances.filter(inst => inst.userId)
-    ]; //at least on personal instance
-    let maxDate = moment();
-    let from = query.timeFrom.format('YYYY-MM-DD');
-    let to = query.timeTo.format('YYYY-MM-DD');
-    let zoomSmall = mapZoom < 5;
-    let preventSearch = loading || zoomSmall || selectedInstances.length === 0;
+    const userInstances = [{ name: NO_CONFIGURATION_SELECTED }, ...instances.filter(inst => inst.userId)]; //at least on personal instance
+
+    let from = queryParams.timeFrom.format('YYYY-MM-DD');
+    let to = queryParams.timeTo.format('YYYY-MM-DD');
+    const isAnyDatasourceSelected = selectedDatasources && selectedDatasources.length > 0;
+    const searchByArea = selectedDatasources.filter(ds => ds.search.searchableByArea).length > 0;
+    let zoomTooSmall = searchByArea && mapZoom < 5;
+    let preventSearch = isSearching || zoomTooSmall || !isAnyDatasourceSelected;
 
     return (
       <div className="searchForm">
         <div>
           {!mainLoaded && (
             <span
-              title="Some configurations are still loading"
+              title="Some configuration instances are still loading"
               style={{ float: 'right' }}
               children={<i className="fa fa-spinner fa-spin fa-fw" />}
             />
           )}
-          <b>Configurations</b>
-          {user &&
-            userInstances.length > 0 && (
-              <div style={{ margin: '0 0 10px' }}>
+          <div className="topLabel">
+            Configuration instance:
+            <a className="configurationsSettings" href={`${Store.getConfig.configuratorUrl}`}>
+              <i className="fa fa-cog" title="Manage configuration instances" />
+            </a>
+            {user ? (
+              <div>
                 <select
                   style={{ width: '100%' }}
-                  value={userInstance}
-                  onChange={this.changeUserInstance}
+                  value={selectedConfiguration}
+                  onChange={this.changeSelectedConfiguration}
                 >
                   {userInstances.map(inst => (
-                    <option value={inst.name}>{inst.name}</option>
+                    <option key={inst.name} value={inst.name}>
+                      {inst.name}
+                    </option>
                   ))}
                 </select>
               </div>
+            ) : (
+              <div>Login to use custom configuration instances.</div>
             )}
-          <div className="searchDatasourceSelect">
-            <CheckboxGroup
-              className="checkboxGroup"
-              name="defaultInstances"
-              value={selectedInstances}
-              onChange={this.changeDSSelection}
-            >
-              {visibleInstances.map((inst, i) => {
-                if (inst === undefined) return null;
-                const { name, tooltip = '' } = inst;
-                return (
-                  <label title={tooltip} key={i}>
-                    <Checkbox value={name} />
-                    {name}
-                  </label>
-                );
-              })}
-            </CheckboxGroup>
           </div>
-          <br />
+          <div className="topLabel">
+            Data sources:
+            <div className="searchDatasourceSelect">
+              <CheckboxGroup
+                className="checkboxGroup"
+                name="dataSourceGroups"
+                value={selectedCheckboxes}
+                onChange={this.changeDSSelection}
+              >
+                <div className="column">{DATASOURCE_GROUPS.map(dsg => this.renderDataSourceGroup(dsg))}</div>
+              </CheckboxGroup>
+            </div>
+          </div>
+          <div className="clear" />
         </div>
-        <div>
-          <label>Cloud coverage</label>
-          <input
-            type="number"
-            placeholder={20}
-            min={0}
-            max={100}
-            style={{ width: '60px', marginLeft: '5px' }}
-            defaultValue={query.cloudCoverPercentage}
-            onChange={e =>
-              this.setState(
-                { query: { ...query, cloudCoverPercentage: e.target.value } },
-                this.updateChangeListener
-              )
-            }
-          />{' '}
-          % <small>(where available)</small>
-          <br />
+
+        <div className="selectTimeRange">
+          <div className="topLabel">Time range:</div>
+          <DayPicker
+            onSelect={e => this.setTimeFrom(e)}
+            selectedDay={from}
+            datasource={datasourcesNames[0]}
+            searchAvailableDays={false}
+            alignment={'lt'}
+          />
+
+          <span className="datePickerSeparator">-</span>
+          <DayPicker
+            onSelect={e => this.setTimeTo(e)}
+            selectedDay={to}
+            datasource={datasourcesNames[0]}
+            searchAvailableDays={false}
+            alignment={'rt'}
+          />
         </div>
-        <label>Select time range</label>
-        <DatePicker
-          key="dateFrom"
-          ref="dateFrom"
-          className="inlineDatepicker"
-          maxDate={maxDate}
-          onNavClick={(from, to) =>
-            queryActiveMonth({ from, to, datasource: datasources[0] })
-          }
-          defaultValue={from}
-          onExpand={() => queryActiveMonth({ singleDate: from, datasource: datasources[0] })}
-          onSelect={e => this.setTimeFrom(e)}
-        />
-        <span className="datePickerSeparator">-</span>
-        <DatePicker
-          key="dateTo"
-          ref="dateTo"
-          maxDate={maxDate}
-          onNavClick={(from, to) =>
-            queryActiveMonth({ from, to, datasource: datasources[0] })
-          }
-          defaulValue={to}
-          onExpand={() => queryActiveMonth({ singleDate: to, datasource: datasources[0] })}
-          className="inlineDatepicker move"
-          onSelect={e => this.setTimeTo(e)}
-        />
-        <br />
+
         <Button
           onClick={() => {
             if (preventSearch) return;
             this.setState({ firstSearch: false });
             this.doSearch(
-              query
+              selectedDatasources,
+              queryParams.timeFrom,
+              queryParams.timeTo,
+              dsgQueryParams,
+              selectedConfiguration,
             );
           }}
           disabled={preventSearch}
-          loading={loading}
+          loading={isSearching}
           fluid
           text="Search"
         />
-        {zoomSmall &&
-          !this.props.loading && (
-            <NotificationPanel msg={`Zoom in to query`} type="error" />
-          )}
-        {this.props.error && (
-          <NotificationPanel
-            msg={`An error occurred: ${this.props.error}`}
-            type="error"
-          />
-        )}
-        {this.props.empty &&
+        {!isAnyDatasourceSelected ? (
+          <NotificationPanel msg={`Select data source`} type="error" />
+        ) : zoomTooSmall && !this.props.loading ? (
+          <NotificationPanel msg={`Zoom in to query`} type="error" />
+        ) : this.props.error ? (
+          <NotificationPanel msg={`An error occurred: ${this.props.error}`} type="error" />
+        ) : this.state.searchError ? (
+          <NotificationPanel msg={`A search error occurred: ${this.state.searchError}`} type="error" />
+        ) : zoomTooSmall && !this.props.loading ? (
+          <NotificationPanel msg={`Zoom in to query`} type="error" />
+        ) : this.props.error ? (
+          <NotificationPanel msg={`An error occurred: ${this.props.error}`} type="error" />
+        ) : this.state.searchError ? (
+          <NotificationPanel msg={`A search error occurred: ${this.state.searchError}`} type="error" />
+        ) : (
+          this.props.empty &&
           !this.props.loading &&
-          !firstSearch && (
-            <NotificationPanel
-              msg="No results found. Try with different parameters."
-              type="info"
-            />
-          )}
-        {!isEmpty(probaLayers) && (
-          <ProbaLayer
-            zoom={mapZoom}
-            probaLayer={probaLayer}
-            probaLayers={probaLayers}
-            onChange={Store.setProbaParams}
-          />
+          !isSearching &&
+          !firstSearch &&
+          this.props.wasSearchPerformed && (
+            <NotificationPanel msg="No results found - try different parameters" type="info" />
+          )
         )}
       </div>
     );
   }
 }
 
-export default connect(store => store)(SearchForm);
+const mapStoreToProps = store => ({
+  instances: store.instances,
+  datasourcesNames: store.datasources,
+  loading: store.loading,
+  error: store.error,
+  user: store.user,
+  mapZoom: store.zoom,
+  mainLoaded: store.mainLoaded,
+  isSearching: store.isSearching,
+  empty: Object.keys(store.searchResults).reduce((prevValue, datasource) => {
+    if (!prevValue) {
+      return false; // already known to be non-empty
+    }
+    return store.searchResults[datasource].length === 0;
+  }, true),
+  wasSearchPerformed: Object.keys(store.searchResults).length > 0,
+});
+export default connect(mapStoreToProps)(SearchForm);

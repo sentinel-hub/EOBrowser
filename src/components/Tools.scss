@@ -1,19 +1,15 @@
 @import '../variables';
-@import 'DatePicker';
 
 #tools {
-  position: absolute;
-  left: 10px;
-  top: 10px;
   background: $mainLight;
   z-index: 1;
-  width: $toolsWidth;
   color: $textColor;
-  box-shadow: 0 2px 5px #000;
   transition: all ease $toolsTransitionSpeed;
+  display: flex;
+  flex-direction: column;
 
-  &.hidden {
-    margin-left: -120%;
+  div.react-tabs.ReactTabs {
+    flex-grow: 1;
   }
 
   footer {
@@ -60,7 +56,6 @@
   .layerDatasourcePicker a {
     display: block;
     color: #ddd;
-    opacity: 0.5;
     font-size: 13px;
     padding-left: 65px;
     padding-top: 10px;
@@ -83,18 +78,23 @@
       border: 3px solid transparent;
     }
     &:hover {
-      opacity: 0.8;
+      color: #fff;
+      background-color: #434554;
+      small {
+        color: #fff;
+      }
     }
     &.active:hover,
     &.active {
-      color: #fff;
+      color: #B6BF00;
       opacity: 1;
+      border-right: solid 4px #B6BF00;
 
       .icon {
-        border: 3px solid $primaryCol;
+        border: 3px solid #B6BF00;
       }
       small {
-        color: #eee;
+        color: #B6BF00;
       }
     }
     small {
@@ -157,9 +157,9 @@
     cursor: grab;
   }
   &.gu-mirror {
-    color: #fff; 
-    background: $mainDark; 
-    box-shadow: 0 3px 5px #000; 
+    color: #fff;
+    background: $mainDark;
+    box-shadow: 0 3px 5px #000;
     cursor: -webkit-grabbing !important;
   }
   & > div:first-child {
@@ -231,6 +231,7 @@
 }
 .tab-panel,
 .ReactTabs__TabPanel {
+  min-height: 450px;
   overflow: auto;
 }
 
@@ -290,7 +291,6 @@
   color: #fff;
   border-bottom: 1px solid $primaryCol;
   padding-bottom: 10px;
-  text-transform: uppercase;
 
   .timelapsePreviewBox {
     position: fixed;
@@ -437,11 +437,11 @@ div.rc-slider {
   /*left: auto;*/
   /*right: 80px;*/
 }
-#toggleSettings {
+.toggleSettings {
   display: block;
   position: absolute;
-  left: 20px;
-  top: 16px;
+  left: 10px;
+  top: 14px;
   color: #fff;
   background: $mainMedium;
   border-radius: 40px;
@@ -450,17 +450,12 @@ div.rc-slider {
   z-index: 2;
   transition: all ease 0.4s;
 
-  &.hidden {
-    left: 16px;
-    top: 11px;
-  }
-
   i {
     margin: 5px;
     display: block;
     width: 24px;
     height: 24px;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 24px;
     transition: all ease 0.4s;
   }
@@ -479,24 +474,10 @@ div.rc-slider {
     line-height: 40px;
   }
 }
-@media screen and (max-width: 1100px) {
-  #searchBox {
-    /*top: 66px;*/
-  }
-}
-
 @media screen and (max-width: 700px) {
-  #tools {
-    /*width: calc(100% - 80px);*/
-    width: calc(100% - 72px);
-  }
   .floatItem {
     z-index: 1;
     box-shadow: none;
-    /*top: 76px;*/
-    /*left: auto;*/
-    /*right: 10px;*/
-    border: 1px solid $mainMedium;
     & > i {
       cursor: pointer;
     }
@@ -521,43 +502,10 @@ div.rc-slider {
       padding: 2px 5px;
       box-shadow: 0 2px 10px #000;
     }
-    .cloudHolder {
-      left: auto;
-      right: 15px;
-      box-shadow: 0 2px 10px #000;
-    }
-  }
-  #dateFloat {
-    margin-top: 40px;
-  }
-  #cloudFloat {
-    margin-left: auto;
-    margin-top: 90px;
   }
   #searchBox {
-    /*left: auto;*/
-    /*z-index: 2;*/
-    /*right: 12px;*/
-    /*top: 70px;*/
-  }
-
-  .tabs-menu > li > a > * {
-    display: inline-block;
-    vertical-align: middle;
-    font-size: 15px;
-    margin-right: 5px;
-  }
-  .colorsContainer div {
-    width: 30px;
-    height: 30px;
-    margin: 5px;
-    line-height: 30px;
-  }
-  .colHolder,
-  .colHolder div {
-    width: 35px;
-    height: 35px;
-    line-height: 35px;
+    left: auto;
+    z-index: 2;
   }
 }
 @media screen and (min-width: 700px) {

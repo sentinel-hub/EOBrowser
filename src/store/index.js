@@ -3,12 +3,7 @@ import values from 'lodash/values';
 import isEmpty from 'lodash/isEmpty';
 import merge from 'lodash/merge';
 import URI from 'urijs';
-import {
-  calcBboxFromXY,
-  getPixelSize,
-  getNativeRes,
-  roundDegrees
-} from '../utils/coords';
+import { calcBboxFromXY, getPixelSize, getNativeRes, roundDegrees, getMapDOMSize } from '../utils/coords';
 import { combineEpics } from 'redux-observable';
 import { createEpicMiddleware } from 'redux-observable';
 import initialState from './config';
@@ -20,7 +15,7 @@ import {
   b64EncodeUnicode,
   isScriptFromLayers,
   evalSourcesMap,
-  isCustomPreset
+  isCustomPreset,
 } from '../utils/utils';
 
 import request from 'axios';
@@ -54,22 +49,20 @@ const SET_MAXCC = 'SET_MAXCC',
   SET_RESOLUTION = 'SET_RESOLUTION',
   SET_PRESETS = 'SET_PRESETS',
   SET_FIS_SHADOW_LAYERS = 'SET_FIS_SHADOW_LAYERS',
-  SET_PROBA = 'SET_PROBA',
+  SET_CLOUD_COVERAGE_LAYERS = 'SET_CLOUD_COVERAGE_LAYERS',
   SET_USER = 'SET_USER',
-  SET_PROBA_LAYERS = 'SET_PROBA_LAYERS',
   SET_MAP_BOUNDS = 'SET_MAP_BOUNDS',
   SET_ATM_FILTER = 'SET_ATM_FILTER',
   SET_AOI_BOUNDS = 'SET_AOI_BOUNDS',
+  SET_POI = 'SET_POI',
   SET_IS_CLIPPING = 'SET_IS_CLIPPING',
   SET_EVAL_SCRIPT = 'SET_EVAL_SCRIPT',
-  SET_AVAILABLE_DAYS = 'SET_AVAILABLE_DAYS',
   SET_START_LOC = 'SET_START_LOC',
   SET_GAIN = 'SET_GAIN',
   SET_GAMMA = 'SET_GAMMA',
   SET_LAT = 'SET_LAT',
   SET_LNG = 'SET_LNG',
   SET_ZOOM = 'SET_ZOOM',
-  SET_SIZE = 'SET_SIZE',
   GENERATE_IMAGE_LINK = 'GENERATE_IMAGE_LINK',
   REFRESH = 'REFRESH',
   IS_SEARCHING = 'IS_SEARCHING',
@@ -81,6 +74,8 @@ const SET_MAXCC = 'SET_MAXCC',
   SET_COMPARE_MODE_TYPE = 'SET_COMPARE_MODE_TYPE',
   SET_FILTER_RESULTS = 'SET_FILTER_RESULTS',
   SET_SELECTED_RESULT = 'SET_SELECTED_RESULT',
+  ADD_MODAL_DIALOG = 'ADD_MODAL_DIALOG',
+  REMOVE_MODAL_DIALOG = 'REMOVE_MODAL_DIALOG',
   ADD_PIN_RESULT = 'ADD_PIN_RESULT',
   CHANGE_PIN_ORDER = 'CHANGE_PIN_ORDER',
   TOGGLE_ACTIVE_LAYER = 'TOGGLE_ACTIVE_LAYER',
@@ -97,7 +92,7 @@ const Reducers = {
     lat,
     lng,
     zoom,
-    updatePosition: update
+    updatePosition: update,
   }),
   SET_DATE: dateTo => ({ dateTo }),
   SET_PREV_DATE: prevDate => ({ prevDate }),
@@ -108,21 +103,19 @@ const Reducers = {
   SET_PRESET: setPreset,
   SET_PRESETS: setPresets,
   SET_FIS_SHADOW_LAYERS: setFisShadowLayers,
+  SET_CLOUD_COVERAGE_LAYERS: setCloudCoverageLayer,
   SET_CURR_VIEW: setCurrentView,
   SET_EVAL_URL: setEvalUrl,
   SET_EVAL_MODE: isEvalUrl => ({ isEvalUrl }),
   SET_USER_INSTANCES: userInstances => ({ userInstances }),
   SET_MAP_BOUNDS: setBoundsAdSquarePerMeter,
-  SET_AVAILABLE_DAYS: availableDays => ({ availableDays }),
   SET_EVAL_SCRIPT: setEvalscript,
   SET_CHANNELS: setChannels,
   SET_START_LOC: startLocation => ({ startLocation }),
   SET_BASE64_URLS: base64Urls => ({ base64Urls }),
   SET_ANALYTICAL: setAnalytical,
   SET_LAYERS: setLayers,
-  SET_PROBA: proba => ({ proba }),
   SET_LOGO: showLogo => ({ showLogo }),
-  SET_PROBA_LAYERS: probaLayers => ({ probaLayers }),
   SET_LAT: lat => ({ lat }),
   SET_LNG: lng => ({ lng }),
   SET_INSTANCES: instances => ({ instances, mainLoaded: true }),
@@ -130,15 +123,17 @@ const Reducers = {
   SET_USER: user => ({ user }),
   SET_ZOOM: zoom => ({ zoom }),
   SET_TAB_INDEX: mainTabIndex => ({ mainTabIndex, isActiveLayerVisible: true }),
-  SET_SIZE: size => ({ size }),
   SET_COMPARE_MODE: compareMode => ({ compareMode }),
   SET_COMPARE_MODE_TYPE: compareModeType => ({ compareModeType }),
   SET_CURRENT_DATE: currentDate => ({ currentDate }),
   TOGGLE_ACTIVE_LAYER: isActiveLayerVisible => ({ isActiveLayerVisible }),
   SET_AOI_BOUNDS: aoiBounds => ({ aoiBounds }),
+  SET_POI: poi => ({ poi }),
   SET_IS_CLIPPING: isAoiClip => ({ isAoiClip }),
   GENERATE_IMAGE_LINK: generateImageLink,
   SET_PATH: updatePath,
+  ADD_MODAL_DIALOG: addModalDialog,
+  REMOVE_MODAL_DIALOG: removeModalDialog,
   ADD_PIN_RESULT: addPinResult,
   CHANGE_PIN_ORDER: changePinOrder,
   SET_CLOUDCOR: setCloudCor,
@@ -157,18 +152,17 @@ const Reducers = {
   SET_FILTER_RESULTS: searchFilterResults => ({ searchFilterResults }),
   SET_SELECTED_RESULT: setSelectedResult,
   SET_SEARCH_RESULTS: setSearchResults,
-  CLEAR_SEARCH_RESULTS: clearSearchResults
+  CLEAR_SEARCH_RESULTS: clearSearchResults,
 };
 
 const DoesNeedRefresh = [
   SET_PRESET,
   SET_LAYERS,
-  SET_PROBA,
   SET_SELECTED_RESULT,
   SET_GAIN,
   SET_GAMMA,
   REFRESH,
-  SET_ATM_FILTER
+  SET_ATM_FILTER,
 ];
 const DoRefreshUrl = [
   REFRESH,
@@ -183,12 +177,12 @@ const DoRefreshUrl = [
   SET_SELECTED_RESULT,
   SET_GAIN,
   SET_GAMMA,
-  SET_ATM_FILTER
+  SET_ATM_FILTER,
 ];
 
 function setChannels(datasource, channels) {
   return {
-    channels: merge(this.channels, { [datasource]: channels })
+    channels: merge(this.channels, { [datasource]: channels }),
   };
 }
 
@@ -196,40 +190,44 @@ function setAnalytical(isAnalytical) {
   return {
     imageFormat: isAnalytical ? this.imageFormat : this.imageFormats[0].value,
     imageExt: isAnalytical ? this.imageExt : this.imageFormats[0].ext,
-    isAnalytical
+    isAnalytical,
   };
 }
 
 function setPresets(datasource, presets) {
   return {
-    presets: merge(this.presets, { [datasource]: presets })
+    presets: merge(this.presets, { [datasource]: presets }),
   };
 }
 function setFisShadowLayers(datasource, fisShadowLayers) {
   return {
-    fisShadowLayers: merge(this.fisShadowLayers, { [datasource]: fisShadowLayers })
+    fisShadowLayers: merge(this.fisShadowLayers, {
+      [datasource]: fisShadowLayers,
+    }),
+  };
+}
+function setCloudCoverageLayer(datasource, cloudCoverageLayers) {
+  return {
+    cloudCoverageLayers: merge(this.cloudCoverageLayers, {
+      [datasource]: cloudCoverageLayers,
+    }),
   };
 }
 function setCurrentView(currView) {
   return {
-    currView
+    currView,
   };
 }
 function setSelectedResult(result) {
   if (result === null) {
     return { selectedResult: null };
   }
-  const {
-    datasource,
-    layers,
-    evalscripturl,
-    evalscript,
-    preset: defaultPreset
-  } = result;
+  const { datasource, layers, evalscripturl, evalscript, preset: defaultPreset } = result;
+
   const instance = this.instances.find(inst => inst.name === datasource) || {};
   const preset = defaultPreset || this.presets[datasource][0].id;
   let startLayers = null;
-  if (this.channels[datasource]) {
+  if (this.channels[datasource] && this.channels[datasource].length > 0) {
     startLayers = {
       r: datasource.includes('Sentinel-1')
         ? this.channels[datasource][0].name
@@ -239,28 +237,24 @@ function setSelectedResult(result) {
         : this.channels[datasource][1].name,
       b: datasource.includes('Sentinel-1')
         ? this.channels[datasource][0].name
-        : this.channels[datasource][2].name
+        : this.channels[datasource][2].name,
     };
   }
   const layersObj = layers && preset === 'CUSTOM' ? layers : startLayers;
-  const defaultEvalscript = b64EncodeUnicode(
-    'return [' + getMultipliedLayers(layersObj) + '];'
-  );
+  const defaultEvalscript = b64EncodeUnicode('return [' + getMultipliedLayers(layersObj) + '];');
   const selectedResult = {
     ...instance,
     preset,
-
     evalscripturl,
     ...result,
-    evalscript:
-      !evalscript || evalscript === '' ? defaultEvalscript : evalscript,
+    evalscript: !evalscript || evalscript === '' ? defaultEvalscript : evalscript,
     layers: layersObj,
-    typename: instance.typename
+    typename: instance.typename,
   };
   const currView = getCurrView(layers, evalscript);
   return {
     selectedResult,
-    currView
+    currView,
   };
 }
 function getCurrView(layers, evalscript) {
@@ -268,10 +262,7 @@ function getCurrView(layers, evalscript) {
     if (!layers) {
       return '3';
     }
-    if (
-      evalscript !==
-      b64EncodeUnicode('return [' + getMultipliedLayers(layers) + '];')
-    ) {
+    if (evalscript !== b64EncodeUnicode('return [' + getMultipliedLayers(layers) + '];')) {
       return '3';
     }
   }
@@ -280,33 +271,27 @@ function getCurrView(layers, evalscript) {
 function setPreset(preset) {
   const isCustom = preset === 'CUSTOM';
   const { layers, evalscript } = this.selectedResult || {};
-  const isESFromLayers =
-    b64EncodeUnicode('return [' + getMultipliedLayers(layers) + '];') ===
-    evalscript;
-  const currView = isCustom
-    ? isESFromLayers ? this.views.BANDS : this.views.SCRIPT
-    : this.views.PRESETS;
+  const isESFromLayers = b64EncodeUnicode('return [' + getMultipliedLayers(layers) + '];') === evalscript;
+  const currView = isCustom ? (isESFromLayers ? this.views.BANDS : this.views.SCRIPT) : this.views.PRESETS;
   return {
     currView,
-    selectedResult: { ...this.selectedResult, preset }
+    selectedResult: { ...this.selectedResult, preset },
   };
 }
 function setEvalUrl(evalscripturl) {
   return {
     selectedResult: { ...this.selectedResult, evalscripturl },
-    currView: this.views.SCRIPT
+    currView: this.views.SCRIPT,
   };
 }
 function setEvalscript(evalscript) {
   return {
     selectedResult: { ...this.selectedResult, evalscript },
-    currView: this.views.SCRIPT
+    currView: this.views.SCRIPT,
   };
 }
 function setLayers(layers) {
-  const evalscript = b64EncodeUnicode(
-    'return [' + getMultipliedLayers(layers) + '];'
-  );
+  const evalscript = b64EncodeUnicode('return [' + getMultipliedLayers(layers) + '];');
   return { selectedResult: { ...this.selectedResult, evalscript, layers } };
 }
 
@@ -331,7 +316,23 @@ function changePinOrder(oldIndex, newIndex) {
   nextState.splice(newIndex, 0, oldPin);
   syncPinsWithLocalStorage(nextState);
   return {
-    pinResults: nextState
+    pinResults: nextState,
+  };
+}
+function addModalDialog(id, component) {
+  return {
+    modalDialogs: [
+      ...this.modalDialogs,
+      {
+        id,
+        component,
+      },
+    ],
+  };
+}
+function removeModalDialog(id) {
+  return {
+    modalDialogs: this.modalDialogs.filter(tc => tc.id !== id),
   };
 }
 function addPinResult(item) {
@@ -342,7 +343,7 @@ function addPinResult(item) {
   });
   syncPinsWithLocalStorage(pinResults);
   return {
-    pinResults
+    pinResults,
   };
 }
 function removePin(index) {
@@ -350,7 +351,7 @@ function removePin(index) {
   syncPinsWithLocalStorage(result);
 
   return {
-    pinResults: result
+    pinResults: result,
   };
 }
 function clearPins() {
@@ -359,7 +360,7 @@ function clearPins() {
   syncPinsWithLocalStorage(result);
 
   return {
-    pinResults: result
+    pinResults: result,
   };
 }
 function setPinOpacity(index, value) {
@@ -370,15 +371,14 @@ function setPinOpacity(index, value) {
       }
       return {
         ...pin,
-        opacity: value
+        opacity: value,
       };
-    })
+    }),
   };
 }
 function setBoundsAdSquarePerMeter(bounds, pixelBounds) {
   const equatorLength = 40075016.685578488;
-  const unitsToMetersRatio =
-    360 / (equatorLength * Math.cos(this.lat * Math.PI / 180));
+  const unitsToMetersRatio = 360 / (equatorLength * Math.cos(this.lat * Math.PI / 180));
   const bboxH = bounds._northEast.lat - bounds._southWest.lat;
   const bboxW = bounds._northEast.lng - bounds._southWest.lng;
   const res = getNativeRes();
@@ -388,21 +388,13 @@ function setBoundsAdSquarePerMeter(bounds, pixelBounds) {
   return {
     mapBounds: bounds,
     mapGeometry,
-    squaresPerMtr: [Math.ceil(imageWidth), Math.ceil(imageHeight)]
+    squaresPerMtr: [Math.ceil(imageWidth), Math.ceil(imageHeight)],
   };
 }
 
 function updatePath() {
   if (!this.mainLoaded) return;
-  const {
-    lat,
-    lng,
-    zoom,
-    selectedResult,
-    isActiveLayerVisible,
-    isEvalUrl,
-    mainTabIndex
-  } = this;
+  const { lat, lng, zoom, selectedResult, isActiveLayerVisible, isEvalUrl, mainTabIndex } = this;
   let params = [];
   params.push(`lat=${roundDegrees(lat, zoom)}`);
   params.push(`lng=${roundDegrees(lng, zoom)}`);
@@ -419,7 +411,7 @@ function updatePath() {
       evalscripturl,
       layers,
       preset,
-      activeLayer
+      activeLayer,
     } = selectedResult;
     params.push(`time=${time}`);
     params.push(`preset=${preset}`);
@@ -449,8 +441,8 @@ function setActiveBaseLayer(name, minmax) {
   return {
     activeBaseLayer: {
       name: name,
-      minmax: { min: minmax.min, max: minmax.max }
-    }
+      minmax: { min: minmax.min, max: minmax.max },
+    },
   };
 }
 
@@ -458,7 +450,7 @@ function setSearchResults(results, datasource, returnParams) {
   return {
     isSearching: false,
     searchResults: { ...this.searchResults, [datasource]: results },
-    searchParams: { ...this.searchParams, [datasource]: returnParams }
+    searchParams: { ...this.searchParams, [datasource]: returnParams },
   };
 }
 
@@ -466,23 +458,13 @@ function clearSearchResults() {
   return {
     isSearching: false,
     searchResults: {},
-    searchParams: {}
+    searchParams: {},
   };
 }
 
 function generateImageLink() {
   const {
-    selectedResult: {
-      datasource,
-      preset,
-      evalscript,
-      evalscripturl,
-      gain,
-      gamma,
-      atmFilter,
-      layers,
-      time
-    },
+    selectedResult: { datasource, preset, evalscript, evalscripturl, gain, gamma, atmFilter, layers, time },
     showLogo,
     instances,
     imageExt,
@@ -490,7 +472,7 @@ function generateImageLink() {
     isEvalUrl,
     resolution,
     imageFormat,
-    aoiBounds
+    aoiBounds,
   } = this;
   const isJp2 = imageFormat.includes('jp2');
   const isKMZ = imageFormat.includes('application');
@@ -498,39 +480,30 @@ function generateImageLink() {
   const isPngJpg = ['jpg', 'png'].includes(imageExt);
   const { width: imageW, height: imageH } = getPixelSize();
   const isScript = !isScriptFromLayers(evalscript, layers);
-  const url = new URI(`${activeLayer.baseUrl}?SERVICE=WMS&REQUEST=GetMap`);
+  const url = new URI(`${activeLayer.baseUrls.WMS}?SERVICE=WMS&REQUEST=GetMap`);
 
   // build url
   url.addQuery('SHOWLOGO', showLogo && !isPngJpg);
   url.addQuery('MAXCC', 100);
   url.addQuery('TIME', `${time}/${time}`);
   url.addQuery('CRS', this.selectedCrs);
-  url.addQuery(
-    'FORMAT',
-    imageFormat.includes('jpg') ? 'image/jpeg' : imageFormat
-  );
+  url.addQuery('FORMAT', imageFormat.includes('jpg') ? 'image/jpeg' : imageFormat);
 
   if (aoiBounds) {
     if (this.selectedCrs === 'EPSG:4326') {
       const wgsCoords = {
         geometry: {
           type: 'Polygon',
-          coordinates: [
-            aoiBounds.geometry.coordinates[0].map(coord => [coord[1], coord[0]])
-          ]
-        }
+          coordinates: [aoiBounds.geometry.coordinates[0].map(coord => [coord[1], coord[0]])],
+        },
       };
       const wgsGeom = new Terraform.Primitive(cloneDeep(wgsCoords.geometry));
       url.addQuery('GEOMETRY', WKT.convert(wgsGeom));
     } else {
-      const mercGeom = new Terraform.Primitive(
-        cloneDeep(aoiBounds.geometry)
-      ).toMercator();
+      const mercGeom = new Terraform.Primitive(cloneDeep(aoiBounds.geometry)).toMercator();
       url.addQuery('GEOMETRY', WKT.convert(mercGeom));
     }
-    const mercGeom = new Terraform.Primitive(
-      cloneDeep(aoiBounds.geometry)
-    ).toMercator();
+    const mercGeom = new Terraform.Primitive(cloneDeep(aoiBounds.geometry)).toMercator();
     url.addQuery('GEOMETRY', WKT.convert(mercGeom));
   } else {
     url.addQuery('BBOX', getBbox(this));
@@ -541,35 +514,24 @@ function generateImageLink() {
 
   if (isCustomPreset(preset)) {
     url.addQuery('EVALSCRIPT', evalscript);
-    evalscripturl !== '' &&
-      isEvalUrl &&
-      url.addQuery('EVALSCRIPTURL', evalscripturl);
+    evalscripturl !== '' && isEvalUrl && url.addQuery('EVALSCRIPTURL', evalscripturl);
 
     isScript && url.addQuery('EVALSCRIPT', evalscript);
     evalscripturl !== '' && isEvalUrl && url.addQuery('EVALSCRIPT', evalscript);
     url.addQuery('EVALSOURCE', evalSourcesMap[datasource]);
   }
-  url.addQuery(
-    'LAYERS',
-    preset === 'CUSTOM' ? this.presets[datasource][0].id : preset
-  );
+  url.addQuery('LAYERS', preset === 'CUSTOM' ? this.presets[datasource][0].id : preset);
 
   if (datasource.includes('EW') && preset.includes('NON_ORTHO')) {
     url.addQuery('ORTHORECTIFY', false);
   }
-  const imageSizeW = isAnalytical
-    ? Math.round(imageW / resolution)
-    : aoiBounds ? imageW : this.size[0];
-  const imageSizeH = isAnalytical
-    ? Math.round(imageH / resolution)
-    : aoiBounds ? imageH : this.size[1];
+  const mapDOMSize = getMapDOMSize();
+  const imageSizeW = isAnalytical ? Math.round(imageW / resolution) : aoiBounds ? imageW : mapDOMSize.width;
+  const imageSizeH = isAnalytical ? Math.round(imageH / resolution) : aoiBounds ? imageH : mapDOMSize.height;
   url.addQuery('WIDTH', imageSizeW);
   url.addQuery('HEIGHT', imageSizeH);
   if (isPngJpg || isKMZ) {
-    url.addQuery(
-      'NICENAME',
-      `${datasource} from ${time}.${isKMZ ? 'kmz' : imageExt}`
-    );
+    url.addQuery('NICENAME', `${datasource} from ${time}.${isKMZ ? 'kmz' : imageExt}`);
     url.addQuery('TRANSPARENT', imageFormat.includes('png') ? 0 : 1);
     url.addQuery('BGCOLOR', '00000000');
     // const browserUrl = url
@@ -582,15 +544,10 @@ function generateImageLink() {
     //   imageH: imageSizeH
     // };
   } else {
-    url.addQuery(
-      'NICENAME',
-      `${datasource} from ${time}.${isJp2 ? 'jp2' : 'tiff'}`
-    );
+    url.addQuery('NICENAME', `${datasource} from ${time}.${isJp2 ? 'jp2' : 'tiff'}`);
     url.addQuery(
       'COVERAGE',
-      preset[datasource] === 'CUSTOM'
-        ? values(layers[datasource]).join(',')
-        : preset[datasource]
+      preset[datasource] === 'CUSTOM' ? values(layers[datasource]).join(',') : preset[datasource],
     );
   }
   const finalUrl = url
@@ -600,7 +557,7 @@ function generateImageLink() {
   return {
     imgWmsUrl: finalUrl,
     imageW: imageSizeW,
-    imageH: imageSizeH
+    imageH: imageSizeH,
   };
 }
 
@@ -615,12 +572,12 @@ function createPolygonFromBounds(latLngBounds) {
   latlngs.push(latLngBounds.getNorthEast()); //top right
   latlngs.push({
     lat: latLngBounds.getNorth(),
-    lng: latLngBounds.getCenter().lng
+    lng: latLngBounds.getCenter().lng,
   }); //top center
   latlngs.push(latLngBounds.getNorthWest()); //top left
   latlngs.push({
     lat: latLngBounds.getCenter().lat,
-    lng: latLngBounds.getWest()
+    lng: latLngBounds.getWest(),
   }); //center left
 
   return new L.polygon(latlngs).toGeoJSON();
@@ -656,12 +613,9 @@ function refreshPath(actions) {
 
 function reducer(currentState, action) {
   if (Reducers[action.type]) {
-    return Object.assign(
-      {},
-      currentState,
-      Reducers[action.type].call(currentState, ...action.args),
-      { action }
-    );
+    return Object.assign({}, currentState, Reducers[action.type].call(currentState, ...action.args), {
+      action,
+    });
   }
   return currentState; // DO NOTHING IF NO MATCH
 }
@@ -670,11 +624,9 @@ const store = createStore(
   reducer,
   initialState,
   compose(
-    applyMiddleware(
-      createEpicMiddleware(combineEpics(mustRefresh, refreshPath))
-    ),
-    window.devToolsExtension ? window.devToolsExtension() : f => f
-  )
+    applyMiddleware(createEpicMiddleware(combineEpics(mustRefresh, refreshPath))),
+    window.devToolsExtension ? window.devToolsExtension() : f => f,
+  ),
 );
 
 if (window.devToolsExtension) {
@@ -687,11 +639,11 @@ function action(x) {
   };
 }
 
-
 const selectedConfig = {
   cliendId: process.env.REACT_APP_CLIENTID,
   redirect: process.env.REACT_APP_REDIRECT,
-  baseUrl: process.env.REACT_APP_BASEURL
+  baseUrl: process.env.REACT_APP_BASEURL,
+  configuratorUrl: process.env.REACT_APP_CONFIGURATORURL,
 };
 const callbackUrl = selectedConfig.redirect;
 const baseOauthURL = selectedConfig.baseUrl;
@@ -703,7 +655,7 @@ const oauth = new ClientOAuth2({
   clientId: selectedConfig.cliendId,
   accessTokenUri: baseOauthURL + 'oauth/token',
   authorizationUri: baseOauthURL + 'oauth/auth',
-  redirectUri: `${callbackUrl}oauthCallback.html`
+  redirectUri: `${callbackUrl}oauthCallback.html`,
 });
 
 function getTokenFromLC(throwErrors = false) {
@@ -745,7 +697,7 @@ function logout() {
   return new Promise((resolve, reject) => {
     request
       .get(baseOauthURL + 'oauth/logout', {
-        withCredentials: true
+        withCredentials: true,
       })
       .then(res => {
         localStorage.removeItem(LC_NAME);
@@ -790,7 +742,6 @@ export default {
   setDateFrom: action(SET_MIN_DATE),
   setDatasource: action(SET_DATASOURCE),
   setDatasources: action(SET_DATASOURCES),
-  setAvailableDates: action(SET_AVAILABLE_DAYS),
   setIsClipping: action(SET_IS_CLIPPING),
   setCurrentView: action(SET_CURR_VIEW),
   setChannels: action(SET_CHANNELS),
@@ -798,13 +749,10 @@ export default {
   setLat: action(SET_LAT),
   setLng: action(SET_LNG),
   setZoom: action(SET_ZOOM),
-  setSize: action(SET_SIZE),
   setTabIndex: action(SET_TAB_INDEX),
   toggleActiveLayer: action(TOGGLE_ACTIVE_LAYER),
   generateImageLink: action(GENERATE_IMAGE_LINK),
   setActiveBaseLayer: action(SET_ACTIVE_BASE_LAYER),
-  setProbaParams: action(SET_PROBA),
-  setProbaLayers: action(SET_PROBA_LAYERS),
   setSearchingIsOn: action(IS_SEARCHING),
   setSearchResults: action(SET_SEARCH_RESULTS),
   clearSearchResults: action(CLEAR_SEARCH_RESULTS),
@@ -817,6 +765,8 @@ export default {
   clearPins: action(CLEAR_PINS),
   removePin: action(REMOVE_PIN),
   setPinOpacity: action(SET_PIN_OPACITY),
+  addModalDialog: action(ADD_MODAL_DIALOG),
+  removeModalDialog: action(REMOVE_MODAL_DIALOG),
   addPinResult: action(ADD_PIN_RESULT),
   changePinOrder: action(CHANGE_PIN_ORDER),
   showLogin: action(SHOW_LOGIN),
@@ -824,6 +774,7 @@ export default {
   setSelectedCrs: action(SET_SELECTED_CRS),
   setImageFormat: action(SET_IMAGE_FORMAT),
   setAOIBounds: action(SET_AOI_BOUNDS),
+  setPOI: action(SET_POI),
   setLogo: action(SET_LOGO),
   setMapView: action(SET_MAP_VIEW),
   setUserInstances: action(SET_USER_INSTANCES),
@@ -832,6 +783,7 @@ export default {
   setPreset: action(SET_PRESET),
   setPresets: action(SET_PRESETS),
   setFISShadowLayers: action(SET_FIS_SHADOW_LAYERS),
+  setCloudCoverageLayer: action(SET_CLOUD_COVERAGE_LAYERS),
   setEvalScript: action(SET_EVAL_SCRIPT),
   refresh: action(REFRESH),
   setSelectedResult: action(SET_SELECTED_RESULT),
@@ -841,5 +793,5 @@ export default {
   setEvalMode: action(SET_EVAL_MODE),
   setEvalUrl: action(SET_EVAL_URL),
   setAnalytical: action(SET_ANALYTICAL),
-  setGamma: action(SET_GAMMA)
+  setGamma: action(SET_GAMMA),
 };

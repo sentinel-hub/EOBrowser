@@ -6,8 +6,11 @@
   "devDependencies": {
     "custom-react-scripts": "^0.2.0",
     "dotenv": "^5.0.1",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-prettier": "^2.6.0",
     "gulp-clean": "^0.3.2",
     "gulp-template": "^4.0.0",
+    "prettier": "^1.12.1",
     "run-sequence": "^1.2.2"
   },
   "dependencies": {
@@ -42,7 +45,7 @@
     "react-awesome-modal": "^2.0.3",
     "react-checkbox-group": "^3.0.1",
     "react-codemirror": "^0.2.6",
-    "react-date-picker": "git+https://github.com/themre/react-date-picker.git",
+    "react-day-picker": "^7.1.9",
     "react-dom": "^15.3.1",
     "react-dragula": "^1.1.16",
     "react-dropzone": "^4.1.2",
@@ -50,6 +53,7 @@
     "react-onclickoutside": "^5.5.0",
     "react-radio-group": "^3.0.1",
     "react-redux": "^4.4.5",
+    "react-sidebar": "^2.3.2",
     "react-skylight": "^0.5.0",
     "react-tabs": "^0.8.0",
     "react-toggle": "^2.2.1",
@@ -70,10 +74,13 @@
   },
   "scripts": {
     "analyze": "source-map-explorer build/static/js/main.*",
-    "start":
-      "node -r dotenv/config ./node_modules/.bin/react-scripts start dotenv_config_path=config/development.env",
-    "build":
-      "node -r dotenv/config ./node_modules/.bin/react-scripts build dotenv_config_path=config/development.env",
+    "prettier": "prettier --write 'src/**/*.js'",
+    "start": "node -r dotenv/config ./node_modules/.bin/react-scripts start dotenv_config_path=config/development.env",
+    "build": "node -r dotenv/config ./node_modules/.bin/react-scripts build dotenv_config_path=config/${BUILD_ENV}.env  ",
+    "build:testing": "BUILD_ENV=testing npm run build",
+    "build:staging": "BUILD_ENV=staging npm run build",
+    "build:production": "BUILD_ENV=production npm run build",
+    "lint": "eslint --max-warnings 0 --ext .js src/",
     "test": "react-app-env test",
     "eject": "react-scripts eject",
     "see": "node -e 'console.log(require(\"process\").env)'"

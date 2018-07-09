@@ -13,7 +13,6 @@ class Pin extends React.Component {
       range: this.props.range,
       isOpacity: true,
       error: null,
-      confirmClear: false
     };
   }
 
@@ -22,24 +21,20 @@ class Pin extends React.Component {
   }
 
   componentWillUnmount() {
-    if (this.props.onComponentWillUnmount)
-      this.props.onComponentWillUnmount(this);
+    if (this.props.onComponentWillUnmount) this.props.onComponentWillUnmount(this);
   }
 
   componentWillUpdate(nextProps) {
     if (!nextProps.isCompare && this.state.range[1] !== 1) {
       this.setState({ range: [0, 1] });
     }
-    if (
-      !nextProps.isCompare &&
-      (this.state.range[1] !== 1 || this.state.range[0] !== 0)
-    ) {
+    if (!nextProps.isCompare && (this.state.range[1] !== 1 || this.state.range[0] !== 0)) {
       this.setState({ range: [0, 1] });
     }
     if (nextProps.isOpacity !== this.state.isOpacity) {
       this.setState({
         isOpacity: nextProps.isOpacity,
-        range: [0, 1]
+        range: [0, 1],
       });
     }
   }
@@ -60,14 +55,39 @@ class Pin extends React.Component {
   };
   onTrashClick = (e, index) => {
     e.stopPropagation();
-    this.setState({
-      confirmClear: true
-    });
+    const modalDialogId = 'confirm-remove-pin';
+    Store.addModalDialog(
+      modalDialogId,
+      <Rodal
+        animation="slideUp"
+        visible={true}
+        width={400}
+        height={150}
+        onClose={() => this.closeDialog(modalDialogId)}
+      >
+        <h3>Delete pin</h3>
+        <b>WARNING:</b> You're about to delete a pin. Do you wish to continue? <br />
+        <center>
+          <Button
+            text="Yes"
+            onClick={e => {
+              this.onRemove(e, index);
+              this.closeDialog(modalDialogId);
+            }}
+            icon="check"
+            style={{ marginRight: 10 }}
+          />
+          <Button text="No" onClick={() => this.closeDialog(modalDialogId)} icon="times" />
+        </center>
+      </Rodal>,
+    );
   };
   onRemove = (e, index) => {
     e.stopPropagation();
-    this.setState({ confirmClear: false });
     this.props.onRemove(index);
+  };
+  closeDialog = modalDialogId => {
+    Store.removeModalDialog(modalDialogId);
   };
   onZoomToPin = (e, { lat, lng, zoom }) => {
     e.stopPropagation();
@@ -78,25 +98,14 @@ class Pin extends React.Component {
       this.props.onPinClick(item, index, false);
     }
   };
-  closeDialog = () => this.setState({ confirmClear: false });
 
   constructImgSrc = item => {
     const { instances, mapBounds, presets } = Store.current;
-    const {
-      lat,
-      lng,
-      zoom = 10,
-      datasource,
-      evalscript,
-      preset,
-      time
-    } = item;
+    const { lat, lng, zoom = 10, datasource, evalscript, preset, time } = item;
     const activeLayer = instances.find(inst => inst.name === datasource);
     if (!activeLayer || !mapBounds || !presets[datasource]) return null;
-    const bbox = calcBboxFromXY({ lat, lng, zoom, width: 50, height: 50 }).join(
-      ','
-    );
-    const baseUrl = activeLayer.baseUrl;
+    const bbox = calcBboxFromXY({ lat, lng, zoom, width: 50, height: 50 }).join(',');
+    const baseUrl = activeLayer.baseUrls.WMS;
     const isCustom = preset === 'CUSTOM';
     const Layers = isCustom ? presets[datasource][0].id : preset;
     const evalsource = evalSourcesMap[datasource];
@@ -111,19 +120,14 @@ class Pin extends React.Component {
       item,
       isCompare,
       index,
-      isOpacity
+      isOpacity,
     } = this.props;
-    const { error, confirmClear } = this.state;
+    const { error } = this.state;
     const isCustom = preset === 'CUSTOM';
     const advancedScript =
-      evalscript && evalscript !== ''
-        ? 'Custom script'
-        : layers ? getMultipliedLayers(layers) : '';
+      evalscript && evalscript !== '' ? 'Custom script' : layers ? getMultipliedLayers(layers) : '';
     return (
-      <div
-        className={isCompare ? 'pinItem compareCursor' : 'pinItem'}
-        data-id={item._id}
-      >
+      <div className={isCompare ? 'pinItem compareCursor' : 'pinItem'} data-id={item._id}>
         <div onClick={() => this.onPinClick(isCompare, item, index, false)}>
           {lat && (
             <img
@@ -131,18 +135,12 @@ class Pin extends React.Component {
               className="preview"
               // onError={() => this.setState({ error: true })}
               src={
-                error
-                  ? 'images/no_preview.png'
-                  : this.constructImgSrc(item, time) || 'images/no_preview.png'
+                error ? 'images/no_preview.png' : this.constructImgSrc(item, time) || 'images/no_preview.png'
               }
             />
           )}
           {!isCompare && (
-            <a
-              className="removePin"
-              onClick={e => this.onTrashClick(e)}
-              title="Remove pin"
-            >
+            <a className="removePin" onClick={e => this.onTrashClick(e, index)} title="Remove pin">
               <i className="fa fa-trash" />
             </a>
           )}
@@ -178,28 +176,6 @@ class Pin extends React.Component {
             <span>{this.state.opacity}</span>
           </div>
         )}
-        {confirmClear && (
-          <Rodal
-            animation="slideUp"
-            visible={true}
-            width={400}
-            height={150}
-            onClose={this.closeDialog}
-          >
-            <h3>Delete pin</h3>
-            <b>WARNING:</b> You're about to delete a pin. Do you wish to
-            continue? <br />
-            <center>
-              <Button
-                text="Yes"
-                onClick={e => this.onRemove(e, index)}
-                icon="check"
-                style={{ marginRight: 10 }}
-              />
-              <Button text="No" onClick={this.closeDialog} icon="times" />
-            </center>
-          </Rodal>
-        )}
       </div>
     );
   }
@@ -209,8 +185,7 @@ const LocationPanel = ({ item }) => {
   const { lat, lng, zoom } = item;
   return (
     <div>
-      Lat/Lon: {parseFloat(lat).toFixed(2)}, {parseFloat(lng).toFixed(2)} |
-      Zoom: {zoom}
+      Lat/Lon: {parseFloat(lat).toFixed(2)}, {parseFloat(lng).toFixed(2)} | Zoom: {zoom}
     </div>
   );
 };

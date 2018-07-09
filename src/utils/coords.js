@@ -1,6 +1,7 @@
 import Store from '../store';
 import L from 'leaflet';
 import get from 'dlv';
+import geo_area from '@mapbox/geojson-area';
 
 export function roundDegrees(deg, zoom) {
   if (!Number.isFinite(deg)) {
@@ -22,7 +23,9 @@ export function wgs84ToMercator({ lat, lng }) {
 export function getNativeRes() {
   const { selectedResult } = Store.current;
   let specialRes = selectedResult
-    ? selectedResult.preset.toLowerCase().includes('pansharp') ? 15 : undefined
+    ? selectedResult.preset.toLowerCase().includes('pansharp')
+      ? 15
+      : undefined
     : undefined;
   const layerRes = get(selectedResult, 'activeLayer.resolution');
   const maxRes = selectedResult ? specialRes || layerRes || 10 : 10;
@@ -48,26 +51,34 @@ export function getPixelSize() {
   return { width, height, res: outputRes };
 }
 
-export function calcBboxFromXY({ lat, lng, zoom, width, height, factor }) {
+export function calcBboxFromXY({ lat, lng, zoom, width, height, factor, wgs84 }) {
   const xy = wgs84ToMercator({ lat, lng });
   const useExactRes = factor !== undefined;
   const { res, width: boundW, height: boundH } = getPixelSize(); // res is max resolution available
-  const scale = useExactRes
-    ? res * parseInt(factor, 10)
-    : 40075016 / (512 * Math.pow(2, Number(zoom) - 1));
-  const imgH = Math.round(
-    useExactRes ? boundH / factor : height || window.innerHeight
-  );
-  const imgW = Math.round(
-    useExactRes ? boundW / factor : width || window.innerWidth
-  );
+  const scale = useExactRes ? res * parseInt(factor, 10) : 40075016 / (512 * Math.pow(2, Number(zoom) - 1));
+  const mapDOMSize = getMapDOMSize();
+  const imgH = Math.round(useExactRes ? boundH / factor : height || mapDOMSize.height);
+  const imgW = Math.round(useExactRes ? boundW / factor : width || mapDOMSize.width);
   const minX = Math.round(Number(xy.x) - 0.5 * imgW * scale);
   const minY = Math.round(Number(xy.y) - 0.5 * imgH * scale);
   const maxX = minX + imgW * scale;
   const maxY = minY + imgH * scale;
-  return [minX, minY, maxX, maxY];
+  let coords;
+  if (wgs84) {
+    const southWest = convertToWgs84([minX, minY]);
+    const northEast = convertToWgs84([maxX, maxY]);
+    coords = [southWest[0], southWest[1], northEast[0], northEast[1]];
+  } else {
+    coords = [minX, minY, maxX, maxY];
+  }
+  return coords;
 }
+function convertToWgs84(xy) {
+  const R2D = 180 / Math.PI;
+  const A = 6378137.0;
 
+  return [xy[0] * R2D / A, (Math.PI * 0.5 - 2.0 * Math.atan(Math.exp(-xy[1] / A))) * R2D];
+}
 export function getCoordsFromBounds(bounds, isLatLng, newService = false) {
   let coords = [];
   let sw = newService ? bounds.getSouthWest() : bounds.getSouthWest().wrap(),
@@ -89,4 +100,42 @@ export function getCoordsFromBounds(bounds, isLatLng, newService = false) {
   }
 
   return coords;
+}
+export function bboxToPolygon(bbox) {
+  const west = Number(bbox[0]);
+  const south = Number(bbox[1]);
+  const east = Number(bbox[2]);
+  const north = Number(bbox[3]);
+
+  const lowLeft = [west, south];
+  const topLeft = [west, north];
+  const topRight = [east, north];
+  const lowRight = [east, south];
+  return {
+    type: 'Polygon',
+    crs: {
+      type: 'name',
+      properties: {
+        name: 'urn:ogc:def:crs:EPSG::4326',
+      },
+    },
+    coordinates: [[lowLeft, lowRight, topRight, topLeft, lowLeft]],
+  };
+}
+
+export function getRecommendedResolution(boundsGeojson) {
+  const areaM2 = geo_area.geometry(boundsGeojson);
+  const resolution = Math.max(
+    Store.current.selectedResult.resolution || 10, // resolution of the layer is a minimal allowed value
+    Math.min(Store.current.selectedResult.fisResolutionCeiling || 2000, Math.ceil(Math.sqrt(areaM2 / 1000))), // we would like to get a bit more than 1000 points
+  );
+  return resolution;
+}
+
+export function getMapDOMSize() {
+  const mapDOMElement = document.getElementById('mapId');
+  return {
+    width: mapDOMElement ? mapDOMElement.clientWidth : window.innerWidth,
+    height: mapDOMElement ? mapDOMElement.clientHeight : window.innerHeight,
+  };
 }

@@ -1,5 +1,5 @@
 {
-  "extends": "react-app",
+  "extends": ["react-app","plugin:prettier/recommended"],
   "rules": {
     "no-extend-native": ["error", { "exceptions": ["Object", "Array"] }]
   }

@@ -1,8 +1,12 @@
 import React from 'react';
 import sgLogo from './logo30.png';
 
-const Header = ({ user, onLogout, showLogin, onShowLogin }) => (
+const Header = ({ user, onLogout, showLogin, onShowLogin, onCollapse }) => (
   <header className="logoHeader">
+    <a className="toggleSettings" onClick={onCollapse}>
+      <i className="fa fa-chevron-left" />
+    </a>
+
     {showLogin && (
       <span className="userPanel">
         {user ? (

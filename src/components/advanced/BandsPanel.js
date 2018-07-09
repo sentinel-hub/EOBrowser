@@ -45,7 +45,7 @@ class BandsPanel extends React.Component {
       accepts: function(el, target, source, sibling) {
         return target !== colorsHolder;
       },
-      copy: true
+      copy: true,
     })
       .on('drop', (el, target, source, sibling) => {
         if ([colTarR, colTarG, colTarB].indexOf(source) > -1) {
@@ -99,7 +99,7 @@ class BandsPanel extends React.Component {
           <div className="colHolder" data-col-prefix="r" ref="colTarR" id="oR">
             <div
               style={{
-                backgroundColor: this.getChannel(layers.r, 'name').color
+                backgroundColor: this.getChannel(layers.r, 'name').color,
               }}
               title={this.getChannel(layers.r, 'name').description}
             >
@@ -110,7 +110,7 @@ class BandsPanel extends React.Component {
           <div className="colHolder" data-col-prefix="g" ref="colTarG" id="oG">
             <div
               style={{
-                backgroundColor: this.getChannel(layers.g, 'name').color
+                backgroundColor: this.getChannel(layers.g, 'name').color,
               }}
               title={this.getChannel(layers.g, 'name').description}
             >
@@ -121,7 +121,7 @@ class BandsPanel extends React.Component {
           <div className="colHolder" data-col-prefix="b" ref="colTarB" id="oB">
             <div
               style={{
-                backgroundColor: this.getChannel(layers.b, 'name').color
+                backgroundColor: this.getChannel(layers.b, 'name').color,
               }}
               title={this.getChannel(layers.b, 'name').description}
             >
@@ -138,7 +138,7 @@ class BandsPanel extends React.Component {
 BandsPanel.propTypes = {
   channels: PropTypes.array,
   layers: PropTypes.object,
-  onDrag: PropTypes.func
+  onDrag: PropTypes.func,
 };
 
 export default BandsPanel;
