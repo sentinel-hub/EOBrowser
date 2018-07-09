@@ -3,29 +3,73 @@
 .searchForm {
   padding: 10px;
 
-  .checkboxGroup {
-    column-count: 2;
-    -moz-column-count: 2;
-    label {
-      display: block;
-    }
+  div.topLabel {
+    font-weight: bold;
+    color: #b5bdcc;
   }
 
-  .searchDatasourceSelect a {
-    display: block;
-    cursor: pointer;
-    margin-bottom: 5px;
-    color: #fff;
-    background: rgba(255,255,255,.1);
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
+  div.topLabel > div {
+    margin: 5px 0 10px 20px;
+    font-weight: normal;
+    font-size: 0.8em;
+  }
 
-    &:hover {
-      background: rgba(255,255,255,.15);
+  div.clear {
+    clear: both;
+  }
+
+  a.configurationsSettings {
+    margin-left: 10px;
+  }
+
+  div.dataSourceGroup {
+    clear: both;
+
+    label {
+      float: left;
+      clear: both;
+      color: #cdd5e3;
     }
-    &.active, &.active:hover {
-      background: rgba(255,255,255,.2);
+
+    div.datasources {
+      margin-left: 20px;
+      clear: both;
+    }
+
+    div.filters {
+      margin-left: 25px;
+      clear: both;
+
+      & > div {
+        float: left;
+      }
+
+      div.filter {
+        clear: both;
+        line-height: 30px;
+        position: relative;
+        display: block;
+
+        label {
+          vertical-align: middle;
+          display: inline-block;
+          margin-right: 20px;
+        }
+
+        select {
+          margin-left: 20px;
+          float: right;
+          height: 25px;
+        }
+      }
+
+    }
+
+  }
+
+  .checkboxGroup {
+    label {
+      display: block;
     }
   }
 
@@ -36,35 +80,27 @@
     margin-right: 5px;
   }
 
-  &.probaFormPicker label,
-  &.probaFormPicker label + * {
-    width: 150px;
-    display: inline-block;
-    vertical-align: middle;
-  }
-
   .btn {
     display: block;
     text-align: center;
-    margin: 10px;
+    margin: 20px 20px 10px;
   }
 }
 
-.probaPanel {
-  margin-top: 10px;
-  border-top: 1px dashed #aaa;
-  padding-top: 10px;
+.selectTimeRange {
+  margin-top: 20px;
 
-  label, b, .react-toggle {
-    width: 140px;
+  & > label {
+    display: block;
+  }
+
+  div.inlineDatepicker {
+    margin: 0 20px;
+    padding: 0;
+  }
+
+  span.datePickerSeparator {
     display: inline-block;
     vertical-align: middle;
-    margin-bottom: 10px;
-  }
-  select {
-    width: calc(100% - 160px);
-  }
-  .react-toggle {
-    width: auto;
   }
 }

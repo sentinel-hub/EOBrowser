@@ -9,13 +9,14 @@ export default class DownloadPanel extends React.Component {
     super(props);
     this.state = {
       crsSerializationVisible: false,
-      isAnalytical: false
+      isAnalytical: false,
     };
   }
 
   render() {
-    const { user } = Store.current;
+    const { user, selectedResult } = Store.current;
     const { isAnalytical, loading } = this.props;
+    const isTimelapseSupported = selectedResult.dateService !== undefined || selectedResult.getDates;
     return (
       <footer className="DownloadPanel">
         {user && (
@@ -42,8 +43,10 @@ export default class DownloadPanel extends React.Component {
               <Button
                 fluid
                 icon="film"
-                text={'Create Gif'}
-                onClick={this.props.toggleTimelapse}
+                text={'Timelapse'}
+                disabled={!isTimelapseSupported}
+                title={isTimelapseSupported ? 'Create a timelapse' : 'This datasource is not supported'}
+                onClick={this.props.showTimelapse}
               />
             </div>
           </div>

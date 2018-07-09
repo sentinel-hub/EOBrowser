@@ -1,46 +1,62 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import request from 'axios'
-import AddPin from '../AddPin'
+import request from 'axios';
+import AddPin from '../AddPin';
 
 class ResultItem extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       linkVisible: false,
-      scihubLink: ''
-    }
+      scihubLink: '',
+    };
   }
 
   toggleLinksPanel = tileData => {
-    const { activeLayer: { getTileUrl, getSciHubLink } } = tileData
-    this.setState({ linkVisible: !this.state.linkVisible })
+    const {
+      activeLayer: { getTileUrl, getSciHubLink },
+    } = tileData;
+    this.setState({ linkVisible: !this.state.linkVisible });
     if (this.state.scihubLink === '' && getTileUrl) {
       request
         .get(getTileUrl(tileData))
         .then(res => {
-          let product = res.data.product['@ref']
+          let product = res.data.product['@ref'];
           this.setState({
-            scihubLink: getSciHubLink(product)
-          })
+            scihubLink: getSciHubLink(product),
+          });
         })
         .catch(e => {
-          this.setState({ scihubError: e.message })
-        })
+          this.setState({ scihubError: e.message });
+        });
     }
-  }
+  };
 
   render() {
-    let { result, result: { tileData, properties: { index } } } = this.props
-    let { datasource, time, sensingTime, cloudCoverage, sunElevation, activeLayer, satellite } = tileData
-    const { crs, mgrs } = activeLayer.getCrsLabel ? activeLayer.getCrsLabel(tileData) : {}
-    let isS2 = datasource.includes('Sentinel-2')
+    let {
+      result,
+      result: {
+        tileData,
+        properties: { index },
+      },
+    } = this.props;
+    let {
+      datasource: datasourceName,
+      time,
+      sensingTime,
+      cloudCoverage,
+      sunElevation,
+      activeLayer: datasource,
+      satellite,
+    } = tileData;
+    const { crs, mgrs } = datasource.getCrsLabel ? datasource.getCrsLabel(tileData) : {};
+    let isS2 = datasourceName.includes('Sentinel-2');
     return (
-      <div className="resultItem" onMouseOver={() => this.props.onResultClick(index, false)}>
-        {activeLayer.getPreviewImage ? (
-          <img src={activeLayer.getPreviewImage(tileData)} alt={datasource} />
+      <div className="resultItem" onMouseOver={() => this.props.onResultHover(index, datasourceName)}>
+        {datasource.getPreviewImage ? (
+          <img src={datasource.getPreviewImage(tileData)} alt={datasourceName} />
         ) : (
-          <div className="noImage">No preview available</div>
+          <div className="noImage">{datasourceName}</div>
         )}
         <div className="details">
           <div title="Sensing time">
@@ -83,7 +99,7 @@ class ResultItem extends React.Component {
                 {mgrs}
               </div>
             )}
-          {(activeLayer.getAwsPath || activeLayer.getSciHubLink || activeLayer.getEOPath) && (
+          {(datasource.getAwsPath || datasource.getSciHubLink || datasource.getEOPath) && (
             <a
               className={`pathLinkIcon ${this.state.linkVisible && 'active'}`}
               onClick={() => this.toggleLinksPanel(tileData)}
@@ -92,16 +108,16 @@ class ResultItem extends React.Component {
             </a>
           )}
           <AddPin pin={tileData} />
-          <a className="btn" onClick={() => this.props.onResultClick(index, true, result)}>
+          <a className="btn" onClick={() => this.props.onResultClick(index, result)}>
             Visualize
           </a>
         </div>
         {this.state.linkVisible && (
           <div className="showLinkPanel">
-            {activeLayer.getAwsPath ? (
+            {datasource.getAwsPath ? (
               <div style={{ marginBottom: '15px' }}>
-                AWS path:<a className="scihubLink" href={activeLayer.getAwsPath(tileData)} target="_blank">
-                  {activeLayer.getAwsPath(tileData)}
+                AWS path:<a className="scihubLink" href={datasource.getAwsPath(tileData)} target="_blank">
+                  {datasource.getAwsPath(tileData)}
                 </a>
               </div>
             ) : (
@@ -109,13 +125,13 @@ class ResultItem extends React.Component {
                 EO Cloud path:<input
                   ref="linkUrl"
                   className="urlInput"
-                  defaultValue={activeLayer.getEOPath(tileData)}
+                  defaultValue={datasource.getEOPath(tileData)}
                   readOnly={true}
                   onFocus={() => this.refs.linkUrl.select()}
                 />
               </div>
             )}
-            {activeLayer.getSciHubLink && (
+            {datasource.getSciHubLink && (
               <div>
                 SciHub link:{' '}
                 <a className="scihubLink" href={this.state.scihubLink} target="_blank">
@@ -126,11 +142,12 @@ class ResultItem extends React.Component {
           </div>
         )}
       </div>
-    )
+    );
   }
 }
 
 ResultItem.PropTypes = {
-  onResultClick: PropTypes.func
-}
-export default ResultItem
+  onResultClick: PropTypes.func,
+  onResultHover: PropTypes.func,
+};
+export default ResultItem;

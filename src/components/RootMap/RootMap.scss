@@ -1,0 +1,150 @@
+.map-wrapper {
+  position: absolute;
+  height: 100%;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+.mainMap {
+  height: 100%;
+  width: 100%;
+}
+
+.cursor-marker {
+  z-index: 100000;
+}
+
+#uploadBtn {
+  position: absolute;
+  right: 10px;
+  top: 60px;
+  background: #333;
+  padding: 13px;
+  z-index: 100;
+  box-shadow: 0 2px 4px #000;
+}
+.aoiPanel {
+  position: absolute !important;
+  right: 10px;
+  top: 60px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+  background: #3b3d4d;
+  color: #fff;
+  height: 42px;
+  -webkit-box-shadow: 0 2px 5px #000;
+  box-shadow: 0 2px 5px #000;
+  text-align: center;
+
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 12px;
+  }
+  .aoiCords {
+    padding-left: 5px;
+  }
+  .drawGeometry {
+    background-color: #191a25;
+  }
+  i {
+    font-size: 20px;
+    line-height: 42px;
+    width: 42px;
+    cursor: pointer;
+  }
+  a {
+    color: #b6bf00;
+    background: none;
+    display: inline-block;
+    width: 42px;
+    text-align: center;
+  }
+  a.disabled {
+    opacity: 0.5;
+  }
+  .area-text {
+    padding: 5px;
+  }
+}
+.poiPanel {
+  position: absolute !important;
+  right: 10px;
+  top: 110px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+  background: #3b3d4d;
+  color: #fff;
+  height: 42px;
+  -webkit-box-shadow: 0 2px 5px #000;
+  box-shadow: 0 2px 5px #000;
+  text-align: center;
+
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 12px;
+  }
+
+  .drawGeometry {
+    background-color: #191a25;
+  }
+  i {
+    font-size: 20px;
+    line-height: 42px;
+  }
+  a {
+    color: #b6bf00;
+    background: none;
+    width: 42px;
+    display: inline-block;
+    text-align: center;
+  }
+  a.disabled {
+    opacity: 0.5;
+  }
+}
+.drawAreaPanel {
+  position: absolute !important;
+  right: 10px;
+  top: 160px;
+  font-size: 12px;
+  background: #22232d;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+  .drawGeometry {
+    margin: 0 12px;
+  }
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 12px;
+  }
+  .drawGeometry {
+    margin: 0 12px;
+  }
+  i {
+    font-size: 20px;
+    line-height: 42px;
+  }
+}
+
+#mapCoords {
+  position: absolute;
+  right: 240px;
+  font-size: 10px;
+  bottom: 0;
+  background: #22232d;
+  color: #eee;
+  padding: 1px;
+  min-width: 160px;
+  text-align: center;
+  z-index: 1;
+}
+.layers {
+  position: absolute;
+  right: 10px;
+  top: 50px;
+}

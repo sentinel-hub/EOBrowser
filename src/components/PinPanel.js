@@ -10,13 +10,6 @@ import { RadioGroup, Radio } from 'react-radio-group';
 import Rodal from 'rodal';
 
 class PinPanel extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      confirmClear: false
-    };
-  }
-
   dragulaDecorator = componentBackingInstance => {
     if (componentBackingInstance) {
       dragula([componentBackingInstance], {
@@ -28,7 +21,7 @@ class PinPanel extends React.Component {
               return true;
             }
           }
-        }
+        },
       }).on('drop', (el, target, source, sibling) => {
         const droppedLocation = this.getIndexInParent(el);
         const oldLocation = this.getIndexInData(el.dataset.id);
@@ -38,50 +31,64 @@ class PinPanel extends React.Component {
   };
   getIndexInParent = el => Array.from(el.parentNode.children).indexOf(el);
   getIndexInData = id => this.props.items.findIndex(e => e._id === id);
-  closeDialog = () => this.setState({ confirmClear: false });
+
+  confirmDeleteAllPins = () => {
+    const modalDialogId = 'confirm-clear-pins';
+    Store.addModalDialog(
+      modalDialogId,
+      <Rodal
+        animation="slideUp"
+        visible={true}
+        width={400}
+        height={150}
+        onClose={() => this.closeDialog(modalDialogId)}
+      >
+        <h3>Delete pins</h3>
+        <b>WARNING:</b> You're about to delete all pins. Do you wish to continue? <br />
+        <center>
+          <Button
+            text="Yes"
+            onClick={() => {
+              this.deletePins();
+              this.closeDialog(modalDialogId);
+            }}
+            icon="check"
+            style={{ marginRight: 10 }}
+          />
+          <Button text="No" onClick={() => this.closeDialog(modalDialogId)} icon="times" />
+        </center>
+      </Rodal>,
+    );
+  };
+
+  closeDialog = modalDialogId => {
+    Store.removeModalDialog(modalDialogId);
+  };
+
+  deletePins = () => {
+    this.props.onClearPins();
+    this.closeDialog();
+  };
 
   changePinOrder = (oldIndex, newIndex) => {
     this.props.pinOrderChange(oldIndex, newIndex);
     Store.changePinOrder(oldIndex, newIndex);
   };
 
-  deletePins = () => {
-    this.setState({ confirmClear: false });
-    this.props.onClearPins();
-  };
-
   render() {
-    const { confirmClear } = this.state;
-    let {
-      items,
-      isCompare,
-      isOpacity,
-      onToggleCompareMode,
-      onRemove,
-      onCompare
-    } = this.props;
+    let { items, isCompare, isOpacity, onToggleCompareMode, onRemove, onCompare } = this.props;
     return (
       <div className={`pinPanel ${!isCompare && 'normalMode'}`}>
         {items.length === 0 ? (
-          <NotificationPanel
-            type="info"
-            msg="No pins. Find your scene and pin it to save it for later."
-          />
+          <NotificationPanel type="info" msg="No pins. Find your scene and pin it to save it for later." />
         ) : (
           <div>
             <div className="comparisonHeader">
-              <a
-                style={{ float: 'right' }}
-                onClick={() => this.setState({ confirmClear: true })}
-              >
+              <a style={{ float: 'right' }} onClick={this.confirmDeleteAllPins}>
                 <i className="fa fa-trash" />Clear pins
               </a>
               <a onClick={onCompare}>
-                <i
-                  className={`fa fa-${
-                    isCompare ? 'check-circle-o' : 'exchange'
-                  }`}
-                />
+                <i className={`fa fa-${isCompare ? 'check-circle-o' : 'exchange'}`} />
                 {isCompare ? 'Finish comparison' : 'Compare'}
               </a>
               {isCompare && (
@@ -125,28 +132,6 @@ class PinPanel extends React.Component {
             </div>
           </div>
         )}
-        {confirmClear && (
-          <Rodal
-            animation="slideUp"
-            visible={true}
-            width={400}
-            height={150}
-            onClose={this.closeDialog}
-          >
-            <h3>Delete pins</h3>
-            <b>WARNING:</b> You're about to delete all pins. Do you wish to
-            continue? <br />
-            <center>
-              <Button
-                text="Yes"
-                onClick={this.deletePins}
-                icon="check"
-                style={{ marginRight: 10 }}
-              />
-              <Button text="No" onClick={this.closeDialog} icon="times" />
-            </center>
-          </Rodal>
-        )}
       </div>
     );
   }
@@ -162,7 +147,7 @@ PinPanel.propTypes = {
   onCompare: PropTypes.func,
   onClearPins: PropTypes.func,
   onOpacityChange: PropTypes.func,
-  onToggleCompareMode: PropTypes.func
+  onToggleCompareMode: PropTypes.func,
 };
 
 export default PinPanel;

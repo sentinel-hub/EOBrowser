@@ -15,15 +15,12 @@ export function getMultipliedLayers(layers) {
 }
 
 export function isScriptFromLayers(script, layers) {
-  return (
-    b64EncodeUnicode('return [' + getMultipliedLayers(layers) + '];') === script
-  );
+  return b64EncodeUnicode('return [' + getMultipliedLayers(layers) + '];') === script;
 }
 
 export function getCrsLabel(tile) {
   const { dataGeometry, tileGeometry, dataUri } = tile;
-  const crs =
-    'EPSG:' + (dataGeometry || tileGeometry).crs.properties.name.split('::')[1];
+  const crs = 'EPSG:' + (dataGeometry || tileGeometry).crs.properties.name.split('::')[1];
   const mgrsPath = dataUri.split('/');
   const mgrs = mgrsPath[4] + mgrsPath[5] + mgrsPath[6];
   return { crs, mgrs };
@@ -44,7 +41,7 @@ export const evalSourcesMap = {
   'Landsat 8': 'L8',
   'Landsat 8 ESA': 'L8',
   'Landsat 8 USGS': 'L8',
-  'Envisat Meris': 'ENV'
+  'Envisat Meris': 'ENV',
 };
 export function isCustomPreset(preset) {
   return preset === 'CUSTOM';
@@ -63,31 +60,25 @@ export function hasPinSaved(currPin) {
 
 export function createMapLayer(instanceObj, pane, progress) {
   if (instanceObj === undefined) return;
-  const {
-    name,
-    baseUrl,
-    minZoom = 5,
-    maxZoom = 16,
-    tileSize = 512
-  } = instanceObj;
+  const { name, baseUrls, minZoom = 5, maxZoom = 16, tileSize = 512 } = instanceObj;
   // when we create compare layer, we will create CLIP layer, otherwise normal wms layer
   let layer =
     pane === 'compareLayer'
-      ? L.tileLayer.clip(baseUrl, {
+      ? L.tileLayer.clip(baseUrls.WMS, {
           showlogo: false,
           tileSize,
           minZoom,
           maxZoom,
           pane,
-          name
+          name,
         })
-      : L.tileLayer.wms(baseUrl, {
+      : L.tileLayer.wms(baseUrls.WMS, {
           showlogo: false,
           tileSize,
           minZoom,
           maxZoom,
           pane,
-          name
+          name,
         });
   layer.on('loading', function() {
     progress.start();
@@ -121,9 +112,7 @@ function isValidId(id) {
   return idRegex.test(id);
 }
 export function uniquePinId() {
-  return `${Math.floor(
-    Math.random() * 1000 + 100
-  )}-${new Date().valueOf()}-pin`;
+  return `${Math.floor(Math.random() * 1000 + 100)}-${new Date().valueOf()}-pin`;
 }
 
 export function getPinsFromLocalStorage() {
@@ -138,7 +127,9 @@ export function getPinsFromLocalStorage() {
           // legacy format
           const {
             name,
-            properties: { rawData: { time } },
+            properties: {
+              rawData: { time },
+            },
             map: { latitude, longitude, zoom },
             ...rest
           } = pin;
@@ -149,13 +140,13 @@ export function getPinsFromLocalStorage() {
             lat: latitude,
             lng: longitude,
             zoom,
-            time
+            time,
           };
         }
         return {
           ...pin,
           opacity: [0, 1],
-          _id: isValidId(pin._id) ? pin._id : uniquePinId()
+          _id: isValidId(pin._id) ? pin._id : uniquePinId(),
         };
       });
   }
@@ -183,7 +174,8 @@ export function b64EncodeUnicode(str) {
 
 export function getPolyfill() {
   if (!Array.prototype.includes) {
-    Object.defineProperty(Array.prototype, 'includes', {  // eslint-disable-line no-extend-native
+    // prettier-ignore
+    Object.defineProperty(Array.prototype, 'includes', { // eslint-disable-line no-extend-native
       value: function(searchElement, fromIndex) {
         // 1. Let O be ? ToObject(this value).
         if (this == null) {
@@ -239,7 +231,8 @@ export function getPolyfill() {
   }
 
   if (!Array.prototype.map) {
-    Array.prototype.map = function(callback /*, thisArg*/) {  // eslint-disable-line no-extend-native
+    // prettier-ignore
+    Array.prototype.map = function(callback /*, thisArg*/) { // eslint-disable-line no-extend-native
       var T, A, k;
 
       if (this == null) {
@@ -300,7 +293,8 @@ export function getPolyfill() {
   }
 
   if (!String.prototype.includes) {
-    String.prototype.includes = function(search, start) {  // eslint-disable-line no-extend-native
+    // prettier-ignore
+    String.prototype.includes = function(search, start) { // eslint-disable-line no-extend-native
       if (typeof start !== 'number') {
         start = 0;
       }
@@ -310,6 +304,12 @@ export function getPolyfill() {
       } else {
         return this.indexOf(search, start) !== -1;
       }
+    };
+  }
+  /* Math.log10 polyfill for internet explorer */
+  if (!Math.log10) {
+    Math.log10 = function(x) {
+      return Math.log(x) * Math.LOG10E;
     };
   }
 }
