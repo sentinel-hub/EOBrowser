@@ -4,7 +4,7 @@
   "homepage": ".",
   "private": true,
   "devDependencies": {
-    "custom-react-scripts": "^0.2.0",
+    "custom-react-scripts": "^0.2.2",
     "dotenv": "^5.0.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-prettier": "^2.6.0",
