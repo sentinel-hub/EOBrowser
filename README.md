@@ -1,6 +1,6 @@
 ## About
 
-The [Earth Observation Browser](https://apps.sentinel-hub.com/eo-browser/) is a search tool for Sentinel-1, -2, -3, Landsat 5, 7, 8, MODIS and Envisat Meris satellite imagery. It was released as open-source to bring earth observation imagery closer to its end users.
+The [Earth Observation Browser](https://apps.sentinel-hub.com/eo-browser/) is a search tool for Sentinel-1, -2, -3, -5P, Landsat 5, 7, 8, MODIS and Envisat Meris satellite imagery. It was released as open-source to bring earth observation imagery closer to its end users.
 
 Some features:
 
