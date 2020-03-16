@@ -1,7 +1,6 @@
 ## About
 
-The [Earth Observation Browser](https://apps.sentinel-hub.com/eo-browser/) is a search tool for Sentinel-1, -2, -3, -5P, Landsat 5, 7, 8, MODIS and Envisat Meris satellite imagery. It was released as open-source to bring earth observation imagery closer to its end users.
-
+The Earth Observation Browser is a search tool for Sentinel-2 and Landsat 5,7,8 satellite imagery. It was released as open-source to bring earth observation imagery closer to its end users.
 Some features:
 
 * Search by date, location, source, and cloud coverage
@@ -12,7 +11,13 @@ Some features:
 
 ## Usage
 
-* Run `npm install`
+* Run `npm install` or `yarn`
 * Run `npm start`
+* Use Sentinel username and password (if you don't have any, contact [Sentinel Hub](www.sentinel-hub.com))
 
-IMPORTANT: By default, application will start at `http://localhost:3000/`. It is important to keep this address, otherwise login to [Sentinel Hub](https://sentinel-hub.com) will not work because of OAuth security considerations.
+## BUILDING
+
+* yarn build:production
+* yarn build:staging
+
+Server credentials can be found on [Sinergise Wiki page](https://wiki.sinergise.com/Maintenance/SentinelApps)

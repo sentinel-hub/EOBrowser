@@ -7,20 +7,10 @@ $textCol: #eee;
   color: $textCol;
 
   .showLinkPanel {
-    padding: 10px;
+    padding: 10px 0px 0px 0;
     color: $textColor;
-    text-align: center;
-    width: calc(100% - 20px);
-
-    input {
-      border: none;
-      border-bottom: 1px solid #fff;
-      padding: 5px;
-      background: none;
-      color: #eee;
-      width: calc(100% - 15px);
-      margin-bottom: 15px;
-    }
+    text-align: left;
+    width: 100%;
   }
 
   .resultsInnerPanel > .btn {
@@ -39,27 +29,29 @@ $textCol: #eee;
 }
 
 .resultItem {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   position: relative;
   transition: all ease 0.4s;
   padding: 10px;
-  background: rgba(255, 255, 255, .05);
+  background: rgba(255, 255, 255, 0.05);
   align-items: center;
 
   .addToPin {
     position: absolute;
-    right: 5px;
-    top: 5px;
+    right: 10px;
+    top: 10px;
   }
   .pathLinkIcon {
     float: right;
     margin-left: 6px;
-    padding: 4px;
     border-radius: 30px;
     width: 30px;
     height: 30px;
     text-align: center;
     line-height: 30px;
+    position: absolute;
+    top: 5px;
+    right: 25px;
 
     &.active {
       background: $primaryCol;
@@ -72,31 +64,34 @@ $textCol: #eee;
     overflow: hidden;
     white-space: nowrap;
   }
+  .awsPath {
+    color: $textCol;
+  }
 
   .noImage {
     text-align: center;
     font-style: italic;
     justify-content: center;
-    opacity: .6;
+    opacity: 0.6;
     max-width: none !important;
   }
 
   & > * {
     width: calc(100% - 140px);
-    margin-right: 5px;
+    margin-right: 0px;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
   }
   & > :first-child {
-    width: 130px;
+    width: 140px;
   }
 
   .details {
-    padding: 15px 0 15px 15px;
+    padding: 0px 0px 0px 10px;
     box-sizing: border-box;
 
     & > div {
-      margin-bottom: 6px;
+      margin-bottom: 4px;
 
       & > :first-child {
         width: 20px;

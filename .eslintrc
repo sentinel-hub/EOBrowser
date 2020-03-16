@@ -1,6 +1,7 @@
 {
   "extends": ["react-app","plugin:prettier/recommended"],
   "rules": {
-    "no-extend-native": ["error", { "exceptions": ["Object", "Array"] }]
+    "no-extend-native": ["error", { "exceptions": ["Object", "Array"] }],
+    "jsx-a11y/anchor-is-valid": 0
   }
 }

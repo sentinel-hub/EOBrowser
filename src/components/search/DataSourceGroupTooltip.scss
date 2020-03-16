@@ -1,0 +1,18 @@
+.dataSourceGroupTooltipLogo {
+  width: 61px;
+}
+
+.dataSourceGroupTooltipDescription {
+  margin-bottom: 2px;
+}
+
+.dataSourceGroupTooltipCredits {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+.dataSourceGroupTooltipCredits > div {
+  padding-top: 5px;
+  padding-right: 6px;
+}

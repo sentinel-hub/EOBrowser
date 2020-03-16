@@ -1,0 +1,48 @@
+.helpTooltip.closed .react-tooltip-lite, .react-tooltip-lite-arrow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.helpTooltip .react-tooltip-lite {
+  background: white;
+  color: black;
+  border-radius: 5px;
+  max-width: 300px !important;
+  font-size: 0.8em;
+}
+
+.helpTooltip .react-tooltip-lite-up-arrow {
+  border-top: 10px solid white;
+}
+
+.helpTooltip .react-tooltip-lite-down-arrow {
+  border-bottom: 10px solid white;
+}
+
+.helpTooltip .react-tooltip-lite-right-arrow {
+  border-right: 10px solid white;
+}
+
+.helpTooltip .react-tooltip-lite-left-arrow {
+  border-left: 10px solid white;
+}
+
+.helpTooltipIcon {
+  vertical-align: middle;
+  opacity: 0.5;
+  font-size: 12px;
+}
+
+.helpTooltipIcon:hover {
+  opacity: 1;
+}
+
+.helpTooltip.padOnLeft {
+  padding-left: 5px;
+}
+
+.helpTooltip.padOnRight {
+  padding-right: 5px;
+}

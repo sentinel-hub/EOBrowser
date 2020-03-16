@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <script src="https://www.google.com/recaptcha/api.js?render=6Lcl15QUAAAAABrHkIp-9ClBCJNFH1nOWfr5CiDK"></script>
+</head>
+
+<body>
+  <iframe id="auth"></iframe>
+
+  <script>
+    window.addEventListener(
+      'message',
+      function (e) {
+        if (e.origin !== 'https://services.sentinel-hub.com') {
+          return;
+        }
+        window.parent.postMessage(e.data, window.location.origin);
+      },
+      false
+    );
+
+    function authenticateWithRecaptcha() {
+      grecaptcha.ready(function () {
+        client_id = '83fc77da-b954-4c64-8384-f9c25005c693';
+        grant_type = 'client_credentials';
+
+        grecaptcha
+          .execute('6Lcl15QUAAAAABrHkIp-9ClBCJNFH1nOWfr5CiDK', {
+            action: 'token_assisted_anonymous'
+          })
+          .then(function (token) {
+            var theUrl = 'https://services.sentinel-hub.com/oauth/token/assisted?client_id=' + client_id + '&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Ftest.html&response_type=token&grant_type=' + grant_type + '&recaptcha=' + token;
+            document.getElementById('auth').src = theUrl;
+          });
+      });
+    }
+
+    authenticateWithRecaptcha();
+  </script>
+</body>
+
+</html>

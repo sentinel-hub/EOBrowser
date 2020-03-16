@@ -21,6 +21,11 @@
   .full-size {
     width: 99%;
   }
+
+  .shadow {
+    box-shadow: 0 2px 5px #000;
+    margin-right: 160px;
+  }
 }
 
 #ControlsContent {
@@ -38,33 +43,20 @@
   padding-left: 0;
 }
 
-div.clear-both-700 {
-  display: none;
-}
-
 .modalDialog {
-    color: #868fa0;
+  color: #868fa0;
 }
 
 @media screen and (max-width: 700px) {
-  div.clear-both-700 {
-    display: block;
-    clear: both;
-  }
-
   .leaflet-control-layers.leaflet-control {
     box-shadow: none !important;
-  }
-
-  .geosuggest input {
-    margin-top: 3px;
-    margin-left: 5px;
   }
 }
 
 .leaflet-control-layers.leaflet-control {
   box-shadow: 0 2px 5px #000;
   overflow: visible;
+  margin-right: 110px;
 }
 
 .userPanel {
@@ -73,44 +65,56 @@ div.clear-both-700 {
   }
 }
 
-.geosuggest {
-  transition: width ease 0.1s;
-}
-
-.searchForm .btn {
-  margin-left: 0;
-  margin-right: 0;
-}
-
 .react-date-field__input {
   margin-bottom: 0 !important;
   margin-left: 3px;
 }
 
-.searchForm p {
-  margin-top: 0.5em;
+.formField {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  margin: 2px 0 2px 0;
+  line-height: 30px;
+  label {
+    flex: 0 0 33%;
+    max-width: 33%;
+  }
 }
-
+.form-input {
+  flex: 0 0 67%;
+  max-width: 67%;
+  display: flex;
+  justify-content: flex-end;
+}
+input.full-width {
+  width: 100%;
+  flex: 1 0 auto;
+  text-align: left;
+  padding: 0.5em;
+  background: #807e7ea3;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  color: #f7f7f7;
+}
+input.full-width::placeholder {
+  color: #cccbcb;
+  opacity: 1;
+}
 @media screen and (max-width: 700px) {
   #Controls {
     width: 2 * $basicMargin + $controlsHeight;
     right: 0;
     z-index: 2;
+
+    .shadow {
+      box-shadow: none;
+    }
   }
 
   #ControlsContent {
     padding-left: 0;
     transition: all ease 0s;
-  }
-
-  #searchBox span {
-    /*display: none;*/
-  }
-
-  #searchBox.active span {
-    display: inline;
-    height: 38px;
-    margin-top: -1px;
   }
 }
 
@@ -121,5 +125,13 @@ div.clear-both-700 {
 
   .inlineDatepicker.move {
     margin-left: 130px;
+  }
+}
+
+label.align-checkbox {
+  input[type='checkbox'] {
+    vertical-align: middle;
+    position: relative;
+    bottom: 2px;
   }
 }

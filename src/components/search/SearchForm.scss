@@ -37,7 +37,6 @@
     }
 
     div.filters {
-      margin-left: 25px;
       clear: both;
 
       & > div {
@@ -62,12 +61,14 @@
           height: 25px;
         }
       }
-
     }
-
   }
 
   .checkboxGroup {
+    .title {
+      display: flex;
+      clear: both;
+    }
     label {
       display: block;
     }
@@ -86,7 +87,10 @@
     margin: 20px 20px 10px;
   }
 }
-
+.searchForm p {
+  margin-top: 0.5em;
+  font-size: 0.8em;
+}
 .selectTimeRange {
   margin-top: 20px;
 
@@ -97,10 +101,27 @@
   div.inlineDatepicker {
     margin: 0 20px;
     padding: 0;
+    position: relative;
   }
 
   span.datePickerSeparator {
     display: inline-block;
     vertical-align: middle;
+  }
+}
+
+.themeSelect {
+  select {
+    background-color: white;
+    color: black;
+    border: grey 1px solid;
+  }
+
+  &.top {
+    margin-bottom: 20px;
+  }
+
+  &.bottom {
+    margin-top: 20px;
   }
 }

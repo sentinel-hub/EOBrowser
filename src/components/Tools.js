@@ -1,16 +1,13 @@
 import React from 'react';
-import Header from './Header';
 import PinPanel from './PinPanel';
 import ResultsPanel from './search/Results';
 import SearchForm from './search/SearchForm';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { Tabs, Tab, EOBHeader } from '@sentinel-hub/eo-components';
+import App from '../App';
 import Store from '../store';
+import { doLogout, doLogin } from '../utils/auth';
 import esaLogo from './esa.png';
-import {
-  loginAndLoadInstances,
-  fetchSearchResultsFromIndexService,
-  loadGetCapabilities,
-} from '../utils/ajax';
+import { loadGetCapabilitiesAndSaveLayers } from '../utils/ajax';
 import Visualization from './Visualization';
 import { connect } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
@@ -21,12 +18,12 @@ import 'rc-slider/assets/index.css';
 import './Tools.scss';
 import { VERSION_INFO } from '../VERSION.js';
 import { DATASOURCES } from '../store/config';
+// import banner from './eo_browser_banner.jpg';
 
 class Tools extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      toolsHeight: window.innerHeight,
       searchError: '',
       showEffects: false,
       queryParams: '',
@@ -34,34 +31,12 @@ class Tools extends React.Component {
       firstSearch: true,
       resultsFound: false,
     };
-    this.onClickResult = this.onClickResult.bind(this);
   }
-
-  handleResize = () => {
-    this.setState({
-      toolsHeight: window.innerHeight,
-    });
-  };
 
   componentWillReceiveProps(nextProps) {
     if (isEmpty(this.props.searchFilterResults) && !isEmpty(nextProps.searchFilterResults)) {
       this.showResultsDialog();
     }
-  }
-
-  componentDidMount() {
-    window.addEventListener('resize', this.handleResize);
-    this.handleResize();
-    if (Store.getTokenFromLC()) {
-      // this.doLogin()
-      loginAndLoadInstances().catch(({ msg }) => {
-        this.setState({ error: msg });
-      });
-    }
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize);
   }
 
   showResultsDialog = () => {
@@ -77,17 +52,18 @@ class Tools extends React.Component {
           this.clearFilterData();
           this.hideResultsDialog();
         }}
+        closeOnEsc={true}
       >
         <ResultsPanel
           key={2}
           results={Store.current.searchFilterResults}
           datasources={Store.current.datasources}
           searchParams={{}}
-          isSearching={false}
           showClear={false}
           inPopup={true}
           onResultClick={this.onClickResult}
           onResultHover={this.onResultHover}
+          allowLoadMoreButton={false}
         />
       </Rodal>,
     );
@@ -102,17 +78,17 @@ class Tools extends React.Component {
     Store.clearSearchResults();
     Store.setSelectedResult(null);
     Store.setTabIndex(0);
-    Store.setSearchingIsOn(false);
     this.setState({ firstSearch: true, resultsFound: false });
     this.props.onClearData();
   };
 
-  handleSelect = (index, last) => {
-    setTimeout(() => {
-      this.handleResize();
-    }, 200);
+  handleSelect = index => {
     Store.setTabIndex(index);
     index !== 3 && Store.setCompareMode(false);
+  };
+
+  handleErrorMessage = msg => {
+    App.displayErrorMessage(msg);
   };
 
   onZoomToPin = ({ lat, lng, zoom }) => {
@@ -137,21 +113,28 @@ class Tools extends React.Component {
     this.props.onHoverTile(i);
   };
 
-  onClickResult = async (i, result, zoomto) => {
+  onClickResult = async (result, zoomto) => {
     if (!result) {
       return;
     }
-    if (result.userId) {
+    if (
+      result.tileData &&
+      (result.tileData.activeLayer.userId || result.tileData.isFakedFromDataSourceWithThemeURL)
+    ) {
       const { instances = [] } = Store.current;
-      const { id } = result.activeLayer;
+      const { id } = result.tileData.activeLayer;
       const selectedInstance = instances.find(inst => inst.id === id);
       if (!selectedInstance) {
         this.setState({ error: "You don't access to this instance." });
         return;
       }
-      await loadGetCapabilities(selectedInstance);
-    }
-    if (result.properties) {
+      await loadGetCapabilitiesAndSaveLayers(selectedInstance);
+      const { datasource } = result.tileData;
+      Store.setSelectedResult({
+        datasource,
+        ...result.tileData,
+      });
+    } else if (result.properties) {
       const { datasource } = result.tileData;
 
       const preset = this.props.presets[datasource][0].id;
@@ -172,33 +155,15 @@ class Tools extends React.Component {
     this.setState({ tabIndex: 2, showEffects: false });
   };
 
-  loadMore = ds => {
-    Store.setSearchingIsOn(true);
-    let query = Store.current.searchParams[ds];
-    query.firstSearch = false;
-    query.multiplyOffset++;
-    fetchSearchResultsFromIndexService(ds, ds, query).then(
-      res => {
-        Store.setSearchingIsOn(false);
-        Store.setSearchResults(res.results, ds, res.params);
-        this.props.onFinishSearch(Store.current.searchResults);
-      },
-      e => {
-        console.error(e.message);
-        Store.setSearchingIsOn(false);
-      },
-    );
-  };
-
   onComparePins = () => {
     let isCompare = !Store.current.compareMode;
     Store.setCompareMode(isCompare);
     this.resetPins();
   };
   resetPins = () => {
-    const { pinResults } = Store.current;
-    pinResults.forEach((pin, index) => {
-      Store.setPinOpacity(index, [0, 1]);
+    const { userPins } = Store.current;
+    userPins.forEach((pin, index) => {
+      Store.setPinProperty(index, 'opacity', [0, 1]);
     });
   };
   clearPins = () => {
@@ -207,7 +172,7 @@ class Tools extends React.Component {
     const selectResult = Store.current.selectedResult;
     Store.setTabIndex(selectResult ? 2 : 3);
   };
-  changeComapreMode = e => {
+  changeCompareMode = e => {
     this.resetPins();
     Store.setCompareModeType(e);
   };
@@ -224,7 +189,9 @@ class Tools extends React.Component {
             }}
           >
             <a
-              href="https://www.sentinel-hub.com/trial?origin=EOBrowser"
+              href={`${process.env.REACT_APP_BASEURL}oauth/subscription?origin=EOBrowser&param_client_id=${
+                process.env.REACT_APP_CLIENTID
+              }`}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -252,17 +219,19 @@ class Tools extends React.Component {
         <a className="esa" href="https://www.esa.int/" target="_blank" rel="noopener noreferrer">
           <img src={esaLogo} alt="ESA" />
         </a>
+        {/* <a
+          className="contestbanner"
+          href="https://www.sentinel-hub.com/contest"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src={banner} alt="Sentinel Hub Custom script Contest" className="contestbanner" />
+        </a> */}
       </div>
     );
   }
 
   render() {
-    let tabs = [
-      ['search', 'Search'],
-      ['list', 'Results'],
-      ['paint-brush', 'Visualization'],
-      ['pinsPanel', 'Pins'],
-    ];
     const {
       datasource,
       datasources,
@@ -272,56 +241,20 @@ class Tools extends React.Component {
       selectedResult,
       compareMode,
       compareModeType,
-      pinResults,
+      userPins,
+      themePins,
       mainTabIndex,
-      isSearching,
-    } = Store.current;
+    } = this.props;
     let hasSelectedResult = selectedResult !== null;
     const showResults = !isEmpty(searchResults);
-    let panels = [
-      <SearchForm onFinishSearch={this.props.onFinishSearch} />,
-      <ResultsPanel
-        showClear={true}
-        {...{ datasource, datasources, isSearching, searchParams }}
-        results={searchResults}
-        onResultClick={this.onClickResult}
-        onResultHover={this.onResultHover}
-        onLoadMore={this.loadMore}
-        onClearData={this.clearData}
-      />,
-      <div>{hasSelectedResult && mainTabIndex === 2 && <Visualization />}</div>,
-      <PinPanel
-        zoom={Number(zoom)}
-        isCompare={compareMode}
-        isOpacity={compareModeType === 'opacity'}
-        onPinClick={(item, i, zoom) => this.onClickResult(i, item, true)}
-        onCompare={this.onComparePins}
-        onClearPins={this.clearPins}
-        onRemove={i => Store.removePin(i)}
-        onZoomToPin={this.onZoomToPin}
-        onOpacityChange={this.props.onOpacityChange}
-        pinOrderChange={this.props.pinOrderChange}
-        onToggleCompareMode={e => this.changeComapreMode(e)}
-        items={pinResults}
-      />,
-    ];
-
-    Tabs.setUseDefaultStyles(false);
-
     return (
-      <div
-        id="tools"
-        className={this.props.className}
-        style={{
-          height: this.state.toolsHeight,
-        }}
-      >
-        <Header
-          showLogin={process.env.REACT_APP_LOGIN === 'yes'}
+      <div id="tools">
+        <EOBHeader
+          showLogin={true}
           user={this.props.user}
-          onShowLogin={() => loginAndLoadInstances()}
+          onShowLogin={doLogin}
           onLogout={() => {
-            Store.doLogout()
+            doLogout()
               .then(() => {
                 try {
                   if (get(Store.current, 'selectedResult.userId')) {
@@ -340,31 +273,55 @@ class Tools extends React.Component {
           }}
           onCollapse={this.props.onCollapse}
         />
+
         <Tabs
-          selectedIndex={mainTabIndex}
+          activeIndex={mainTabIndex}
           onSelect={this.handleSelect}
-          forceRenderTabPanel={true}
-          ref="tabsPanel"
+          onErrorMessage={this.handleErrorMessage}
         >
-          <TabList>
-            <Tab key={1}>
-              <i className={`fa fa-search`} />Search
-            </Tab>
-            <Tab key={2} style={{ display: showResults ? 'block' : 'none' }}>
-              <i className={`fa fa-sliders`} />Results
-            </Tab>
-            <Tab key={3} style={{ display: hasSelectedResult ? 'block' : 'none' }}>
-              <i className={`fa fa-paint-brush`} />Visualization
-            </Tab>
-            <Tab key={5}>
-              <i className={`fa fa-thumb-tack`} />My pins
-            </Tab>
-          </TabList>
-          {panels.map((panel, i) => (
-            <TabPanel id={`tabPanel-${i}`} key={i} className={tabs[i][0]}>
-              {panel}
-            </TabPanel>
-          ))}
+          <Tab title="Search" icon="search" renderKey={0}>
+            {this.props.themes ? (
+              <SearchForm onFinishSearch={this.props.onFinishSearch} themes={this.props.themes} />
+            ) : (
+              <i className="fa fa-spinner fa-spin fa-fw" />
+            )}
+          </Tab>
+
+          <Tab title="Results" icon="list" renderKey={1} enabled={showResults}>
+            <ResultsPanel
+              showClear={true}
+              {...{ datasource, datasources, searchParams }}
+              results={searchResults}
+              onResultClick={this.onClickResult}
+              onResultHover={this.onResultHover}
+              onClearData={this.clearData}
+              onFinishSearch={this.props.onFinishSearch}
+              allowLoadMoreButton={true}
+            />
+          </Tab>
+
+          <Tab title="Visualization" icon="paint-brush" renderKey={2} enabled={hasSelectedResult}>
+            <div>{hasSelectedResult && mainTabIndex === 2 && <Visualization />}</div>
+          </Tab>
+
+          <Tab title="Pins" icon="thumb-tack" renderKey={3}>
+            <PinPanel
+              zoom={Number(zoom)}
+              isCompare={compareMode}
+              isOpacity={compareModeType === 'opacity'}
+              onPinClick={item => this.onClickResult(item, true)}
+              onCompare={this.onComparePins}
+              onClearPins={this.clearPins}
+              onRemove={i => Store.removePin(i)}
+              onZoomToPin={this.onZoomToPin}
+              onOpacityChange={this.props.onOpacityChange}
+              pinOrderChange={this.props.pinOrderChange}
+              onToggleCompareMode={e => this.changeCompareMode(e)}
+              items={themePins ? themePins : userPins}
+              readOnly={!!themePins}
+              loggedIn={!!this.props.user}
+            />
+          </Tab>
         </Tabs>
 
         {this.renderPoweredBy()}
@@ -373,4 +330,20 @@ class Tools extends React.Component {
   }
 }
 
-export default connect(store => store, null, null, { withRef: true })(Tools);
+const mapStoreToProps = store => ({
+  datasource: store.datasource,
+  datasources: store.datasources,
+  compareMode: store.compareMode,
+  compareModeType: store.compareModeType,
+  mainTabIndex: store.mainTabIndex,
+  userPins: store.userPins,
+  themePins: store.themePins,
+  presets: store.presets,
+  searchFilterResults: store.searchFilterResults,
+  searchParams: store.searchParams,
+  searchResults: store.searchResults,
+  selectedResult: store.selectedResult,
+  user: store.user,
+  zoom: store.zoom,
+});
+export default connect(mapStoreToProps, null, null, { withRef: true })(Tools);

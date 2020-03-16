@@ -1,7 +1,8 @@
 import L from 'leaflet';
 
 //this is copied from https://raw.githubusercontent.com/mylen/leaflet.TileLayer.WMTS/master/leaflet-tilelayer-wmts-src.js where there was an issue with map zoom.
-// See line 44
+// See line 46
+// issue with repeating tilerow number; see line 61
 
 L.TileLayer.WMTS = L.TileLayer.extend({
   defaultWmtsParams: {
@@ -57,8 +58,9 @@ L.TileLayer.WMTS = L.TileLayer.extend({
     let ident = this.matrixIds[zoom].identifier;
     let X0 = this.matrixIds[zoom].topLeftCorner.lng;
     let Y0 = this.matrixIds[zoom].topLeftCorner.lat;
-    let tilecol = Math.floor((nw.x - X0) / tilewidth);
-    let tilerow = -Math.floor((nw.y - Y0) / tilewidth);
+    // fix repeating tilerow with using Math.round() instead of Math.floor()
+    let tilecol = Math.round((nw.x - X0) / tilewidth);
+    let tilerow = -Math.round((nw.y - Y0) / tilewidth);
     let url = L.Util.template(this._url, { s: this._getSubdomain(tilePoint) });
     return (
       url +

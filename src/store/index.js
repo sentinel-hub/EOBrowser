@@ -1,29 +1,14 @@
-import cloneDeep from 'lodash/cloneDeep';
 import values from 'lodash/values';
 import isEmpty from 'lodash/isEmpty';
 import merge from 'lodash/merge';
-import URI from 'urijs';
-import { calcBboxFromXY, getPixelSize, getNativeRes, roundDegrees, getMapDOMSize } from '../utils/coords';
+import { getNativeRes, roundDegrees } from '../utils/coords';
 import { combineEpics } from 'redux-observable';
 import { createEpicMiddleware } from 'redux-observable';
 import initialState from './config';
 import { createStore, applyMiddleware, compose } from 'redux';
 import get from 'dlv';
-import {
-  getMultipliedLayers,
-  syncPinsWithLocalStorage,
-  b64EncodeUnicode,
-  isScriptFromLayers,
-  evalSourcesMap,
-  isCustomPreset,
-} from '../utils/utils';
+import { getMultipliedLayers, b64EncodeUnicode, updatePins } from '../utils/utils';
 
-import request from 'axios';
-import ClientOAuth2 from 'client-oauth2';
-import jwt_dec from 'jwt-decode';
-
-import Terraform from 'terraformer';
-import WKT from 'terraformer-wkt-parser';
 import L from 'leaflet';
 // eslint-disable-next-line
 import rxjs from 'rxjs';
@@ -32,7 +17,6 @@ const SET_MAXCC = 'SET_MAXCC',
   SET_DATE = 'SET_DATE',
   SET_PREV_DATE = 'SET_PREV_DATE',
   SET_NEXT_DATE = 'SET_NEXT_DATE',
-  SET_LOGO = 'SET_LOGO',
   SET_MAP_VIEW = 'SET_MAP_VIEW',
   SET_MIN_DATE = 'SET_MIN_DATE',
   SET_USER_INSTANCES = 'SET_USER_INSTANCES',
@@ -42,30 +26,31 @@ const SET_MAXCC = 'SET_MAXCC',
   SET_EVAL_URL = 'SET_EVAL_URL',
   SET_EVAL_MODE = 'SET_EVAL_MODE',
   SET_PRESET = 'SET_PRESET',
-  SET_ANALYTICAL = 'SET_ANALYTICAL',
   SET_CURR_VIEW = 'SET_CURR_VIEW',
   SET_CHANNELS = 'SET_CHANNELS',
   SET_LAYERS = 'SET_LAYERS',
-  SET_RESOLUTION = 'SET_RESOLUTION',
   SET_PRESETS = 'SET_PRESETS',
   SET_FIS_SHADOW_LAYERS = 'SET_FIS_SHADOW_LAYERS',
   SET_CLOUD_COVERAGE_LAYERS = 'SET_CLOUD_COVERAGE_LAYERS',
   SET_USER = 'SET_USER',
   SET_MAP_BOUNDS = 'SET_MAP_BOUNDS',
+  SET_MAP_MAX_BOUNDS = 'SET_MAP_MAX_BOUNDS',
   SET_ATM_FILTER = 'SET_ATM_FILTER',
   SET_AOI_BOUNDS = 'SET_AOI_BOUNDS',
   SET_POI = 'SET_POI',
   SET_IS_CLIPPING = 'SET_IS_CLIPPING',
   SET_EVAL_SCRIPT = 'SET_EVAL_SCRIPT',
   SET_START_LOC = 'SET_START_LOC',
-  SET_GAIN = 'SET_GAIN',
-  SET_GAMMA = 'SET_GAMMA',
+  SET_GAIN_OVERRIDE = 'SET_GAIN_OVERRIDE',
+  SET_GAMMA_OVERRIDE = 'SET_GAMMA_OVERRIDE',
+  SET_RED_RANGE_OVERRIDE = 'SET_RED_RANGE_OVERRIDE',
+  SET_GREEN_RANGE_OVERRIDE = 'SET_GREEN_RANGE_OVERRIDE',
+  SET_BLUE_RANGE_OVERRIDE = 'SET_BLUE_RANGE_OVERRIDE',
+  SET_VALUE_RANGE_OVERRIDE = 'SET_VALUE_RANGE_OVERRIDE',
   SET_LAT = 'SET_LAT',
   SET_LNG = 'SET_LNG',
   SET_ZOOM = 'SET_ZOOM',
-  GENERATE_IMAGE_LINK = 'GENERATE_IMAGE_LINK',
   REFRESH = 'REFRESH',
-  IS_SEARCHING = 'IS_SEARCHING',
   SET_PATH = 'SET_PATH',
   SET_TAB_INDEX = 'SET_TAB_INDEX',
   SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS',
@@ -76,24 +61,23 @@ const SET_MAXCC = 'SET_MAXCC',
   SET_SELECTED_RESULT = 'SET_SELECTED_RESULT',
   ADD_MODAL_DIALOG = 'ADD_MODAL_DIALOG',
   REMOVE_MODAL_DIALOG = 'REMOVE_MODAL_DIALOG',
-  ADD_PIN_RESULT = 'ADD_PIN_RESULT',
+  SET_THEMES_URL = 'SET_THEMES_URL',
+  SET_PINS = 'SET_PINS',
+  SET_THEME_PINS = 'SET_THEME_PINS',
+  SET_SELECTED_THEME = 'SET_SELECTED_THEME',
+  SET_MODE = 'SET_MODE',
+  ADD_PINS = 'ADD_PINS',
   CHANGE_PIN_ORDER = 'CHANGE_PIN_ORDER',
   TOGGLE_ACTIVE_LAYER = 'TOGGLE_ACTIVE_LAYER',
   REMOVE_PIN = 'REMOVE_PIN',
   CLEAR_PINS = 'CLEAR_PINS',
-  SET_PIN_OPACITY = 'SET_PIN_OPACITY',
+  SET_PIN_PROPERTY = 'SET_PIN_PROPERTY',
   SHOW_LOGIN = 'SHOW_LOGIN',
   SET_ACTIVE_BASE_LAYER = 'SET_ACTIVE_BASE_LAYER',
-  SET_SELECTED_CRS = 'SET_SELECTED_CRS',
-  SET_IMAGE_FORMAT = 'SET_IMAGE_FORMAT';
+  SET_RECAPTCHA_AUTH_TOKEN = 'SET_RECAPTCHA_AUTH_TOKEN';
 
 const Reducers = {
-  SET_MAP_VIEW: ({ lat, lng, zoom = this.zoom, update }) => ({
-    lat,
-    lng,
-    zoom,
-    updatePosition: update,
-  }),
+  SET_MAP_VIEW: setMapView,
   SET_DATE: dateTo => ({ dateTo }),
   SET_PREV_DATE: prevDate => ({ prevDate }),
   SET_NEXT_DATE: nextDate => ({ nextDate }),
@@ -109,17 +93,15 @@ const Reducers = {
   SET_EVAL_MODE: isEvalUrl => ({ isEvalUrl }),
   SET_USER_INSTANCES: userInstances => ({ userInstances }),
   SET_MAP_BOUNDS: setBoundsAdSquarePerMeter,
+  SET_MAP_MAX_BOUNDS: setMapMaxBounds,
   SET_EVAL_SCRIPT: setEvalscript,
   SET_CHANNELS: setChannels,
   SET_START_LOC: startLocation => ({ startLocation }),
   SET_BASE64_URLS: base64Urls => ({ base64Urls }),
-  SET_ANALYTICAL: setAnalytical,
   SET_LAYERS: setLayers,
-  SET_LOGO: showLogo => ({ showLogo }),
   SET_LAT: lat => ({ lat }),
   SET_LNG: lng => ({ lng }),
-  SET_INSTANCES: instances => ({ instances, mainLoaded: true }),
-  SET_RESOLUTION: resolution => ({ resolution }),
+  SET_INSTANCES: instances => ({ instances, allGetCapabilitiesLoaded: true }),
   SET_USER: user => ({ user }),
   SET_ZOOM: zoom => ({ zoom }),
   SET_TAB_INDEX: mainTabIndex => ({ mainTabIndex, isActiveLayerVisible: true }),
@@ -130,37 +112,49 @@ const Reducers = {
   SET_AOI_BOUNDS: aoiBounds => ({ aoiBounds }),
   SET_POI: poi => ({ poi }),
   SET_IS_CLIPPING: isAoiClip => ({ isAoiClip }),
-  GENERATE_IMAGE_LINK: generateImageLink,
   SET_PATH: updatePath,
   ADD_MODAL_DIALOG: addModalDialog,
   REMOVE_MODAL_DIALOG: removeModalDialog,
-  ADD_PIN_RESULT: addPinResult,
+  SET_THEMES_URL: themesUrl => ({ themesUrl }),
+  SET_PINS: userPins => ({ userPins }),
+  SET_THEME_PINS: setThemePins,
+  SET_SELECTED_THEME: setSelectedTheme,
+  SET_MODE: setMode,
+  ADD_PINS: addPins,
   CHANGE_PIN_ORDER: changePinOrder,
   SET_CLOUDCOR: setCloudCor,
-  SET_GAIN: setGain,
-  SET_GAMMA: setGamma,
+  SET_GAIN_OVERRIDE: setGainOverride,
+  SET_GAMMA_OVERRIDE: setGammaOverride,
+  SET_RED_RANGE_OVERRIDE: setRedRangeOverride,
+  SET_GREEN_RANGE_OVERRIDE: setGreenRangeOverride,
+  SET_BLUE_RANGE_OVERRIDE: setBlueRangeOverride,
+  SET_VALUE_RANGE_OVERRIDE: setValueRangeOverride,
+
   SET_ATM_FILTER: setAtmFilter,
   REMOVE_PIN: removePin,
   CLEAR_PINS: clearPins,
-  SET_PIN_OPACITY: setPinOpacity,
+  SET_PIN_PROPERTY: setPinProperty,
   REFRESH: doRefresh => ({ doRefresh }),
   SET_ACTIVE_BASE_LAYER: setActiveBaseLayer,
-  SET_SELECTED_CRS: selectedCrs => ({ selectedCrs }),
-  SET_IMAGE_FORMAT: ({ imageFormat, imageExt }) => ({ imageFormat, imageExt }),
-  IS_SEARCHING: isSearching => ({ isSearching }),
   SHOW_LOGIN: showLogin => ({ showLogin }),
   SET_FILTER_RESULTS: searchFilterResults => ({ searchFilterResults }),
   SET_SELECTED_RESULT: setSelectedResult,
   SET_SEARCH_RESULTS: setSearchResults,
   CLEAR_SEARCH_RESULTS: clearSearchResults,
+
+  SET_RECAPTCHA_AUTH_TOKEN: recaptchaAuthToken => ({ recaptchaAuthToken }),
 };
 
 const DoesNeedRefresh = [
   SET_PRESET,
   SET_LAYERS,
   SET_SELECTED_RESULT,
-  SET_GAIN,
-  SET_GAMMA,
+  SET_GAIN_OVERRIDE,
+  SET_GAMMA_OVERRIDE,
+  SET_RED_RANGE_OVERRIDE,
+  SET_GREEN_RANGE_OVERRIDE,
+  SET_BLUE_RANGE_OVERRIDE,
+  SET_VALUE_RANGE_OVERRIDE,
   REFRESH,
   SET_ATM_FILTER,
 ];
@@ -175,10 +169,26 @@ const DoRefreshUrl = [
   SET_MAP_VIEW,
   SET_TAB_INDEX,
   SET_SELECTED_RESULT,
-  SET_GAIN,
-  SET_GAMMA,
+  SET_GAIN_OVERRIDE,
+  SET_GAMMA_OVERRIDE,
+  SET_RED_RANGE_OVERRIDE,
+  SET_GREEN_RANGE_OVERRIDE,
+  SET_BLUE_RANGE_OVERRIDE,
+  SET_VALUE_RANGE_OVERRIDE,
   SET_ATM_FILTER,
 ];
+
+function setMapView({ lat, lng, zoom = undefined, update }) {
+  let result = {
+    lat: lat,
+    lng: lng,
+    updatePosition: update,
+  };
+  if (zoom) {
+    result.zoom = zoom;
+  }
+  return result;
+}
 
 function setChannels(datasource, channels) {
   return {
@@ -186,17 +196,14 @@ function setChannels(datasource, channels) {
   };
 }
 
-function setAnalytical(isAnalytical) {
-  return {
-    imageFormat: isAnalytical ? this.imageFormat : this.imageFormats[0].value,
-    imageExt: isAnalytical ? this.imageExt : this.imageFormats[0].ext,
-    isAnalytical,
-  };
-}
-
 function setPresets(datasource, presets) {
   return {
-    presets: merge(this.presets, { [datasource]: presets }),
+    presets: {
+      ...this.presets,
+      ...{
+        [datasource]: presets,
+      },
+    },
   };
 }
 function setFisShadowLayers(datasource, fisShadowLayers) {
@@ -229,15 +236,15 @@ function setSelectedResult(result) {
   let startLayers = null;
   if (this.channels[datasource] && this.channels[datasource].length > 0) {
     startLayers = {
-      r: datasource.includes('Sentinel-1')
-        ? this.channels[datasource][0].name
-        : this.channels[datasource][0].name,
-      g: datasource.includes('Sentinel-1')
-        ? this.channels[datasource][0].name
-        : this.channels[datasource][1].name,
-      b: datasource.includes('Sentinel-1')
-        ? this.channels[datasource][0].name
-        : this.channels[datasource][2].name,
+      r: this.channels[datasource][0].name,
+      g:
+        this.channels[datasource].length < 3
+          ? this.channels[datasource][0].name
+          : this.channels[datasource][1].name,
+      b:
+        this.channels[datasource].length < 3
+          ? this.channels[datasource][0].name
+          : this.channels[datasource][2].name,
     };
   }
   const layersObj = layers && preset === 'CUSTOM' ? layers : startLayers;
@@ -298,27 +305,30 @@ function setLayers(layers) {
 function setCloudCor(cloudCor) {
   return { selectedResult: { ...this.selectedResult, cloudCor } };
 }
-function setGain(gain) {
-  return { selectedResult: { ...this.selectedResult, gain } };
+
+function setGainOverride(gainOverride) {
+  return { selectedResult: { ...this.selectedResult, gainOverride } };
 }
-function setGamma(gamma) {
-  return { selectedResult: { ...this.selectedResult, gamma } };
+function setGammaOverride(gammaOverride) {
+  return { selectedResult: { ...this.selectedResult, gammaOverride } };
 }
+function setRedRangeOverride(redRangeOverride) {
+  return { selectedResult: { ...this.selectedResult, redRangeOverride } };
+}
+function setGreenRangeOverride(greenRangeOverride) {
+  return { selectedResult: { ...this.selectedResult, greenRangeOverride } };
+}
+function setBlueRangeOverride(blueRangeOverride) {
+  return { selectedResult: { ...this.selectedResult, blueRangeOverride } };
+}
+function setValueRangeOverride(valueRangeOverride) {
+  return { selectedResult: { ...this.selectedResult, valueRangeOverride } };
+}
+
 function setAtmFilter(atmFilter) {
   return { selectedResult: { ...this.selectedResult, atmFilter } };
 }
 
-function changePinOrder(oldIndex, newIndex) {
-  const oldPin = this.pinResults[oldIndex];
-  const pins = this.pinResults;
-  const nextState = pins.slice();
-  nextState.splice(oldIndex, 1);
-  nextState.splice(newIndex, 0, oldPin);
-  syncPinsWithLocalStorage(nextState);
-  return {
-    pinResults: nextState,
-  };
-}
 function addModalDialog(id, component) {
   return {
     modalDialogs: [
@@ -335,45 +345,104 @@ function removeModalDialog(id) {
     modalDialogs: this.modalDialogs.filter(tc => tc.id !== id),
   };
 }
-function addPinResult(item) {
+
+function changePinOrder(oldIndex, newIndex, readOnly) {
+  const pins = readOnly ? this.themePins : this.userPins;
+  const newPins = [...pins];
+  const draggedPin = pins[oldIndex];
+  newPins.splice(oldIndex, 1);
+  newPins.splice(newIndex, 0, draggedPin);
+
+  if (readOnly) {
+    return {
+      themePins: newPins,
+    };
+  } else {
+    updatePins(newPins).catch(e => {
+      console.error(e);
+    });
+    return {
+      userPins: newPins,
+    };
+  }
+}
+
+function setThemePins(pins) {
+  let themePins = pins;
+  if (pins) {
+    themePins = pins.map(pin => {
+      return {
+        ...pin,
+        opacity: [0, 1],
+      };
+    });
+  }
+  return {
+    themePins,
+  };
+}
+
+function setSelectedTheme(selectedTheme) {
+  return { selectedTheme: selectedTheme };
+}
+
+function setMode(mode) {
+  return { mode: mode };
+}
+
+function addPins(items) {
   const { lat, lng, zoom = 10 } = this;
-  let pinItem = { lat, lng, zoom, ...item };
-  let pinResults = [pinItem, ...this.pinResults].map(pin => {
+  let pinItems = items.map(item => ({ lat, lng, zoom, ...item }));
+  let userPins = [...pinItems, ...this.userPins].map(pin => {
     return { ...pin, opacity: 1 };
   });
-  syncPinsWithLocalStorage(pinResults);
+  updatePins(userPins).catch(e => {
+    console.error(e);
+  });
   return {
-    pinResults,
+    userPins,
   };
 }
 function removePin(index) {
-  let result = this.pinResults.filter((obj, i) => i !== index);
-  syncPinsWithLocalStorage(result);
-
+  let result = this.userPins.filter((obj, i) => i !== index);
+  updatePins(result).catch(e => {
+    console.error(e);
+  });
   return {
-    pinResults: result,
+    userPins: result,
   };
 }
 function clearPins() {
   let result = [];
 
-  syncPinsWithLocalStorage(result);
-
+  updatePins(result).catch(e => {
+    console.error(e);
+  });
   return {
-    pinResults: result,
+    userPins: result,
   };
 }
-function setPinOpacity(index, value) {
+function setPinProperty(index, propertyName, value) {
+  const userPins = this.userPins.map((pin, i) => {
+    if (index !== i) {
+      return pin;
+    }
+    return {
+      ...pin,
+      [propertyName]: value,
+    };
+  });
+
+  const shouldUpdateSavedPins = propertyName !== 'opacity';
+
+  if (shouldUpdateSavedPins) {
+    updatePins(userPins).catch(e => {
+      console.error(e);
+    });
+  }
+
   return {
-    pinResults: this.pinResults.map((pin, i) => {
-      if (index !== i) {
-        return pin;
-      }
-      return {
-        ...pin,
-        opacity: value,
-      };
-    }),
+    userPins: userPins,
   };
 }
 function setBoundsAdSquarePerMeter(bounds, pixelBounds) {
@@ -392,19 +461,32 @@ function setBoundsAdSquarePerMeter(bounds, pixelBounds) {
   };
 }
 
+function setMapMaxBounds(mapMaxBounds) {
+  return {
+    mapMaxBounds: mapMaxBounds,
+  };
+}
+
 function updatePath() {
-  if (!this.mainLoaded) return;
-  const { lat, lng, zoom, selectedResult, isActiveLayerVisible, isEvalUrl, mainTabIndex } = this;
+  if (!this.allGetCapabilitiesLoaded) return;
+  const { lat, lng, zoom, selectedResult, isActiveLayerVisible, isEvalUrl, mainTabIndex, themesUrl } = this;
   let params = [];
   params.push(`lat=${roundDegrees(lat, zoom)}`);
   params.push(`lng=${roundDegrees(lng, zoom)}`);
   params.push(`zoom=${zoom}`);
+  if (themesUrl) {
+    params.push(`themesUrl=${themesUrl}`);
+  }
 
   if (!isEmpty(selectedResult) && isActiveLayerVisible && mainTabIndex === 2) {
     const {
       datasource,
-      gain,
-      gamma,
+      gainOverride,
+      gammaOverride,
+      redRangeOverride,
+      greenRangeOverride,
+      blueRangeOverride,
+      valueRangeOverride,
       atmFilter,
       time,
       evalscript,
@@ -415,9 +497,29 @@ function updatePath() {
     } = selectedResult;
     params.push(`time=${time}`);
     params.push(`preset=${preset}`);
-    gain && params.push(`gain=${gain}`);
-    gamma && params.push(`gamma=${gamma}`);
     atmFilter && params.push(`atmFilter=${atmFilter}`);
+
+    // don't encode evalscriptoverride params for EOB url so it's
+    // easier to get params directly from EOB url when copying / sharing
+    if (gainOverride) {
+      params.push(`gainOverride=${gainOverride}`);
+    }
+    if (gammaOverride) {
+      params.push(`gammaOverride=${gammaOverride}`);
+    }
+    if (redRangeOverride) {
+      params.push(`redRangeOverride=${JSON.stringify(redRangeOverride)}`);
+    }
+    if (greenRangeOverride) {
+      params.push(`greenRangeOverride=${JSON.stringify(greenRangeOverride)}`);
+    }
+    if (blueRangeOverride) {
+      params.push(`blueRangeOverride=${JSON.stringify(blueRangeOverride)}`);
+    }
+    if (valueRangeOverride) {
+      params.push(`valueRangeOverride=${JSON.stringify(valueRangeOverride)}`);
+    }
+
     const instanceId = get(activeLayer, '@id');
     if (instanceId) {
       params.push(`instanceId=${window.encodeURIComponent(instanceId)}`);
@@ -433,7 +535,10 @@ function updatePath() {
   }
 
   const path = params.join('&');
-  window.location.hash = path;
+  const newUrl =
+    window.location.protocol + '//' + window.location.host + window.location.pathname + '?' + path;
+  window.history.pushState({}, '', newUrl);
+
   return { path };
 }
 
@@ -448,7 +553,6 @@ function setActiveBaseLayer(name, minmax) {
 
 function setSearchResults(results, datasource, returnParams) {
   return {
-    isSearching: false,
     searchResults: { ...this.searchResults, [datasource]: results },
     searchParams: { ...this.searchParams, [datasource]: returnParams },
   };
@@ -456,108 +560,8 @@ function setSearchResults(results, datasource, returnParams) {
 
 function clearSearchResults() {
   return {
-    isSearching: false,
     searchResults: {},
     searchParams: {},
-  };
-}
-
-function generateImageLink() {
-  const {
-    selectedResult: { datasource, preset, evalscript, evalscripturl, gain, gamma, atmFilter, layers, time },
-    showLogo,
-    instances,
-    imageExt,
-    isAnalytical,
-    isEvalUrl,
-    resolution,
-    imageFormat,
-    aoiBounds,
-  } = this;
-  const isJp2 = imageFormat.includes('jp2');
-  const isKMZ = imageFormat.includes('application');
-  const activeLayer = instances.find(inst => inst.name === datasource);
-  const isPngJpg = ['jpg', 'png'].includes(imageExt);
-  const { width: imageW, height: imageH } = getPixelSize();
-  const isScript = !isScriptFromLayers(evalscript, layers);
-  const url = new URI(`${activeLayer.baseUrls.WMS}?SERVICE=WMS&REQUEST=GetMap`);
-
-  // build url
-  url.addQuery('SHOWLOGO', showLogo && !isPngJpg);
-  url.addQuery('MAXCC', 100);
-  url.addQuery('TIME', `${time}/${time}`);
-  url.addQuery('CRS', this.selectedCrs);
-  url.addQuery('FORMAT', imageFormat.includes('jpg') ? 'image/jpeg' : imageFormat);
-
-  if (aoiBounds) {
-    if (this.selectedCrs === 'EPSG:4326') {
-      const wgsCoords = {
-        geometry: {
-          type: 'Polygon',
-          coordinates: [aoiBounds.geometry.coordinates[0].map(coord => [coord[1], coord[0]])],
-        },
-      };
-      const wgsGeom = new Terraform.Primitive(cloneDeep(wgsCoords.geometry));
-      url.addQuery('GEOMETRY', WKT.convert(wgsGeom));
-    } else {
-      const mercGeom = new Terraform.Primitive(cloneDeep(aoiBounds.geometry)).toMercator();
-      url.addQuery('GEOMETRY', WKT.convert(mercGeom));
-    }
-    const mercGeom = new Terraform.Primitive(cloneDeep(aoiBounds.geometry)).toMercator();
-    url.addQuery('GEOMETRY', WKT.convert(mercGeom));
-  } else {
-    url.addQuery('BBOX', getBbox(this));
-  }
-  gain && url.addQuery('gain', gain);
-  atmFilter && atmFilter !== 'null' && url.addQuery('ATMFILTER', atmFilter);
-  gamma && url.addQuery('gamma', gamma);
-
-  if (isCustomPreset(preset)) {
-    url.addQuery('EVALSCRIPT', evalscript);
-    evalscripturl !== '' && isEvalUrl && url.addQuery('EVALSCRIPTURL', evalscripturl);
-
-    isScript && url.addQuery('EVALSCRIPT', evalscript);
-    evalscripturl !== '' && isEvalUrl && url.addQuery('EVALSCRIPT', evalscript);
-    url.addQuery('EVALSOURCE', evalSourcesMap[datasource]);
-  }
-  url.addQuery('LAYERS', preset === 'CUSTOM' ? this.presets[datasource][0].id : preset);
-
-  if (datasource.includes('EW') && preset.includes('NON_ORTHO')) {
-    url.addQuery('ORTHORECTIFY', false);
-  }
-  const mapDOMSize = getMapDOMSize();
-  const imageSizeW = isAnalytical ? Math.round(imageW / resolution) : aoiBounds ? imageW : mapDOMSize.width;
-  const imageSizeH = isAnalytical ? Math.round(imageH / resolution) : aoiBounds ? imageH : mapDOMSize.height;
-  url.addQuery('WIDTH', imageSizeW);
-  url.addQuery('HEIGHT', imageSizeH);
-  if (isPngJpg || isKMZ) {
-    url.addQuery('NICENAME', `${datasource} from ${time}.${isKMZ ? 'kmz' : imageExt}`);
-    url.addQuery('TRANSPARENT', imageFormat.includes('png') ? 0 : 1);
-    url.addQuery('BGCOLOR', '00000000');
-    // const browserUrl = url
-    //   .toString()
-    //   .replace(/%2f/gi, '/')
-    //   .replace(/%2c/gi, ',');
-    // return {
-    //   imgWmsUrl: browserUrl,
-    //   imageW: imageSizeW,
-    //   imageH: imageSizeH
-    // };
-  } else {
-    url.addQuery('NICENAME', `${datasource} from ${time}.${isJp2 ? 'jp2' : 'tiff'}`);
-    url.addQuery(
-      'COVERAGE',
-      preset[datasource] === 'CUSTOM' ? values(layers[datasource]).join(',') : preset[datasource],
-    );
-  }
-  const finalUrl = url
-    .toString()
-    .replace(/%2f/gi, '/')
-    .replace(/%2c/gi, ',');
-  return {
-    imgWmsUrl: finalUrl,
-    imageW: imageSizeW,
-    imageH: imageSizeH,
   };
 }
 
@@ -581,19 +585,6 @@ function createPolygonFromBounds(latLngBounds) {
   }); //center left
 
   return new L.polygon(latlngs).toGeoJSON();
-}
-
-function getBbox(store) {
-  const { mapBounds, selectedCrs, lat, lng, zoom, resolution: factor } = store;
-  const bbox =
-    selectedCrs === 'EPSG:4326'
-      ? mapBounds
-          .toBBoxString()
-          .split(',')
-          .reverse()
-          .join(',')
-      : calcBboxFromXY({ lat, lng, zoom, factor }).join(',');
-  return bbox;
 }
 
 function mustRefresh(actions) {
@@ -620,100 +611,21 @@ function reducer(currentState, action) {
   return currentState; // DO NOTHING IF NO MATCH
 }
 
-const store = createStore(
-  reducer,
-  initialState,
-  compose(
-    applyMiddleware(createEpicMiddleware(combineEpics(mustRefresh, refreshPath))),
-    window.devToolsExtension ? window.devToolsExtension() : f => f,
-  ),
-);
+const composeEnhancers =
+  typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})
+    : compose;
 
-if (window.devToolsExtension) {
-  window.devToolsExtension.updateStore(store);
-}
+const middleware = createEpicMiddleware(combineEpics(mustRefresh, refreshPath));
+const enhancer = composeEnhancers(applyMiddleware(middleware));
+
+const store = createStore(reducer, initialState, enhancer);
 
 function action(x) {
   return (...args) => {
     store.dispatch({ type: x, args });
   };
 }
-
-const selectedConfig = {
-  cliendId: process.env.REACT_APP_CLIENTID,
-  redirect: process.env.REACT_APP_REDIRECT,
-  baseUrl: process.env.REACT_APP_BASEURL,
-  configuratorUrl: process.env.REACT_APP_CONFIGURATORURL,
-};
-const callbackUrl = selectedConfig.redirect;
-const baseOauthURL = selectedConfig.baseUrl;
-
-const LC_NAME = 'eobrowser_oauth';
-let token = null;
-let user = null;
-const oauth = new ClientOAuth2({
-  clientId: selectedConfig.cliendId,
-  accessTokenUri: baseOauthURL + 'oauth/token',
-  authorizationUri: baseOauthURL + 'oauth/auth',
-  redirectUri: `${callbackUrl}oauthCallback.html`,
-});
-
-function getTokenFromLC(throwErrors = false) {
-  let localToken = localStorage.getItem(LC_NAME);
-  if (localToken) {
-    localToken = JSON.parse(localToken);
-    const now = new Date().valueOf();
-    const expiration = parseInt(localToken['expires_in'], 10);
-    const domain = localToken['domain'];
-    if (expiration > now && domain === window.location.pathname) {
-      token = localToken;
-      user = jwt_dec(localToken['id_token']);
-      return true;
-    } else if (throwErrors) {
-      throw new Error('Token expired');
-    }
-  } else if (throwErrors) {
-    throw new Error('Token not found');
-  }
-}
-
-function assureLoggedIn() {
-  if (isTokenExpired()) {
-    // must get new token, open OAuth callback and wait for resolution
-    return new Promise((resolve, reject) => {
-      window.authorizationCallback = { resolve, reject };
-      window.open(oauth.token.getUri(), 'popupWindow', 'width=800,height=600');
-    }).then(() => {
-      getTokenFromLC(true);
-      return { user, token };
-    });
-  } else {
-    // token is fine, we are still logged in
-    return Promise.resolve({ user, token });
-  }
-}
-
-function logout() {
-  return new Promise((resolve, reject) => {
-    request
-      .get(baseOauthURL + 'oauth/logout', {
-        withCredentials: true,
-      })
-      .then(res => {
-        localStorage.removeItem(LC_NAME);
-        token = null;
-        user = null;
-        resolve();
-      })
-      .catch(e => reject());
-  });
-}
-
-function isTokenExpired() {
-  const now = new Date().valueOf();
-  return now > (token ? token['expires_in'] : 0);
-}
-
 export default {
   get current() {
     return store.getState();
@@ -721,20 +633,6 @@ export default {
   get Store() {
     return store;
   },
-  get getConfig() {
-    return selectedConfig;
-  },
-
-  doLogin() {
-    return assureLoggedIn();
-  },
-  doLogout() {
-    return logout();
-  },
-  getTokenFromLC() {
-    return getTokenFromLC();
-  },
-
   setMaxcc: action(SET_MAXCC),
   setDate: action(SET_DATE),
   nextDate: action(SET_NEXT_DATE),
@@ -746,14 +644,13 @@ export default {
   setCurrentView: action(SET_CURR_VIEW),
   setChannels: action(SET_CHANNELS),
   setMapBounds: action(SET_MAP_BOUNDS),
+  setMapMaxBounds: action(SET_MAP_MAX_BOUNDS),
   setLat: action(SET_LAT),
   setLng: action(SET_LNG),
   setZoom: action(SET_ZOOM),
   setTabIndex: action(SET_TAB_INDEX),
   toggleActiveLayer: action(TOGGLE_ACTIVE_LAYER),
-  generateImageLink: action(GENERATE_IMAGE_LINK),
   setActiveBaseLayer: action(SET_ACTIVE_BASE_LAYER),
-  setSearchingIsOn: action(IS_SEARCHING),
   setSearchResults: action(SET_SEARCH_RESULTS),
   clearSearchResults: action(CLEAR_SEARCH_RESULTS),
   setInstances: action(SET_INSTANCES),
@@ -764,18 +661,20 @@ export default {
   setCompareModeType: action(SET_COMPARE_MODE_TYPE),
   clearPins: action(CLEAR_PINS),
   removePin: action(REMOVE_PIN),
-  setPinOpacity: action(SET_PIN_OPACITY),
+  setPinProperty: action(SET_PIN_PROPERTY),
   addModalDialog: action(ADD_MODAL_DIALOG),
   removeModalDialog: action(REMOVE_MODAL_DIALOG),
-  addPinResult: action(ADD_PIN_RESULT),
+  setThemesUrl: action(SET_THEMES_URL),
+  addPins: action(ADD_PINS),
+  setPins: action(SET_PINS),
+  setThemePins: action(SET_THEME_PINS),
+  setSelectedTheme: action(SET_SELECTED_THEME),
+  setMode: action(SET_MODE),
   changePinOrder: action(CHANGE_PIN_ORDER),
   showLogin: action(SHOW_LOGIN),
   setUser: action(SET_USER),
-  setSelectedCrs: action(SET_SELECTED_CRS),
-  setImageFormat: action(SET_IMAGE_FORMAT),
   setAOIBounds: action(SET_AOI_BOUNDS),
   setPOI: action(SET_POI),
-  setLogo: action(SET_LOGO),
   setMapView: action(SET_MAP_VIEW),
   setUserInstances: action(SET_USER_INSTANCES),
 
@@ -787,11 +686,17 @@ export default {
   setEvalScript: action(SET_EVAL_SCRIPT),
   refresh: action(REFRESH),
   setSelectedResult: action(SET_SELECTED_RESULT),
-  setResolution: action(SET_RESOLUTION),
   setAtmFilter: action(SET_ATM_FILTER),
-  setGain: action(SET_GAIN),
   setEvalMode: action(SET_EVAL_MODE),
   setEvalUrl: action(SET_EVAL_URL),
-  setAnalytical: action(SET_ANALYTICAL),
-  setGamma: action(SET_GAMMA),
+
+  // evalscriptoverrides
+  setGainOverride: action(SET_GAIN_OVERRIDE),
+  setGammaOverride: action(SET_GAMMA_OVERRIDE),
+  setRedRangeOverride: action(SET_RED_RANGE_OVERRIDE),
+  setGreenRangeOverride: action(SET_GREEN_RANGE_OVERRIDE),
+  setBlueRangeOverride: action(SET_BLUE_RANGE_OVERRIDE),
+  setValueRangeOverride: action(SET_VALUE_RANGE_OVERRIDE),
+
+  setRecaptchaAuthToken: action(SET_RECAPTCHA_AUTH_TOKEN),
 };

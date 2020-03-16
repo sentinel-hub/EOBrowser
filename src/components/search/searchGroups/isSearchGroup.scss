@@ -1,0 +1,56 @@
+.searchForm div.dataSourceGroup {
+  label {
+    float: none;
+    display: inline;
+  }
+  .react-toggle-track {
+    height: 17px;
+  }
+  .react-toggle-thumb {
+    height: 15px;
+    width: 15px;
+    margin-left: 4px;
+  }
+  div.advanced {
+    padding: 10px 10px 10px 20px;
+  }
+  div.advanced > div {
+    margin-top: 5px;
+  }
+  div.warning {
+    color: orange;
+    padding: 5px 5px 10px;
+  }
+  div.warning i {
+    margin-right: 3px;
+  }
+
+  div.checkboxes {
+    display: block;
+    clear: both;
+    padding: 3px 10px;
+
+    label.checkboxItem {
+      margin-right: 20px;
+    }
+    .checkboxItem input {
+      margin-right: 7px;
+    }
+  }
+
+  .breakLines div.checkboxes .checkboxItem {
+    display: block;
+    clear: both;
+  }
+  .twoItemsPerLine div.checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    width: 230px;
+  }
+  .twoItemsPerLine div.checkboxes .checkboxItem {
+    display: block;
+    width: 50%;
+    margin-right: 0;
+  }
+
+}

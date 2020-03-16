@@ -1,0 +1,32 @@
+.pintoolsIcon {
+  float: right;
+  cursor: pointer;
+  color: #b6bf00;
+}
+
+.pin-tools {
+  z-index: 5;
+  background-color: #474954;
+  box-shadow: 0 2px 5px #000;
+  position: absolute;
+  width: max-content;
+  color: #fff;
+}
+
+.show {
+  display: block;
+}
+
+.pin-tools ul {
+  list-style: none;
+  margin: 0px;
+  padding: 10px;
+}
+
+.pin-tools li {
+  padding: 2px;
+}
+
+.pin-tools li a {
+  text-decoration: none;
+}

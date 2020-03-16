@@ -1,7 +1,5 @@
 @import 'variables';
-@import 'geosuggest';
 $loginBg: url('./bahamas.jpg');
-$bg-img: url('./components/bg.jpg');
 
 html,
 body,
@@ -10,6 +8,9 @@ body,
   padding: 0;
   height: 100%;
   font-family: Arial, Helvetica, sans-serif;
+}
+body {
+  overflow: hidden;
 }
 .centeredFa {
   i {
@@ -58,37 +59,9 @@ body,
     display: block;
   }
 }
+
 .logoHeader {
-  padding: 15px 10px 50px 52px;
-  background: $bg-img left top no-repeat;
-  background-size: cover;
-
-  .appTitle {
-    font-size: 24px;
-    color: #fff;
-    text-decoration: none;
-  }
-
-  .userPanel {
-    position: absolute;
-    right: 9px;
-    top: 12px;
-    font-size: 12px;
-
-    .fa {
-      font-size: 16px;
-      color: #fff;
-      margin-left: 5px;
-    }
-  }
-
-  a {
-    cursor: pointer;
-    img {
-      margin-right: 5px;
-      vertical-align: middle;
-    }
-  }
+  background: url('./assets/header-bg.jpg') left top no-repeat;
 }
 
 .imageBucketRoot .logoHeader.withBg {
@@ -127,7 +100,6 @@ a {
   }
 }
 
-input,
 .inlineDatepicker {
   border: none;
   border-bottom: 1px solid #fff;
@@ -184,16 +156,6 @@ input,
     background: #eee;
     cursor: default;
   }
-}
-
-.notification {
-  margin: 10px auto;
-  max-width: 400px;
-  padding: 10px;
-  position: relative;
-  text-align: center;
-  color: orange;
-  font-size: 14px;
 }
 
 .imageWithLoader {
@@ -282,7 +244,8 @@ div.socialLogin {
 
 #aboutSentinel {
   position: absolute;
-  left: calc(50% - 250px);
+  left: calc(50%);
+  transform: translateX(-50%);
   background: $mainMedium;
   color: $primaryCol;
   bottom: 0;
@@ -341,7 +304,32 @@ div.socialLogin {
   }
 
   #aboutSentinel {
-    left: auto;
+    transform: translateX(0);
+    left: 0;
+  }
+}
+@media screen and (max-width: 500px) {
+  .leaflet-control-scale {
+    bottom: 25px;
+  }
+
+  #mapCoords {
     right: 0;
   }
+}
+
+/******measure path override *******/
+.leaflet-measure-path-measurement {
+  z-index: 500;
+}
+.leaflet-tooltip-pane {
+  z-index: 650 !important;
+}
+.contestbanner {
+  margin-top: 10px;
+  width: 100%;
+}
+.contestbanner:hover {
+  transform: scale(1.01);
+  transition: 0.3s ease-in-out;
 }

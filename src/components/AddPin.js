@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { uniquePinId } from '../utils/utils';
 import Store from '../store';
-import { connect } from 'react-redux';
 
 class AddPin extends Component {
   savePin = () => {
@@ -19,25 +19,28 @@ class AddPin extends Component {
       lat: pin ? pin.lat : lat,
       lng: pin ? pin.lng : lng,
       _id: uniquePinId(),
+      pinTitle: '',
     };
-    Store.addPinResult(savePin);
+    Store.addPins([savePin]);
     Store.setTabIndex(3);
   };
 
   render() {
+    const title = `Pin to your favourite items`;
     return (
-      <a
-        className="addToPin"
-        onClick={() => {
-          // this.props.onAddToPin && this.props.onAddToPin();
-          this.savePin();
-        }}
-        title="Pin to your favourite items"
-      >
+      <a className="addToPin" onClick={this.savePin} title={title}>
         <i className="fa fa-thumb-tack" />
       </a>
     );
   }
 }
 
-export default connect(s => s)(AddPin);
+const mapStoreToProps = store => ({
+  lat: store.lat,
+  lng: store.lng,
+  zoom: store.zoom,
+  selectedResult: store.selectedResult,
+  presets: store.presets,
+  loggedIn: !!store.user,
+});
+export default connect(mapStoreToProps)(AddPin);

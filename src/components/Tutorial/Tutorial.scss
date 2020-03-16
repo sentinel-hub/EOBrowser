@@ -1,0 +1,164 @@
+.tutorialWrap {
+  background-color: rgb(255, 255, 255);
+  border-radius: 5px;
+  box-sizing: border-box;
+  color: rgb(51, 51, 51);
+  font-size: 16px;
+  max-width: 100%;
+  padding: 15px;
+  position: relative;
+  width: 800px;
+  max-height: 80vh;
+}
+
+.tutorialBody {
+  line-height: 1.4;
+  text-align: center;
+}
+
+.activateCloseAnimation {
+  display: block !important;
+  animation-name: animateCloseInfo;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes animateCloseInfo {
+  0% {
+    display: block;
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    height: 0 !important;
+    right: 10px;
+    top: 10px;
+    opacity: 0;
+    display: none;
+  }
+}
+
+.closeCross {
+  background-color: transparent;
+  border: 0px;
+  border-radius: 0px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 15px;
+  -webkit-appearance: none;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+}
+
+.tutorialFooter {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.tutorialButton {
+  background-color: rgb(182, 191, 0);
+  border: 0px;
+  border-radius: 4px;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  line-height: 1;
+  padding: 8px;
+  -webkit-appearance: none;
+  font-size: 14px;
+  margin: 2px;
+}
+
+.tutorialButton:disabled {
+  background-color: rgb(145, 145, 145);
+}
+
+.contentDivStyle {
+  text-align: left;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.tutorialTitle {
+  font-size: 20px;
+  margin: 0px 0px 10px;
+}
+
+.contentWrapper {
+  padding: 0px 10px;
+}
+
+.firstTutorialNextButton {
+  margin-right: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
+  border: 1px solid rgb(182, 191, 0);
+}
+
+.firstTutorialCloseButton {
+  margin-left: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
+  color: rgb(182, 191, 0);
+  background: rgb(255, 255, 255);
+  border: 1px solid rgb(182, 191, 0);
+}
+
+.firstTutorialFooter {
+  padding-bottom: 40px;
+}
+
+.tutorialPanelButton {
+  position: absolute !important;
+  right: 10px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+  background: #3b3d4d;
+  color: #fff;
+  height: 40px;
+  -webkit-box-shadow: 0 2px 5px #000;
+  box-shadow: 0 2px 5px #000;
+  text-align: center;
+
+  &.tutorialInfoPanelButton {
+    top: 10px;
+  }
+
+  &#tutorialAnimatedInfoPanelButton {
+    top: 50vh;
+    right: 50vw;
+    width: 40px;
+    display: none;
+  }
+
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 12px;
+  }
+
+  .drawGeometry {
+    background-color: #191a25;
+  }
+  i {
+    font-size: 20px;
+    line-height: 40px;
+    width: 40px;
+    cursor: pointer;
+  }
+  a {
+    color: #b6bf00;
+    background: none;
+    display: inline-block;
+    width: 40px;
+    text-align: center;
+  }
+  a.disabled {
+    opacity: 0.5;
+  }
+}

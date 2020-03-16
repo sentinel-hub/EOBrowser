@@ -79,12 +79,12 @@ function convertToWgs84(xy) {
 
   return [xy[0] * R2D / A, (Math.PI * 0.5 - 2.0 * Math.atan(Math.exp(-xy[1] / A))) * R2D];
 }
-export function getCoordsFromBounds(bounds, isLatLng, newService = false) {
+export function getCoordsFromBounds(bounds, isLatLng, shouldWrap = true) {
   let coords = [];
-  let sw = newService ? bounds.getSouthWest() : bounds.getSouthWest().wrap(),
-    se = newService ? bounds.getSouthEast() : bounds.getSouthEast().wrap(),
-    ne = newService ? bounds.getNorthEast() : bounds.getNorthEast().wrap(),
-    nw = newService ? bounds.getNorthWest() : bounds.getNorthWest().wrap();
+  const sw = shouldWrap ? bounds.getSouthWest().wrap() : bounds.getSouthWest();
+  const se = shouldWrap ? bounds.getSouthEast().wrap() : bounds.getSouthEast();
+  const ne = shouldWrap ? bounds.getNorthEast().wrap() : bounds.getNorthEast();
+  const nw = shouldWrap ? bounds.getNorthWest().wrap() : bounds.getNorthWest();
   if (!isLatLng) {
     coords.push([sw.lng, sw.lat]);
     coords.push([se.lng, se.lat]);

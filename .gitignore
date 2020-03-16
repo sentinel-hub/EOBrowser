@@ -14,3 +14,8 @@ build
 .idea
 npm-debug.log
 *.log
+
+# translations
+i18n/*.mo
+
+.env

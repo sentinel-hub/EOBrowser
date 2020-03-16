@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 import request from 'axios';
 import AddPin from '../AddPin';
-
+import CopyToClipboard from '../CopyToClipboard';
 class ResultItem extends React.Component {
   constructor(props) {
     super(props);
@@ -10,6 +10,7 @@ class ResultItem extends React.Component {
       linkVisible: false,
       scihubLink: '',
     };
+    this.awsPathRef = React.createRef();
   }
 
   toggleLinksPanel = tileData => {
@@ -33,14 +34,11 @@ class ResultItem extends React.Component {
   };
 
   render() {
-    let {
+    const {
       result,
-      result: {
-        tileData,
-        properties: { index },
-      },
+      result: { tileData, resultIndex },
     } = this.props;
-    let {
+    const {
       datasource: datasourceName,
       time,
       sensingTime,
@@ -50,9 +48,9 @@ class ResultItem extends React.Component {
       satellite,
     } = tileData;
     const { crs, mgrs } = datasource.getCrsLabel ? datasource.getCrsLabel(tileData) : {};
-    let isS2 = datasourceName.includes('Sentinel-2');
+    const isS2 = datasourceName.includes('Sentinel-2');
     return (
-      <div className="resultItem" onMouseOver={() => this.props.onResultHover(index, datasourceName)}>
+      <div className="resultItem" onMouseOver={() => this.props.onResultHover(resultIndex, datasourceName)}>
         {datasource.getPreviewImage ? (
           <img src={datasource.getPreviewImage(tileData)} alt={datasourceName} />
         ) : (
@@ -99,7 +97,10 @@ class ResultItem extends React.Component {
                 {mgrs}
               </div>
             )}
-          {(datasource.getAwsPath || datasource.getSciHubLink || datasource.getEOPath) && (
+          {(datasource.getAwsPath ||
+            datasource.getSciHubLink ||
+            datasource.getEOPath ||
+            datasource.getCreoDIASPath) && (
             <a
               className={`pathLinkIcon ${this.state.linkVisible && 'active'}`}
               onClick={() => this.toggleLinksPanel(tileData)}
@@ -108,33 +109,42 @@ class ResultItem extends React.Component {
             </a>
           )}
           <AddPin pin={tileData} />
-          <a className="btn" onClick={() => this.props.onResultClick(index, result)}>
+          <a className="btn" onClick={() => this.props.onResultClick(result)}>
             Visualize
           </a>
         </div>
         {this.state.linkVisible && (
           <div className="showLinkPanel">
-            {datasource.getAwsPath ? (
-              <div style={{ marginBottom: '15px' }}>
-                AWS path:<a className="scihubLink" href={datasource.getAwsPath(tileData)} target="_blank">
-                  {datasource.getAwsPath(tileData)}
-                </a>
+            {datasource.getAwsPath && (
+              <div style={{ marginBottom: '10px' }}>
+                AWS path:<div className="awsPath" ref={this.awsPathRef}>
+                  <CopyToClipboard defaultValue={datasource.getAwsPath(tileData)} readOnly={true} />
+                </div>
               </div>
-            ) : (
+            )}
+            {datasource.getEOPath && (
               <div>
-                EO Cloud path:<input
-                  ref="linkUrl"
-                  className="urlInput"
-                  defaultValue={datasource.getEOPath(tileData)}
-                  readOnly={true}
-                  onFocus={() => this.refs.linkUrl.select()}
-                />
+                EO Cloud path:<div>
+                  <CopyToClipboard defaultValue={datasource.getEOPath(tileData)} readOnly={true} />
+                </div>
+              </div>
+            )}
+            {datasource.getCreoDIASPath && (
+              <div>
+                CreoDIAS path:<div>
+                  <CopyToClipboard defaultValue={datasource.getCreoDIASPath(tileData)} readOnly={true} />
+                </div>
               </div>
             )}
             {datasource.getSciHubLink && (
               <div>
                 SciHub link:{' '}
-                <a className="scihubLink" href={this.state.scihubLink} target="_blank">
+                <a
+                  className="scihubLink"
+                  href={this.state.scihubLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {this.state.scihubLink}
                 </a>
               </div>
@@ -146,8 +156,8 @@ class ResultItem extends React.Component {
   }
 }
 
-ResultItem.PropTypes = {
-  onResultClick: PropTypes.func,
-  onResultHover: PropTypes.func,
+ResultItem.propTypes = {
+  onResultClick: propTypes.func,
+  onResultHover: propTypes.func,
 };
 export default ResultItem;
