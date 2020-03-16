@@ -21,7 +21,7 @@
     "@turf/area": "^6.0.1",
     "@turf/invariant": "^6.1.2",
     "@turf/length": "^6.0.2",
-    "axios": "^0.17.1",
+    "axios": "^0.18.1",
     "axios-extensions": "^2.0.0",
     "client-oauth2": "^4.1.0",
     "d3-queue": "^3.0.7",
