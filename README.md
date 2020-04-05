@@ -13,7 +13,7 @@ Some features:
 
 * Run `npm install` or `yarn`
 * Run `npm start`
-* Use Sentinel username and password (if you don't have any, contact [Sentinel Hub](www.sentinel-hub.com))
+* Use Sentinel username and password (if you don't have any, contact [Sentinel Hub](https://www.sentinel-hub.com))
 
 ## BUILDING
 
