@@ -20,4 +20,4 @@ Some features:
 * yarn build:production
 * yarn build:staging
 
-Server credentials can be found on [Sinergise Wiki page](https://wiki.sinergise.com/Maintenance/SentinelApps)
+Note about the authentication: might not work.
