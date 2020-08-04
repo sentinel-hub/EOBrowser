@@ -1,0 +1,18 @@
+@import '../../variables';
+
+.share-pins-link {
+  color: $textCol;
+  display: flex;
+  flex-direction: column;
+
+  .content {
+    .actions {
+      text-align: center;
+      padding: 10px;
+
+      a {
+        margin-left: 10px;
+      }
+    }
+  }
+}

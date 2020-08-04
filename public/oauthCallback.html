@@ -10,12 +10,8 @@
               const [key, value] = hm.split('=')
               obj[key] = (key === 'expires_in') ? (new Date().valueOf() + (parseInt(value) * 1000)) : value
             })
-            localStorage.setItem('eobrowser_oauth', JSON.stringify(obj)) // this blocks
-            setTimeout(() => {
               window.opener.authorizationCallback.resolve(obj)
               window.close()
-            }, 200)
-  
           } else {
             window.opener.authorizationCallback.reject('No access token')
             window.close()
@@ -26,5 +22,4 @@
       </script>
   </head>
   <body></body>
-  </html>
-  
+</html>

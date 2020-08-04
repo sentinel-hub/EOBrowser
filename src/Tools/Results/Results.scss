@@ -1,0 +1,162 @@
+@import '../../variables';
+
+$textCol: #eee;
+$headerBorderWidth: 2px;
+$headerPadding: 10px;
+
+.results {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  .results-heading {
+    border-bottom: $headerBorderWidth solid #b6bf00;
+    background-color: $mainLight;
+    z-index: 501;
+    padding: $headerPadding;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    font-size: 14px;
+
+    .showing-n-results {
+      text-align: right;
+    }
+
+    .back-to-search {
+      max-width: 45%;
+      text-align: center;
+    }
+  }
+
+  .results-panel {
+    background-color: $mainLight;
+    padding: 0 10px 10px 10px;
+    color: $textCol;
+
+    & > .btn {
+      display: block;
+      text-align: center;
+    }
+
+    .rodal .results-panel {
+      height: calc(100% - 20px);
+      overflow: auto;
+      background: $mainMedium;
+    }
+
+    .results-controls {
+      width: 100%;
+    }
+  }
+
+  .result-item {
+    margin-bottom: 10px;
+    position: relative;
+    transition: all ease 0.4s;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    align-items: center;
+
+    &:first-of-type {
+      margin-top: 10px;
+    }
+
+    .no-image {
+      text-align: center;
+      font-style: italic;
+      justify-content: center;
+      opacity: 0.6;
+      max-width: none !important;
+    }
+
+    & > * {
+      width: calc(100% - 140px);
+      margin-right: 0;
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .preview-image {
+      width: 140px;
+    }
+
+    .show-link-panel {
+      padding: 10px 0 0 0;
+      color: $textColor;
+      text-align: left;
+      width: 100%;
+    }
+
+    .scihub-link {
+      display: block;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      color: $primaryCol;
+    }
+
+    .aws-path {
+      color: $textCol;
+    }
+
+    .path-link-icon {
+      float: right;
+      margin-left: 6px;
+      border-radius: 30px;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      cursor: pointer;
+
+      &.active {
+        background: $primaryCol;
+        color: #fff;
+
+        &:hover {
+          color: #fff;
+        }
+      }
+
+      &:hover {
+        color: $primaryCol;
+      }
+
+      .fa-link {
+        margin-right: 0 !important;
+      }
+    }
+
+    .details {
+      padding: 0 0 0 10px;
+      box-sizing: border-box;
+
+      .detail {
+        margin-bottom: 4px;
+
+        &.bold {
+          font-weight: bold;
+        }
+
+        & > :first-child {
+          width: 20px;
+          display: inline-block;
+          margin-right: 5px;
+        }
+
+        sup {
+          vertical-align: top;
+          padding-left: 2px;
+        }
+      }
+
+      svg path {
+        fill: $textCol;
+      }
+    }
+  }
+}

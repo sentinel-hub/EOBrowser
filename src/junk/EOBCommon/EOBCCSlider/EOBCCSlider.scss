@@ -1,0 +1,33 @@
+/* stylelint-disable */
+.cc-slider {
+  display: flex;
+  align-items: center;
+
+  div.rcStyler {
+    margin: 0 10px 0 6px;
+    display: flex;
+  }
+
+  div.rc-slider {
+    // RCSlider needs to have width defined via CSS. However if it is defined via CSS class, we
+    // can't change it via props. So we use 'inherit' here and set width on parent div.rcStyler.
+    width: inherit !important;
+    margin-bottom: 1px;
+  }
+
+  i.fa-sun-o {
+    color: #ff0;
+    font-size: 10px;
+  }
+
+  i.fa-cloud {
+    color: #c0fbff;
+    font-size: 10px;
+  }
+
+  span.percentage {
+    margin-left: 5px;
+    display: inline-block;
+    width: 30px;
+  }
+}

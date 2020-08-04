@@ -1,0 +1,135 @@
+@import '../../variables.scss';
+
+.fis {
+  padding: 10px;
+  color: #fff;
+  font-size: 0.8em;
+
+  .title-bar {
+    display: flex;
+
+    h3.title {
+      margin: 14px 0 0 20px;
+      flex-grow: 1;
+    }
+
+    div.ccslider {
+      margin: 15px 70px 0 0;
+    }
+  }
+
+  div.fis-content {
+    margin-top: 30px;
+  }
+
+  div.fetching {
+    margin: 0 20px;
+
+    i {
+      margin-right: 10px;
+    }
+  }
+
+  div.error-message {
+    word-break: break-all;
+    margin-bottom: 20px;
+  }
+
+  div.interval-buttons {
+    margin: 0 50px 20px;
+    display: flex;
+    justify-content: space-around;
+
+    a.btn {
+      background-color: #22232d;
+      border-radius: 0;
+      border-bottom: 3px solid #22232d;
+    }
+
+    a.btn.selected {
+      border-bottom: 3px solid #b6bf00;
+    }
+  }
+
+  div.fetching-small {
+    right: 30px;
+    top: -20px;
+    background-color: #22232d;
+    padding: 15px;
+    border: 1px solid #666;
+  }
+
+  svg.visualization-layer {
+    text {
+      fill: #fff;
+    }
+
+    path,
+    line {
+      fill: none;
+    }
+
+    path.tick-line {
+      shape-rendering: crispEdges;
+      stroke: #666;
+      stroke-dasharray: 5, 5;
+    }
+
+    line.axis-baseline {
+      shape-rendering: crispEdges;
+      stroke: #eee;
+    }
+  }
+
+  svg.background-graphics {
+    text {
+      fill: #fff;
+    }
+
+    path,
+    line {
+      fill: none;
+    }
+
+    path.tick-line {
+      shape-rendering: crispEdges;
+      stroke: #666;
+      stroke-dasharray: 5, 5;
+    }
+
+    line.axis-baseline {
+      shape-rendering: crispEdges;
+      stroke: #eee;
+    }
+  }
+
+  svg.legend {
+    margin-left: 50px;
+
+    text {
+      fill: #fff;
+    }
+  }
+
+  div.annotation {
+    background-color: #fff;
+    color: #000;
+    padding: 20px;
+    border-radius: 5px;
+    min-width: 200px;
+
+    ul {
+      padding-left: 20px;
+    }
+
+    hr {
+      border: none;
+      background-color: #666;
+      height: 1px;
+    }
+  }
+}
+
+.rc-tooltip {
+  z-index: 33333;
+}

@@ -1,0 +1,183 @@
+@import '../../variables.scss';
+
+.pins-story-builder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 20px 20px 0;
+  box-sizing: border-box;
+  font-size: 16px;
+
+  .error {
+    color: #f60;
+    margin-top: 10px;
+  }
+
+  .horizontal-stack {
+    width: 100%;
+    height: 100%;
+    padding-top: 50px;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+
+    .pins-selector {
+      overflow-y: auto;
+      margin-right: 20px;
+
+      .pin-item .pin-content {
+        display: flex;
+
+        .slide-image {
+          position: relative;
+          margin-right: 10px;
+        }
+      }
+
+      .pin-story-warning {
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+
+        .fa {
+          margin-bottom: 10px;
+        }
+      }
+
+      .info-panel {
+        white-space: pre-line;
+        color: #d0d5dd;
+        margin-top: 20px;
+        margin-left: 10px;
+        max-width: 400px;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+
+        .fa {
+          margin-right: 10px;
+          margin-bottom: 10px;
+        }
+      }
+    }
+
+    .vertical-stack {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      overflow-y: auto;
+
+      .fa.fa-spinner.downloading-images {
+        color: #fff;
+        font-size: 26px;
+        line-height: 512px;
+        margin-bottom: 50px;
+        align-self: center;
+      }
+
+      .slides-preview {
+        flex: 1; // fill whole area
+        flex-grow: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+
+        .controls {
+          margin: 20px 0;
+          color: #fff;
+
+          button.play-pause {
+            background-color: transparent;
+            color: $primaryCol;
+            margin: 0;
+            padding: 0;
+            border: none;
+            font-size: 20px;
+
+            .fa {
+              margin: 5px 20px;
+            }
+          }
+
+          .interval-panel {
+            margin: 0 20px;
+
+            label {
+              margin-right: 5px;
+            }
+
+            input {
+              max-width: 40px;
+            }
+          }
+
+          div.rc-slider {
+            margin-left: 30px;
+          }
+
+          .timeline-label {
+            display: block;
+            margin-top: 10px;
+          }
+        }
+      }
+
+      .slides-options {
+        flex-grow: 0;
+        margin-right: auto;
+        display: flex;
+        flex-direction: column;
+
+        .field {
+          width: 100%;
+          display: flex;
+          margin-bottom: 5px;
+
+          // https://stylelint.io/user-guide/rules/no-descending-specificity#dom-limitations
+          /* stylelint-disable no-descending-specificity */
+          label {
+            flex-grow: 1;
+            margin-right: 20px;
+            color: #d0d5dd;
+          }
+          /* stylelint-enable */
+        }
+      }
+
+      .slides-download {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+
+        .btn {
+          min-width: 150px;
+          display: flex;
+          justify-content: center;
+
+          .progress {
+            margin-left: 5px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .pins-story-builder {
+    .horizontal-stack {
+      flex-direction: column;
+      height: auto;
+
+      & > * {
+        flex: 1; // fill whole area
+      }
+    }
+  }
+}

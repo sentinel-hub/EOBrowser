@@ -1,0 +1,43 @@
+.img-download {
+  color: #fff;
+  background-color: #22232d;
+  font-size: 14px;
+  padding: 15px;
+
+  /* stylelint-disable */
+  .formField {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    margin: 2px 0 2px 0;
+    line-height: 30px;
+    /* stylelint-enable */
+
+    label {
+      flex: 0 0 33%;
+      max-width: 33%;
+    }
+  }
+
+  .form-input {
+    flex: 0 0 67%;
+    max-width: 67%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  input.full-width {
+    width: 100%;
+    text-align: left;
+    padding: 0.5em;
+    background: #807e7ea3;
+    border: 1px solid rgba(34, 36, 38, 0.15);
+    color: #f7f7f7;
+  }
+
+  input .full-width::placeholder {
+    color: #cccbcb;
+    opacity: 1;
+  }
+}

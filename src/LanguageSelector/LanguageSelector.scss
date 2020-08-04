@@ -1,0 +1,44 @@
+.language-selector {
+  padding-right: 10px;
+
+  .menu-flags {
+    color: white;
+    background-color: #525e73;
+  }
+  /* stylelint-disable selector-class-pattern  */
+  .flag-select__options {
+    background: #525e73;
+  }
+
+  .flag-select__option--placeholder {
+    vertical-align: inherit;
+  }
+
+  .flag-select__btn {
+    color: white;
+    border: none;
+    background: transparent;
+    padding: 0;
+  }
+
+  .flag-select__option {
+    margin: 0;
+  }
+
+  .flag-select__option__icon {
+    top: 0.2em;
+  }
+
+  .flag-select__btn::after {
+    margin-right: 8px;
+  }
+
+  .flag-select__btn[aria-expanded='false']::after {
+    border-top: 5px solid white;
+  }
+
+  .flag-select__btn[aria-expanded='true']::after {
+    border-bottom: 5px solid white;
+  }
+  /* stylelint-enable */
+}

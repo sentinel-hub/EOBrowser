@@ -1,0 +1,72 @@
+/* stylelint-disable */
+.tabs-container {
+  height: 100%;
+  overflow-y: hidden;
+  display: flex;
+  flex-flow: column;
+}
+
+.tab-list {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background-color: #070c15;
+
+  li {
+    flex: auto;
+    text-align: center;
+    list-style: none;
+    cursor: pointer;
+    color: #eee;
+    padding: 7px 10.5px;
+    border-bottom: 4px solid transparent;
+
+    &[disabled] {
+      color: #aaa;
+    }
+  }
+
+  .fa-icon {
+    font-size: 17px;
+    fill: #aaa;
+    width: 17px;
+    height: 17px;
+    margin: 0 6px 0 0;
+  }
+
+  & .tab-selected {
+    color: #fff;
+    border-color: #b6bf00;
+  }
+
+  &::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+
+  .counter-badge {
+    margin-right: 5px;
+    padding: 3px 3px;
+    border-radius: 15%;
+    background: #b6bf00;
+    color: white;
+    font-size: 14px;
+  }
+}
+
+.tabPanelContainer {
+  max-height: 100%;
+  overflow-y: auto;
+
+  > div {
+    display: none;
+  }
+
+  > div.active {
+    display: block;
+  }
+}

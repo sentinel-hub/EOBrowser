@@ -1,0 +1,135 @@
+/* stylelint-disable */
+.advancedPanel {
+  padding: 10px;
+  font-size: 14px;
+
+  .grouped-bands-to-rgb {
+    button {
+      border: none;
+      background-color: #22232d;
+      color: #eee;
+      font-size: 15px;
+      padding: 3px 25px;
+      margin: 20px 15px 0 0;
+      border-radius: 5px;
+
+      &.selected {
+        border: 2px solid #aaa;
+        padding: 1px 23px;
+      }
+    }
+  }
+
+  .toggleBandMode {
+    position: relative;
+    float: right;
+    background: #22232d;
+    width: 72px;
+    height: 28px;
+    border-radius: 30px;
+    padding: 2px;
+    cursor: pointer;
+
+    i {
+      border-radius: 20px;
+      padding: 2px 4px;
+      position: absolute;
+      left: 8px;
+      top: 6px;
+      color: #fff;
+      font-size: 16px;
+
+      &.script {
+        right: 8px;
+        left: auto;
+      }
+    }
+
+    &::before {
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      width: 30px;
+      height: 25px;
+      border-radius: 25px;
+      content: '';
+      background: #b6bf00;
+      transition: all ease 0.4s;
+    }
+
+    &.script::before {
+      left: 40px;
+    }
+  }
+
+  header {
+    padding: 5px 0;
+  }
+
+  .scriptBtnPanel {
+    text-align: center;
+    padding: 5px;
+  }
+
+  .insert-url-block {
+    padding: 2px 20px;
+
+    .primary-dataset {
+      margin-bottom: 5px;
+    }
+  }
+
+  .datasource-info {
+    font-style: italic;
+    padding-left: 20px;
+    margin-top: 5px;
+
+    span {
+      margin-left: 5px;
+    }
+  }
+
+  .supplemental-dataset-settings {
+    padding-left: 20px;
+
+    .mosaicking-order {
+      margin-top: 5px;
+
+      select {
+        margin-left: 10px;
+      }
+    }
+
+    .timespan {
+      margin-bottom: 10px;
+
+      input[type='checkbox'] {
+        margin-left: 0;
+      }
+
+      .timespan-picker {
+        background-color: inherit;
+        margin-top: 0;
+        padding: 0;
+
+        .date-time-input {
+          display: flex;
+          flex-wrap: nowrap;
+
+          .date-time-input-label {
+            display: none;
+          }
+
+          .numeric-input input {
+            max-width: 30px;
+            background-color: inherit;
+          }
+        }
+
+        .date-input {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}

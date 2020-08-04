@@ -1,0 +1,105 @@
+.effects-panel {
+  padding: 10px;
+
+  .effects-header {
+    .reset-effects {
+      color: #b6bf00;
+      cursor: pointer;
+    }
+  }
+
+  .effect-container {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+
+    &.effect-with-dropdown {
+      margin-bottom: 10px;
+    }
+
+    &:last-of-type {
+      margin-bottom: 5px;
+    }
+
+    .effect-name {
+      color: #868fa0;
+    }
+
+    .effect-slider {
+      .rc-slider {
+        width: 120px;
+      }
+
+      .slider-value-input {
+        width: 36px;
+        padding: 0;
+        font-size: 0.9em;
+        color: white;
+        background-color: #3b3d4d;
+        border: none;
+        border-bottom: 1px solid white;
+
+        &,
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+          // remove style for number input so it can be only 40px wide
+          -webkit-appearance: none;
+          -moz-appearance: textfield;
+          appearance: none;
+        }
+
+        &.left-value {
+          margin-right: 15px;
+        }
+
+        &.right-value {
+          margin-left: 15px;
+        }
+      }
+    }
+
+    .effect-dropdown {
+      select {
+        // width of the slider + 2 times label and its margin
+        width: calc(120px + 2 * 36px + 2 * 15px);
+        text-transform: capitalize;
+
+        .interpolation-option {
+          text-transform: capitalize;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    .effect-container {
+      flex-direction: column;
+      padding-bottom: 20px;
+      align-items: stretch;
+
+      .effect-name {
+        padding-bottom: 5px;
+      }
+
+      .effect-slider {
+        .rc-slider {
+          // 100% - 2 times label and its margin
+          width: calc(100% - 2 * 40px - 2 * 15px);
+
+          // add margin for slider with no left value
+          &.slider-no-left-value {
+            margin-left: calc(40px + 15px);
+          }
+        }
+      }
+
+      .effect-dropdown {
+        select {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

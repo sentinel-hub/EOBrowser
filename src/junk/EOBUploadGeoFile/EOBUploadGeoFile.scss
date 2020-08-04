@@ -1,0 +1,23 @@
+/* stylelint-disable */
+.fileUploadWindow {
+  color: #fff;
+
+  .fileUploadPanel {
+    border: 2px dashed #aaa;
+    cursor: pointer;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .ok {
+    box-shadow: 0 0 3px #0c0;
+  }
+
+  .false {
+    box-shadow: 0 0 3px #c00;
+  }
+
+  .error {
+    color: #c14444;
+  }
+}

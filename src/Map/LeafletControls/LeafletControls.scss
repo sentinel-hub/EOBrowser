@@ -1,0 +1,119 @@
+@import '../../variables.scss';
+
+#map {
+  .leaflet-control-container {
+    .leaflet-bottom.leaflet-left {
+      .leaflet-control-attribution {
+        background: $mainMedium;
+        color: hsla(0, 0%, 100%, 0.6);
+
+        a {
+          color: $primaryCol;
+        }
+      }
+
+      @media screen and (max-width: 1200px) {
+        .leaflet-control-attribution {
+          max-width: 230px;
+        }
+      }
+
+      @media screen and (max-width: 780px) {
+        .leaflet-control-attribution {
+          bottom: 25px;
+        }
+      }
+
+      @media screen and (max-width: 400px) {
+        .leaflet-control-attribution {
+          bottom: 25px;
+        }
+      }
+    }
+
+    .leaflet-bottom.leaflet-right {
+      .leaflet-control-zoom {
+        border: none;
+
+        a {
+          padding-right: 2px;
+          line-height: 27px;
+        }
+
+        .leaflet-control-zoom-in {
+          border-bottom: 2px solid $mainLight;
+        }
+
+        .leaflet-control-zoom-in,
+        .leaflet-control-zoom-out {
+          background-color: $mainMedium;
+          color: #ddd;
+          box-shadow: $boxShadow;
+          border-radius: 0;
+        }
+
+        .leaflet-control-zoom-in:hover,
+        .leaflet-control-zoom-out:hover {
+          background: $primaryCol;
+          color: #fff;
+        }
+      }
+
+      @media screen and (max-width: 700px) {
+        .leaflet-control-zoom {
+          display: none;
+        }
+      }
+
+      .leaflet-control-scale {
+        margin-bottom: 0;
+
+        .leaflet-control-scale-line {
+          background: $mainMedium;
+          color: #fff;
+          border-color: #fff;
+        }
+      }
+
+      @media screen and (max-width: 500px) {
+        .leaflet-control-scale {
+          bottom: 2px;
+        }
+      }
+
+      @media screen and (max-width: 400px) {
+        .leaflet-control-scale {
+          bottom: 62px;
+        }
+      }
+
+      .leaflet-control-map-coordinates {
+        display: block;
+        margin-bottom: 0;
+        clear: unset;
+        font-size: 10px;
+        background: $mainMedium;
+        color: $textCol;
+        padding: 1px;
+        min-width: 160px;
+        text-align: center;
+      }
+
+      .leaflet-control-map-coordinates.no-coordinates {
+        display: none;
+      }
+
+      @media screen and (max-width: 500px) {
+        .leaflet-control-map-coordinates {
+          clear: both;
+        }
+      }
+
+      @media screen and (max-width: 400px) {
+        .leaflet-control-map-coordinates {
+          bottom: 60px;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+@import '../../variables.scss';
+
+.date-picker {
+  border-bottom: 1px solid #fff;
+  color: #fff;
+  display: inline-flex;
+  align-items: baseline;
+
+  .date-picker-input-wrapper {
+    .date-picker-input-icon {
+      color: #fff;
+      text-align: center;
+      width: 20px;
+    }
+
+    .date-picker-input {
+      background: none;
+      color: #eee;
+      border: none;
+      width: 75px;
+    }
+  }
+}

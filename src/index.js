@@ -1,26 +1,32 @@
-import './utils/i18nInit';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+
+import store from './store';
 import App from './App';
-import 'font-awesome/css/font-awesome.css';
-import './animate.css';
+import { initLanguage } from './LanguageSelector/langUtils';
+import AuthProvider from './Auth/AuthProvider';
+import URLParamsParser from './URLParamsParser/URLParamsParser';
+import ThemesProvider from './ThemesProvider/ThemesProvider';
+import { DndProvider } from 'react-dnd-multi-backend';
+import HTML5toTouch from 'react-dnd-multi-backend/dist/esm/HTML5toTouch';
 
 import './index.scss';
-import { Provider } from 'react-redux';
-import Store from './store';
 
-const rootEl = document.getElementById('root');
-
+initLanguage();
 ReactDOM.render(
-  <Provider store={Store.Store}>
-    <App />
+  <Provider store={store}>
+    <DndProvider options={HTML5toTouch}>
+      <AuthProvider>
+        <URLParamsParser>
+          {(themeId, sharedPinsListId) => (
+            <ThemesProvider themeIdFromUrlParams={themeId}>
+              <App sharedPinsListIdFromUrlParams={sharedPinsListId} />
+            </ThemesProvider>
+          )}
+        </URLParamsParser>
+      </AuthProvider>
+    </DndProvider>
   </Provider>,
-  rootEl,
+  document.getElementById('root'),
 );
-
-if (module.hot) {
-  module.hot.accept('./App', () => {
-    const NextApp = require('./App').default;
-    ReactDOM.render(<NextApp />, rootEl);
-  });
-}

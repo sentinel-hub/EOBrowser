@@ -1,0 +1,149 @@
+@import '../variables.scss';
+
+#map {
+  background-color: #fff;
+  min-width: 280px;
+  min-height: 406px;
+  z-index: 0;
+
+  .leaflet-control-container {
+    .leaflet-top.leaflet-right {
+      .leaflet-control-layers {
+        background: #22232d;
+        color: #fff;
+        border-radius: 0;
+        border: none;
+        margin-right: 110px;
+        box-shadow: $boxShadow;
+
+        .leaflet-control-layers-toggle {
+          background-image: url(layers.png);
+          border: none;
+          width: 40px;
+          height: 40px;
+        }
+
+        .leaflet-retina .leaflet-control-layers-toggle {
+          background-image: url(layers2x.png);
+        }
+      }
+    }
+  }
+}
+
+#nprogress {
+  .bar {
+    background: $primaryCol;
+
+    .peg {
+      box-shadow: 0 0 10px $primaryCol, 0 0 5px $primaryCol;
+    }
+
+    .spinner-icon {
+      border-top-color: $primaryCol;
+      border-left-color: $primaryCol;
+    }
+  }
+}
+
+.search-box-wrapper {
+  position: relative;
+  z-index: 401;
+  float: right;
+  margin-right: 160px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  flex-direction: column;
+  box-sizing: border-box;
+  font-size: 15px;
+  background-color: #3b3d4d;
+  border: 0;
+  border-radius: 0;
+  box-shadow: $boxShadow;
+  color: white;
+}
+
+/* stylelint-disable */
+.poi-wrapper > .poiPanel,
+.aoi-wrapper > .aoiPanel,
+.measure-wrapper > .measurePanel,
+.img-download-wrapper > .screenshotPanelButton,
+.timelapse-wrapper > .timelapsePanelButton {
+  z-index: 400;
+  cursor: pointer;
+}
+/* stylelint-enable */
+
+.rodal {
+  z-index: 9999;
+  font: initial;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+}
+
+.rodal-mask {
+  background: rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 100%;
+}
+
+.rodal-close {
+  position: absolute;
+  cursor: pointer;
+  top: 16px;
+  right: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.rodal-close::before,
+.rodal-close::after {
+  position: absolute;
+  content: '';
+  height: 2px;
+  width: 100%;
+  top: 50%;
+  left: 0;
+  margin-top: -1px;
+  background: #999;
+  border-radius: 100%;
+  -webkit-transition: background 0.2s;
+  transition: background 0.2s;
+}
+
+.rodal-close::before {
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.rodal-close::after {
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+
+.rodal-dialog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  z-index: 9999;
+  padding: 15px;
+  border-radius: 3px;
+  background: #22232d;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}

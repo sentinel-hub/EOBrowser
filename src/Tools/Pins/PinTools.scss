@@ -1,0 +1,40 @@
+@import '../../variables';
+
+.pin-tools {
+  display: flex;
+  justify-content: space-between;
+  background-color: $mainLight;
+  color: #fff;
+
+  > div,
+  a {
+    cursor: pointer;
+    color: $primaryCol;
+    text-decoration: none;
+    margin: 0 5px;
+    text-align: center;
+  }
+
+  .file-upload-dialog {
+    color: $textCol;
+
+    .file-upload-panel {
+      border: 2px dashed #aaa;
+      cursor: pointer;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .ok {
+      box-shadow: 0 0 3px #0c0;
+    }
+
+    .false {
+      box-shadow: 0 0 3px #c00;
+    }
+
+    .error {
+      color: #c14444;
+    }
+  }
+}

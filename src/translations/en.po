@@ -1,0 +1,3189 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals = 2; plural = (n != 1);\n"
+"Language: en\n"
+"mime-version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Education"
+msgstr ""
+
+msgid "Normal"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Close and don't show again"
+msgstr ""
+
+msgid "Previous"
+msgstr ""
+
+msgid "End tutorial"
+msgstr ""
+
+msgid "Next"
+msgstr ""
+
+msgid "Continue with tutorial"
+msgstr ""
+
+msgid "Don't show again"
+msgstr ""
+
+msgid "Show info"
+msgstr ""
+
+msgid ""
+"Here you can select which base layer and overlays (roads, borders, labels) "
+"are shown on the map."
+msgstr ""
+
+msgid ""
+"With this tool you can mark a point on the map.\n"
+"\n"
+"You can also view statistical data for some layers by clicking on the chart "
+"icon\n"
+"<i class=\"fa fa-bar-chart\" />. \n"
+"You can remove the mark by clicking the remove icon <i class=\"fa "
+"fa-close\" />.\n"
+"</p>"
+msgstr ""
+
+msgid ""
+"With this tool you can measure distances and areas on the map.\n"
+"\n"
+"Every mouse click creates a new point on the path. To stop adding points, "
+"press <code>Esc</code>  key\n"
+"or double click on the map.  \n"
+"You can remove the measurement by clicking the remove icon <i class=\"fa "
+"fa-close\" />."
+msgstr ""
+
+msgid ""
+"You have reached the end of the tutorial. If you have any other question, "
+"feel free to ask us on [the forum](https://forum.sentinel-hub.com/)\n"
+"or contact us [via "
+"email](mailto:info@sentinel-hub.com?Subject=EO%20Browser%20Feedback).\n"
+"\n"
+"\n"
+"If you want to view the tutorial in the future you can always view it by "
+"clicking the info icon\n"
+"<span style=\"background-color: #191a25; color: #eee; padding: 4px 10px\">\n"
+"<i className=\"fa fa-info\" />\n"
+"</span>\n"
+"in the top right corner."
+msgstr ""
+
+msgid ""
+"Search for a location either by scrolling the map with mouse or enter the "
+"location in the search\n"
+"field."
+msgstr ""
+
+msgid "Measure distances"
+msgstr ""
+
+msgid "Download image"
+msgstr ""
+
+msgid "Create timelapse animation"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "No tile found"
+msgstr ""
+
+msgid "Dataset"
+msgstr ""
+
+msgid "Show"
+msgstr ""
+
+msgid "Show visualization"
+msgstr ""
+
+msgid "Zoom to tile"
+msgstr ""
+
+msgid "Pin to your favourite items"
+msgstr ""
+
+msgid "Hide layer"
+msgstr ""
+
+msgid "Show layer"
+msgstr ""
+
+msgid "Custom"
+msgstr ""
+
+msgid "Create custom rendering"
+msgstr ""
+
+msgid "Zoom in to view data"
+msgstr ""
+
+msgid "Free sign up"
+msgstr ""
+
+msgid "for all features"
+msgstr ""
+
+msgid "Powered by"
+msgstr ""
+
+msgid "with contributions from the European Space Agency"
+msgstr ""
+
+msgid "Please select data source(s)!"
+msgstr ""
+
+msgid "Invalid time range!"
+msgstr ""
+
+msgid "No results found"
+msgstr ""
+
+msgid "Theme"
+msgstr ""
+
+msgid "Manage configuration instances"
+msgstr ""
+
+msgid "Login to use custom configuration instances."
+msgstr ""
+
+msgid "Error retrieving additional data!"
+msgstr ""
+
+msgid "Data sources"
+msgstr ""
+
+msgid "Please select a theme"
+msgstr ""
+
+msgid "Time range [UTC]"
+msgstr ""
+
+msgid "Based on: "
+msgstr ""
+
+msgid "Band 1 - Yellow substance and detrital pigments - 412.5 nm"
+msgstr ""
+
+msgid "Band 2 - Chlorophyll absoption maximum - 442 nm"
+msgstr ""
+
+msgid "Band 3 - Chlorophyll and other pigments - 490 nm"
+msgstr ""
+
+msgid "Band 4 - Suspended sediment, red tides - 510 nm"
+msgstr ""
+
+msgid "Band 5 - Chlorophyll absorption minimum - 560 nm"
+msgstr ""
+
+msgid "Band 6 - Suspended sediment - 620 nm"
+msgstr ""
+
+msgid "Band 7 - Chlorophyll absorption & fluo. reference - 665 nm"
+msgstr ""
+
+msgid "Band 8 - Chlorophyll fluorescence peak - 681 nm"
+msgstr ""
+
+msgid "Band 9 - Fluo. reference, atmosphere corrections - 709 nm"
+msgstr ""
+
+msgid "Band 10 - Vegetation, cloud - 753 nm"
+msgstr ""
+
+msgid "Band 11 - O2 R- branch absoption band - 761 nm"
+msgstr ""
+
+msgid "Band 12 - Atmosphere corrections - 779 nm"
+msgstr ""
+
+msgid "Band 13 - Vegetation, water vapour reference - 865 nm"
+msgstr ""
+
+msgid "Band 14 - Atmosphere corrections - 885 nm"
+msgstr ""
+
+msgid "Band 15 - Water vapour, land - 900 nm"
+msgstr ""
+
+msgid "Band 1 - Blue - 450-515 nm"
+msgstr ""
+
+msgid "Band 2 - Green - 525-605 nm"
+msgstr ""
+
+msgid "Band 3 - Red - 630-690 nm"
+msgstr ""
+
+msgid "Band 4 - NIR - 750-900 nm"
+msgstr ""
+
+msgid "Band 5 - SWIR-1 - 1550-1750 nm"
+msgstr ""
+
+msgid "Band 7 - SWIR-2 - 2090-2350 nm"
+msgstr ""
+
+msgid "Band 8 - Panchromatic - 520-900 nm"
+msgstr ""
+
+msgid "Band 1 - Coastal/Aerosol - 433-453 nm"
+msgstr ""
+
+msgid "Band 2 - Blue - 450-515 nm"
+msgstr ""
+
+msgid "Band 3 - Green - 525-600 nm"
+msgstr ""
+
+msgid "Band 4 - Red - 630-680 nm"
+msgstr ""
+
+msgid "Band 5 - NIR - 845-885 nm"
+msgstr ""
+
+msgid "Band 6 - SWIR-1 - 1560-1660 nm"
+msgstr ""
+
+msgid "Band 7 - SWIR-2 - 2100-2300 nm"
+msgstr ""
+
+msgid "Band 8 - Panchromatic - 500-680 nm"
+msgstr ""
+
+msgid "Band 9 - Cirrus - 1360-1390 nm"
+msgstr ""
+
+msgid "Landsat 5 (ESA archive)"
+msgstr ""
+
+msgid "Landsat 7 (ESA archive)"
+msgstr ""
+
+msgid "Landsat 8 (ESA archive)"
+msgstr ""
+
+msgid "Landsat 8 (USGS archive)"
+msgstr ""
+
+msgid "Red band"
+msgstr ""
+
+msgid "841 - 876 nm (NIR)"
+msgstr ""
+
+msgid "Blue band"
+msgstr ""
+
+msgid "Green band"
+msgstr ""
+
+msgid "1230 - 1250 nm"
+msgstr ""
+
+msgid "1628 - 1652 nm"
+msgstr ""
+
+msgid "2105 - 2155 nm"
+msgstr ""
+
+msgid "1 day (S1)"
+msgstr ""
+
+msgid "5 day (S5)"
+msgstr ""
+
+msgid "10 day (S10)"
+msgstr ""
+
+msgid "Band 1 - Coastal aerosol - 443 nm"
+msgstr ""
+
+msgid "Band 2 - Blue - 490 nm"
+msgstr ""
+
+msgid "Band 3 - Green - 560 nm"
+msgstr ""
+
+msgid "Band 4 - Red - 665 nm"
+msgstr ""
+
+msgid "Band 5 - Vegetation Red Edge - 705 nm"
+msgstr ""
+
+msgid "Band 6 - Vegetation Red Edge - 740 nm"
+msgstr ""
+
+msgid "Band 7 - Vegetation Red Edge - 783 nm"
+msgstr ""
+
+msgid "Band 8 - NIR - 842 nm"
+msgstr ""
+
+msgid "Band 9 - Water vapour - 945 nm"
+msgstr ""
+
+msgid "Band 10 - SWIR - Cirrus - 1375 nm"
+msgstr ""
+
+msgid "Band 11 - SWIR - 1610 nm"
+msgstr ""
+
+msgid "Band 12 - SWIR - 2190 nm"
+msgstr ""
+
+msgid "Band 8A - Vegetation Red Edge - 865 nm"
+msgstr ""
+
+msgid "Band 1 - Aerosol correction, improved water constituent retrieval - 400 nm"
+msgstr ""
+
+msgid "Band 2 - Yellow substance and detrital pigments (turbidity)-412 nm"
+msgstr ""
+
+msgid "Band 3 - Chl absorption max., biogeochemistry, vegetation - 442.5 nm"
+msgstr ""
+
+msgid "Band 4 - High Chl, other pigments - 490 nm"
+msgstr ""
+
+msgid "Band 5 - Chl, sediment, turbidity, red tide - 510 nm"
+msgstr ""
+
+msgid "Band 6 - Chlorophyll reference (Chl minimum) - 560 nm"
+msgstr ""
+
+msgid "Band 7 - Sediment loading - 620 nm"
+msgstr ""
+
+msgid ""
+"Band 8 - Chl (2nd Chl abs. max.), sediment, yellow substance/vegetation - "
+"665 nm"
+msgstr ""
+
+msgid ""
+"Band 9 - For improved fluorescence retrieval and to better account for "
+"smile together with the bands 665 and 680 nm - 673.75 nm "
+msgstr ""
+
+msgid "Band 10 - Chl fluorescence peak, red edge - 681.25 nm"
+msgstr ""
+
+msgid "Band 11 - Chl fluorescence baseline, red edge transition - 708.75 nm"
+msgstr ""
+
+msgid "Band 12 - O2 absorption/clouds, vegetation - 753.75 nm"
+msgstr ""
+
+msgid "Band 13 - O2 absorption band/aerosol corr. - 761.25 nm"
+msgstr ""
+
+msgid "Band 14 - Atmospheric correction - 764.375 nm"
+msgstr ""
+
+msgid "Band 15 - O2A used for cloud top pressure, fluorescence over land - 767.5 nm"
+msgstr ""
+
+msgid "Band 16 - Atmos. corr./aerosol corr. - 778.75 nm"
+msgstr ""
+
+msgid "Band 17 - Atmos. corr./aerosol corr., clouds, pixel co-registration - 865 nm"
+msgstr ""
+
+msgid ""
+"Band 18 - Water vapour absorption reference band. Common reference band "
+"with SLSTR instrument. Vegetation monitoring - 885 nm"
+msgstr ""
+
+msgid ""
+"Band 19 - Water vapour absorption/vegetation monitoring (max. reflectance) "
+"- 900 nm"
+msgstr ""
+
+msgid "Band 20 - Water vapour absorption, atmos./aerosol corr. - 940 nm"
+msgstr ""
+
+msgid "Band 21 - Atmos./aerosol corr. - 1020 nm"
+msgstr ""
+
+msgid "Band F1 - Thermal IR fire emission - Active fire - 3742.00 nm"
+msgstr ""
+
+msgid "Band F2 - Thermal IR fire emission - Active fire - 10854.00 nm"
+msgstr ""
+
+msgid "Band S1 - VNIR - Cloud screening, vegetation monitoring, aerosol - 554.27 nm"
+msgstr ""
+
+msgid "Band S2 - VNIR - NDVI, vegetation monitoring, aerosol - 659.47 nm"
+msgstr ""
+
+msgid "Band S3 - VNIR - NDVI, cloud flagging, pixel co-registration - 868.00 nm"
+msgstr ""
+
+msgid "Band S4 - SWIR - Cirrus detection over land - 1374.80 nm"
+msgstr ""
+
+msgid ""
+"Band S5 - SWIR - Cloud clearing, ice, snow, vegetation monitoring - 1613.40 "
+"nm"
+msgstr ""
+
+msgid "Band S6 - SWIR - Vegetation state and cloud clearing - 2255.70 nm"
+msgstr ""
+
+msgid "Band S7 - Thermal IR Ambient - SST, LST, active fire - 3742.00 nm"
+msgstr ""
+
+msgid "Band S8 - Thermal IR Ambient - SST, LST, active fire - 10854.00 nm"
+msgstr ""
+
+msgid "Band S9 - Thermal IR Ambient - SST, LST - 12022.50 nm"
+msgstr ""
+
+msgid "Reflectance"
+msgstr ""
+
+msgid "Brightness temperature"
+msgstr ""
+
+msgid "Max. cloud coverage"
+msgstr ""
+
+msgid ""
+"**MERIS** (Medium-resolution spectrometer) was a sensor on board the "
+"ENVISAT satellite with the\n"
+"primary mission to observe land and ocean colour and the atmosphere. It is "
+"no longer active and has\n"
+"been succeeded by Sentinel-3. EO Browser provides data processed at level "
+"1B (the Top Of Atmosphere\n"
+"(TOA) reflectance).\n"
+"\n"
+"**Spatial resolution:** Full Resolution 260m across track 290m along track.\n"
+"\n"
+"**Revisit time:** <= 3 days.\n"
+"\n"
+"**Data availability:** June 2002 – April 2012.\n"
+"\n"
+"**Common usage:** Ocean monitoring (phytoplankton, yellow substance, "
+"suspended matter),\n"
+"atmosphere (water vapour, CO2, clouds, aerosols), and land (vegetation "
+"index, global coverage,\n"
+"moisture)."
+msgstr ""
+
+msgid "Credits:"
+msgstr ""
+
+msgid ""
+"**GIBS** (Global Imagery Browse Services) provides quick access to over 600 "
+"satellite imagery\n"
+"products, covering every part of the world. Most imagery is available "
+"within a few hours after\n"
+"satellite overpass, some products span almost 30 years."
+msgstr ""
+
+msgid ""
+"**Landsat** – NASA's Landsat satellites are similar to Sentinel-2, "
+"capturing visible and infrared\n"
+"wavelengths and additionally thermal in Landsat 8. It also has a long "
+"history spanning nearly five\n"
+"decades of imagery from the first Landsat mission, making it a unique "
+"resource for those who work in\n"
+"agriculture, geology, forestry, regional planning, education, mapping, and "
+"global change research.\n"
+"EO Browser provides imagery acquired from satellites Landsat 5, 7 and 8 "
+"processed at Level-1\n"
+"reflectance.\n"
+"\n"
+"**Spatial resolution:** 130m, thermal (100m resampled to 30m) and "
+"panchromatic (15m) bands.\n"
+"\n"
+"**Revisit time:** <= 8 days with the two operational satellites Landsat 7 "
+"and Landsat 8.\n"
+"\n"
+"**Data availability:** Europe and North Africa from 1984 - 2011 (Landsat "
+"5), 1999 - 2003\n"
+"(Landsat 7), 2013 until present (Landsat 8) from the ESA archive. The "
+"global USGS archive since\n"
+"April 2013 until present (Landsat 8 only).\n"
+"\n"
+"**Common usage:** Vegetation monitoring, land use, land cover maps, change "
+"monitoring, etc."
+msgstr ""
+
+msgid ""
+"Nasa's **MODIS** – (Moderate Resolution Imaging Spectroradiometer) acquires "
+"data with the objective\n"
+"to improve our understanding of global processes occurring on land. EO "
+"browser provides data for\n"
+"observation of land (bands 1-7).\n"
+"\n"
+"**Spatial resolution:** 250m (bands 1-2), 500m (bands 3-7), 1000m (bands "
+"8-36).\n"
+"\n"
+"**Revisit time:** Global coverage in 1 – 2 days with both Aqua and Terra "
+"satellites.\n"
+"\n"
+"**Data availability:** Since January 2013.\n"
+"\n"
+"**Common usage:** Monitoring of land, clouds, ocean colour at a global "
+"scale."
+msgstr ""
+
+msgid ""
+"The **Proba-V** satellite is a small satellite designed to map land cover "
+"and vegetation growth\n"
+"across the entire globe every two days. EO Browser provides derived "
+"products which minimize cloud\n"
+"cover by combining cloud-free measurement within a 1 day (S1), 5 day (S5) "
+"and 10 day (S10) period.\n"
+"\n"
+"**Spatial resolution:** 100m for S1 and S5, 333m for S1 and S10, 1000m for "
+"S1 and S10.\n"
+"\n"
+"**Revisit time:** 1 day for latitudes 35-75°N and 35-56°S, 2 days for "
+"latitudes between 35°N\n"
+"and 35°S.\n"
+"\n"
+"**Data availability:** Since October 2013.\n"
+"\n"
+"**Common usage:** MThe observation of land cover, vegetation growth, "
+"climate impact assessment,\n"
+"water resource management, agricultural monitoring and food security "
+"estimates, inland water\n"
+"resource monitoring and tracking the steady spread of deserts and "
+"deforestation."
+msgstr ""
+
+msgid ""
+"**Sentinel-1** provides all-weather, day and night radar imagery for land "
+"and ocean services. EO\n"
+"Browser provides data acquired in Interferometric Wide Swath (IW) and Extra "
+"Wide Swath (EW) modes\n"
+"processed to Level-1 Ground Range Detected (GRD).\n"
+"\n"
+"**Pixel spacing:** 10m (IW), 40m (EW).\n"
+"\n"
+"**Revisit time:** <= 5 days using both satellites.\n"
+"\n"
+"**Revisit time** (for asc/desc and overlap using both satellites): <= 3 "
+"days, see [observation "
+"scenario](https://sentinel.esa.int/web/sentinel/missions/sentinel-1/"
+"observation-scenario)\n"
+"\n"
+"**Data availability:** Since October 2014.\n"
+"\n"
+"**Common usage:** Maritime and land monitoring, emergency response, climate "
+"change."
+msgstr ""
+
+msgid ""
+"**Sentinel-2** provides high-resolution imagery in the visible and infrared "
+"part of the spectrum\n"
+"aiming to support the monitoring of vegetation, soil and water cover, "
+"inland waterways and coastal\n"
+"areas. EO Browser provides data processed to two levels: L1C "
+"(orthorectified Top-Of-Atmosphere\n"
+"reflectance) and L2A (orthorectified Bottom-Of-Atmosphere reflectance).\n"
+"\n"
+"**Spatial resolution:** 10m, 20m, and 60m, depending on the wavelength.\n"
+"\n"
+"**Revisit time:** <= 5 days using both satellites.\n"
+"\n"
+"**Data availability:** Since June 2015.\n"
+"\n"
+"**Common usage:** Land-cover maps, land-change detection maps, vegetation "
+"monitoring,\n"
+"monitoring of burnt areas."
+msgstr ""
+
+msgid ""
+"The main objective of the Sentinel-3 mission is to measure sea surface "
+"topography, sea and land\n"
+"surface temperature, and ocean and land surface colour with high accuracy "
+"and reliability (source:\n"
+"ESA). Both Sentinel-3 satellites have four different sensors on board. Data "
+"acquired by OLCI and\n"
+"SLSTR sensors are available in EO Browser."
+msgstr ""
+
+msgid ""
+"**Sentinel-3 SLSTR** provides global and regional Sea and Land Surface "
+"Temperature. EO\n"
+"Browser provides data acquired in nadir view while descending. Measurements "
+"are processed at\n"
+"Level 1B and represent top of atmosphere reflectance or brightness "
+"temperature.\n"
+"\n"
+"**Spatial resolution:** 500m for bands S1 to S6, 1km for bands S7 to S9, "
+"F1, and F2.\n"
+"\n"
+"**Revisit time:** <= 1 day using both satellites.\n"
+"\n"
+"**Data availability:** Since May 2016.\n"
+"\n"
+"**Common usage:** Climate change monitoring, vegetation monitoring, active "
+"fire detection,\n"
+"land and sea surface temperature monitoring. Sentinel-3 SLSTR instrument "
+"ensures continuity of\n"
+"the Envisat AATSR."
+msgstr ""
+
+msgid ""
+"**Sentinel-3 OLCI** provides more frequent optical imagery than Sentinel-2 "
+"but at lower\n"
+"resolution and with more spectral bands to support the ocean, "
+"environmental, and climate\n"
+"monitoring. EO Browser provides data acquired with the OLCI sensor at full "
+"resolution and\n"
+"processed at Level 1 reflectance.\n"
+"\n"
+"**Spatial resolution:** 300m.\n"
+"\n"
+"**Revisit time:**  2 days using both satellites.\n"
+"\n"
+"**Data availability:** Since May 2016.\n"
+"\n"
+"**Common usage:** Surface topography observations, ocean and land surface "
+"colour\n"
+"observation and monitoring. The Sentinel-3 OLCI instrument ensures the "
+"continuity of Envisat\n"
+"Meris."
+msgstr ""
+
+msgid ""
+"**Sentinel-5P** provides atmospheric measurements, relating to air quality, "
+"climate forcing,\n"
+"ozone and UV radiation with high spatio-temporal resolution. EO Browser "
+"serves level 2 geophysical\n"
+"products.\n"
+"\n"
+"**Spatial resolution:** 7 x 3.5km.\n"
+"\n"
+"**Revisit time:** <= 5 1 day.\n"
+"\n"
+"**Data availability:** Since April 2018.\n"
+"\n"
+"**Common usage:** Monitoring the concentration of carbon monoxide (CO), "
+"nitrogen dioxide (NO2)\n"
+"and ozone (O3) in the air. Monitoring the UV aerosol index (AER_AI) and "
+"various geophysical\n"
+"parameters of clouds (CLOUD)."
+msgstr ""
+
+msgid "Copied"
+msgstr ""
+
+msgid "Copy to clipboard"
+msgstr ""
+
+msgid "Sensing time"
+msgstr ""
+
+msgid "Cloud coverage"
+msgstr ""
+
+msgid "Sun elevation"
+msgstr ""
+
+msgid "Tile CRS"
+msgstr ""
+
+msgid "MGRS location"
+msgstr ""
+
+msgid "Visualize"
+msgstr ""
+
+msgid "AWS path"
+msgstr ""
+
+msgid "EO Cloud path"
+msgstr ""
+
+msgid "CreoDIAS path"
+msgstr ""
+
+msgid "SciHub link"
+msgstr ""
+
+msgid "Back to search"
+msgstr ""
+
+msgid "Load more"
+msgstr ""
+
+msgid "Loading more results ..."
+msgstr ""
+
+msgid "Results"
+msgstr ""
+
+#, javascript-format
+msgid "Showing ${ this.state.selectedTiles.length } result."
+msgid_plural "Showing ${ this.state.selectedTiles.length } results."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Lat/Lon"
+msgstr ""
+
+msgid "Zoom"
+msgstr ""
+
+msgid "Remove pin"
+msgstr ""
+
+msgid "Opacity"
+msgstr ""
+
+msgid "WARNING: You're about to delete a pin. Do you wish to continue?"
+msgstr ""
+
+msgid "WARNING: You're about to delete all pins. Do you wish to continue?"
+msgstr ""
+
+msgid ""
+"No pins. Go to the Visualize tab to save a pin or upload a JSON file with "
+"saved pins."
+msgstr ""
+
+msgid ""
+"Note that the pins will be saved only if you log in. Otherwise, the pins "
+"will be lost once the application is closed."
+msgstr ""
+
+msgid "Split"
+msgstr ""
+
+msgid "Create link"
+msgstr ""
+
+#. the space before the second string is on purpose to have a space between the texts
+msgid "No pins."
+msgstr ""
+
+msgid "File type not supported"
+msgstr ""
+
+msgid "not supported"
+msgstr ""
+
+msgid "No pins were found."
+msgstr ""
+
+msgid "Error parsing file:"
+msgstr ""
+
+msgid "File upload"
+msgstr ""
+
+msgid "Upload a JSON file with saved pins."
+msgstr ""
+
+msgid "Drop JSON file or search your computer"
+msgstr ""
+
+msgid "Keep existing pins"
+msgstr ""
+
+msgid "Share"
+msgstr ""
+
+msgid "Export"
+msgstr ""
+
+msgid "Import"
+msgstr ""
+
+msgid "Clear"
+msgstr ""
+
+msgid "Share pins link"
+msgstr ""
+
+msgid "Creating link..."
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Hello,"
+msgstr ""
+
+msgid "Go to Place"
+msgstr ""
+
+msgid "Labels"
+msgstr ""
+
+msgid "Borders"
+msgstr ""
+
+msgid "Roads"
+msgstr ""
+
+msgid "Zoom in"
+msgstr ""
+
+msgid "Zoom out"
+msgstr ""
+
+msgid "About EO Browser"
+msgstr ""
+
+msgid "Contact us"
+msgstr ""
+
+msgid "Get data"
+msgstr ""
+
+msgid "you need to log in to use this function"
+msgstr ""
+
+msgid "please select a layer"
+msgstr ""
+
+msgid "downloading image in compare mode is not possible"
+msgstr ""
+
+msgid "this datasource is not supported"
+msgstr ""
+
+#. jsx-a11y/anchor-is-valid
+#. eslint-disable-next-line
+msgid "Statistical Info / Feature Info Service chart"
+msgstr ""
+
+msgid "Statistical Info / Feature Info Service chart - "
+msgstr ""
+
+msgid "not available for "
+msgstr ""
+
+#, javascript-format
+msgid ""
+"not available for \"${ props.presetLayerName }\" (layer with value is not "
+"set up)"
+msgstr ""
+
+msgid "Search for data first."
+msgstr ""
+
+msgid "Mark point of interest"
+msgstr ""
+
+#. jsx-a11y/anchor-is-valid
+#. eslint-disable-next-line
+msgid "Center map on feature"
+msgstr ""
+
+#. jsx-a11y/anchor-is-valid
+#. eslint-disable-next-line
+msgid "Remove geometry"
+msgstr ""
+
+msgid "Area of interest"
+msgstr ""
+
+msgid "Select mode"
+msgstr ""
+
+msgid "Mode:"
+msgstr ""
+
+#. jsx-a11y/anchor-is-valid
+#. eslint-disable-next-line
+msgid "Remove measurement"
+msgstr ""
+
+msgid "km"
+msgstr ""
+
+msgid "m"
+msgstr ""
+
+msgid "Gain"
+msgstr ""
+
+msgid "Gamma"
+msgstr ""
+
+msgid "R"
+msgstr ""
+
+msgid "G"
+msgstr ""
+
+msgid "B"
+msgstr ""
+
+#. jsx-a11y/anchor-is-valid
+#. eslint-disable-next-line
+msgid "Reset all"
+msgstr ""
+
+msgid "Timespan:"
+msgstr ""
+
+msgid "Date:"
+msgstr ""
+
+msgid "Single date"
+msgstr ""
+
+msgid "Timespan"
+msgstr ""
+
+msgid "hh"
+msgstr ""
+
+msgid "mm"
+msgstr ""
+
+msgid "From:"
+msgstr ""
+
+msgid "Until:"
+msgstr ""
+
+msgid "Apply"
+msgstr ""
+
+msgid "filter by months"
+msgstr ""
+
+#. jsx-a11y/anchor-is-valid
+#. eslint-disable-next-line
+msgid "Draw area of interest for image downloads"
+msgstr ""
+
+msgid "Copy geometry to clipboard"
+msgstr ""
+
+#. jsx-a11y/anchor-is-valid
+#. eslint-disable-next-line
+msgid "Cancel edit."
+msgstr ""
+
+msgid "Draw area of interest"
+msgstr ""
+
+#. jsx-a11y/anchor-is-valid
+#. eslint-disable-next-line
+msgid "Upload data"
+msgstr ""
+
+msgid "Least cloud coverage"
+msgstr ""
+
+msgid "Use additional datasets (advanced)"
+msgstr ""
+
+msgid "Mosaicking order"
+msgstr ""
+
+msgid "Most recent"
+msgstr ""
+
+msgid "Least recent"
+msgstr ""
+
+msgid "Customize timespan"
+msgstr ""
+
+#. eslint-disable-next-line
+msgid "Back"
+msgstr ""
+
+msgid "Error loading script. Check your URL."
+msgstr ""
+
+msgid "Load script from URL"
+msgstr ""
+
+msgid "Enter URL to your script"
+msgstr ""
+
+msgid "Script loaded."
+msgstr ""
+
+msgid "Only HTTPS domains are allowed."
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "orbit"
+msgstr ""
+
+msgid "day"
+msgstr ""
+
+msgid "week"
+msgstr ""
+
+msgid "month"
+msgstr ""
+
+msgid "year"
+msgstr ""
+
+msgid "Select 1 image per:"
+msgstr ""
+
+msgid "Timelapse"
+msgstr ""
+
+msgid "Select All"
+msgstr ""
+
+msgid "An error occured:"
+msgstr ""
+
+msgid "No images selected"
+msgstr ""
+
+msgid "Speed:"
+msgstr ""
+
+msgid "frames / s"
+msgstr ""
+
+msgid "Preparing..."
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "File will have logo attached."
+msgstr ""
+
+msgid "Show logo"
+msgstr ""
+
+msgid "Image format"
+msgstr ""
+
+msgid "Image resolution"
+msgstr ""
+
+msgid "Coordinate system"
+msgstr ""
+
+msgid "Layers"
+msgstr ""
+
+msgid "Visualized"
+msgstr ""
+
+msgid "Raw"
+msgstr ""
+
+msgid ""
+"The map's overlay layers (place labels, streets and political boundaries) "
+"will be added to the image."
+msgstr ""
+
+msgid "Exported image(s) will include datasource and date, zoom scale and branding"
+msgstr ""
+
+msgid "Add a short description to the exported image"
+msgstr ""
+
+msgid "Show captions"
+msgstr ""
+
+msgid "Add map overlays"
+msgstr ""
+
+msgid "Show legend"
+msgstr ""
+
+msgid "Exported image will include legend"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+#, javascript-format
+msgid "Projected resolution: ${ projectedResolution } m/px"
+msgstr ""
+
+msgid "min/px"
+msgstr ""
+
+msgid "sec/px"
+msgstr ""
+
+msgid "Resolution"
+msgstr ""
+
+msgid "lat."
+msgstr ""
+
+msgid "deg/px"
+msgstr ""
+
+msgid "long."
+msgstr ""
+
+msgid "Basic"
+msgstr ""
+
+msgid "Analytical"
+msgstr ""
+
+msgid "Please log in to use this feature"
+msgstr ""
+
+msgid "High-res print"
+msgstr ""
+
+msgid "Image download"
+msgstr ""
+
+msgid "Image format:"
+msgstr ""
+
+msgid "Image width [inches]:"
+msgstr ""
+
+msgid "Image height [inches]:"
+msgstr ""
+
+msgid "DPI:"
+msgstr ""
+
+msgid "Could not download files:"
+msgstr ""
+
+msgid "Can't download via canvas"
+msgstr ""
+
+msgid "Could not ZIP files:"
+msgstr ""
+
+msgid "There was a problem downloading image"
+msgstr ""
+
+msgid "Error fetching image: url is empty!"
+msgstr ""
+
+msgid "Error fetching image:"
+msgstr ""
+
+msgid "Could not load image from blob"
+msgstr ""
+
+msgid "Drag bands onto RGB fields."
+msgstr ""
+
+msgid "Click to place marker"
+msgstr ""
+
+msgid "Click to place first vertex"
+msgstr ""
+
+msgid "Click to continue drawing"
+msgstr ""
+
+msgid "Click first marker to finish"
+msgstr ""
+
+msgid "5 years"
+msgstr ""
+
+msgid "2 years"
+msgstr ""
+
+msgid "1 year"
+msgstr ""
+
+msgid "6 months"
+msgstr ""
+
+msgid "3 months"
+msgstr ""
+
+msgid "1 month"
+msgstr ""
+
+msgid "Retry"
+msgstr ""
+
+msgid "Loading, please wait"
+msgstr ""
+
+msgid "mean"
+msgstr ""
+
+msgid "median"
+msgstr ""
+
+msgid "st. dev."
+msgstr ""
+
+msgid "min / max"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid ""
+"Login to unlock advanced features such as timelapse, analytical download, "
+"own configurations and more."
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "Default"
+msgstr ""
+
+msgid "Volcanoes"
+msgstr ""
+
+msgid "Wildfires"
+msgstr ""
+
+msgid "Monitoring Earth from Space"
+msgstr ""
+
+msgid "Agriculture"
+msgstr ""
+
+msgid "Atmosphere and Pollution"
+msgstr ""
+
+msgid "Change Detection through Time"
+msgstr ""
+
+msgid "Flooding and Droughts"
+msgstr ""
+
+msgid "Geology"
+msgstr ""
+
+msgid "Ocean and Water Bodies"
+msgstr ""
+
+msgid "Snow and Glaciers"
+msgstr ""
+
+msgid "Urban"
+msgstr ""
+
+msgid "Vegetation and Forestry"
+msgstr ""
+
+msgid "Based on the combination of bands 4, 3, 2"
+msgstr ""
+
+msgid "Based on the combination of bands (B04-B03)/(B04+B03)"
+msgstr ""
+
+msgid "Based on the combination of bands 5, 4, 3"
+msgstr ""
+
+msgid "Based on true color bands 4, 3, 2 and a pan band 8"
+msgstr ""
+
+msgid "Based on the combination of bands (B05-B04)/(B05+B04)"
+msgstr ""
+
+msgid "VV - linear gamma0 - orthorectified"
+msgstr ""
+
+msgid "VV - linear gamma0 - non-orthorectified"
+msgstr ""
+
+msgid "VH - linear gamma0 - orthorectified"
+msgstr ""
+
+msgid "Based on the combination of bands 3, 2, 1"
+msgstr ""
+
+msgid "VH - linear gamma 0 - non-orthorectified"
+msgstr ""
+
+msgid ""
+"Color image by mapping the input bands. Value [RGB] = [VV, 2 VH, VV / VH / "
+"100.0]  - linear gamma0 - orthorectified"
+msgstr ""
+
+msgid "VV - decibel gamma0 [-20,0] - orthorectified"
+msgstr ""
+
+msgid "VH - decibel gamma0 [-20,0] - orthorectified"
+msgstr ""
+
+msgid "Returns a composite of (VH, VV, VH-VV)"
+msgstr ""
+
+msgid "HH - linear gamma0 - orthorectified"
+msgstr ""
+
+msgid "HV - linear gamma0 - orthorectified"
+msgstr ""
+
+msgid ""
+"Color image by mapping the input bands. Value [RGB] = [HH, 2 HV, HH / HV / "
+"100.0] - linear gamma0 - orthorectified"
+msgstr ""
+
+msgid "HH - decibel gamma0 [-20,0] - orthorectified"
+msgstr ""
+
+msgid "HV - decibel gamma0 [-20,0] - orthorectified"
+msgstr ""
+
+msgid "HH - linear gamma0 - non-orthorectified"
+msgstr ""
+
+msgid "Based on bands 4,3,2"
+msgstr ""
+
+msgid "Based on bands 8,4,3"
+msgstr ""
+
+msgid "Based on bands 12,11,4"
+msgstr ""
+
+msgid "Based on combination of bands (B8 - B4)/(B8 + B4)"
+msgstr ""
+
+msgid "Based on combination of bands (B8A - B11)/(B8A + B11)"
+msgstr ""
+
+msgid "Based on bands 12,8A,4"
+msgstr ""
+
+msgid "Based on combination of bands (B3 - B8)/(B3 + B8)"
+msgstr ""
+
+msgid ""
+"Based on combination of bands (B3 - B11)/(B3 + B11); values above 0.42 are "
+"regarded as snowy"
+msgstr ""
+
+msgid ""
+"Classification of Sentinel2 data as result of ESA's Scene classificaiton "
+"algorithm."
+msgstr ""
+
+msgid "UV Aerosol Index from 380 and 340 nm"
+msgstr ""
+
+msgid "Based on combination of bands (B3 - B11)/(B3 + B11)"
+msgstr ""
+
+msgid ""
+"OLCI Terrestrial Chlorophyll Index, Based on combination of bands (B12 - "
+"B11)/(B11 - B10)"
+msgstr ""
+
+msgid "UV Aerosol Index from 388 and 354 nm"
+msgstr ""
+
+msgid "Column averaged dry air mixing ratio of methane"
+msgstr ""
+
+msgid "Cloud base height"
+msgstr ""
+
+msgid "Cloud base pressure"
+msgstr ""
+
+msgid "Effective radiometric cloud fraction"
+msgstr ""
+
+msgid "Cloud optical thickness"
+msgstr ""
+
+msgid "Cloud top height"
+msgstr ""
+
+msgid "Cloud top pressure"
+msgstr ""
+
+msgid "Carbon Monoxide total column"
+msgstr ""
+
+msgid "Formaldehyde troposheric vertical column"
+msgstr ""
+
+msgid "Nitrogen Dioxide tropospheric column"
+msgstr ""
+
+msgid "Ozone total column"
+msgstr ""
+
+msgid "Sulfur Dioxide total column"
+msgstr ""
+
+msgid "Based on bands 2, 1, 4"
+msgstr ""
+
+msgid "Based on combination of bands (B02 - B01)/(B02 + B01)"
+msgstr ""
+
+msgid "Based on combination of bands (B02 - B05)/(B02 + B05)"
+msgstr ""
+
+msgid "Based on combination of bands (B06 - B07)/(B06 + B07)"
+msgstr ""
+
+msgid "Based on bands 1, 4, 3"
+msgstr ""
+
+msgid "Based on the combination of bands 7, 5, 3"
+msgstr ""
+
+msgid "(B09 -  B08)/(B09 + B08)"
+msgstr ""
+
+msgid "B09 / B08"
+msgstr ""
+
+msgid "Based on the combination of bands 13, 5, 2"
+msgstr ""
+
+msgid "Based on bands 13, 4, 1"
+msgstr ""
+
+msgid "Based on bands 13, 5, 2"
+msgstr ""
+
+msgid "Based on the combination of bands (B13-B07) / (B13+B07)"
+msgstr ""
+
+msgid "Terrestrial Chlorophyl Index"
+msgstr ""
+
+msgid ""
+"PROBA-V 10-daily Synthesis\n"
+"Top of Canopy (Atmospherically corrected)\n"
+"temporal resolution: 10-daily\n"
+"Resolution: 333M (pixel size)"
+msgstr ""
+
+msgid ""
+"PROBA-V daily Synthesis\n"
+"Top of Atmosphere\n"
+"temporal resolution: daily\n"
+"Resolution: 333M (pixel size)"
+msgstr ""
+
+msgid ""
+"PROBA-V 5-daily Synthesis\n"
+"Top of Atmosphere\n"
+"temporal resolution: 5-daily\n"
+"Resolution: 100M (pixel size)"
+msgstr ""
+
+msgid ""
+"PROBA-V daily Synthesis\n"
+"Top of Canopy (Atmospherically corrected)\n"
+"temporal resolution: daily\n"
+"Resolution: 333M (pixel size)"
+msgstr ""
+
+msgid "OrbitTracks_Aqua_Descending"
+msgstr ""
+
+msgid ""
+"PROBA-V 5-daily Synthesis\n"
+"Top of Canopy (Atmospherically corrected)\n"
+"temporal resolution: 5-daily\n"
+"Resolution: 100M (pixel size)"
+msgstr ""
+
+msgid "OrbitTracks_Aqua_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Aura_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Aura_Descending"
+msgstr ""
+
+msgid "OrbitTracks_CloudSat_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Calipso_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Calipso_Descending"
+msgstr ""
+
+msgid "OrbitTracks_CloudSat_Descending"
+msgstr ""
+
+msgid "OrbitTracks_CYGNSS_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_CYGNSS_Descending"
+msgstr ""
+
+msgid "OrbitTracks_GCOM-C_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_GCOM-C_Descending"
+msgstr ""
+
+msgid "OrbitTracks_GCOM-W1_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_GCOM-W1_Descending"
+msgstr ""
+
+msgid "OrbitTracks_GOSAT-2_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_GOSAT-2_Descending"
+msgstr ""
+
+msgid "OrbitTracks_GOSAT_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_GOSAT_Descending"
+msgstr ""
+
+msgid "OrbitTracks_GPM_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_GPM_Descending"
+msgstr ""
+
+msgid "OrbitTracks_ICESAT-2_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_ICESAT-2_Descending"
+msgstr ""
+
+msgid "OrbitTracks_ISS_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_ISS_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Landsat-7_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Landsat-7_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Landsat-8_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_METOP-A_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_METOP-B_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Landsat-8_Descending"
+msgstr ""
+
+msgid "OrbitTracks_METOP-C_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_METOP-C_Descending"
+msgstr ""
+
+msgid "OrbitTracks_NOAA-20_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_NOAA-20_Descending"
+msgstr ""
+
+msgid "OrbitTracks_METOP-B_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_OCO-2_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_OCO-2_Descending"
+msgstr ""
+
+msgid "OrbitTracks_SAOCOM1-A_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_SAOCOM1-A_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Sentinel-1A_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Sentinel-1B_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Sentinel-1A_Descending"
+msgstr ""
+
+msgid "OrbitTracks_METOP-A_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Sentinel-1B_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Sentinel-2A_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Sentinel-2A_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Sentinel-2B_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Sentinel-2B_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Sentinel-5P_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Sentinel-5P_Descending"
+msgstr ""
+
+msgid "OrbitTracks_SMAP_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_SMAP_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Suomi_NPP_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Suomi_NPP_Ascending"
+msgstr ""
+
+msgid "OrbitTracks_Terra_Descending"
+msgstr ""
+
+msgid "OrbitTracks_Terra_Ascending"
+msgstr ""
+
+msgid "Based on bands 4, 3, 2 enhanced by bands 12 and 11."
+msgstr ""
+
+msgid "Based on bands B07, B06, B04"
+msgstr ""
+
+msgid "Based on the combination of bands (B8 - B4)/(B8 + B4)"
+msgstr ""
+
+msgid "Based on thermal band 10"
+msgstr ""
+
+msgid "Based on bands B12, B11, B8A"
+msgstr ""
+
+msgid "Based on the combination of bands (B08 - B12)/(B08 + B12)"
+msgstr ""
+
+msgid "Enhanced natural color visualization"
+msgstr ""
+
+msgid "Based on the combination of bands 8, 6, 4"
+msgstr ""
+
+msgid "Enhanced Vegetation Index"
+msgstr ""
+
+msgid "Based on the combination: BSI, B08, B11"
+msgstr ""
+
+msgid "Classified NDMI for irrigation"
+msgstr ""
+
+msgid "Based on bands B11, B08, B02"
+msgstr ""
+
+msgid "False Color 13, 5, 2"
+msgstr ""
+
+msgid "Based on the combination of bands (B13 - B07) / (B13 + B07)"
+msgstr ""
+
+msgid "Based on bands 12,8,2"
+msgstr ""
+
+msgid "Based on bands 4, 3, 2"
+msgstr ""
+
+msgid "Based on bands 8, 4, 3"
+msgstr ""
+
+msgid "Based on bands 12, 8, 2"
+msgstr ""
+
+msgid "Based on bands 8, 11, 12"
+msgstr ""
+
+msgid "Water sedimentation and chlorophyll content"
+msgstr ""
+
+msgid "Based on bands 12, 8A, 4"
+msgstr ""
+
+msgid "Based on NDSI"
+msgstr ""
+
+msgid "Based on the combination of bands 11, 8, 2"
+msgstr ""
+
+msgid "Based on bands B12, B11, B04"
+msgstr ""
+
+msgid "Based on bands 4, 3 ,2"
+msgstr ""
+
+msgid "Atmospherically Resistant Vegetation Index"
+msgstr ""
+
+msgid "Soil Adjusted Vegetation Index"
+msgstr ""
+
+msgid "Modified Atrocyanin Reflectance Index"
+msgstr ""
+
+msgid ""
+"# Thermal IR fire emission bands\n"
+"\n"
+"SLSTR channels F1 and F2, with a central wavelength of 3742 nm and 10854 nm "
+"respectively, aim to detect the Land Surface Temperature (LST) of the "
+"Earth. LST is the radiative skin temperature of the land derived from solar "
+"radiation. A simplified definition would be how hot the surface of the "
+"Earth would feel to the touch in a particular location. SLSTR channels F1 "
+"and F2 are designed to deliver the radiometric data necessary for the "
+"generation of quantitative active fire products. This prevents saturation "
+"of the thermal channels and applies to targets with an upper limit of "
+"500°C. They are useful for fire mapping.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here.](https://sentinel.esa.int/web/sentinel/user-guides/sentinel-3-slstr/"
+"overview/geophysical-measurements/land-surface-temperature)"
+msgstr ""
+
+msgid ""
+"# Formaldehyde (HCHO)\n"
+"\n"
+"\n"
+"\n"
+"Long-term satellite observations of tropospheric formaldehyde HCHO are "
+"essential to support air quality and chemistry-climate related studies from "
+"the regional to the global scale. Formaldehyde is an intermediate gas in "
+"almost all oxidation chains of non-methane volatile organic compounds "
+"(NMVOC), leading eventually to CO2. Non-Methane Volatile Organic Compounds "
+"(NMVOCs) are, together with NOx, CO and CH4, among the most important "
+"precursors of tropospheric O3. The major HCHO source in the remote "
+"atmosphere is CH4 oxidation. Over the continents, the oxidation of higher "
+"NMVOCs emitted from vegetation, fires, traffic and industrial sources "
+"results in important and localized enhancements of the HCHO levels. The "
+"seasonal and inter-annual variations of the formaldehyde distribution are "
+"principally related to temperature changes and fire events, but also to "
+"changes in anthropogenic activities. Its lifetime being of the order of a "
+"few hours, HCHO concentrations in the boundary layer can be directly "
+"related to the release of short-lived hydrocarbons, which mostly cannot be "
+"observed directly from space.\n"
+"\n"
+"\n"
+"\n"
+"[More...](http://www.tropomi.eu/data-products/formaldehyde)"
+msgstr ""
+
+msgid ""
+"# Ozone (O3)\n"
+"\n"
+"\n"
+"\n"
+"Ozone is of crucial importance for the equilibrium of the Earth atmosphere. "
+"In the stratosphere, the ozone layer shields the biosphere from dangerous "
+"solar ultraviolet radiation. In the troposphere, it acts as an efficient "
+"cleansing agent, but a high concentration of it is harmful to the health of "
+"humans, animals, and vegetation. Ozone is also an important greenhouse-gas "
+"contributor to ongoing climate change. Since the discovery of the Antarctic "
+"ozone hole in the 1980s and the subsequent Montreal Protocol regulating the "
+"production of chlorine-containing ozone-depleting substances, ozone has "
+"been routinely monitored from the ground and from space.\n"
+"\n"
+"\n"
+"\n"
+"[More...](http://www.tropomi.eu/data-products/total-ozone-column)"
+msgstr ""
+
+msgid ""
+"# Nitrogen Dioxide (NO2)\n"
+"\n"
+"\n"
+"\n"
+"Nitrogen dioxide (NO2) and nitrogen oxide (NO) together are usually "
+"referred to as nitrogen oxides (NOx = NO + NO2). They are important trace "
+"gases in the Earth’s atmosphere, present in both the troposphere and the "
+"stratosphere. They enter the atmosphere as a result of anthropogenic "
+"activities (notably fossil fuel combustion and biomass burning) and natural "
+"processes (such as microbiological processes in soils, wildfires and "
+"lightning). During daytime, i.e. in the presence of sunlight, a "
+"photochemical cycle involving ozone (O3) converts NO into NO2 (and vice "
+"versa) on a timescale of minutes, so that NO2 is a robust measure for "
+"concentrations of nitrogen oxides.  \n"
+"\n"
+"\n"
+"\n"
+"[More...](http://www.tropomi.eu/data-products/nitrogen-dioxide)"
+msgstr ""
+
+msgid ""
+"# Aerosol Index\n"
+"\n"
+"The Aerosol Index (AI) is a qualitative index indicating the presence of "
+"elevated layers of aerosols in the atmosphere.\n"
+"\n"
+"The main aerosol types that cause signals detected in the AI (because of "
+"their significant absorption) are desert dust, biomass burning and volcanic "
+"ash plumes. An advantage of the AI is that it can be derived for clear as "
+"well as (partly) cloudy ground pixels.\n"
+"\n"
+"[More...](https://earth.esa.int/web/sentinel/technical-guides/sentinel-5p/"
+"level-2/aerosol-index)"
+msgstr ""
+
+msgid ""
+"# Thermal band 10\n"
+"\n"
+"This thermal visualization is based on the Landsat 8's thermal band 10. At "
+"the central wavelength of 10895 nm it is in the thermal infrared, or TIR – "
+"it detects heat. Instead of measuring the temperature of the air, like "
+"weather stations do, band 10 reports on the ground itself, which is often "
+"much hotter. Thermal bands 10 and 11 are useful in providing more accurate "
+"surface temperatures and are collected at 100 meters.\n"
+"\n"
+"\n"
+"\n"
+"More "
+"[here](https://www.usgs.gov/faqs/what-are-band-designations-landsat-"
+"satellites?qt-news_science_products=0#qt-news_science_products) and "
+"[here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)"
+msgstr ""
+
+msgid ""
+"# Normalized Difference Vegetation Index (NDVI)\n"
+"\n"
+"The well known and widely used NDVI is a simple, but effective index for "
+"quantifying green vegetation. It normalizes green leaf scattering in Near "
+"Infra-red wavelengths with chlorophyll absorption in red wavelengths. The "
+"value range of the NDVI is `-1` to `1`. Negative values of the NDVI (values "
+"approaching `-1`) correspond to water. Values close to zero (`-0.1` to "
+"`0.1`) generally correspond to barren areas of rock, sand, or snow. Low, "
+"positive values represent shrub and grassland (approximately `0.2` to "
+"`0.4`), while high values indicate temperate and tropical rainforests "
+"(values approaching `1`).\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ndvi/)"
+msgstr ""
+
+msgid ""
+"# Soil Adjusted Vegetation Index (SAVI)\n"
+"\n"
+"Empirically derived NDVI products have been shown to be unstable, varying "
+"with soil colour, soil moisture, and saturation effects from high density "
+"vegetation. The SAVI is similar to the NDVI but is used in areas where "
+"vegetative cover is low (< 40%). When a significant amount of the soil "
+"surface is exposed, the soil reflectance can influence the NDVI values. "
+"Light reflected from the soil can have a significant effect on NDVI values "
+"(changing the values by up to 20%). The index is a transformation technique "
+"that minimizes soil brightness influences from spectral vegetation indices "
+"involving red and near-infrared (NIR) wavelengths.\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/savi/)"
+msgstr ""
+
+msgid ""
+"# Modified Anthocyanin Reflectance Index (mARI/ARI2)\n"
+"\n"
+"Anthocyanins are pigments common in higher plants, causing their red, blue "
+"and purple coloration. They provide valuable information about the "
+"physiological status of plants, as they are considered indicators of "
+"various types of plant stresses. The reflectance of anthocyanin is highest "
+"around 550nm. However, the same wavelengths are reflected by chlorophyll as "
+"well. To isolate the anthocyanins, the 700nm spectral band, that reflects "
+"only chlorophyll and not anthocyanins, is subtracted.\n"
+"\n"
+"To correct for leaf density and thickness, the near infrared spectral band "
+"(in the recommended wavelengths of 760-800nm), which is related to leaf "
+"scattering, is added to the basic ARI index. The new index is called "
+"modified ARI or mARI (also ARI2).\n"
+"\n"
+"mARI values for the examined trees in [this original "
+"article](https://custom-scripts.sentinel-hub.com/sentinel-2/mari/) ranged "
+"in values from 0 to 8.\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://digitalcommons.unl.edu/cgi/viewcontent.cgi?article=1227&"
+"context=natrespapers)"
+msgstr ""
+
+msgid ""
+"# Green City Script\n"
+"\n"
+"The Green city script, made by Carlos Bentes, aims to raise awareness of "
+"green areas in cities around the world. The script takes into account the "
+"NDVI and true color bands; with setting up tresholds it separates built-up "
+"areas from vegetated ones, making it useful for detecting urban areas. "
+"Built-up areas are displayed in grey and vegetation is displayed in green. \n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/green_city/#)"
+msgstr ""
+
+msgid ""
+"# Urban Classified Script\n"
+"\n"
+"The Urban Classified script aims to detect built-up areas by separating "
+"them from barren ground, vegetation and water. Areas with NDWI higher than "
+"0.3 have a high moisture content and are returned in blue; areas, where B11 "
+"is greater than 0.8 and NDVI lower than 0.1, indicate built-up areas and "
+"are returned in white; NDVI greater than 0.2 indicates vegetated areas and "
+"is returned in green; everythyng else indicates barren ground and is "
+"displayed in brown colors.\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/urban_"
+"classified//)"
+msgstr ""
+
+msgid ""
+"# Urban Land Infrared Color Script\n"
+"\n"
+"This script, made by Leo Tolari, combines true color visualization with the "
+"NIR band 8 and the SWIR band 12. The script highlights urban areas better "
+"than true color, while still looking natural.\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/urban_land_"
+"infrared/)"
+msgstr ""
+
+msgid ""
+"# NDMI for Moisture Stress\n"
+"\n"
+"The NDMI for moisture stress can be used to detect irrigation. It is based "
+"on the NDMI and visualized in 4 classes. For all the index values above 0, "
+"knowing the land use and land cover, it is possible to determine whether "
+"irrigation has taken place. Knowing the type of crop grown (e.g. citrus "
+"crops), it is possible to identify whether irrigation is being effective or "
+"not during the crucial growing summer season, as well as find out if some "
+"parts of the farm are being under or over-irrigated.\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ndmi_special/#)"
+msgstr ""
+
+msgid ""
+"# Normalized Difference Moisture Index (NDMI)\n"
+"\n"
+"The NDMI is a normalized difference moisture index, that uses NIR and SWIR "
+"bands to display moisture. The SWIR band reflects changes in both the "
+"vegetation water content and the spongy mesophyll structure in vegetation "
+"canopies, while the NIR reflectance is affected by leaf internal structure "
+"and leaf dry matter content but not by water content. The combination of "
+"the NIR with the SWIR removes variations induced by leaf internal structure "
+"and leaf dry matter content, improving the accuracy in retrieving the "
+"vegetation water content. The amount of water available in the internal "
+"leaf structure largely controls the spectral reflectance in the SWIR "
+"interval of the electromagnetic spectrum. SWIR reflectance is therefore "
+"negatively related to leaf water content.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ndmi/)"
+msgstr ""
+
+msgid ""
+"# Normalized Difference Water Index (NDWI)\n"
+"\n"
+"The NDWI index is most appropriate for water body mapping. The water body "
+"has strong absorbability and low radiation in the range from visible to "
+"infrared wavelengths.\n"
+"\n"
+"The index uses the green and Near Infra-red bands of remote sensing images "
+"based on this phenomenon.Values of water bodies are larger than 0.5. "
+"Vegetation has smaller values. Built-up features have positive values "
+"between zero and 0.2.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ndwi/)"
+msgstr ""
+
+msgid ""
+"# Normalized Difference Water Index (NDWI)\n"
+"\n"
+"The NDWI index is most appropriate for water body mapping. The water body "
+"has strong absorbability and low radiation in the range from visible to "
+"infrared wavelengths.\n"
+"\n"
+"The index uses the green and Near Infra-red bands of remote sensing images "
+"based on this phenomenon.Values of water bodies are larger than 0.5. "
+"Vegetation has smaller values. Built-up features have positive values "
+"between zero and 0.2."
+msgstr ""
+
+msgid ""
+"# False color composite\n"
+"\n"
+"False color composite using near infrared, red and green bands is very "
+"popular. It is most commonly used to assess plant density and health, as "
+"plants reflect near infrared and green light, while absorbing red. Since "
+"they reflect more near infrared than green, plant-covered land appears deep "
+"red. Denser plant growth is darker red. Cities and exposed ground are gray "
+"or tan, and water appears blue or black.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here](https://custom-scripts.sentinel-hub.com/sentinel-2/false_color_"
+"infrared/) and "
+"[here.](https://earthobservatory.nasa.gov/features/FalseColor/page6.php)"
+msgstr ""
+
+msgid ""
+"# False color composite\n"
+"\n"
+"False color composite using near infrared, red and green bands is very "
+"popular. It is most commonly used to assess plant density and health, as "
+"plants reflect near infrared and green light, while absorbing red. Since "
+"they reflect more near infrared than green, plant-covered land appears deep "
+"red. Denser plant growth is darker red. Cities and exposed ground are gray "
+"or tan, and water appears blue or black.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and "
+"[here.](https://gisgeography.com/landsat-8-bands-combinations/)"
+msgstr ""
+
+msgid ""
+"# False color composite\n"
+"\n"
+"False color composite using near infrared, red and green bands is very "
+"popular. It is most commonly used to assess plant density and health, as "
+"plants reflect near infrared and green light, while absorbing red. Since "
+"they reflect more near infrared than green, plant-covered land appears deep "
+"red. Denser plant growth is darker red. Cities and exposed ground are gray "
+"or tan, and water appears blue or black.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here](https://custom-scripts.sentinel-hub.com/Landsat-57/composites/) and "
+"[here.](https://earthobservatory.nasa.gov/features/FalseColor)"
+msgstr ""
+
+msgid ""
+"# False color composite\n"
+"\n"
+"False color composite using near infrared, red and green bands is very "
+"popular. It is most commonly used to assess plant density and health, as "
+"plants reflect near infrared and green light, while absorbing red. Since "
+"they reflect more near infrared than green, plant-covered land appears deep "
+"red. Denser plant growth is darker red. Cities and exposed ground are gray "
+"or tan, and water appears blue or black.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here.](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/"
+"meris/)"
+msgstr ""
+
+msgid ""
+"# True color composite\n"
+"\n"
+"True color composite uses visible light bands red (B04), green (B03) and "
+"blue (B02) in the corresponding red, green and blue color channels, "
+"resulting in a natural colored result, that is a good representation of the "
+"Earth as humans would see it naturally.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/) and "
+"[here.](https://sentinel.esa.int/web/sentinel/user-guides/sentinel-2-msi/"
+"definitions)"
+msgstr ""
+
+msgid ""
+"# True color composite\n"
+"\n"
+"True color composite uses visible light bands red (B03), green (B02) and "
+"blue (B01) in the corresponding red, green and blue color channels, "
+"resulting in a natural colored result, that is a good representation of the "
+"Earth as humans would see it naturally.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here](https://custom-scripts.sentinel-hub.com/Landsat-57/composites/) and "
+"[here.](https://www.usgs.gov/land-resources/nli/landsat/landsat-5?qt-"
+"science_support_page_related_con=0#qt-science_support_page_related_con)"
+msgstr ""
+
+msgid ""
+"# True color composite\n"
+"\n"
+"True color composite uses visible light bands red (B04), green (B03) and "
+"blue (B02) in the corresponding red, green and blue color channels, "
+"resulting in a natural colored result, that is a good representation of the "
+"Earth as humans would see it naturally.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and "
+"[here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)"
+msgstr ""
+
+msgid ""
+"# True color composite\n"
+"\n"
+"True color composite uses visible light bands red (B07), green (B05) and "
+"blue (B03) in the corresponding red, green and blue color channels, "
+"resulting in a natural colored result, that is a good representation of the "
+"Earth as humans would see it naturally.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here.](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/"
+"meris/)"
+msgstr ""
+
+msgid ""
+"# True color composite\n"
+"\n"
+"True color composite uses visible light bands red (B08), green (B06) and "
+"blue (B04) in the corresponding red, green and blue color channels, "
+"resulting in a natural colored result, that is a good representation of the "
+"Earth as humans would see it naturally.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here.](https://sentinel.esa.int/web/sentinel/user-guides/sentinel-3-olci/"
+"overview/heritage)"
+msgstr ""
+
+msgid ""
+"# Pansharpened True Color\n"
+"\n"
+"The pansharpened true color composite is done by using the usual RGB true "
+"color bands with the spatial resolution of 30 m and enhancing them by using "
+"the panchromatic band 8, or pan band, with the spatial resolution of 15 m. "
+"An image from the pan band is similar to black-and-white film: it combines "
+"light from the red, green, and blue parts of the spectrum into a single "
+"measure of overall visible reflectance. Pansharpened images have 2x the "
+"resolution of the usual true color composite, greatly enhancing the "
+"usefulness of Landsat imagery.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here.](https://blog.mapbox.com/pansharpening-for-higher-resolution-in-"
+"landsat-live-e4717cd7c356)"
+msgstr ""
+
+msgid ""
+"# False Color Urban composite\n"
+"\n"
+"This composite uses both SWIR bands and the red band. As vegetation "
+"reflects SWIR band 11, it is visible in shades of green, while urbanized "
+"areas, which reflect all 3, are represented by white, gray, or purple. "
+"Soils, sand, and minerals are shown in a variety of colors. Due to the "
+"almost complete absorption of solar radiation in the middle IR range by "
+"water, snow, and ice, coastlines and water objects are well distinguished. "
+"Snow and ice appear as dark blue, and water as black or blue. SWIR bands "
+"are also useful for detecting wildfires, as they are reflected by heated "
+"areas.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://eos.com/false-color/)"
+msgstr ""
+
+msgid ""
+"# False Color Urban composite\n"
+"\n"
+"The short-wave infrared band combination uses SWIR-2 (7), SWIR-1 (6) and "
+"red (4). This composite displays vegetation in shades of green. While "
+"darker shades of green indicate denser vegetation, sparse vegetation have "
+"lighter shades. Urban areas are blue and soils have various shades of "
+"brown.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://gisgeography.com/landsat-8-bands-combinations/)"
+msgstr ""
+
+msgid ""
+"# Agriculture composite\n"
+"\n"
+"This composite, often called the Agriculture composite, uses bands SWIR-1 "
+"(B11), near-infrared (B08) and blue (B02). It’s mostly used to monitor crop "
+"health, as both short-wave and near infrared bands are particularly good at "
+"highlighting dense vegetation, which appears dark green in the composite. "
+"SWIR measurements can help scientists estimate how much water is present in "
+"plants and soil, as water reflects SWIR light. Shortwave-infrared bands are "
+"also useful for distinguishing between snow, and ice, all of which appear "
+"white in visible light. Newly burned land reflects strongly in SWIR bands, "
+"making them valuable for mapping fire damages.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here](https://earthobservatory.nasa.gov/features/FalseColor/page5.php) and "
+"[here.](https://gisgeography.com/sentinel-2-bands-combinations/)"
+msgstr ""
+
+msgid ""
+"# Snow Classifier\n"
+"\n"
+"The Snow Classifier algorithm aims to detect snow by classifying pixels "
+"based on different brightness and "
+"[NDSI](https://custom-scripts.sentinel-hub.com/sentinel-2/ndsi/#) "
+"thresholds. Values greater than 0.3 (for brightness) and values greater "
+"than 0.4 (for NDSI) were used to classify snow.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/snow_"
+"classifier/)"
+msgstr ""
+
+msgid ""
+"# Ulyssys Water Quality Viewer (UWQV)\n"
+"\n"
+"The script aims to dynamically visualize the chlorophyll and sediment "
+"conditions of water bodies, which are primary indicators of water quality. "
+"The visualization is a product of two masking operations (cloud masking and "
+"water masking) and two water quality parameter visualizations: suspended "
+"sediment concentration visualization and chlorophyll concentration "
+"visualization.\n"
+"\n"
+"The Chlorophyll content ranges in colors from dark blue (low chlorophyll "
+"content) through green to red (high chlorophyll content). Sediment "
+"concentrations are colored brown and the amount of sediment is displayed by "
+"transparency; opaque brown indicates high sediment content. Due to the "
+"opacity of the sedimentation parameter, chlorophyll shows through if both "
+"are present, this making it possible to know the relative amount of each "
+"parameter.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ulyssys_water_"
+"quality_viewer/)"
+msgstr ""
+
+msgid ""
+"# Short wave infrared composite (SWIR)\n"
+"\n"
+"SWIR (bands 11 and 12) measurements can help scientists estimate how much "
+"water is present in plants and soil, as water reflects SWIR wavelengths. "
+"Shortwave-infrared bands are also useful for distinguishing between cloud "
+"types (water clouds versus ice clouds), snow and ice, all of which appear "
+"white in visible light. Newly burned land reflects strongly in SWIR bands, "
+"making them valuable for mapping fire damages. Each rock type reflects "
+"shortwave infrared light differently, making it possible to map out geology "
+"by comparing reflected SWIR light. In this composite, B8A is reflected by "
+"vegetation and shown in the green channel, while the reflected red band, "
+"highlighting bare soil and built-up areas, is shown in the blue channel. \n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/)"
+msgstr ""
+
+msgid ""
+"# Normalised Difference Snow Index (NDSI)\n"
+"\n"
+"The Sentinel-2 normalised difference snow index is a normalized difference "
+"two bands: one in the VIR (Band 3) and one in the SWIR (Band 11). Values "
+"above 0.42 are usually snow.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ndsi/)"
+msgstr ""
+
+msgid ""
+"# Highlight Optimized Natural Color\n"
+"\n"
+"This script aims to display the Earth in beautiful natural color images. It "
+"uses highlight optimization to avoid burnt out pixels and to even out the "
+"exposure. The script is very simple, needing only 3 code lines and was "
+"inspired by the [Tonemapped Natural Color "
+"Script](https://custom-scripts.sentinel-hub.com/sentinel-2/tonemapped_"
+"natural_color/).\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://sentinel-hub.github.io/custom-scripts/sentinel-2/"
+"highlight_optimized_natural_color/#)"
+msgstr ""
+
+msgid ""
+"# Geology 12, 8, 2 composite\n"
+"\n"
+"This composite uses the SWIR band 12 to differentiate among different rock "
+"types. Each rock type reflects shortwave infrared light differently, making "
+"it possible to map out geology by comparing reflected SWIR light. The NIR "
+"band 8 highlights vegetation and band 2 detects moisture, both contributing "
+"to differentiation of ground materials. The composite is useful for geology "
+"and mining. \n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here](https://www.euspaceimaging.com/wp-content/uploads/2018/06/EUSI-SWIR."
+"pdf) and [here.](http://murphygeological.com/new---sentinel-2.html#)"
+msgstr ""
+
+msgid ""
+"# Geology 8, 11, 12 composite\n"
+"\n"
+"This composite uses both SWIR bands 11 and 12 to differentiate among "
+"different rock types. Each rock type reflects shortwave infrared light "
+"differently, making it possible to map out geology by comparing reflected "
+"SWIR light. NIR band 8 highlights vegetation, contributing to "
+"differentiation of ground materials. The composite is useful for geology "
+"and mining. Vegetation in the composite appears red.\n"
+"\n"
+"\n"
+"\n"
+"More info "
+"[here](https://earthobservatory.nasa.gov/features/FalseColor/page5.php) and "
+"[here.](http://murphygeological.com/new---sentinel-2.html#)"
+msgstr ""
+
+msgid ""
+"# Wildfires\n"
+"\n"
+"This script, created by Pierre Markuse, visualizes wildfires using "
+"Sentinel-2 data. It combines natural color background with some NIR/SWIR "
+"data for smoke penetration and more detail, while adding highlights from "
+"B11 and B12 to show fires in red and orange colors.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://pierre-markuse.net/2017/08/07/visualizing-wildfires-"
+"sentinel-2-imagery-eo-browser/)"
+msgstr ""
+
+msgid ""
+"# Enhanced True Color\n"
+"\n"
+"This script, created by Pierre Markuse, uses multiple bands and saturation "
+"and brightness control to enhance the true color visualization.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-3/enhanced_true_"
+"color-2/#)"
+msgstr ""
+
+msgid ""
+"# Normalized Burn Ratio (NBR)\n"
+"\n"
+"Normalized Burn Ratio is frequently used to estimate burn severity. \n"
+"\n"
+"Imagery collected before a fire will have very high near infrared band "
+"values and very low mid infrared band values and a Imagery collected over a "
+"forest after a fire will have very low near infrared band values and very "
+"high mid infrared band values.\n"
+"\n"
+"Higher dNBR indicate more severe damage. Areas with negative dNBR values "
+"may indicate increased vegetation productivity following a fire.\n"
+"\n"
+"\n"
+"\n"
+"[More...](http://gsp.humboldt.edu/OLM/Courses/GSP_216_Online/lesson5-1/NBR."
+"html)"
+msgstr ""
+
+msgid ""
+"# Atmospheric penetration\n"
+"\n"
+"Vegetation in the composite appears blue, displaying details related to the "
+"vegetation vigor. Healthy vegetation is shown in light blue while the "
+"stressed, sparse or/and arid vegetation appears in dull blue. Urban "
+"features are white, gray, cyan or purple. \n"
+"\n"
+"\n"
+"\n"
+"[More...](https://eos.com/atmospheric-penetration/)"
+msgstr ""
+
+msgid ""
+"# Barren Soil Visualization\n"
+"\n"
+"The Barren Soil Visualization displays the Barren soil index (BSI) in the "
+"red channel, B08 in the green channel and B11 in the blue channel. All B08 "
+"values larger than 0.6 are returned white.\n"
+"\n"
+"Barren and built-up areas appear red, vegetation green, water black and "
+"snow white.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/barren_soil/)"
+msgstr ""
+
+msgid ""
+"# True Color with IR Highlights composite\n"
+"\n"
+"This composite enhances the true color visualization by adding the SWIR "
+"bands 11 and 12 to amplify details and display heated areas in red/orange.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://medium.com/sentinel-hub/active-volcanoes-as-seen-from-"
+"space-9d1de0133733)"
+msgstr ""
+
+msgid ""
+"# Detection of Burned Areas\n"
+"\n"
+"This script uses SWIR bands 11 and 12 in a normalized difference index, "
+"combined with B08, which all have low reflectance values at burned areas. "
+"All pixels of this index with values greater than 0.1 for S2L2A and 0.15 "
+"for S2L1C are colored red and highlight burned areas. All other pixels are "
+"returned in true color (high moisture and high vegetation areas were added "
+"into the true color visualization to increase the accuracy of the script).\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/burned_area_ms/"
+")"
+msgstr ""
+
+msgid ""
+"# Scene classification\n"
+"\n"
+"\n"
+"\n"
+"Scene classification was developed to be used in Sen2Cor project in the "
+"atmospheric correction module to distinguish between cloudy pixels, clear "
+"pixels and water pixels of Sentinel-2 data as a result of ESA's Scene "
+"classificaiton algorithm. It does not constitute a land cover "
+"classification map in a strict sense.\n"
+"\n"
+"\n"
+"\n"
+"[More...](http://step.esa.int/thirdparties/sen2cor/2.5.5/docs/S2-PDGS-MPC-L2"
+"A-SUM-V2.5.5_V2.pdf)"
+msgstr ""
+
+msgid ""
+"# Terrestrial Chlorophyll Index (OTCI)\n"
+"\n"
+"\n"
+"\n"
+"OTCI, the Terrestrial Chlorophyll Index, can be used to assess chlorophyll "
+"content over land to monitor vegetation condition and health. It is "
+"produced globally at 300m spatial resolution from OLCI data on the Sentinel "
+"3 mission. The theoretical basis document on OTCI is available "
+"[here.](https://sentinel.esa.int/documents/247904/349589/OLCI_L2_ATBD_OLCI_"
+"Terrestrial_Chlorophyll_Index.pdf)\n"
+"\n"
+"Blue colors display extremely low OTCI values. They usually signify water, "
+"sand or snow. Extremely high values, displayed with white, usually suggest "
+"the absence of chlorophyll as well. They generally represent either bare "
+"ground, rock or clouds. The chlorophyll values in between range from red "
+"(low chlorophyll values) to dark green (high chlorophyll values) and can be "
+"used to determine vegetation health.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-3/otci/)"
+msgstr ""
+
+msgid ""
+"# Normalized Difference Salinity Index\n"
+"\n"
+"The index visualizes the amount of salt present in soils. Soil salinization "
+"is one of the most common land degradation processes, especially in arid "
+"and semi-arid regions, where precipitation exceeds evaporation. \n"
+"\n"
+"Higher values indicate higher salinity and low values indicate lower "
+"salinity.\n"
+"\n"
+"Read more "
+"[here,](https://webapps.itc.utwente.nl/librarywww/papers_2003/msc/wrem/"
+"khaier.pdf) "
+"[here](https://modis.gsfc.nasa.gov/sci_team/pubs/abstract_new.php?id=29271) "
+"and [here.](https://www.indexdatabase.de/db/i-single.php?id=57)"
+msgstr ""
+
+msgid ""
+"# Enhanced Vegetation Index (EVI)\n"
+"\n"
+"In areas of dense canopy cover, where the leaf area index (LAI) is high, "
+"the blue wavelengths can be used to improve the accuracy of NDVI, as it "
+"corrects for soil background signals and atmospheric influences.\n"
+"\n"
+"Values description:()=> The range of values for EVI is -1 to 1, with "
+"healthy vegetation generally around 0.20 to 0.80.\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/evi/)"
+msgstr ""
+
+msgid ""
+"# Atmospherically Resistant Vegetation Index (ARVI)\n"
+"\n"
+"The ARVI is most useful in regions of high atmospheric aerosol content. It "
+"uses blue light reflectance measurements to correct for the atmospheric "
+"scattering effects, that also influence reflectance of red light.\n"
+"\n"
+"Values description:()=> The range for an ARVI is -1 to 1 where green "
+"vegetation generally falls between values of 0.20 to 0.80.\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/arvi/)"
+msgstr ""
+
+msgid ""
+"# Burned Area Index\n"
+"\n"
+"Burned Area Index takes advantage of the wider spectrum of Visible, "
+"Red-Edge, NIR and SWIR bands.\n"
+"\n"
+"Values description:()=> The range of values for the index is `-1` to `1` "
+"for burn scars, and `1` - `6` for active fires. Different fire intensities "
+"may result in different thresholds; the current values were calibrated, as "
+"per original author, on mostly Mediterranen regions.\n"
+"\n"
+"\n"
+"\n"
+"[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/bais2/)"
+msgstr ""
+
+msgid "Min. data quality"
+msgstr ""
+
+msgid "Upsampling"
+msgstr ""
+
+msgid "Downsampling"
+msgstr ""
+
+msgid "Share on Facebook"
+msgstr ""
+
+msgid "Share on Twitter"
+msgstr ""
+
+msgid "Check this out "
+msgstr ""
+
+msgid "Discover"
+msgstr ""
+
+msgid "Show effects and advanced options"
+msgstr ""
+
+msgid "This theme has no highlights"
+msgstr ""
+
+#, javascript-format
+msgid "Showing ${ this.state.results.length } result"
+msgid_plural "Showing ${ this.state.results.length } results"
+msgstr[0] ""
+msgstr[1] ""
+
+#, javascript-format
+msgid ""
+"You are about to add pins (${ N_PINS }) to your pin collection. Do you want "
+"to proceed?"
+msgstr ""
+
+msgid "Remove all"
+msgstr ""
+
+msgid "Add all pins"
+msgstr ""
+
+#, javascript-format
+msgid ""
+"Some pins (${ N_PINS_OUTSIDE_BOUNDS }) are ignored because they are not "
+"within the selected area."
+msgstr ""
+
+msgid "Show slide descriptions"
+msgstr ""
+
+msgid "Compare"
+msgstr ""
+
+msgid "Highlights"
+msgstr ""
+
+msgid "Advanced search"
+msgstr ""
+
+msgid "Data location"
+msgstr ""
+
+msgid "Please select at least one location!"
+msgstr ""
+
+msgid "Acquisition mode"
+msgstr ""
+
+msgid "Please select at least one data acquisition mode!"
+msgstr ""
+
+msgid "Polarization"
+msgstr ""
+
+msgid "Please select at least one polarization!"
+msgstr ""
+
+msgid "Orbit direction"
+msgstr ""
+
+msgid "Please select at least one orbit direction!"
+msgstr ""
+
+msgid ""
+"<b>Sentinel-1</b> services are available both on EOCloud and AWS. The "
+"capabilities of each\n"
+"service differ. More infos at"
+msgstr ""
+
+msgid "Add to compare"
+msgstr ""
+
+msgid "split"
+msgstr ""
+
+msgid "opacity"
+msgstr ""
+
+msgid "No layers to compare."
+msgstr ""
+
+msgid "Split position"
+msgstr ""
+
+msgid "Share pins"
+msgstr ""
+
+msgid "Import pins from a saved file"
+msgstr ""
+
+msgid "Delete all pins"
+msgstr ""
+
+msgid "Drag bands into the index equation"
+msgstr ""
+
+msgid "Index "
+msgstr ""
+
+msgid "Threshold"
+msgstr ""
+
+msgid "Remove color picker"
+msgstr ""
+
+msgid "Add color picker"
+msgstr ""
+
+msgid ""
+"# Methane (CH4)\n"
+"\n"
+"\n"
+"\n"
+"After carbon dioxide (CO2), methane is the most important contributor to "
+"the anthropogenically enhanced greenhouse effect. Roughly three-quarters of "
+"methane emissions are anthropogenic and as such it is important to continue "
+"recording satellite based measurements. TROPOMI aims at providing CH4 "
+"column concentrations with high sensitivity to the Earth’s surface, good "
+"spatiotemporal coverage, and sufficient accuracy to facilitate inverse "
+"modelling of sources and sinks. TROPOMI uses absorption information from "
+"the Oxygen-A Band (760nm) and the SWIR spectral range to monitor CH4 "
+"abundances in the Earth's atmosphere.\n"
+"\n"
+"\n"
+"\n"
+"[More...](http://www.tropomi.eu/data-products/methane)"
+msgstr ""
+
+msgid ""
+"# Sulfur Dioxide (SO2)\n"
+"\n"
+"\n"
+"\n"
+"Sulphur dioxide enters the Earth’s atmosphere through both natural and "
+"anthropogenic processes. It plays a role in chemistry on a local and global "
+"scale and its impact ranges from short-term pollution to effects on the "
+"climate. Only about 30% of the emitted SO2 comes from natural sources; the "
+"majority is of anthropogenic origin. SO2 emissions adversely affect human "
+"health and air quality. SO2 has an effect on climate through radiative "
+"forcing, via the formation of sulphate aerosols. Along with volcanic ash "
+"volcanic SO2 emissions also pose a threat to aviation. S5P/TROPOMI samples "
+"the Earth’s surface with a revisit time of one day with unprecedented "
+"spatial resolution of 3.5 x 7 km which allows the resolution of fine "
+"details including the detection of much smaller SO2 plumes. \n"
+"\n"
+"\n"
+"\n"
+"[More...](http://www.tropomi.eu/data-products/sulphur-dioxide)"
+msgstr ""
+
+msgid ""
+"# Carbon Monoxide (CO)\n"
+"\n"
+"\n"
+"\n"
+"Carbon monoxide (CO) is an important atmospheric trace gas for our "
+"understanding of tropospheric chemistry. In certain urban areas, it is a "
+"major atmospheric pollutant. The main sources of CO are combustion of "
+"fossil fuels, biomass burning, and atmospheric oxidation of methane and "
+"other hydrocarbons, whereas fossil fuel combustion is the main source of CO "
+"at Northern mid-latitudes, the oxidation of isoprene and biomass burning "
+"play an important role in the tropics. TROPOMI on the Sentinel 5 Precursor "
+"(S5P) satellite observes the global CO abundance exploiting clear-sky and "
+"cloudy-sky Earth radiance measurements in the 2.3 µm spectral range of the "
+"shortwave infrared (SWIR) part of the solar spectrum. \n"
+"\n"
+"\n"
+"\n"
+"[More...](http://www.tropomi.eu/data-products/carbon-monoxide)"
+msgstr ""
+
+msgid "Pins"
+msgstr ""
+
+msgid "Story"
+msgstr ""
+
+msgid "No pins were found within the current field of view."
+msgstr ""
+
+msgid ""
+"To create a pin story, navigate to the desired position on the map.\n"
+"\n"
+"All pins within the current field of view will be used to create the story, "
+"the rest will be ignored."
+msgstr ""
+
+msgid "Create a story from pins"
+msgstr ""
+
+msgid "Export pins to the computer"
+msgstr ""
+
+msgid "There was a problem downloading your instances"
+msgstr ""
+
+msgid ""
+"Your instances could not be loaded as your account has expired. Consider "
+"subscribing to one of the plans: "
+msgstr ""
+
+msgid ""
+"#### Quick overview of EO Browser features\n"
+"\n"
+"EO Browser combines a complete archive of Sentinel-1, Sentinel-2, "
+"Sentinel-3, Sentinel-5P, ESA’s archive of Landsat 5, 7 and 8, global "
+"coverage of Landsat 8, Envisat Meris, MODIS, Proba-V and GIBS products in "
+"one place and makes it possible to browse and compare full resolution "
+"images from those sources. You simply go to your area of interest, select "
+"data sources, time range and cloud coverage, and inspect the resulting "
+"data.\n"
+"\n"
+"You can continue the tutorial by clicking on the \"Next\" button or you can "
+"close it. By clicking the info icon <span style=\"background-color: rgb(25, "
+"26, 37); color: rgb(238, 238, 238); padding: 4px 10px;\"><i class=\"fa "
+"fa-info\" /></span> in the top right corner you can always resume the "
+"tutorial in case you closed it by mistake or because you wanted to try "
+"things."
+msgstr ""
+
+msgid ""
+"You can view the tutorial anytime by clicking on this info icon\n"
+"<span style=\"background-color: #191a25; color: #eee; padding: 4px 10px\">\n"
+"<i className=\"fa fa-info\" />\n"
+"</span>."
+msgstr ""
+
+msgid ""
+"#### Quick overview of EO Browser features\n"
+"\n"
+"If you have a small screen, please go "
+"[here](https://www.sentinel-hub.com/explore/eobrowser/user-guide/) to view "
+"our user guide.\n"
+"\n"
+"You can always view this info again by clicking the info icon\n"
+"<span style=\"background-color: #191a25, color: #eee, padding: 4px 10px\">\n"
+"<i class=\"fa fa-info\" />\n"
+"</span>\n"
+"in the top right corner.\n"
+"\n"
+"#### Other resources\n"
+"- [EO Browser presentation "
+"page](https://www.sentinel-hub.com/explore/eobrowser/)\n"
+"- [EO Browser Summer 2018 updates - "
+"video](https://www.youtube.com/embed/m3pron0C0kE)"
+msgstr ""
+
+msgid ""
+"# Welcome To EO Browser!\n"
+"\n"
+"A complete archive of Sentinel-1, Sentinel-2, Sentinel-3, Sentinel-5P, "
+"ESA’s  \n"
+"archive of Landsat 5, 7 and 8, global coverage of Landsat 8, Envisat Meris, "
+" \n"
+"MODIS, Proba-V and GIBS products in one place.\n"
+"\n"
+"[EO Browser presentation "
+"page](https://www.sentinel-hub.com/explore/eobrowser/)  \n"
+"[EO Browser user "
+"guide](https://www.sentinel-hub.com/explore/eobrowser/user-guide/)"
+msgstr ""
+
+msgid ""
+"In the **Discover** tab you can:\n"
+"\n"
+"- Select a **Theme.**\n"
+"- **Search** for data.\n"
+"- View theme **Highlights.**\n"
+"\n"
+"The **Theme** dropdown offers you different preconfigured themes as well as "
+"own custom configured instances if you are Logged-in. To create an "
+"instance, click on\n"
+"the settings icon <i className=\"fa fa-cog\" /> and log in with the same "
+"credentials as you used for EO Browser.\n"
+"\n"
+"Under **Search** you can set search criteria:\n"
+" - Choose from which satellites you want to receive the data by selecting "
+"checkboxes.\n"
+" - Select additional options where applicable, for example cloud coverage "
+"with the slider.\n"
+" - Select time range by either typing the date or select the date from the "
+"calendar.\n"
+"\n"
+"You can read explanations of satellites by clicking on the question icon\n"
+"<i className=\"fa fa-question-circle\" /> next to the data source name.\n"
+"\n"
+"Once you hit <span class=\"btn\" style=\"font-size: 12px; padding: 4px 6px "
+"4px 6px\">Search</span> you get a list of results. Each result is presented "
+"\n"
+"with a preview image, and relevant data specific to the datasource. For "
+"some data sources the link icon <i class=\"fa fa-link\" /> is also visible "
+"for each result.\n"
+"Clicking on it reveals direct links to the raw image of the result on EO "
+"Cloud or SciHub. Clicking on the <span class=\"btn\" style=\"font-size: "
+"12px; padding: 4px 6px 4px 6px\">Visualize</span> button will open the "
+"**Visualize** tab for the selected result.\n"
+"\n"
+"Under **Highlight** you find preselected interessting locations connected "
+"to the selected theme."
+msgstr ""
+
+msgid ""
+"In the <b>Visualize</b> tab you can select different pre-installed or "
+"custom spectral band combinations to visualise data for the selected "
+"result.\n"
+"\n"
+"Some of the common options:\n"
+"- **True Color** - Visual interpretation of land cover.\n"
+"- **False Color** - Visual interpretation of vegetation.\n"
+"- **NDVI** - Vegetation index.\n"
+"- **Moisture index** - Moisture index\n"
+"- **SWIR** - Shortwave-infrared index.\n"
+"- **NDWI** - Normalized Difference Water Index.\n"
+"- **NDSI** - Normalized Difference Snow Index.\n"
+"\n"
+"Most visualizations are given a description and a legend, which you can "
+"view by clicking on the expand\n"
+"icon <i className=\"fa fa-angle-double-down \" />.\n"
+" \n"
+"For most data sources the **Custom Script** option is available. Click on "
+"it to select custom\n"
+"band combinations, index combinations or write your own classification "
+"script for the visualisation of data. You can also\n"
+"use custom scripts, which are stored elsewhere, either on Google drive, "
+"GitHub or in our [Custom script "
+"repository](https://custom-scripts.sentinel-hub.com/). \n"
+"Paste the URL of the script into a text box in the advanced script editing "
+"panel and click Refresh.\n"
+" \n"
+"You can change the date directly in the <b>Visualize</b> tab, without going "
+"back to the **Discover** tab. Type in or select it from the calendar <i "
+"className=\"fa fa-calendar cal-icon-cal\" />.\n"
+"\n"
+"Above the visualizations you have on line of additional tools. Note that "
+"their avalibilty depends on the data source.\n"
+"- **Pin layer** to save it in the application for future use - by clicking "
+"on the pin icon <i className=\"fa fa-thumb-tack\" />.\n"
+"- Select **advanced options** like the sampling method or apply different "
+"**effects** such as contrast (gain) and luminance (gamma) - by clicking on "
+"the effect sliders icon <i className=\"fa fa-sliders\" />.\n"
+"- Add a layer to the **Compare** tab for later comparison - by clicking on "
+"the compare icon <i ClassName=\"fas fa-exchange-alt\" />.\n"
+"- **Zoom** to the centre of the tile - by clicking on the crosshair <i "
+"className=\"fa fa-crosshairs\" />.\n"
+"- Toggle **layer visibility** - by clicking on the visibility icon <i "
+"className=\"fa fa-eye-slash\" />.\n"
+"- **Share** your visualization on social media - by clicking on the share "
+"icon <i className=\"fas fa-share-alt\" />."
+msgstr ""
+
+msgid ""
+"In the **Compare** tab you will find all visualizations that you added via "
+"<i ClassName=\"fas fa-exchange-alt\" /> to **Compare**. \n"
+"\n"
+"There are two modes:\n"
+" - **Opacity** (Draw opacity slider left or right to fade between compared "
+"images)\n"
+" - **Split** (Draw split slider left or right to set the boundary between "
+"compared images)\n"
+"\n"
+"You can add all pins to the compare panel using <i className=\"fa "
+"fa-plus-square\" /> **Add all pins** or remove all visualizations\n"
+"from the **Compare** tab with the <i className=\"fa fa-trash\" /> **Remove "
+"all** button."
+msgstr ""
+
+msgid ""
+"Here you can switch between the **normal** and the **education** mode. The "
+"**education** mode offers you a slightly simplified version of the app.\n"
+"It can also be accessed directly via its [dedicated "
+"URL](https://apps.sentinel-hub.com/eo-browser-education/)."
+msgstr ""
+
+msgid ""
+"This tool allows you to draw a polygon on the map and display the polygon's "
+"size.\n"
+"\n"
+"All layers that return a single value (such as NDVI, Moisture index, "
+"NDWI,…) support viewing the\n"
+"index for the selected area over time. Clicking the chart icon  <i "
+"class=\"fa fa-bar-chart\" /> will\n"
+"display the charts. You can remove the polygon by clicking the remove icon "
+"<i class=\"fa fa-close\" />.\n"
+"\n"
+"You can also upload a KML/KMZ, GPX or GEOJSON file with a polygon geometry.\n"
+"\n"
+"The two sheets icon <i class=\"far fa-copy\" /> lets you copy the polygon "
+"coordinates as a GEOJSON, the crosshair <i className=\"fa fa-crosshairs\" "
+"/>\n"
+"centres the map to the drawn polygon.\n"
+"\n"
+"Exported images will be cropped to the area of interest in analytical "
+"downloads."
+msgstr ""
+
+msgid ""
+"With this tool you can create a timelapse animation of the visualized layer "
+"and displayed location.\n"
+"\n"
+"First, choose a time range. You can define you search results further by "
+"filtering them by months\n"
+"(filter by months checkbox) and/or selecting one image per defined period "
+"(orbit, day, week, month,\n"
+"year).\n"
+"\n"
+"Then press <span class=\"btn\" style=\"font-size: 12px; padding: 4px 6px "
+"4px 6px\"> <i className=\"fa fa-search\" /> Search </span> and select your "
+"images.\n"
+"You can select all by checking the checkbox or filter the images by cloud "
+"coverage by moving the slider. Or you can pick images one by\n"
+"one by scrolling through the list and selecting them. Via the **Borders** "
+"checkbox you can enable/disable the boarders on your image.\n"
+"\n"
+"You can preview the timelapse by pressing the play button on the bottom. "
+"You can also set the speed\n"
+"(frames per second).\n"
+"\n"
+"When you are satisfied with the result, click the download button and the "
+"timelapse will be\n"
+"downloaded as a <code>.gif</code> file."
+msgstr ""
+
+msgid "What Is EO Browser?"
+msgstr ""
+
+msgid "User Account"
+msgstr ""
+
+msgid "Discover Tab"
+msgstr ""
+
+msgid "Visualize Tab"
+msgstr ""
+
+msgid "Compare Tab"
+msgstr ""
+
+msgid "Pins Tab"
+msgstr ""
+
+msgid "Search Places"
+msgstr ""
+
+msgid "Layers And Overlays"
+msgstr ""
+
+msgid "Education Mode"
+msgstr ""
+
+msgid "Information And Tutorial"
+msgstr ""
+
+msgid "Draw Area Of Interest"
+msgstr ""
+
+msgid "Mark Point Of Interest"
+msgstr ""
+
+msgid "Measure Distances"
+msgstr ""
+
+msgid "Download Image"
+msgstr ""
+
+msgid "Create Timelapse Animation"
+msgstr ""
+
+msgid "Happy Browsing!"
+msgstr ""
+
+msgid "Welcome To EO Browser!"
+msgstr ""
+
+msgid ""
+"The **Pins** tab contains your pinned (favourite/saved) items. Pinned items "
+"contain information\n"
+"about location, data source and its specific layer, zoom level and time.\n"
+"\n"
+"For each pin you have several options how to interact with a single pin:\n"
+"\n"
+"- Change **order** - by clicking on the move icon\n"
+"<span style=\"display: inline-flex; padding-top: 0.05em;\">\n"
+" <i class=\"fa fa-ellipsis-v\"/>\n"
+" <i class=\"fa fa-ellipsis-v\"/>\n"
+"</span> \n"
+"in the top left corner of the pin and dragging the pin up or down the list.\n"
+"- **Rename** - by clicking on the pencil icon <i className=\"fa fa-pencil\" "
+"/> next to the pin's name.\n"
+"- Add to the **Compare** tab - by clicking on the compare icon <i "
+"ClassName=\"fas fa-exchange-alt\" />\n"
+"- Enter a **description** - by clicking on the expand icon <i "
+"className=\"fa fa-angle-double-down \" />.\n"
+"- **Remove** - by clicking the remove icon <i className=\"fa fa-trash\" />.\n"
+"- **Zoom** to the pin's location - by clicking on the Lat/Lon.\n"
+"\n"
+"In the line above all pins you have different options that apply for all "
+"pins:\n"
+"- Create your own story from pins - by clicking on <i class=\"fa fa-film\"> "
+"**Story**.\n"
+"- Share your pins with others via a link - by clicking on <i "
+"className=\"fas fa-share-alt\"> **Share**.\n"
+"- Export pins as a JSON file - by clicking on  <i class=\"fa "
+"fa-cloud-download\" /> **Export**.\n"
+"- Import pins from a JSON file - by clicking on  <i class=\"fa "
+"fa-cloud-upload\" /> **Import**.\n"
+"- Delete all pins - by clicking on  <i class=\"fa fa-trash\" /> **Clear**."
+msgstr ""
+
+msgid ""
+"With this tool you can download an image of visualized data for the "
+"displayed location. You can choose\n"
+"to show captions and you can add your own description.\n"
+"By enabling Analytical mode, you can choose between various image formats, "
+"image resolutions and\n"
+"coordinate systems. You can also select multiple layers and download them "
+"as a <code>.zip</code>  file.\n"
+"\n"
+"Click the download button\n"
+"<span class=\"btn\" style=\"font-size: 12px; padding: 4px 6px 4px 6px\"><i "
+"className=\"fa fa-download\" />Download</span>\n"
+"and your image(s) will begin to download. The process can take a few "
+"seconds, depending on the selected\n"
+"resolution and the number of selected layers.\n"
+"\n"
+"Before downloading, you can define an area of interest (AOI) by clicking on "
+"the Area selection tool\n"
+"icon. Your data will be clipped to match this area."
+msgstr ""
+
+msgid "Updating pin collection."
+msgstr ""
+
+#, javascript-format
+msgid ""
+"There was a problem permanently updating the pin collection: ${ "
+"updatingPinsError }."
+msgstr ""
+
+msgid ""
+"**Logged-in users** can use their custom themes, save and load pins, create "
+"a pin story, measure distances, create a\n"
+"timelapse and use the advanced image download.\n"
+"\n"
+"To create a free account simply click "
+"[here](https://services.sentinel-hub.com/oauth/subscription)\n"
+"or within the app on **Login** and then \"Sign Up\"."
+msgstr ""
+
+msgid "Data source name"
+msgstr ""

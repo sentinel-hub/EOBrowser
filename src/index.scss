@@ -1,335 +1,101 @@
-@import 'variables';
-$loginBg: url('./bahamas.jpg');
+@import './variables.scss';
 
-html,
-body,
-#root {
+body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: Arial, Helvetica, sans-serif;
-}
-body {
-  overflow: hidden;
-}
-.centeredFa {
-  i {
-    margin-right: 0 !important;
-  }
-}
-.loginWrap {
-  .loginPanel {
-    text-align: center;
-    color: #fff;
-    .btn {
-      display: block;
-      margin: 20px auto 10px;
-      max-width: 200px;
-    }
-
-    label {
-      display: block;
-      margin: 20px 0 10px;
-    }
-    input[type='checkbox'] + label {
-      display: inline-block;
-      font-size: 0.9em;
-      opacity: 0.8;
-      margin: 5px 3px;
-    }
-  }
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.poweredby {
-  background: $mainDark;
-  font-size: 11px;
-  padding: 10px;
-  color: #fff;
-
-  .esa {
-    float: right;
-    margin-top: -9px;
-    img {
-      width: 20px;
-    }
-  }
-  &:after {
-    content: '';
-    clear: both;
-    display: block;
-  }
+code {
+  font-family:
+    source-code-pro,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Courier New",
+    monospace;
 }
 
-.logoHeader {
-  background: url('./assets/header-bg.jpg') left top no-repeat;
-}
-
-.imageBucketRoot .logoHeader.withBg {
-  background: $mainMedium;
-}
-
-#nprogress .bar {
-  background: $primaryCol;
-  .peg {
-    box-shadow: 0 0 10px $primaryCol, 0 0 5px $primaryCol;
-  }
-  .spinner-icon {
-    border-top-color: $primaryCol;
-    border-left-color: $primaryCol;
-  }
-}
-a {
-  color: $primaryCol;
-  cursor: pointer;
-}
-
-#loading {
-  position: fixed;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background: #000;
-  text-align: center;
-  color: #fff;
-
-  i {
-    margin: calc(100vh / 2 - 50px) auto 10px;
-    font-size: 45px;
-    display: block;
-  }
-}
-
-.inlineDatepicker {
-  border: none;
-  border-bottom: 1px solid #fff;
-  padding: 5px;
-  color: #fff;
-  background: none;
-  display: inline-block;
-  vertical-align: middle;
-  margin-bottom: 5px;
-  i {
-    height: $controlsHeight;
-    width: $controlsHeight;
-    color: #fff;
-    text-align: center;
-    line-height: $controlsHeight + 8px;
-    & + span {
-      font-size: 15px;
-    }
-  }
-}
-
-.btn {
-  border-radius: 6px;
-  border: none;
-  background: $primaryCol;
-  color: #fff;
-  padding: 6px 10px;
-  font-size: 15px;
-  display: inline-block;
-  vertical-align: middle;
-  text-decoration: none;
-  cursor: pointer;
-
-  &.full-size {
-    display: block;
-    text-align: center;
-  }
-  i {
-    margin-right: 5px;
-  }
-
-  &:hover {
-    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
-    color: #fff;
-    transition: all ease 0.4s;
-  }
-  &.secondary {
-    background: $mainMedium;
-  }
-  &.disabled,
-  &[disabled],
-  &[disabled]:hover {
-    color: #666;
-    background: #eee;
-    cursor: default;
-  }
-}
-
-.imageWithLoader {
-  display: block;
-  text-align: center;
-  i {
-    margin: calc(100vh / 2 - 50px) auto 10px;
-    font-size: 45px;
-    display: block;
-  }
-}
-
-.leaflet-popup-pane {
-  z-index: 300;
-}
-
-.leaflet-popup-content-wrapper,
-.leaflet-popup-tip {
-  background: $mainMedium;
-  color: $textColor;
-}
-.leaflet-bottom .leaflet-control.leaflet-bar {
-  margin-top: -15px;
-}
-.rodal-dialog {
-  z-index: 1000 !important;
-  background: $mainMedium;
-
-  .rodal-close:before,
-  .rodal-close:after {
-    background: white;
-  }
-
-  .dialogContent {
-    padding: 10px;
-  }
-  .dialogBtnPanel {
-    text-align: center;
-    border-top: 1px solid #ccc;
-    padding: 5px;
-  }
-}
-
-div.socialLogin {
-  position: absolute;
-  right: 330px;
-  top: 30px;
-  left: auto;
-}
-
-.leaflet-container .leaflet-control-attribution {
-  background: $mainMedium;
-  color: rgba(255, 255, 255, 0.6);
-
-  a {
+// Leaflet.js overwrites CSS styles of buttons in the right-hand side panel,
+// so we need to be more specific:
+.leaflet-container {
+  .controlsWrapper .panelButton i { /* stylelint-disable-line */
     color: $primaryCol;
   }
 }
-.leaflet-control-layers,
-.leaflet-bar {
-  border: none !important;
-  background: $mainMedium;
-  color: #fff;
-  border-radius: 0;
-  /*margin-top: 15px !important;*/
-  margin-top: 10px !important;
-}
-.leaflet-control-layers-toggle {
-  background-image: url(layers.png);
-  border: none;
-  width: 40px !important;
-  height: 40px !important;
-}
 
-.leaflet-retina .leaflet-control-layers-toggle {
-  background-image: url(layers2x.png);
-}
-.leaflet-bar a {
-  background: $mainMedium;
-  color: #ddd;
-  &:hover {
-    background: $mainDark;
-    color: #fff;
-  }
-}
-
-#aboutSentinel {
-  position: absolute;
-  left: calc(50%);
-  transform: translateX(-50%);
-  background: $mainMedium;
-  color: $primaryCol;
-  bottom: 0;
-  z-index: 10;
-  padding: 2px;
-  font-size: 11px;
-  text-decoration: none;
-  cursor: pointer;
-  a {
-    padding: 3px 5px;
-    display: inline-block;
-    vertical-align: middle;
-    border-left: 1px solid #eee;
-    color: $primaryCol;
-
-    &:first-child {
-      border: none;
-    }
-  }
-}
-
-.shareBar {
-  position: absolute;
-  left: 0;
-  bottom: 0px;
-  right: 0;
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  padding: 10px;
-  text-align: center;
-  transition: all ease 0.5s;
-}
-.shareBar a {
-  color: #fff;
-  opacity: 0.7;
+div.rc-slider {
   display: inline-block;
+  width: 200px;
+
+  .rc-slider-handle {
+    border-color: $primaryCol;
+    // Weird workaround for rc-slider. By default margin-left is minus (half of rc-slider-handle's width).
+    // https://github.com/react-component/slider/issues/433#issuecomment-397442871
+    // But here margin-left somehow needs to be 0 for slider to work correctly.
+    // Default values from rc-slider's CSS: width: 14px; margin-left: -7px;
+    margin-left: 0;
+  }
+
+  .rc-slider-track {
+    background: $primaryCol;
+  }
+}
+
+// remove after merging with eo-components
+/* stylelint-disable */
+.floatItem {
+  box-shadow: $boxShadow !important;
+}
+
+.react-toggle {
   vertical-align: middle;
-  margin: 2px 4px;
-}
-.leaflet-control-scale-line {
-  background: $mainMedium;
-  color: #fff;
-  border-color: #fff;
-}
-.shareBar a:hover {
-  opacity: 1;
+  margin-left: 10px;
 }
 
-@media screen and (max-width: 700px) {
-  .leaflet-control-zoom {
-    display: none;
-  }
-
-  .leaflet-container .leaflet-control-attribution {
-    bottom: 25px;
-  }
-
-  #aboutSentinel {
-    transform: translateX(0);
-    left: 0;
-  }
-}
-@media screen and (max-width: 500px) {
-  .leaflet-control-scale {
-    bottom: 25px;
-  }
-
-  #mapCoords {
-    right: 0;
-  }
+.react-toggle--checked .react-toggle-track,
+.react-toggle.react-toggle--checked:hover .react-toggle-track {
+  background: $primaryCol;
 }
 
-/******measure path override *******/
-.leaflet-measure-path-measurement {
-  z-index: 500;
+.react-toggle--focus .react-toggle-thumb {
+  box-shadow: 0 0 2px 3px $primaryCol;
 }
-.leaflet-tooltip-pane {
-  z-index: 650 !important;
+
+.react-toggle:active .react-toggle-thumb {
+  box-shadow: 0 0 5px 5px $primaryCol;
 }
-.contestbanner {
-  margin-top: 10px;
-  width: 100%;
+
+.react-toggle.react-toggle--focus .react-toggle-thumb {
+  box-shadow: 0 0 3px $primaryCol;
 }
-.contestbanner:hover {
-  transform: scale(1.01);
-  transition: 0.3s ease-in-out;
+
+.react-toggle--checked .react-toggle-thumb {
+  border-color: $primaryCol;
 }
+
+.react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb {
+  box-shadow: 0 0 2px 2px #fff;
+}
+
+.react-toggle:hover:not(.react-toggle--disabled) .react-toggle-track {
+  background-color: #4d4d4d;
+}
+
+.react-toggle.react-toggle--checked:hover .react-toggle-track {
+  background-color: $primaryCol;
+}
+/* stylelint-enable */

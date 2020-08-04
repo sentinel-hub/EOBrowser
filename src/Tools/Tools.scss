@@ -1,0 +1,318 @@
+@import '../variables';
+
+$searchBorderColour: #6d7300;
+
+.tools-wrapper {
+  max-width: 450px;
+  min-width: 260px;
+  color: #868fa0;
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  position: fixed;
+  box-shadow: $boxShadow;
+  z-index: 500;
+
+  .tools-container {
+    max-height: calc(100vh - 20px); // same space (10px) on top and bottom
+    display: flex;
+    flex-flow: column;
+  }
+}
+
+.open-tools {
+  display: block;
+  position: absolute;
+  left: 10px;
+  top: 14px;
+  color: #fff;
+  background: $mainMedium;
+  border-radius: 40px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: all ease 0.4s;
+
+  i {
+    margin: 5px;
+    display: block;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    line-height: 24px;
+    transition: all ease 0.4s;
+  }
+
+  i.fa-cogs {
+    margin: 10px;
+    font-size: 20px;
+  }
+
+  &.open {
+    box-shadow: 0 2px 10px #000;
+    left: 15px;
+    top: 15px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+  }
+}
+
+.select-time-range {
+  margin-top: 20px;
+
+  & > label {
+    display: block;
+  }
+  /* stylelint-disable */
+  div.inlineDatepicker {
+    margin: 2px 20px;
+    padding: 3px 5px;
+    position: relative;
+  }
+  /* stylelint-enable */
+
+  .date-pickers-wrapper {
+    .calendar-wrapper {
+      margin-left: -5px;
+      margin-top: 5px;
+    }
+
+    .date-picker-separator {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .date-picker {
+      margin: 2px 20px;
+      padding: 3px 5px;
+    }
+  }
+}
+
+.data-source-group-tooltip-credits > div {
+  padding-top: 5px;
+  padding-right: 6px;
+}
+
+.theme-select {
+  select {
+    width: 100%;
+  }
+
+  &.top {
+    margin-bottom: 20px;
+  }
+
+  &.bottom {
+    margin-top: 20px;
+  }
+
+  .configurations-settings {
+    margin-left: 10px;
+    color: $primaryCol;
+  }
+}
+
+.search-panel {
+  background-color: $mainLight;
+  padding: 10px;
+
+  .notification {
+    a {
+      color: $primaryCol;
+    }
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  div.top-label {
+    font-weight: bold;
+    color: #b5bdcc;
+  }
+
+  div.top-label > div {
+    margin: 5px 0 10px 20px;
+    font-weight: normal;
+    font-size: 0.8em;
+  }
+
+  div.clear {
+    clear: both;
+  }
+
+  .discover-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background-color: $mainLight;
+
+    .discover-tab-button {
+      flex: auto;
+      text-align: center;
+      list-style: none;
+      cursor: pointer;
+      color: #eee;
+      padding: 7px 10.5px;
+      width: 25%;
+      border-bottom: 2px solid $searchBorderColour;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .active {
+      border: solid $searchBorderColour;
+      border-width: 2px 2px 0 2px;
+    }
+
+    .not-clickable {
+      pointer-events: none;
+    }
+  }
+
+  .discover-tab {
+    border: solid $searchBorderColour;
+    border-width: 0 2px 2px 2px;
+    padding-left: 5px;
+
+    .hidden {
+      display: hidden;
+    }
+  }
+
+  & > label,
+  & > label + * {
+    margin-bottom: 5px;
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  .checkbox-group {
+    .title {
+      display: flex;
+      clear: both;
+    }
+
+    label {
+      display: block;
+    }
+
+    .no-theme-selected {
+      font-size: 14px;
+      color: orange;
+    }
+  }
+
+  div.data-source-group {
+    clear: both;
+
+    label {
+      float: left;
+      clear: both;
+      color: #cdd5e3;
+    }
+
+    div.datasources {
+      margin-left: 20px;
+      clear: both;
+    }
+
+    div.filters {
+      clear: both;
+
+      & > div {
+        float: left;
+      }
+
+      div.filter {
+        clear: both;
+        line-height: 30px;
+        position: relative;
+        display: block;
+
+        label {
+          vertical-align: middle;
+          display: inline-block;
+          margin-right: 20px;
+        }
+
+        select {
+          margin-left: 20px;
+          float: right;
+          height: 25px;
+        }
+      }
+    }
+  }
+
+  .btn {
+    display: block;
+    text-align: center;
+    margin: 20px 20px 10px;
+  }
+}
+
+.search-panel p {
+  margin-top: 0.5em;
+  font-size: 0.8em;
+}
+
+.data-source-group-tooltip-logo {
+  width: 61px;
+}
+
+.data-source-group-tooltip-description {
+  z-index: 1000;
+  margin-bottom: 2px;
+}
+
+.data-source-group-tooltip-credits {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+#datepicker-expansion {
+  height: 175px;
+}
+
+.dropdown {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: 100%;
+  background-position-y: -3px;
+  border: none;
+  border-bottom: 1px solid #fff;
+  border-radius: 0;
+  padding: 2px;
+  color: #cdd5e3;
+  font-size: 12px;
+  width: 100%;
+  margin: 5px 0;
+  text-align: left;
+
+  :focus {
+    outline-offset: 0;
+  }
+
+  option {
+    color: #000;
+    border: none;
+    padding: 2px;
+    text-align: left;
+  }
+}
+
+.search-loader {
+  background-color: #3b3d4d;
+}

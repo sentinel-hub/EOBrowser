@@ -1,0 +1,375 @@
+@import '../../variables';
+
+.pins-header {
+  border-bottom: 2px solid $primaryCol;
+  padding: 10px;
+
+  .pins-controls {
+    width: 100%;
+
+    .compare-pin-button {
+      color: $primaryCol;
+      float: left;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+
+  i {
+    margin-right: 5px;
+  }
+}
+
+.pin-top-container {
+  display: grid;
+  grid-template-columns: 16px 70px auto;
+  grid-column-gap: 10px;
+
+  .add-to-compare {
+    i {
+      color: $primaryCol;
+    }
+  }
+}
+
+.pin-description-container {
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  width: 100%;
+
+  a {
+    color: $primaryCol;
+  }
+
+  textarea {
+    margin-bottom: 5px;
+    font-family:
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      'Roboto',
+      'Oxygen',
+      'Ubuntu',
+      'Cantarell',
+      'Fira Sans',
+      'Droid Sans',
+      'Helvetica Neue',
+      sans-serif;
+    font-size: 14px;
+    padding: 0.25em;
+    resize: none;
+  }
+
+  .notification {
+    padding: 0;
+    margin: 0;
+  }
+
+  .description-edit-controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    font-size: 16px;
+
+    i.fa-pencil {
+      color: $primaryCol;
+    }
+
+    .confirm {
+      color: #aab226;
+    }
+
+    .cancel {
+      margin-right: 10px;
+      color: #b24626;
+    }
+  }
+}
+
+.pin-item {
+  padding: 10px;
+  font-size: 14px;
+  clear: both;
+  border-bottom: 1px solid $mainDark;
+  user-select: none;
+  color: $pinTextCol;
+  min-height: 65px;
+
+  &.normal-mode:hover {
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+
+    & > div:first-child {
+      color: #fff;
+    }
+  }
+
+  .pin-left-controls-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    i {
+      color: $primaryCol;
+      padding: 0;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .pin-drag-handler {
+      display: flex;
+
+      i {
+        cursor: move;
+      }
+    }
+  }
+
+  div.preview-image {
+    position: relative;
+    display: block;
+
+    img {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  span.pin-selector {
+    height: 22px;
+    width: 22px;
+    position: absolute;
+    cursor: pointer;
+    right: 10px;
+    top: 0;
+
+    &::before {
+      content: '';
+      background: #fff;
+      left: 5px;
+      top: 5px;
+      width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      position: absolute;
+      border: 1px solid #999;
+    }
+
+    &.selected::after {
+      content: '';
+      width: 4px;
+      height: 10px;
+      border-right: 4px solid #191a25;
+      border-bottom: 4px solid #191a25;
+      transform: rotate(45deg);
+      position: absolute;
+      left: 13px;
+      top: 9px;
+    }
+  }
+
+  .pin-title-text {
+    width: 100%;
+  }
+
+  input {
+    width: 80%;
+    border: none;
+    padding: 2px 5px;
+    margin-bottom: 2px;
+  }
+
+  > span {
+    height: 22px;
+    width: 22px;
+    position: absolute;
+    cursor: pointer;
+    right: 10px;
+    top: 0;
+
+    &::before {
+      content: '';
+      background: #fff;
+      left: 5px;
+      top: 5px;
+      width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      position: absolute;
+      border: 1px solid #999;
+    }
+
+    &.selected::after {
+      content: '';
+      width: 4px;
+      height: 10px;
+      border-right: 4px solid #191a25;
+      border-bottom: 4px solid #191a25;
+      transform: rotate(45deg);
+      position: absolute;
+      left: 13px;
+      top: 9px;
+    }
+  }
+
+  .compare-panel {
+    display: flex;
+    align-items: center;
+    padding-top: 10px;
+
+    label {
+      white-space: nowrap;
+    }
+
+    .rc-slider {
+      width: 100%;
+      margin: 0 15px;
+    }
+  }
+
+  .pin-share-handler {
+    width: 4%;
+  }
+
+  .pin-editable-title {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+
+    .pin-edit-controls {
+      width: 42px;
+      display: flex;
+      justify-content: flex-end;
+      font-size: 16px;
+
+      i.fa-pencil {
+        color: $primaryCol;
+        margin-right: -2px;
+      }
+
+      .confirm {
+        color: #aab226;
+      }
+
+      .cancel {
+        margin-right: 10px;
+        color: #b24626;
+      }
+    }
+  }
+
+  .pin-info {
+    display: flex;
+    flex-direction: column;
+
+    .pin-info-row {
+      line-height: 16px;
+      font-size: 14px;
+      height: 16px;
+
+      label {
+        height: 16px;
+      }
+    }
+
+    .pin-lat-lng-link {
+      color: $primaryCol;
+      text-decoration: underline;
+      border: none;
+      background-color: transparent;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .pin-date {
+      margin: 3px 0;
+    }
+
+    .pin-info-title {
+      min-height: 32px;
+      height: auto;
+    }
+
+    .pin-location {
+      display: flex;
+
+      .pin-description-toggle {
+        margin-left: auto;
+        font-size: 16px;
+        color: $primaryCol;
+        margin-right: 2px;
+      }
+    }
+  }
+
+  .remove-pin,
+  .zoom-to-pin,
+  .add-to-compare {
+    float: right;
+  }
+
+  &.gu-mirror,
+  &.gu-transit {
+    color: #fff;
+    opacity: 0.8;
+    background-color: $mainDark !important;
+    box-shadow: 0 3px 5px #000;
+    cursor: -webkit-grabbing !important;
+  }
+}
+
+.pin-panel {
+  background-color: $mainLight;
+  color: $pinTextCol;
+  display: flex;
+  flex-flow: column;
+
+  & > .btn {
+    display: block;
+    text-align: center;
+  }
+
+  .clear-data {
+    float: right;
+    color: $primaryCol;
+    cursor: pointer;
+  }
+
+  .results-heading {
+    border-bottom: 2px solid #b6bf00;
+    padding: 5px 0;
+    margin-top: 10px;
+  }
+
+  .rodal .results-panel {
+    height: calc(100% - 20px);
+    overflow: auto;
+    background: $mainMedium;
+  }
+
+  .pins-container {
+    position: relative;
+
+    .pins-selection-confirm {
+      width: 85%;
+      margin: 20px 20px 10px;
+    }
+  }
+
+  .compare-toggle-panel {
+    display: flex;
+    padding-top: 8px;
+    justify-content: center;
+    text-align: center;
+    color: $pinTextCol;
+  }
+}

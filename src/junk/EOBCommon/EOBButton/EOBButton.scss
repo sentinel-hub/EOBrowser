@@ -1,0 +1,61 @@
+/* stylelint-disable */
+@import '../variables.scss';
+
+.btn {
+  background: $primaryCol;
+  border-radius: 6px;
+  border: none;
+  color: $mainMedium;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 12px;
+  text-decoration: none;
+
+  span {
+    vertical-align: middle;
+  }
+
+  &.full-size {
+    display: block;
+    text-align: center;
+  }
+
+  i {
+    margin-right: 5px;
+
+    &.fa-spinner {
+      margin-right: 0;
+    }
+  }
+
+  &:hover {
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+    transition: all ease 0.4s;
+    background: rgba($primaryCol, 0.7);
+  }
+
+  &.secondary {
+    background: $mainMedium;
+    color: #fff;
+
+    &:hover {
+      background: rgba($mainMedium, 0.8);
+    }
+  }
+
+  &.small {
+    padding: 6px 10px;
+    font-size: 15px;
+  }
+
+  &.disabled,
+  &[disabled],
+  &[disabled]:hover {
+    color: #666;
+    background: #eee;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}

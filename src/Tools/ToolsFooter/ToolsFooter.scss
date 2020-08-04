@@ -1,0 +1,43 @@
+@import '../../variables';
+
+.tools-footer {
+  background: $mainDark;
+  font-size: 11px;
+  padding: 10px;
+  color: #fff;
+
+  a {
+    color: $primaryCol;
+  }
+
+  .footer-info {
+    .free-signup {
+      text-align: center;
+      margin: -3px 0 8px;
+      font-size: 14px;
+    }
+
+    .esa-logo {
+      float: right;
+      margin-top: -9px;
+
+      img {
+        width: 20px;
+      }
+    }
+  }
+
+  .footer-banner {
+    .banner-link {
+      .banner-img {
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .banner-img:hover {
+        transform: scale(1.01);
+        transition: 0.3s ease-in-out;
+      }
+    }
+  }
+}

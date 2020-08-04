@@ -1,0 +1,36 @@
+@import '../../variables.scss';
+
+#map {
+  #about-sh-links {
+    position: absolute;
+    bottom: 0;
+    left: calc(50%);
+    transform: translateX(-50%);
+    padding: 1px;
+    z-index: 1001;
+    background: $mainMedium;
+    color: $primaryCol;
+    font-size: 11px;
+    text-decoration: none;
+    cursor: pointer;
+
+    a {
+      padding: 2px 5px;
+      display: inline-block;
+      vertical-align: middle;
+      border-left: 1px solid #eee;
+      color: $primaryCol;
+
+      &:first-child {
+        border: none;
+      }
+    }
+  }
+
+  @media screen and (max-width: 780px) {
+    #about-sh-links {
+      transform: translateX(0);
+      left: 0;
+    }
+  }
+}

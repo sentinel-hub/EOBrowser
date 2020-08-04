@@ -1,0 +1,165 @@
+@import '../../variables';
+
+.visualization-panel {
+  background-color: $mainLight;
+  color: $textCol;
+
+  .header {
+    display: flex;
+    flex-flow: column;
+    border-bottom: 1px solid #b6bf00;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+
+    .dataset-info {
+      display: flex;
+      text-align: center;
+      padding: 10px;
+      align-items: center;
+
+      .title {
+        display: flex;
+        color: white;
+        text-align: left;
+        font-size: 15px;
+
+        b {
+          color: $textColor;
+          text-transform: none;
+          padding-top: 5px;
+        }
+
+        .dataset-name {
+          margin-left: 10px;
+          padding-top: 5px;
+        }
+      }
+    }
+
+    // This is an override for eo-component EOBVisualizationTimeSelect needed to get the layout right
+    .date-selection {
+      .time-select-type {
+        font-weight: bold;
+        font-size: 15px;
+      }
+
+      .visualization-time-select {
+        padding: 0 10px;
+        margin-bottom: 10px;
+        margin-top: 15px;
+      }
+
+      .timespan-toggle {
+        min-width: 70px;
+        text-align: right;
+      }
+    }
+  }
+
+  .actions {
+    justify-content: space-around;
+    border-bottom: 2px solid $primaryCol;
+    padding: 10px;
+    display: flex;
+    flex: 1;
+    flex-flow: wrap;
+    flex-direction: row;
+    cursor: pointer;
+
+    i {
+      color: $primaryCol;
+      margin-right: 5px;
+    }
+
+    .action-wrapper {
+      margin-left: 12px;
+      display: inline-block;
+      min-width: 25px;
+      text-align: center;
+    }
+  }
+
+  .layer-datasource-picker {
+    display: block;
+    color: #ddd;
+    font-size: 13px;
+
+    .layer {
+      padding: 10px 10px 0 10px;
+      min-height: 46px;
+      border-bottom: 1px solid #555;
+      clear: both;
+      cursor: pointer;
+
+      small {
+        color: #ccc;
+        display: block;
+      }
+
+      .icon {
+        float: left;
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        line-height: 40px;
+        margin-right: 5px;
+        margin-top: -5px;
+        border-radius: 50px;
+        display: block;
+        background: $mainMedium;
+        border: 3px solid transparent;
+      }
+
+      .add-to-compare {
+        margin-bottom: 25px;
+        float: right;
+
+        i {
+          color: $primaryCol;
+        }
+      }
+    }
+
+    .layer:hover {
+      color: #fff;
+      background-color: #434554;
+
+      small {
+        color: #fff;
+      }
+    }
+
+    .layer.active,
+    .layer.active:hover {
+      color: #b6bf00;
+      opacity: 1;
+      border-right: solid 4px #b6bf00;
+
+      .icon {
+        border: 3px solid #b6bf00;
+      }
+
+      small {
+        color: #b6bf00;
+      }
+
+      .fa.fa-angle-double-down {
+        float: right;
+        font-size: 14px;
+        margin: 20px 0 0 0;
+        transition: transform ease-in 0.2s;
+        padding: 5px 0 5px 5px;
+
+        &.show {
+          color: #b6bf00;
+          transform: rotate(180deg);
+        }
+      }
+    }
+
+    .zoom-notification-footer {
+      // This is needed in order to display NotificationPanel properly inside the sidebar
+      padding-bottom: 1px;
+    }
+  }
+}
