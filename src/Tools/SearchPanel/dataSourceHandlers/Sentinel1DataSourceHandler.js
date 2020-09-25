@@ -444,4 +444,20 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
   supportsInterpolation() {
     return true;
   }
+
+  supportsV3Evalscript = datasetId => {
+    switch (datasetId) {
+      case S1:
+      case S1_EW:
+      case S1_EW_SH:
+        return false;
+      case S1_AWS_IW_VVVH:
+      case S1_AWS_IW_VV:
+      case S1_AWS_EW_HHHV:
+      case S1_AWS_EW_HH:
+        return true;
+      default:
+        return false;
+    }
+  };
 }

@@ -3,11 +3,22 @@ import './EOBButton.scss';
 
 export class EOBButton extends PureComponent {
   render() {
-    const { text, icon, loading, fluid, onClick, disabled, className, progress = null, ...rest } = this.props;
+    const {
+      text,
+      icon,
+      loading,
+      fluid,
+      onClick,
+      onDisabledClick,
+      disabled,
+      className,
+      progress = null,
+      ...rest
+    } = this.props;
     return (
       <a
         className={`btn ${className || ''} ${fluid ? 'full-size' : ''} ${disabled ? 'disabled' : ''}`}
-        onClick={!disabled ? onClick : null}
+        onClick={!disabled ? onClick : onDisabledClick}
         {...rest}
       >
         {loading ? (

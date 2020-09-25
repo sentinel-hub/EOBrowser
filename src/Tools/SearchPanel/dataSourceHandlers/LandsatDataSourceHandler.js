@@ -347,4 +347,11 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
   supportsInterpolation() {
     return true;
   }
+
+  supportsV3Evalscript(datasetId) {
+    if (datasetId === AWS_L8L1C) {
+      return true;
+    }
+    return false;
+  }
 }

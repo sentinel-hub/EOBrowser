@@ -2,9 +2,9 @@
 
 #logo-header {
   display: flex;
-  background: url('./bg.jpg') left top no-repeat;
+  background-color: $mainDark;
   padding: 12px 10px;
-  height: 42px;
+  min-height: 42px;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
@@ -111,7 +111,6 @@
   }
 
   .btn {
-    border-radius: 6px;
     border: none;
     background: $primaryCol;
     color: #fff;

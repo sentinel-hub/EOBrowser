@@ -6,6 +6,10 @@
   display: inline-flex;
   align-items: baseline;
 
+  :hover {
+    cursor: pointer;
+  }
+
   .date-picker-input-wrapper {
     .date-picker-input-icon {
       color: #fff;
@@ -18,6 +22,32 @@
       color: #eee;
       border: none;
       width: 75px;
+    }
+
+    .cal-icon-left,
+    .cal-icon-right {
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+      }
+    }
+
+    /***  month and year select  ***/ //
+
+    i.fa.cal-icon-left,
+    i.fa.cal-icon-right {
+      color: #fff;
+    }
+
+    i.fa.cal-icon-left,
+    i.fa.cal-icon-right,
+    i.fa.cal-icon-cal {
+      width: $controlsHeight/2;
+    }
+
+    i.fa.cal-icon-left.disabled,
+    i.fa.cal-icon-right.disabled {
+      color: #aaa;
     }
   }
 }

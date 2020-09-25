@@ -1,0 +1,19 @@
+.cm-s-readonly {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* stylelint-disable-next-line */
+.cm-s-readonly .CodeMirror-lines {
+  cursor: not-allowed;
+}
+
+.info-uncheck-url {
+  font-size: 12px;
+  margin-top: 5px;
+
+  i {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+}

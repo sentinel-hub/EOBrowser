@@ -1,7 +1,18 @@
 .filter-search-by-months {
   color: #cdd5e3;
-  font-size: 12px;
-  margin: 10px 10px 10px 20px;
+  font-size: 0.9em;
+  margin: 10px 10px 10px 8px;
+
+  label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    input {
+      width: 15px;
+      height: 15px;
+    }
+  }
 
   .months {
     display: grid;

@@ -5,6 +5,7 @@ import toGeoJSON from '@mapbox/togeojson';
 import { getType } from '@turf/invariant';
 import { coordEach, featureReduce } from '@turf/meta';
 import JSZip from 'jszip';
+import { t } from 'ttag';
 import './EOBUploadGeoFile.scss';
 
 export class EOBUploadGeoFile extends Component {
@@ -117,10 +118,9 @@ export class EOBUploadGeoFile extends Component {
         closeOnEsc={true}
       >
         <div className="fileUploadWindow">
-          <h3>File upload</h3>
+          <h3>{t`File upload`}</h3>
           <p>
-            Upload a KML/KMZ, GPX or GEOJSON file to create area of interest. Area will be used for clipping
-            when exporting an image.
+            {t`Upload a KML/KMZ, GPX or GEOJSON file to create area of interest. Area will be used for clipping when exporting an image.`}
           </p>
           <Dropzone
             acceptClassName="ok"
@@ -131,7 +131,7 @@ export class EOBUploadGeoFile extends Component {
             // accept={['application/vnd.google-earth.kml+xml', 'application/vnd.google-earth.kmz']}
             // accept={['application/vnd.google-earth.kml+xml']}
           >
-            Drop KML/KMZ, GPX, GEOJSON file or search your computer
+            {t`Drop KML/KMZ, GPX, GEOJSON file or search your computer`}
           </Dropzone>
           {this.state.error && <p className="error">{this.state.error}</p>}
         </div>

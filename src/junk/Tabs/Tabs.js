@@ -12,6 +12,10 @@ import { t } from 'ttag';
 
 export class Tabs extends Component {
   handleSelect = renderKey => {
+    if (renderKey !== 2) {
+      // clear hash routes, except for 2 = Visualization tab
+      window.location.hash = '';
+    }
     this.props.onSelect(renderKey);
   };
 

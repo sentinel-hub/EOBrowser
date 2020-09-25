@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { getAvailableYears } from './Datepicker.utils';
+import { getAvailableYears, getAvailableMonths } from './Datepicker.utils';
 import { getMonths } from './MomentLocaleUtils';
 
-const YearMonthForm = ({ minFromDate, maxToDate, date, onChange, locale }) => {
-  const months = getMonths(locale);
+const YearMonthForm = ({ minFromDate, maxToDate, onChange, locale, selectedDay }) => {
+  const allMonths = getMonths(locale);
   const years = getAvailableYears(minFromDate, maxToDate);
+  const months = getAvailableMonths(allMonths, minFromDate, maxToDate, selectedDay);
 
   const handleChange = function handleChange(e) {
     const { year, month } = e.target.form;
@@ -14,14 +15,14 @@ const YearMonthForm = ({ minFromDate, maxToDate, date, onChange, locale }) => {
 
   return (
     <form className="year-month-form">
-      <select name="month" onChange={handleChange} value={date.getMonth()}>
-        {months.map((month, i) => (
-          <option key={month} value={i}>
-            {month}
+      <select name="month" onChange={handleChange} value={selectedDay.get('month')}>
+        {months.map(month => (
+          <option key={month.name} value={month.index}>
+            {month.name}
           </option>
         ))}
       </select>
-      <select name="year" onChange={handleChange} value={date.getFullYear()}>
+      <select name="year" onChange={handleChange} value={selectedDay.get('year')}>
         {years.map(year => (
           <option key={year} value={year}>
             {year}

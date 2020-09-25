@@ -199,4 +199,8 @@ export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
   supportsInterpolation() {
     return true;
   }
+
+  supportsV3Evalscript() {
+    return false;
+  }
 }

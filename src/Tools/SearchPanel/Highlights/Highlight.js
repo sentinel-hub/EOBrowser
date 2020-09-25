@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import moment from 'moment';
 import { t } from 'ttag';
 import PinPreviewImage from '../../Pins/PinPreviewImage';
 import store, { compareLayersSlice } from '../../../store';
 import Description from '../../Pins/Description';
+
+import { constructTimespanString } from '../../Pins/Pin.utils';
 
 import './Highlight.scss';
 
@@ -32,7 +33,7 @@ class Highlight extends Component {
 
   render() {
     const { pin, index } = this.props;
-    const { description, title, toTime } = pin;
+    const { description, title } = pin;
     const { showDescription } = this.state;
 
     return (
@@ -47,11 +48,14 @@ class Highlight extends Component {
               </div>
             </span>
             <div>
-              <label>Date:</label>{' '}
-              <span className="highlight-date">{moment(toTime).format('YYYY-MM-DD')}</span>
+              <label>{t`Date`}:</label> <span className="highlight-date">{constructTimespanString(pin)}</span>
             </div>
             {this.canDisplayDescription() && (
-              <div className="highlight-info-row pin-description-toggle" onClick={this.toggleDescription}>
+              <div
+                className="highlight-info-row pin-description-toggle"
+                title={showDescription ? t`Hide description` : t`Show description`}
+                onClick={this.toggleDescription}
+              >
                 <i className={showDescription ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down '} />
               </div>
             )}

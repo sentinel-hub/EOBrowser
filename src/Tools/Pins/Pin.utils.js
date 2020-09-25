@@ -13,6 +13,7 @@ import { getTokenFromLocalStorage } from '../../Auth/authHelpers';
 import { getDataSourceHandler } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
 import { datasourceToDatasetId, dataSourceToThemeId, datasourceToUrl } from '../../utils/handleOldUrls';
+import { ensureCorrectDataFusionFormat } from '../../utils';
 
 const PINS_LC_NAME = 'eob-pins';
 
@@ -196,7 +197,7 @@ export function getPinsFromServer() {
             const convertedPins = res.data.pins.map(pin => convertToNewFormat(pin));
             res.data.pins_eob3 = convertedPins;
             await axios.put(url, res.data, requestParams);
-            resolve(convertedPins);
+            resolve(preparePins(convertedPins));
           }
         } catch (e) {
           console.warn(e);
@@ -346,7 +347,7 @@ export function getPinsFromSessionStorage() {
   } else {
     pins = JSON.parse(pins);
   }
-  return pins;
+  return preparePins(pins);
 }
 
 export async function createShareLink(pins) {
@@ -402,7 +403,7 @@ export async function importSharedPins(sharedPinsListId) {
 
   const N_PINS = sharedPins.items.length;
   if (
-    !window.confirm(t`You are about to add pins (${N_PINS}) to your pin collection. Do you want to proceed?`)
+    !window.confirm(t`You are about to add ${N_PINS} pin(s) to your pin collection. Do you want to proceed?`)
   ) {
     return [];
   }
@@ -469,6 +470,25 @@ export async function layerFromPin(pin, reqConfig) {
   return layer;
 }
 
+export const isOnEqualDate = (date1, date2) => {
+  const date1Moment = moment.utc(date1);
+  const date2Moment = moment.utc(date2);
+
+  return date1Moment.isSame(date2Moment, 'day');
+};
+
+export const constructTimespanString = ({ fromTime, toTime } = {}) => {
+  if (!toTime) {
+    return null;
+  }
+
+  if (!fromTime || isOnEqualDate(fromTime, toTime)) {
+    return moment.utc(toTime).format('YYYY-MM-DD');
+  }
+
+  return `${moment.utc(fromTime).format('YYYY-MM-DD')} - ${moment.utc(toTime).format('YYYY-MM-DD')}`;
+};
+
 export function constructSHJSEffects(pin) {
   const { gain, gamma, redRange, greenRange, blueRange } = pin;
 
@@ -490,4 +510,14 @@ export function constructSHJSEffects(pin) {
   }
 
   return Object.keys(effects).length > 0 ? effects : null;
+}
+
+function preparePins(pins) {
+  return pins.map(pin => {
+    if (pin.dataFusion) {
+      const dataFusionInCorrectFormat = ensureCorrectDataFusionFormat(pin.dataFusion, pin.datasetId);
+      pin.dataFusion = dataFusionInCorrectFormat;
+    }
+    return pin;
+  });
 }

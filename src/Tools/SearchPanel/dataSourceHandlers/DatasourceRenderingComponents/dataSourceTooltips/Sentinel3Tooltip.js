@@ -6,43 +6,40 @@ import logoCopernicus from './images/logo-tooltips-copernicus.png';
 import logoCreodias from './images/logo-tooltips-creodias.png';
 
 const s3Markdown = () => t`
-The main objective of the Sentinel-3 mission is to measure sea surface topography, sea and land
-surface temperature, and ocean and land surface colour with high accuracy and reliability (source:
-ESA). Both Sentinel-3 satellites have four different sensors on board. Data acquired by OLCI and
-SLSTR sensors are available in EO Browser.
+**Sentinel-3** mission main objective is to measure sea surface topography, sea and land surface temperature, ocean and land surface colour. Sentinel-3 has four different instruments on board. Data acquired by the Ocean and Land Colour Instrument (OLCI) and the Sea and Land Surface Temperature Instrument (SLSTR) are available in this platform.
+
+**Data availability:** Since May 2016 onwards.
 `;
 
 const S3SLSTRMarkdown = () => t`
-**Sentinel-3 SLSTR** provides global and regional Sea and Land Surface Temperature. EO
-Browser provides data acquired in nadir view while descending. Measurements are processed at
-Level 1B and represent top of atmosphere reflectance or brightness temperature.
+The **Sea and Land Surface Temperature (SLSTR)** instrument on board Sentinel-3 measures the global and regional sea and land surface 
+temperature. The SLSTR covers the visible, shortwave infrared, and thermal infrared wavelengths of the electromagnetic spectrum. 
 
-**Spatial resolution:** 500m for bands S1 to S6, 1km for bands S7 to S9, F1, and F2.
+**Spatial resolution:** 500m for visible, near- and shortwave infrared wavelengths and 1km for thermal infrared (that is, only details 
+bigger than 500m and 1km can be seen, respectively).
 
-**Revisit time:** <= 1 day using both satellites.
+**Revisit time:** Maximum 1 day to revisit the same area, using both satellites.
 
-**Data availability:** Since May 2016.
+**Data availability:** Since May 2016 onwards.
 
-**Common usage:** Climate change monitoring, vegetation monitoring, active fire detection,
-land and sea surface temperature monitoring. Sentinel-3 SLSTR instrument ensures continuity of
-the Envisat AATSR.
+**Common usage:** Climate change monitoring, vegetation monitoring, active fire detection, land and sea surface temperature monitoring. 
 `;
 
 const S3OLCIMarkdown = () => t`
-**Sentinel-3 OLCI** provides more frequent optical imagery than Sentinel-2 but at lower
-resolution and with more spectral bands to support the ocean, environmental, and climate
-monitoring. EO Browser provides data acquired with the OLCI sensor at full resolution and
-processed at Level 1 reflectance.
+The **Ocean and Land Colour Instrument (OLCI)** on board Sentinel-3 is a spectrometer that 
+measures the solar radiation reflected by Earth, and it monitors the ocean, the environment, 
+and climate. It provides more frequent visible imagery than Sentinel-2 but at a lower resolution
+and with more wavelengths covered.
 
-**Spatial resolution:** 300m.
+**Spatial resolution:** 300m (that is, only details bigger than 300m can be seen).
 
-**Revisit time:**  2 days using both satellites.
+**Revisit time:** Maximum 2 days to revisit the same area, using both satellites.
 
-**Data availability:** Since May 2016.
+**Data availability:** Since May 2016 onwards.
 
-**Common usage:** Surface topography observations, ocean and land surface colour
-observation and monitoring. The Sentinel-3 OLCI instrument ensures the continuity of Envisat
-Meris.
+**Common usage:** Surface topography, ocean and land surface colour observations and monitoring. 
+The Sentinel-3 OLCI instrument continues the measurements previously performed by the MERIS instrument 
+on board Envisat, whose mission concluded (Select the theme *Change detection through Time* in order to access Envisat data).
 `;
 
 const Sentinel3Tooltip = () => {

@@ -1,3 +1,5 @@
+@import '../../variables.scss';
+
 /* stylelint-disable */
 .mode-selection {
   position: absolute !important;
@@ -8,7 +10,7 @@
   height: 40px;
   text-align: center;
   top: 10px;
-  background-color: #191a25;
+  background-color: $mainDark;
 
   .active {
     color: #b6bf00;
@@ -31,7 +33,7 @@
     flex-direction: column;
     padding: 5px;
     height: auto;
-    background-color: #191a25;
+    background-color: $mainMedium;
     min-width: 100px;
     -webkit-box-shadow: 0 2px 5px #000;
     box-shadow: 0 2px 5px #000;

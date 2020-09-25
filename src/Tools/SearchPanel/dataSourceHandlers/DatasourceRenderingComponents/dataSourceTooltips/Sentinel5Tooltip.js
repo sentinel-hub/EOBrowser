@@ -6,19 +6,17 @@ import logoCopernicus from './images/logo-tooltips-copernicus.png';
 import logoCreodias from './images/logo-tooltips-creodias.png';
 
 const getMarkdown = () => t`
-**Sentinel-5P** provides atmospheric measurements, relating to air quality, climate forcing,
-ozone and UV radiation with high spatio-temporal resolution. EO Browser serves level 2 geophysical
-products.
+**Sentinel-5P** is a satellite that provides atmospheric measurements to be used for air quality, ozone monitoring, UV radiation,
+ and climate monitoring and forecasting.
 
-**Spatial resolution:** 7 x 3.5km.
+**Spatial resolution:** 7 x 3.5km (that is, only details bigger than 7 x 3.5km can be seen).
 
-**Revisit time:** <= 5 1 day.
+**Revisit time:** Maximum 1 day to revisit the same area.
 
-**Data availability:** Since April 2018.
+**Data availability:** Since April 2018 onwards.
 
-**Common usage:** Monitoring the concentration of carbon monoxide (CO), nitrogen dioxide (NO2)
-and ozone (O3) in the air. Monitoring the UV aerosol index (AER_AI) and various geophysical
-parameters of clouds (CLOUD).
+**Common usage:** Monitoring the concentration of carbon monoxide (CO), nitrogen dioxide (NO2) and ozone (O3) in the air. Monitoring the UV aerosol index (AER_AI) and various geophysical parameters of clouds (Cloud).
+
 `;
 
 const Sentinel5Tooltip = () => {

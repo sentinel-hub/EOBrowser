@@ -7,7 +7,7 @@ import { isAuthTokenSet, setAuthToken } from '@sentinel-hub/sentinelhub-js';
 
 import { EOBButton } from '../EOBCommon/EOBButton/EOBButton';
 import { EOBCCSlider } from '../EOBCommon/EOBCCSlider/EOBCCSlider';
-import { default as EOBDatePicker } from '../EOBCommon/EOBDatePicker/EOBDatePicker';
+import DatePicker from '../../components/DatePicker/DatePicker';
 import AlertContainer from 'react-alert';
 import gifshot from 'gifshot';
 import FileSaver from 'file-saver';
@@ -748,25 +748,30 @@ export class EOB3TimelapsePanel extends Component {
           <div className="wrap">
             <div className="side">
               <div className="head">
-                <div className="date-range">
-                  <EOBDatePicker
-                    onSelect={e => this.updateDate('from', e)}
+                <div className="date-pickers-wrapper timelapse-date-select">
+                  <DatePicker
+                    id="date-picker-from"
+                    calendarContainer={this.calendarHolder}
                     selectedDay={moment.utc(from)}
-                    minDate={minDate}
-                    maxDate={maxDate}
-                    onGetAndSetNextPrev={this.props.onGetAndSetNextPrev}
+                    setSelectedDay={e => this.updateDate('from', e)}
+                    minDate={moment.utc(minDate)}
+                    maxDate={moment.utc(to)}
+                    getAndSetNextPrevDate={this.props.onGetAndSetNextPre}
                     onQueryDatesForActiveMonth={this.props.onQueryDatesForActiveMonth}
                   />
-                  <span className="datePickerSeparator">-</span>
-                  <EOBDatePicker
-                    onSelect={e => this.updateDate('to', e)}
+                  <span className="date-picker-separator">-</span>
+                  <DatePicker
+                    id="date-picker-to"
+                    calendarContainer={this.calendarHolder}
                     selectedDay={moment.utc(to)}
-                    minDate={minDate}
-                    maxDate={maxDate}
-                    onGetAndSetNextPrev={this.props.onGetAndSetNextPrev}
+                    setSelectedDay={e => this.updateDate('to', e)}
+                    minDate={moment.utc(from)}
+                    maxDate={moment.utc(maxDate)}
+                    getAndSetNextPrevDate={this.props.onGetAndSetNextPre}
                     onQueryDatesForActiveMonth={this.props.onQueryDatesForActiveMonth}
                   />
                 </div>
+                <div className="timelapse-calendar-holder" ref={e => (this.calendarHolder = e)} />
 
                 <div className="filter-months">
                   <EOBFilterSearchByMonths onChange={this.setFilterMonths} />

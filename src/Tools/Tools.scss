@@ -23,15 +23,14 @@ $searchBorderColour: #6d7300;
 .open-tools {
   display: block;
   position: absolute;
-  left: 10px;
-  top: 14px;
   color: #fff;
-  background: $mainMedium;
+  background: $mainDark;
   border-radius: 40px;
   text-align: center;
   cursor: pointer;
   z-index: 2;
   transition: all ease 0.4s;
+  top: 3px;
 
   i {
     margin: 5px;
@@ -59,14 +58,14 @@ $searchBorderColour: #6d7300;
 }
 
 .select-time-range {
-  margin-top: 20px;
+  margin-top: 10px;
 
   & > label {
     display: block;
   }
   /* stylelint-disable */
   div.inlineDatepicker {
-    margin: 2px 20px;
+    margin: 10px 20px 5px 20px;
     padding: 3px 5px;
     position: relative;
   }
@@ -74,8 +73,7 @@ $searchBorderColour: #6d7300;
 
   .date-pickers-wrapper {
     .calendar-wrapper {
-      margin-left: -5px;
-      margin-top: 5px;
+      margin: 8px -10px 0 -10px;
     }
 
     .date-picker-separator {
@@ -84,7 +82,7 @@ $searchBorderColour: #6d7300;
     }
 
     .date-picker {
-      margin: 2px 20px;
+      margin: 8px 8px 0;
       padding: 3px 5px;
     }
   }
@@ -101,7 +99,7 @@ $searchBorderColour: #6d7300;
   }
 
   &.top {
-    margin-bottom: 20px;
+    padding: 15px 10px 20px 10px;
   }
 
   &.bottom {
@@ -115,8 +113,7 @@ $searchBorderColour: #6d7300;
 }
 
 .search-panel {
-  background-color: $mainLight;
-  padding: 10px;
+  background-color: $mainMedium;
 
   .notification {
     a {
@@ -134,7 +131,7 @@ $searchBorderColour: #6d7300;
   }
 
   div.top-label > div {
-    margin: 5px 0 10px 20px;
+    margin: 8px 0 10px 8px;
     font-weight: normal;
     font-size: 0.8em;
   }
@@ -150,7 +147,6 @@ $searchBorderColour: #6d7300;
     margin: 0;
     padding: 0;
     list-style: none;
-    background-color: $mainLight;
 
     .discover-tab-button {
       flex: auto;
@@ -158,9 +154,8 @@ $searchBorderColour: #6d7300;
       list-style: none;
       cursor: pointer;
       color: #eee;
-      padding: 7px 10.5px;
+      padding: 9px 10.5px 7px 10.5px;
       width: 25%;
-      border-bottom: 2px solid $searchBorderColour;
     }
 
     .hidden {
@@ -168,8 +163,7 @@ $searchBorderColour: #6d7300;
     }
 
     .active {
-      border: solid $searchBorderColour;
-      border-width: 2px 2px 0 2px;
+      background-color: $mainLight;
     }
 
     .not-clickable {
@@ -178,9 +172,10 @@ $searchBorderColour: #6d7300;
   }
 
   .discover-tab {
-    border: solid $searchBorderColour;
-    border-width: 0 2px 2px 2px;
-    padding-left: 5px;
+    background-color: $mainLight;
+    border-width: 1px;
+    padding: 10px;
+    font: $textColor;
 
     .hidden {
       display: hidden;
@@ -212,11 +207,22 @@ $searchBorderColour: #6d7300;
 
   div.data-source-group {
     clear: both;
+    padding: 2px 0;
 
     label {
       float: left;
       clear: both;
       color: #cdd5e3;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+
+      input {
+        cursor: pointer;
+        width: 15px;
+        height: 15px;
+      }
     }
 
     div.datasources {
@@ -255,7 +261,7 @@ $searchBorderColour: #6d7300;
   .btn {
     display: block;
     text-align: center;
-    margin: 20px 20px 10px;
+    margin: 25px 0 10px 0;
   }
 }
 
@@ -279,10 +285,6 @@ $searchBorderColour: #6d7300;
   align-items: center;
 }
 
-#datepicker-expansion {
-  height: 175px;
-}
-
 .dropdown {
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -296,7 +298,7 @@ $searchBorderColour: #6d7300;
   border-radius: 0;
   padding: 2px;
   color: #cdd5e3;
-  font-size: 12px;
+  font-size: 0.9em;
   width: 100%;
   margin: 5px 0;
   text-align: left;

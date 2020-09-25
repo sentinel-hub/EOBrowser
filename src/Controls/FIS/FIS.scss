@@ -5,6 +5,10 @@
   color: #fff;
   font-size: 0.8em;
 
+  .export-csv-button {
+    float: right;
+  }
+
   .title-bar {
     display: flex;
 
@@ -41,9 +45,8 @@
     justify-content: space-around;
 
     a.btn {
-      background-color: #22232d;
       border-radius: 0;
-      border-bottom: 3px solid #22232d;
+      border-bottom: 3px solid transparent;
     }
 
     a.btn.selected {

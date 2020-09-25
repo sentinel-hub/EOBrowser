@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { VERSION_INFO } from '../../VERSION.js';
 import ExternalLink from '../../ExternalLink/ExternalLink';
-// import Banner from './Banner.js';
+import Banner from './Banner.js';
 import esaLogo from './esa.png';
 import { t } from 'ttag';
 
@@ -24,9 +24,14 @@ class ToolsFooter extends Component {
               {t`for all features`}
             </p>
           )}
-          {t`Powered by`} <ExternalLink href="https://www.sinergise.com">Sinergise</ExternalLink>{' '}
-          {t`with contributions from the European Space Agency`}
+          {t`Powered by`} <ExternalLink href="https://www.sentinel-hub.com/">Sentinel Hub</ExternalLink>{' '}
+          {t`with contributions by`} <ExternalLink href="https://www.esa.int/">ESA</ExternalLink>
           <br />
+          <ExternalLink className="esa-logo" href="https://www.esa.int/">
+            <img src={esaLogo} alt="ESA" />
+          </ExternalLink>
+        </div>
+        <div className="footer-version">
           {VERSION_INFO.tag ? (
             VERSION_INFO.tag
           ) : VERSION_INFO.commit ? (
@@ -37,12 +42,8 @@ class ToolsFooter extends Component {
           ) : (
             <span>Local build</span>
           )}
-          <ExternalLink className="esa-logo" href="https://www.esa.int/">
-            <img src={esaLogo} alt="ESA" />
-          </ExternalLink>
         </div>
-
-        {/* <Banner /> */}
+        <Banner />
       </div>
     );
   }

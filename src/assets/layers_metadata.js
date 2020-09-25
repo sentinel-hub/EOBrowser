@@ -50,7 +50,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Thermal IR fire emission bands\n\nSLSTR channels F1 and F2, with a central wavelength of 3742 nm and 10854 nm respectively, aim to detect the Land Surface Temperature (LST) of the Earth. LST is the radiative skin temperature of the land derived from solar radiation. A simplified definition would be how hot the surface of the Earth would feel to the touch in a particular location. SLSTR channels F1 and F2 are designed to deliver the radiometric data necessary for the generation of quantitative active fire products. This prevents saturation of the thermal channels and applies to targets with an upper limit of 500°C. They are useful for fire mapping.\n\n\n\nMore info [here.](https://sentinel.esa.int/web/sentinel/user-guides/sentinel-3-slstr/overview/geophysical-measurements/land-surface-temperature)`,
+      t`# Thermal IR fire emission bands\n\nSentinel-3 Sea and Land Surface Temperature Instrument (SLSTR) has two dedicated channels (F1 and F2) that aim to detect Land Surface Temperature (LST). F2 Channel, with a central wavelength of 10854 nm measures in the thermal infrared, or TIR. It is very useful for fire and high temperature event monitoring at 1 km resolution.\n\n\n\nMore info [here.](https://sentinel.esa.int/web/sentinel/user-guides/sentinel-3-slstr/overview/geophysical-measurements/land-surface-temperature)`,
   },
 
   {
@@ -69,7 +69,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Methane (CH4)\n\n\n\n After carbon dioxide (CO2), methane is the most important contributor to the anthropogenically enhanced greenhouse effect. Roughly three-quarters of methane emissions are anthropogenic and as such it is important to continue recording satellite based measurements. TROPOMI aims at providing CH4 column concentrations with high sensitivity to the Earth’s surface, good spatiotemporal coverage, and sufficient accuracy to facilitate inverse modelling of sources and sinks. TROPOMI uses absorption information from the Oxygen-A Band (760nm) and the SWIR spectral range to monitor CH4 abundances in the Earth's atmosphere.\n\n\n\n[More...](http://www.tropomi.eu/data-products/methane)`,
+      t`# Methane (CH4)\n\n\n\nMethane is, after carbon dioxide, the most important contributor to the anthropogenically (caused by human activity) enhanced greenhouse effect. Measurements are provided in parts per billion (ppb) with a spatial resolution of 7 km x 3.5 km.\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/methane)`,
   },
 
   {
@@ -88,7 +88,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Formaldehyde (HCHO)\n\n\n\n Long-term satellite observations of tropospheric formaldehyde HCHO are essential to support air quality and chemistry-climate related studies from the regional to the global scale. Formaldehyde is an intermediate gas in almost all oxidation chains of non-methane volatile organic compounds (NMVOC), leading eventually to CO2. Non-Methane Volatile Organic Compounds (NMVOCs) are, together with NOx, CO and CH4, among the most important precursors of tropospheric O3. The major HCHO source in the remote atmosphere is CH4 oxidation. Over the continents, the oxidation of higher NMVOCs emitted from vegetation, fires, traffic and industrial sources results in important and localized enhancements of the HCHO levels. The seasonal and inter-annual variations of the formaldehyde distribution are principally related to temperature changes and fire events, but also to changes in anthropogenic activities. Its lifetime being of the order of a few hours, HCHO concentrations in the boundary layer can be directly related to the release of short-lived hydrocarbons, which mostly cannot be observed directly from space.\n\n\n\n[More...](http://www.tropomi.eu/data-products/formaldehyde)`,
+      t`# Formaldehyde (HCHO)\n\n\n\nLong term satellite observations of tropospheric formaldehyde (HCHO) are essential to support air quality and chemistry-climate related studies from the regional to the global scale. The seasonal and inter-annual variations of the formaldehyde distribution are principally related to temperature changes and fire events, but also to changes in anthropogenic (human-made) activities. Its lifetime being of the order of a few hours, HCHO concentrations in the boundary layer can be directly related to the release of short-lived hydrocarbons, which mostly cannot be observed directly from space. Measurements are in mol per square meter (mol/ m^2).\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/formaldehyde)`,
   },
 
   {
@@ -107,7 +107,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Sulfur Dioxide (SO2)\n\n\n\nSulphur dioxide enters the Earth’s atmosphere through both natural and anthropogenic processes. It plays a role in chemistry on a local and global scale and its impact ranges from short-term pollution to effects on the climate. Only about 30% of the emitted SO2 comes from natural sources; the majority is of anthropogenic origin. SO2 emissions adversely affect human health and air quality. SO2 has an effect on climate through radiative forcing, via the formation of sulphate aerosols. Along with volcanic ash volcanic SO2 emissions also pose a threat to aviation. S5P/TROPOMI samples the Earth’s surface with a revisit time of one day with unprecedented spatial resolution of 3.5 x 7 km which allows the resolution of fine details including the detection of much smaller SO2 plumes. \n\n\n\n[More...](http://www.tropomi.eu/data-products/sulphur-dioxide)`,
+      t`# Sulfur Dioxide (SO2)\n\n\n\nSulphur dioxide enters the Earth’s atmosphere through both natural and anthropogenic (human made) processes. It plays a role in chemistry on a local and global scale and its impact ranges from short term pollution to effects on climate. Only about 30% of the emitted SO2 comes from natural sources; the majority is of anthropogenic origin. Sentinel-5P/TROPOMI instrument samples the Earth’s surface with a revisit time of one day with a spatial resolution of 3.5 x 7 km which allows the resolution of fine details including the detection of smaller SO2 plumes. Measurements are in mol per square meter (mol/ m^2).\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/sulphur-dioxide)`,
   },
 
   {
@@ -126,7 +126,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Ozone (O3)\n\n\n\nOzone is of crucial importance for the equilibrium of the Earth atmosphere. In the stratosphere, the ozone layer shields the biosphere from dangerous solar ultraviolet radiation. In the troposphere, it acts as an efficient cleansing agent, but a high concentration of it is harmful to the health of humans, animals, and vegetation. Ozone is also an important greenhouse-gas contributor to ongoing climate change. Since the discovery of the Antarctic ozone hole in the 1980s and the subsequent Montreal Protocol regulating the production of chlorine-containing ozone-depleting substances, ozone has been routinely monitored from the ground and from space.\n\n\n\n[More...](http://www.tropomi.eu/data-products/total-ozone-column)`,
+      t`# Ozone (O3)\n\n\n\nOzone is of crucial importance for the equilibrium of the Earth atmosphere. In the stratosphere, the ozone layer shields the biosphere from dangerous solar ultraviolet radiation. In the troposphere, it acts as an efficient cleansing agent, but at high concentration it also becomes harmful to the health of humans, animals, and vegetation. Ozone is also an important greenhouse-gas contributor to ongoing climate change. Since the discovery of the Antarctic ozone hole in the 1980s and the subsequent Montreal Protocol regulating the production of chlorine-containing ozone-depleting substances, ozone has been routinely monitored from the ground and from space. Measurements are in mol per square meter (mol/ m^2)\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/total-ozone-column)`,
   },
 
   {
@@ -145,7 +145,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Nitrogen Dioxide (NO2)\n\n\n\nNitrogen dioxide (NO2) and nitrogen oxide (NO) together are usually referred to as nitrogen oxides (NOx = NO + NO2). They are important trace gases in the Earth’s atmosphere, present in both the troposphere and the stratosphere. They enter the atmosphere as a result of anthropogenic activities (notably fossil fuel combustion and biomass burning) and natural processes (such as microbiological processes in soils, wildfires and lightning). During daytime, i.e. in the presence of sunlight, a photochemical cycle involving ozone (O3) converts NO into NO2 (and vice versa) on a timescale of minutes, so that NO2 is a robust measure for concentrations of nitrogen oxides.  \n\n\n\n[More...](http://www.tropomi.eu/data-products/nitrogen-dioxide)`,
+      t`# Nitrogen Dioxide (NO2)\n\n\n\nNitrogen dioxide (NO2) and nitrogen oxide (NO) together are usually referred to as nitrogen oxides. They are important trace gases in the Earth’s atmosphere, present in both the troposphere and the stratosphere. They enter the atmosphere as a result of anthropogenic activities (particularly fossil fuel combustion and biomass burning) and natural processes (such as microbiological processes in soils, wildfires and lightning). Measurements are in mol per square meter (mol/ m^2).\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/nitrogen-dioxide)`,
   },
 
   {
@@ -164,7 +164,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Carbon Monoxide (CO)\n\n\n\nCarbon monoxide (CO) is an important atmospheric trace gas for our understanding of tropospheric chemistry. In certain urban areas, it is a major atmospheric pollutant. The main sources of CO are combustion of fossil fuels, biomass burning, and atmospheric oxidation of methane and other hydrocarbons, whereas fossil fuel combustion is the main source of CO at Northern mid-latitudes, the oxidation of isoprene and biomass burning play an important role in the tropics. TROPOMI on the Sentinel 5 Precursor (S5P) satellite observes the global CO abundance exploiting clear-sky and cloudy-sky Earth radiance measurements in the 2.3 µm spectral range of the shortwave infrared (SWIR) part of the solar spectrum. \n\n\n\n[More...](http://www.tropomi.eu/data-products/carbon-monoxide)`,
+      t`# Carbon Monoxide (CO)\n\n\n\nCarbon monoxide (CO) is an important atmospheric trace gas. In certain urban areas, it is a major atmospheric pollutant. Main sources of CO are combustion of fossil fuels, biomass burning, and atmospheric oxidation of methane and other hydrocarbons. The carbon monoxide total column is measured in mol per square meter (mol/ m^2).\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/carbon-monoxide)`,
   },
 
   {
@@ -186,7 +186,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Aerosol Index\n\nThe Aerosol Index (AI) is a qualitative index indicating the presence of elevated layers of aerosols in the atmosphere.\n\nThe main aerosol types that cause signals detected in the AI (because of their significant absorption) are desert dust, biomass burning and volcanic ash plumes. An advantage of the AI is that it can be derived for clear as well as (partly) cloudy ground pixels.\n\n[More...](https://earth.esa.int/web/sentinel/technical-guides/sentinel-5p/level-2/aerosol-index)`,
+      t`# Aerosol Index\n\nThe Aerosol Index (AI) is a qualitative index indicating the presence of elevated layers of aerosols in the atmosphere. It can be used to detect the presence of UV absorbing aerosols such as desert dust and volcanic ash plumes. Positive values (from light blue to red) indicate the presence of UV-absorbing aerosol. This index is calculated for two pairs of wavelengths: 340/380 nm and 354/388 nm.\n\nMore info [here.](https://earth.esa.int/web/sentinel/technical-guides/sentinel-5p/level-2/aerosol-index)`,
   },
 
   {
@@ -204,6 +204,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 20000, color: '#800000', label: '20000 [m]' },
       ],
     },
+    description: () => t`# Cloud base height\n\nHeight of cloud base measured in meters (m).`,
   },
 
   {
@@ -221,6 +222,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 110000, color: '#800000', label: '110000 [Pa]' },
       ],
     },
+    description: () => t`# Cloud base pressure\n\nPressure measured at cloud base in Pascal (Pa).`,
   },
 
   {
@@ -238,6 +240,8 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 1, color: '#800000', label: '1' },
       ],
     },
+    description: () =>
+      t`# Effective radiometric cloud fraction\n\nCloud fraction is the portion of Earth's surface covered by cloud relative to the portion of Earth not covered by cloud. Clouds have shielding, albedo, and in-cloud absorption effects on trace gas retrieval. The effective radiometric cloud fraction is an important parameter to correct these effects.`,
   },
 
   {
@@ -255,6 +259,8 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 250, color: '#800000', label: '250' },
       ],
     },
+    description: () =>
+      t`# Cloud optical thickness\n\nThe cloud thickness is a key parameter to characterise optical properties of clouds. It is a measure of how much sunlight passes through the cloud to reach Earth's surface. The higher a cloud's optical thickness, the more sunlight the cloud is scattering and reflecting. Dark blue shows where there are low cloud optical thickness values and red shows larger cloud optical thickness.`,
   },
 
   {
@@ -272,6 +278,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 20000, color: '#800000', label: '20000 [m]' },
       ],
     },
+    description: () => t`# Cloud top height\n\nHeight of cloud top measured in meters (m).`,
   },
 
   {
@@ -289,6 +296,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 110000, color: '#800000', label: '110000 [Pa]' },
       ],
     },
+    description: () => t`# Cloud top pressure\n\nPressure measured at cloud top in Pascal (Pa).`,
   },
 
   {
@@ -313,7 +321,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Thermal band 10\n\n This thermal visualization is based on the Landsat 8's thermal band 10. At the central wavelength of 10895 nm it is in the thermal infrared, or TIR – it detects heat. Instead of measuring the temperature of the air, like weather stations do, band 10 reports on the ground itself, which is often much hotter. Thermal bands 10 and 11 are useful in providing more accurate surface temperatures and are collected at 100 meters.\n\n\n\nMore [here](https://www.usgs.gov/faqs/what-are-band-designations-landsat-satellites?qt-news_science_products=0#qt-news_science_products) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
+      t`# Thermal band 10\n\nThis thermal visualization is based on band 10 (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). At the central wavelength of 10895 nm it measures in the thermal infrared, or TIR. Instead of measuring the temperature of the air, like weather stations do, band 10 reports on the ground itself, which is often much hotter. Thermal band 10 is useful in providing surface temperatures and is collected at 100 meters above the surface.\n\n\n\nMore info [here](https://www.usgs.gov/faqs/what-are-band-designations-landsat-satellites?qt-news_science_products=0#qt-news_science_products) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
   },
 
   {
@@ -383,7 +391,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Normalized Difference Vegetation Index (NDVI)\n\n The well known and widely used NDVI is a simple, but effective index for quantifying green vegetation. It normalizes green leaf scattering in Near Infra-red wavelengths with chlorophyll absorption in red wavelengths. The value range of the NDVI is \`-1\` to \`1\`. Negative values of the NDVI (values approaching \`-1\`) correspond to water. Values close to zero (\`-0.1\` to \`0.1\`) generally correspond to barren areas of rock, sand, or snow. Low, positive values represent shrub and grassland (approximately \`0.2\` to \`0.4\`), while high values indicate temperate and tropical rainforests (values approaching \`1\`).\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ndvi/)`,
+      t`# Normalized Difference Vegetation Index (NDVI)\n\nThe normalized difference vegetation index is a simple, but effective index for quantifying green vegetation. It is a measure of the state of vegetation health based on how plants reflect light at certain wavelengths. The value range of the NDVI is -1 to 1. Negative values of NDVI (values approaching -1) correspond to water. Values close to zero (-0.1to 0.1) generally correspond to barren areas of rock, sand, or snow. Low, positive values represent shrub and grassland (approximately 0.2 to 0.4), while high values indicate temperate and tropical rainforests (values approaching 1).\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/ndvi/) and [here.](https://eos.com/ndvi/)`,
   },
 
   {
@@ -393,7 +401,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Enhanced Vegetation Index (EVI)\n\nIn areas of dense canopy cover, where the leaf area index (LAI) is high, the blue wavelengths can be used to improve the accuracy of NDVI, as it corrects for soil background signals and atmospheric influences.\n\nValues description:()=> The range of values for EVI is -1 to 1, with healthy vegetation generally around 0.20 to 0.80.\n\n\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/evi/)`,
+      t`# Enhanced Vegetation Index (EVI)\n\nThe enhanced vegetation index (EVI) is an 'optimized' vegetation index as it corrects for soil background signals and atmospheric influences. It is very useful in areas of dense canopy cover. The range of values for EVI is -1 to 1, with healthy vegetation generally around 0.20 to 0.80.\n\n\n\n\n\nMore infos [here](https://custom-scripts.sentinel-hub.com/sentinel-2/evi/) and [here.](https://earthobservatory.nasa.gov/features/MeasuringVegetation/measuring_vegetation_4.php)`,
   },
   {
     match: [
@@ -402,16 +410,18 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Atmospherically Resistant Vegetation Index (ARVI)\n\nThe ARVI is most useful in regions of high atmospheric aerosol content. It uses blue light reflectance measurements to correct for the atmospheric scattering effects, that also influence reflectance of red light.\n\nValues description:()=> The range for an ARVI is -1 to 1 where green vegetation generally falls between values of 0.20 to 0.80.\n\n\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/arvi/)`,
+      t`# Atmospherically Resistant Vegetation Index (ARVI)\n\nThe Atmospherically Resistant Vegetation Index (ARVI) is a vegetation index that minimizes the effects of atmospheric scattering. It is most useful for regions with high content of atmospheric aerosol (fog, dust, smoke, air pollution). The range for an ARVI is -1 to 1 where green vegetation generally falls between values of 0.20 to 0.80.\n\n\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/arvi/) and [here.](https://eos.com/blog/6-spectral-indexes-on-top-of-ndvi-to-make-your-vegetation-analysis-complete/)`,
   },
   {
     match: [
       { datasourceId: 'S2L1C', layerId: '6_SAVI', themeId: 'FORESTRY' },
       { datasourceId: 'S2L2A', layerId: '6_SAVI', themeId: 'FORESTRY' },
+      { datasourceId: 'S2L1C', layerId: 'SAVI', themeId: 'AGRICULTURE' },
+      { datasourceId: 'S2L2A', layerId: 'SAVI', themeId: 'AGRICULTURE' },
     ],
 
     description: () =>
-      t`# Soil Adjusted Vegetation Index (SAVI)\n\nEmpirically derived NDVI products have been shown to be unstable, varying with soil colour, soil moisture, and saturation effects from high density vegetation. The SAVI is similar to the NDVI but is used in areas where vegetative cover is low (< 40%). When a significant amount of the soil surface is exposed, the soil reflectance can influence the NDVI values. Light reflected from the soil can have a significant effect on NDVI values (changing the values by up to 20%). The index is a transformation technique that minimizes soil brightness influences from spectral vegetation indices involving red and near-infrared (NIR) wavelengths.\n\n\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/savi/)`,
+      t`# Soil Adjusted Vegetation Index (SAVI)\n\n The Soil Adjusted Vegetation Index is similar to Normalized Difference Vegetation Index (NDVI) but is used in areas where vegetative cover is low (< 40%). The index is a transformation technique that minimizes soil brightness influences from spectral vegetation indices involving red and near-infrared (NIR) wavelengths. The index is helpful when analysing young crops, arid regions with sparse vegetation and exposed soil surfaces.\n\n\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/savi/) and [here.](https://eos.com/blog/6-spectral-indexes-on-top-of-ndvi-to-make-your-vegetation-analysis-complete/)`,
   },
 
   {
@@ -421,7 +431,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Modified Anthocyanin Reflectance Index (mARI/ARI2)\n\nAnthocyanins are pigments common in higher plants, causing their red, blue and purple coloration. They provide valuable information about the physiological status of plants, as they are considered indicators of various types of plant stresses. The reflectance of anthocyanin is highest around 550nm. However, the same wavelengths are reflected by chlorophyll as well. To isolate the anthocyanins, the 700nm spectral band, that reflects only chlorophyll and not anthocyanins, is subtracted.\n\nTo correct for leaf density and thickness, the near infrared spectral band (in the recommended wavelengths of 760-800nm), which is related to leaf scattering, is added to the basic ARI index. The new index is called modified ARI or mARI (also ARI2).\n\nmARI values for the examined trees in [this original article](https://custom-scripts.sentinel-hub.com/sentinel-2/mari/) ranged in values from 0 to 8.\n\n\n\n\n\n[More...](https://digitalcommons.unl.edu/cgi/viewcontent.cgi?article=1227&context=natrespapers)`,
+      t`# Modified Anthocyanin Reflectance Index (mARI/ARI2)\n\nAnthocyanins are pigments common in higher plants, causing their red, blue and purple coloration. They provide valuable information about the physiological status of plants, as they are considered indicators of various types of plant stresses. The reflectance of anthocyanin is highest around 550nm. However, the same wavelengths are reflected by chlorophyll as well. To isolate the anthocyanins, the 700nm spectral band, that reflects only chlorophyll and not anthocyanins, is subtracted.\n\nTo correct for leaf density and thickness, the near infrared spectral band (in the recommended wavelengths of 760-800nm), which is related to leaf scattering, is added to the basic ARI index. The new index is called modified ARI or mARI (also ARI2).\n\nmARI values for the examined trees in [this original article](https://custom-scripts.sentinel-hub.com/sentinel-2/mari/) ranged in values from 0 to 8.\n\n\n\n\n\nMore info [here.](https://digitalcommons.unl.edu/cgi/viewcontent.cgi?article=1227&context=natrespapers)`,
   },
 
   {
@@ -431,7 +441,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Green City Script\n\nThe Green city script, made by Carlos Bentes, aims to raise awareness of green areas in cities around the world. The script takes into account the NDVI and true color bands; with setting up tresholds it separates built-up areas from vegetated ones, making it useful for detecting urban areas. Built-up areas are displayed in grey and vegetation is displayed in green. \n\n\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/green_city/#)`,
+      t`# Green City Script\n\nThe Green city script aims to raise awareness of green areas in cities around the world. The script takes into account the Normalized Difference Vegetation Index (NDVI) and true color wavelengths; it separates built up areas from vegetated ones, making it useful for detecting urban areas. Built up areas are displayed in grey and vegetation is displayed in green.\n\n\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/green_city/)`,
   },
 
   {
@@ -441,7 +451,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Urban Classified Script\n\nThe Urban Classified script aims to detect built-up areas by separating them from barren ground, vegetation and water. Areas with NDWI higher than 0.3 have a high moisture content and are returned in blue; areas, where B11 is greater than 0.8 and NDVI lower than 0.1, indicate built-up areas and are returned in white; NDVI greater than 0.2 indicates vegetated areas and is returned in green; everythyng else indicates barren ground and is displayed in brown colors.\n\n\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/urban_classified//)`,
+      t`# Urban Classified Script\n\nThe Urban Classified script aims to detect built up areas by separating them from barren ground, vegetation and water. Areas with a high moisture content are returned in blue; areas indicating built up areas are returned in white; vegetated areas are returned in green; everything else indicates barren ground and is displayed in brown colors.\n\n\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/urban_classified/)`,
   },
 
   {
@@ -451,7 +461,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Urban Land Infrared Color Script\n\nThis script, made by Leo Tolari, combines true color visualization with the NIR band 8 and the SWIR band 12. The script highlights urban areas better than true color, while still looking natural.\n\n\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/urban_land_infrared/)`,
+      t`# Urban Land Infrared Color Script\n\nThis script, made by Leo Tolari, combines true color visualization with near infrared (NIR) and shortwave infrared (SWIR) wavelengths. The script highlights urban areas better than true color, while still looking natural.\n\n\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/urban_land_infrared/)`,
   },
 
   {
@@ -463,7 +473,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# NDMI for Moisture Stress\n\nThe NDMI for moisture stress can be used to detect irrigation. It is based on the NDMI and visualized in 4 classes. For all the index values above 0, knowing the land use and land cover, it is possible to determine whether irrigation has taken place. Knowing the type of crop grown (e.g. citrus crops), it is possible to identify whether irrigation is being effective or not during the crucial growing summer season, as well as find out if some parts of the farm are being under or over-irrigated.\n\n\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ndmi_special/#)`,
+      t`# NDMI for Moisture Stress\n\nThe Normalized Difference Moisture Index (NDMI) for moisture stress can be used to detect irrigation. For all the index values above 0, knowing the land use and land cover, it is possible to determine whether irrigation has taken place. Knowing the type of crop grown (e.g. citrus crops), it is possible to identify whether irrigation is being effective or not during the crucial growing summer season, as well as find out if some parts of the farm are being under or over-irrigated.\n\n\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/ndmi_special/#)`,
   },
   {
     match: [
@@ -491,7 +501,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Normalized Difference Moisture Index (NDMI)\n\n The NDMI is a normalized difference moisture index, that uses NIR and SWIR bands to display moisture. The SWIR band reflects changes in both the vegetation water content and the spongy mesophyll structure in vegetation canopies, while the NIR reflectance is affected by leaf internal structure and leaf dry matter content but not by water content. The combination of the NIR with the SWIR removes variations induced by leaf internal structure and leaf dry matter content, improving the accuracy in retrieving the vegetation water content. The amount of water available in the internal leaf structure largely controls the spectral reflectance in the SWIR interval of the electromagnetic spectrum. SWIR reflectance is therefore negatively related to leaf water content.\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ndmi/)`,
+      t`# Normalized Difference Moisture Index (NDMI)\n\nThe normalized difference moisture Index (NDMI) is used to determine vegetation water content and monitor droughts. The value range of the NDMI is -1 to 1. Negative values of NDMI (values approaching -1) correspond to barren soil. Values around zero (-0.2 to 0.4) generally correspond to water stress. High, positive values represent high canopy without water stress (approximately 0.4 to 1).\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/ndmi/)`,
   },
   {
     match: [
@@ -512,7 +522,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Normalized Difference Water Index (NDWI)\n\nThe NDWI index is most appropriate for water body mapping. The water body has strong absorbability and low radiation in the range from visible to infrared wavelengths.\n\nThe index uses the green and Near Infra-red bands of remote sensing images based on this phenomenon.Values of water bodies are larger than 0.5. Vegetation has smaller values. Built-up features have positive values between zero and 0.2.\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ndwi/)`,
+      t`# Normalized Difference Water Index (NDWI)\n\nThe normalized difference water index is most appropriate for water body mapping. Values of water bodies are larger than 0.5. Vegetation has smaller values. Built-up features have positive values between zero and 0.2.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/ndwi/)`,
   },
 
   {
@@ -528,7 +538,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Normalized Difference Water Index (NDWI)\n\nThe NDWI index is most appropriate for water body mapping. The water body has strong absorbability and low radiation in the range from visible to infrared wavelengths.\n\nThe index uses the green and Near Infra-red bands of remote sensing images based on this phenomenon.Values of water bodies are larger than 0.5. Vegetation has smaller values. Built-up features have positive values between zero and 0.2.`,
+      t`# Normalized Difference Water Index (NDWI)\n\nThe normalized difference water index is most appropriate for water body mapping. Values of water bodies are larger than 0.5. Vegetation has smaller values. Built-up features have positive values between zero and 0.2.`,
   },
 
   {
@@ -542,14 +552,14 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# False color composite\n\nFalse color composite using near infrared, red and green bands is very popular. It is most commonly used to assess plant density and health, as plants reflect near infrared and green light, while absorbing red. Since they reflect more near infrared than green, plant-covered land appears deep red. Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/false_color_infrared/) and [here.](https://earthobservatory.nasa.gov/features/FalseColor/page6.php)`,
+      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/false_color_infrared/) and [here.](https://earthobservatory.nasa.gov/features/FalseColor/page6.php)`,
   },
 
   {
     match: [{ datasourceId: 'AWS_L8L1C', layerId: '3_FALSE_COLOR' }],
 
     description: () =>
-      t`# False color composite\n\nFalse color composite using near infrared, red and green bands is very popular. It is most commonly used to assess plant density and health, as plants reflect near infrared and green light, while absorbing red. Since they reflect more near infrared than green, plant-covered land appears deep red. Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://gisgeography.com/landsat-8-bands-combinations/)`,
+      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://gisgeography.com/landsat-8-bands-combinations/)`,
   },
 
   {
@@ -559,14 +569,14 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# False color composite\n\nFalse color composite using near infrared, red and green bands is very popular. It is most commonly used to assess plant density and health, as plants reflect near infrared and green light, while absorbing red. Since they reflect more near infrared than green, plant-covered land appears deep red. Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/Landsat-57/composites/) and [here.](https://earthobservatory.nasa.gov/features/FalseColor)`,
+      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/Landsat-57/composites/) and [here.](https://earthobservatory.nasa.gov/features/FalseColor)`,
   },
 
   {
     match: [{ datasourceId: 'ENVISAT_MERIS', layerId: 'FALSE_COLOR' }],
 
     description: () =>
-      t`# False color composite\n\nFalse color composite using near infrared, red and green bands is very popular. It is most commonly used to assess plant density and health, as plants reflect near infrared and green light, while absorbing red. Since they reflect more near infrared than green, plant-covered land appears deep red. Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.\n\n\n\nMore info [here.](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/meris/)`,
+      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here.](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/meris/)`,
   },
 
   {
@@ -580,17 +590,21 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# True color composite\n\nTrue color composite uses visible light bands red (B04), green (B03) and blue (B02) in the corresponding red, green and blue color channels, resulting in a natural colored result, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/) and [here.](https://sentinel.esa.int/web/sentinel/user-guides/sentinel-2-msi/definitions)`,
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Sentinel-2 has 13 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/) and [here.](http://www.fis.uni-bonn.de/en/recherchetools/infobox/professionals/remote-sensing-systems/spectroscopy).`,
   },
 
   {
-    match: [
-      { datasourceId: 'ESA_L5', layerId: '1_TRUE_COLOR' },
-      { datasourceId: 'ESA_L7', layerId: '1_TRUE_COLOR' },
-    ],
+    match: [{ datasourceId: 'ESA_L5', layerId: '1_TRUE_COLOR' }],
 
     description: () =>
-      t`# True color composite\n\nTrue color composite uses visible light bands red (B03), green (B02) and blue (B01) in the corresponding red, green and blue color channels, resulting in a natural colored result, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/Landsat-57/composites/) and [here.](https://www.usgs.gov/land-resources/nli/landsat/landsat-5?qt-science_support_page_related_con=0#qt-science_support_page_related_con)`,
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 5 has 7 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/Landsat-57/composites/) and [here.](https://www.usgs.gov/land-resources/nli/landsat/landsat-5?qt-science_support_page_related_con=0#qt-science_support_page_related_con)`,
+  },
+
+  {
+    match: [{ datasourceId: 'ESA_L7', layerId: '1_TRUE_COLOR' }],
+
+    description: () =>
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 7 has 8 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/Landsat-57/composites/) and [here.](https://www.usgs.gov/land-resources/nli/landsat/landsat-7?qt-science_support_page_related_con=0#qt-science_support_page_related_con)`,
   },
 
   {
@@ -601,28 +615,28 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# True color composite\n\nTrue color composite uses visible light bands red (B04), green (B03) and blue (B02) in the corresponding red, green and blue color channels, resulting in a natural colored result, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
+      t`# rue color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 8 has 11 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
   },
 
   {
     match: [{ datasourceId: 'ENVISAT_MERIS', layerId: '1_TRUE_COLOR' }],
 
     description: () =>
-      t`# True color composite\n\nTrue color composite uses visible light bands red (B07), green (B05) and blue (B03) in the corresponding red, green and blue color channels, resulting in a natural colored result, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here.](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/meris/)`,
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum Each region in the spectrum is referred to as a band. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here.](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/meris/)`,
   },
 
   {
     match: [{ datasourceId: 'S3OLCI', layerId: '1_TRUE_COLOR' }],
 
     description: () =>
-      t`# True color composite\n\nTrue color composite uses visible light bands red (B08), green (B06) and blue (B04) in the corresponding red, green and blue color channels, resulting in a natural colored result, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here.](https://sentinel.esa.int/web/sentinel/user-guides/sentinel-3-olci/overview/heritage)`,
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum . Each region in the spectrum is referred to as a band. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here.](https://sentinel.esa.int/web/sentinel/user-guides/sentinel-3-olci/overview/heritage)`,
   },
 
   {
     match: [{ datasourceId: 'AWS_L8L1C', layerId: '2_TRUE_COLOR_PANSHARPENED' }],
 
     description: () =>
-      t`# Pansharpened True Color\n\nThe pansharpened true color composite is done by using the usual RGB true color bands with the spatial resolution of 30 m and enhancing them by using the panchromatic band 8, or pan band, with the spatial resolution of 15 m. An image from the pan band is similar to black-and-white film: it combines light from the red, green, and blue parts of the spectrum into a single measure of overall visible reflectance. Pansharpened images have 2x the resolution of the usual true color composite, greatly enhancing the usefulness of Landsat imagery.\n\n\n\nMore info [here.](https://blog.mapbox.com/pansharpening-for-higher-resolution-in-landsat-live-e4717cd7c356)`,
+      t`# Pansharpened True Color\n\nThe pansharpened true color composite is done by using the usual true color data (red, green and blue (RGB)) and enhancing them by using the panchromatic band 8, or pan band (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). An image from the pan band is similar to black-and-white film: it combines light from the red, green, and blue parts of the spectrum into a single measure of overall visible reflectance. Pansharpened images have 2x the resolution of the usual true color composite, greatly enhancing the usefulness of Landsat imagery.\n\n\n\nMore info [here](https://blog.mapbox.com/pansharpening-for-higher-resolution-in-landsat-live-e4717cd7c356) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
   },
   {
     match: [
@@ -635,14 +649,14 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# False Color Urban composite\n\n This composite uses both SWIR bands and the red band. As vegetation reflects SWIR band 11, it is visible in shades of green, while urbanized areas, which reflect all 3, are represented by white, gray, or purple. Soils, sand, and minerals are shown in a variety of colors. Due to the almost complete absorption of solar radiation in the middle IR range by water, snow, and ice, coastlines and water objects are well distinguished. Snow and ice appear as dark blue, and water as black or blue. SWIR bands are also useful for detecting wildfires, as they are reflected by heated areas.\n\n\n\n[More...](https://eos.com/false-color/)`,
+      t`# False Color Urban composite\n\nThis composite is used to visualize urbanized areas more clearly. Vegetation is visible in shades of green, while urbanized areas are represented by white, grey, or purple. Soils, sand, and minerals are shown in a variety of colors. Snow and ice appear as dark blue, and water as black or blue. Flooded areas are very dark blue and almost black. The composite is useful for detecting wildfires and calderas of volcanoes, as they are displayed in shades of red and yellow.\n\n\n\nMore info [here.](https://eos.com/false-color/)`,
   },
 
   {
     match: [{ datasourceId: 'AWS_L8L1C', layerId: 'FALSE-COLOR-LAVA-FLOW' }],
 
     description: () =>
-      t`# False Color Urban composite\n\n The short-wave infrared band combination uses SWIR-2 (7), SWIR-1 (6) and red (4). This composite displays vegetation in shades of green. While darker shades of green indicate denser vegetation, sparse vegetation have lighter shades. Urban areas are blue and soils have various shades of brown.\n\n\n\n[More...](https://gisgeography.com/landsat-8-bands-combinations/)`,
+      t`# False Color Urban composite\n\nThis composite uses a combination of bands in visible and in short wave infrared (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). It displays vegetation in shades of green. While darker shades of green indicate denser vegetation, sparse vegetation have lighter shades. Urban areas are blue and soils have various shades of brown.\n\n\n\nMore info [here.](https://gisgeography.com/landsat-8-bands-combinations/)`,
   },
   {
     match: [
@@ -655,7 +669,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Agriculture composite\n\nThis composite, often called the Agriculture composite, uses bands SWIR-1 (B11), near-infrared (B08) and blue (B02). It’s mostly used to monitor crop health, as both short-wave and near infrared bands are particularly good at highlighting dense vegetation, which appears dark green in the composite. SWIR measurements can help scientists estimate how much water is present in plants and soil, as water reflects SWIR light. Shortwave-infrared bands are also useful for distinguishing between snow, and ice, all of which appear white in visible light. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages.\n\n\n\nMore info [here](https://earthobservatory.nasa.gov/features/FalseColor/page5.php) and [here.](https://gisgeography.com/sentinel-2-bands-combinations/)`,
+      t`# Agriculture composite\n\nThis composite uses short-wave infrared, near-infrared and blue bands to monitor crop health (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). Both short-wave and near infrared bands are particularly good at highlighting dense vegetation, which appears dark green in the composite. Crops appear in a vibrant green and bare earth appears magenta.\n\n\n\nMore info [here](https://earthobservatory.nasa.gov/features/FalseColor/page5.php) and [here.](https://gisgeography.com/sentinel-2-bands-combinations/)`,
   },
 
   {
@@ -665,7 +679,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Snow Classifier\n\nThe Snow Classifier algorithm aims to detect snow by classifying pixels based on different brightness and [NDSI](https://custom-scripts.sentinel-hub.com/sentinel-2/ndsi/#) thresholds. Values greater than 0.3 (for brightness) and values greater than 0.4 (for NDSI) were used to classify snow.\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/snow_classifier/)`,
+      t`# Snow Classifier\n\nThe Snow Classifier algorithm aims to detect snow by classifying pixels based on different brightness and Normalized Difference Snow Index (NDSI) thresholds. Values classified as snow are returned in bright vivid blue. The script can overestimate snow areas over clouds.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/snow_classifier/)`,
   },
 
   {
@@ -675,7 +689,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Ulyssys Water Quality Viewer (UWQV)\n\nThe script aims to dynamically visualize the chlorophyll and sediment conditions of water bodies, which are primary indicators of water quality. The visualization is a product of two masking operations (cloud masking and water masking) and two water quality parameter visualizations: suspended sediment concentration visualization and chlorophyll concentration visualization.\n\nThe Chlorophyll content ranges in colors from dark blue (low chlorophyll content) through green to red (high chlorophyll content). Sediment concentrations are colored brown and the amount of sediment is displayed by transparency; opaque brown indicates high sediment content. Due to the opacity of the sedimentation parameter, chlorophyll shows through if both are present, this making it possible to know the relative amount of each parameter.\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ulyssys_water_quality_viewer/)`,
+      t`# Ulyssys Water Quality Viewer (UWQV)\n\nThe script aims to dynamically visualize the chlorophyll and sediment conditions of water bodies, which are primary indicators of water quality. The chlorophyll content ranges in colors from dark blue (low chlorophyll content) through green to red (high chlorophyll content). Sediment concentrations are colored brown; opaque brown indicates high sediment content.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/ulyssys_water_quality_viewer/)`,
   },
 
   {
@@ -687,7 +701,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Short wave infrared composite (SWIR)\n\nSWIR (bands 11 and 12) measurements can help scientists estimate how much water is present in plants and soil, as water reflects SWIR wavelengths. Shortwave-infrared bands are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light. In this composite, B8A is reflected by vegetation and shown in the green channel, while the reflected red band, highlighting bare soil and built-up areas, is shown in the blue channel. \n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/)`,
+      t`# Short wave infrared composite (SWIR)\n\nShort wave infrared (SWIR) measurements can help scientists estimate how much water is present in plants and soil, as water reflects SWIR wavelengths. Short wave infrared bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. In this composite vegetation appears in shades of red, soils vary from dark to light brown and urban areas are cyan blue. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/)`,
   },
 
   {
@@ -699,7 +713,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Normalised Difference Snow Index (NDSI)\n\nThe Sentinel-2 normalised difference snow index is a normalized difference two bands: one in the VIR (Band 3) and one in the SWIR (Band 11). Values above 0.42 are usually snow.\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/ndsi/)`,
+      t`# Normalised Difference Snow Index (NDSI)\n\nThe Sentinel-2 normalised difference snow index can be used to differentiate between cloud and snow cover as snow absorbs in the short-wave infrared light, but reflects in the visible-infrared, whereas cloud is generally reflective in both wavelengths. Snow cover is represented in bright vivid blue.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/ndsi/) and [here.](https://earth.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-2a/algorithm)`,
   },
 
   {
@@ -711,7 +725,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Highlight Optimized Natural Color\n\nThis script aims to display the Earth in beautiful natural color images. It uses highlight optimization to avoid burnt out pixels and to even out the exposure. The script is very simple, needing only 3 code lines and was inspired by the [Tonemapped Natural Color Script](https://custom-scripts.sentinel-hub.com/sentinel-2/tonemapped_natural_color/).\n\n\n\n[More...](https://sentinel-hub.github.io/custom-scripts/sentinel-2/highlight_optimized_natural_color/#)`,
+      t`# Highlight Optimized Natural Color\n\nThis script aims to display the Earth in beautiful natural color images. It uses highlight optimization to avoid burnt out pixels and to even out the exposure.\n\n\n\nMore info [here.](https://sentinel-hub.github.io/custom-scripts/sentinel-2/highlight_optimized_natural_color/#)`,
   },
   {
     match: [
@@ -720,7 +734,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Geology 12, 8, 2 composite\n\nThis composite uses the SWIR band 12 to differentiate among different rock types. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light. The NIR band 8 highlights vegetation and band 2 detects moisture, both contributing to differentiation of ground materials. The composite is useful for geology and mining. \n\n\n\nMore info [here](https://www.euspaceimaging.com/wp-content/uploads/2018/06/EUSI-SWIR.pdf) and [here.](http://murphygeological.com/new---sentinel-2.html#)`,
+      t`# Geology 12, 8, 2 composite\n\nThis composite uses short-wave infrared (SWIR) band 12 to differentiate among different rock types (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). Each rock and mineral type reflects short-wave infrared light differently, making it possible to map out geology by comparing reflected SWIR light. Near infrared (NIR) band 8 highlights vegetation and band 2 detects moisture, both contributing to differentiation of ground materials. The composite is useful for finding geological formations and features (e.g. faults, fractures), lithology (e.g. granite, basalt, etc.) and mining applications.\n\n\n\nMore info [here.](https://www.euspaceimaging.com/wp-content/uploads/2018/06/EUSI-SWIR.pdf)`,
   },
 
   {
@@ -730,7 +744,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Geology 8, 11, 12 composite\n\nThis composite uses both SWIR bands 11 and 12 to differentiate among different rock types. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light. NIR band 8 highlights vegetation, contributing to differentiation of ground materials. The composite is useful for geology and mining. Vegetation in the composite appears red.\n\n\n\nMore info [here](https://earthobservatory.nasa.gov/features/FalseColor/page5.php) and [here.](http://murphygeological.com/new---sentinel-2.html#)`,
+      t`# Geology 8, 11, 12 composite\n\nThis composite uses both short-wave infrared (SWIR) bands 11 and 12 to differentiate among different rock types (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). Each rock and mineral type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light. Near Infrared (NIR) band 8 highlights vegetation, contributing to differentiation of ground materials. Vegetation in the composite appears red. The composite is useful for differentiating vegetation, and land especially geologic features that can be useful for mining and mineral exploration.\n\n\n\nMore info [here](https://earthobservatory.nasa.gov/features/FalseColor/page5.php) and [here.](http://murphygeological.com/new---sentinel-2.html#)`,
   },
 
   {
@@ -744,7 +758,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Wildfires\n\nThis script, created by Pierre Markuse, visualizes wildfires using Sentinel-2 data. It combines natural color background with some NIR/SWIR data for smoke penetration and more detail, while adding highlights from B11 and B12 to show fires in red and orange colors.\n\n\n\n[More...](https://pierre-markuse.net/2017/08/07/visualizing-wildfires-sentinel-2-imagery-eo-browser/)`,
+      t`# Wildfires\n\nThis script, created by Pierre Markuse, visualizes wildfires using Sentinel-2 data. It combines natural color background with some NIR/SWIR data for smoke penetration and more detail, while adding highlights from B11 and B12 to show fires in red and orange colors.\n\n\n\nMore info [here.](https://pierre-markuse.net/2017/08/07/visualizing-wildfires-sentinel-2-imagery-eo-browser/)`,
   },
 
   {
@@ -754,7 +768,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Enhanced True Color\n\nThis script, created by Pierre Markuse, uses multiple bands and saturation and brightness control to enhance the true color visualization.\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-3/enhanced_true_color-2/#)`,
+      t`# Enhanced True Color\n\nThis script, created by Pierre Markuse, uses multiple bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) and saturation and brightness control to enhance the true color visualization.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-3/enhanced_true_color-2/#)`,
   },
   {
     match: [
@@ -776,7 +790,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Burned Area Index\n\nBurned Area Index takes advantage of the wider spectrum of Visible, Red-Edge, NIR and SWIR bands.\n\nValues description:()=> The range of values for the index is \`-1\` to \`1\` for burn scars, and \`1\` - \`6\` for active fires. Different fire intensities may result in different thresholds; the current values were calibrated, as per original author, on mostly Mediterranen regions.\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/bais2/)`,
+      t`# Burned Area Index\n\nBurned Area Index takes advantage of the wider spectrum of Visible, Red-Edge, NIR and SWIR bands.\n\nValues description:()=> The range of values for the index is \`-1\` to \`1\` for burn scars, and \`1\` - \`6\` for active fires. Different fire intensities may result in different thresholds; the current values were calibrated, as per original author, on mostly Mediterranen regions.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/bais2/)`,
   },
 
   {
@@ -799,7 +813,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Normalized Burn Ratio (NBR)\n\nNormalized Burn Ratio is frequently used to estimate burn severity. \n\nImagery collected before a fire will have very high near infrared band values and very low mid infrared band values and a Imagery collected over a forest after a fire will have very low near infrared band values and very high mid infrared band values.\n\n Higher dNBR indicate more severe damage. Areas with negative dNBR values may indicate increased vegetation productivity following a fire.\n\n\n\n[More...](http://gsp.humboldt.edu/OLM/Courses/GSP_216_Online/lesson5-1/NBR.html)`,
+      t`# Normalized Burn Ratio (NBR)\n\nNormalized Burn Ratio is frequently used to estimate burn severity. It uses near-infrared (NIR) and shortwave-infrared (SWIR) wavelengths. Healthy vegetation has a high reflectance in the near-infrared portion of the spectrum, and a low short-wave infrared reflectance. On the other hand, burned areas have a high shortwave infrared reflectance but low reflectance in the near infrared Darker pixels indicate burned areas.\n\n\n\nMore info [here](http://gsp.humboldt.edu/OLM/Courses/GSP_216_Online/lesson5-1/NBR.html) and [here.](https://mybinder.org/v2/gh/sentinel-hub/education/master?filepath=wildfires%2FWildfires%20from%20Satellite%20Images.ipynb)`,
   },
   {
     match: [
@@ -808,7 +822,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Atmospheric penetration\n\nVegetation in the composite appears blue, displaying details related to the vegetation vigor. Healthy vegetation is shown in light blue while the stressed, sparse or/and arid vegetation appears in dull blue. Urban features are white, gray, cyan or purple. \n\n\n\n[More...](https://eos.com/atmospheric-penetration/)`,
+      t`# Atmospheric penetration\n\nThis composite uses different bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) in the non-visible part of the electromagnetic spectrum to reduce the influence of the atmosphere in the image. Short wave infrared bands 11 and 12 are highly reflected by the heated areas, making them useful for fire and burned area mapping. Short wave infrared band 8, is on contrary, highly reflected by vegetation, which signifies absence of fire. Vegetation appears blue, displaying details related to the vegetation vigor. Healthy vegetation is shown in light blue while the stressed, sparse or/and arid vegetation appears in dull blue. Urban features are white, grey, cyan or purple.\n\n\n\nMore info [here.](https://eos.com/atmospheric-penetration/)`,
   },
 
   {
@@ -820,7 +834,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Barren Soil Visualization\n\nThe Barren Soil Visualization displays the Barren soil index (BSI) in the red channel, B08 in the green channel and B11 in the blue channel. All B08 values larger than 0.6 are returned white.\n\nBarren and built-up areas appear red, vegetation green, water black and snow white.\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/barren_soil/)`,
+      t`# Barren Soil Visualization\n\nThe Barren Soil Visualization can be useful for soil mapping, to investigate the location of landslides or the extent of erosion in non-vegetated areas. This visualization shows all vegetation in green and the barren ground in red. Water appears black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/barren_soil/) and [here.](https://medium.com/sentinel-hub/create-useful-and-beautiful-satellite-images-with-custom-scripts-8ef0e6a474c6)`,
   },
 
   {
@@ -830,7 +844,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# True Color with IR Highlights composite\n\nThis composite enhances the true color visualization by adding the SWIR bands 11 and 12 to amplify details and display heated areas in red/orange.\n\n\n\n[More...](https://medium.com/sentinel-hub/active-volcanoes-as-seen-from-space-9d1de0133733)`,
+      t`# True Color with IR Highlights composite\n\nThis composite enhances the true color visualization by adding the shortwave infrared wavelengths to amplify details. It displays heated areas in red/orange.\n\n\n\nMore info [here.](https://medium.com/sentinel-hub/active-volcanoes-as-seen-from-space-9d1de0133733)`,
   },
 
   {
@@ -840,7 +854,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Detection of Burned Areas\n\nThis script uses SWIR bands 11 and 12 in a normalized difference index, combined with B08, which all have low reflectance values at burned areas. All pixels of this index with values greater than 0.1 for S2L2A and 0.15 for S2L1C are colored red and highlight burned areas. All other pixels are returned in true color (high moisture and high vegetation areas were added into the true color visualization to increase the accuracy of the script).\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-2/burned_area_ms/)`,
+      t`# Detection of Burned Areas\n\nThis script is used to detect large scale recently burned areas. Pixels colored red highlight burned areas, and all other pixels are returned in true color. The script sometimes overestimates burned areas over water and clouds.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/burned_area_ms/)`,
   },
 
   {
@@ -900,7 +914,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Scene classification\n\n\n\n Scene classification was developed to be used in Sen2Cor project in the atmospheric correction module to distinguish between cloudy pixels, clear pixels and water pixels of Sentinel-2 data as a result of ESA's Scene classificaiton algorithm. It does not constitute a land cover classification map in a strict sense.\n\n\n\n[More...](http://step.esa.int/thirdparties/sen2cor/2.5.5/docs/S2-PDGS-MPC-L2A-SUM-V2.5.5_V2.pdf)`,
+      t`# Scene classification\n\n\n\nScene classification was developed to distinguish between cloudy pixels, clear pixels and water pixels of Sentinel-2 data as a result of ESA's Scene classification algorithm. Twelve different classifications are provided including classes of clouds, vegetation, soils/desert, water and snow. It does not constitute a land cover classification map in a strict sense.\n\n\n\nMore info [here.](http://step.esa.int/thirdparties/sen2cor/2.5.5/docs/S2-PDGS-MPC-L2A-SUM-V2.5.5_V2.pdf)`,
   },
 
   {
@@ -951,7 +965,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       minPosition: 0,
     },
     description: () =>
-      t`# Terrestrial Chlorophyll Index (OTCI)\n\n\n\nOTCI, the Terrestrial Chlorophyll Index, can be used to assess chlorophyll content over land to monitor vegetation condition and health. It is produced globally at 300m spatial resolution from OLCI data on the Sentinel 3 mission. The theoretical basis document on OTCI is available [here.](https://sentinel.esa.int/documents/247904/349589/OLCI_L2_ATBD_OLCI_Terrestrial_Chlorophyll_Index.pdf)\n\nBlue colors display extremely low OTCI values. They usually signify water, sand or snow. Extremely high values, displayed with white, usually suggest the absence of chlorophyll as well. They generally represent either bare ground, rock or clouds. The chlorophyll values in between range from red (low chlorophyll values) to dark green (high chlorophyll values) and can be used to determine vegetation health.\n\n\n\n[More...](https://custom-scripts.sentinel-hub.com/sentinel-3/otci/)`,
+      t`# Terrestrial Chlorophyll Index (OTCI)\n\n\n\nThe Terrestrial Chlorophyll Index (OTCI) is estimated based on the chlorophyll content in terrestrial vegetation and can be used to monitor vegetation condition and health. Low OTCI values usually signify water, sand or snow. Extremely high values, displayed with white, usually suggest the absence of chlorophyll as well. They generally represent either bare ground, rock or clouds. The chlorophyll values in between range from red (low chlorophyll values) to dark green (high chlorophyll values) can be used to determine vegetation health.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-3/otci/)`,
   },
 
   {

@@ -1,0 +1,164 @@
+@import '../../variables.scss';
+
+.image-download {
+  color: #fff;
+  background-color: #101119;
+  font-size: 14px;
+  padding: 15px;
+
+  .image-download-mode-selection {
+    .btn {
+      margin-right: 20px;
+      background-color: $mainDark;
+      border-radius: 0;
+      border-bottom: 3px solid $mainDark;
+      color: #fff;
+
+      &.selected {
+        border-bottom: 3px solid #b6bf00;
+      }
+
+      &:hover {
+        box-shadow: none;
+        color: #b6bf00;
+      }
+
+      &.disabled {
+        opacity: 0.5;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .image-download-forms {
+    overflow: auto;
+
+    .data-fusion-image-download-warning {
+      margin: 10px 0 10px auto;
+      padding: 0 10px;
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 5px;
+      color: orange;
+
+      .fa {
+        margin-right: 6px;
+      }
+    }
+
+    .form-field {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      align-items: center;
+      margin: 2px 0;
+      line-height: 30px;
+
+      label {
+        flex: 0 0 33%;
+        max-width: 33%;
+
+        i {
+          margin-left: 5px;
+          color: #fff;
+        }
+      }
+    }
+
+    .form-input {
+      flex: 0 0 67%;
+      max-width: 67%;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    input.full-width {
+      width: 100%;
+      text-align: left;
+      padding: 0.5em;
+      background: #807e7ea3;
+      border: 1px solid rgba(34, 36, 38, 0.15);
+      color: #f7f7f7;
+    }
+
+    input .full-width::placeholder {
+      color: #cccbcb;
+      opacity: 1;
+    }
+
+    .row {
+      display: flex;
+      margin-bottom: 6px;
+
+      label {
+        flex: 0 0 200px;
+      }
+
+      .dropdown {
+        flex: 1 1;
+      }
+
+      .wgs84-resolution {
+        .lat-lng {
+          padding-left: 15px;
+        }
+      }
+    }
+
+    .analytical-mode {
+      max-height: 650px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: all 0.5s;
+      transition-property: max-height, padding-bottom;
+      padding: 0 10px 0 30px;
+
+      .download-layers {
+        flex: 1 1;
+
+        .column {
+          float: left;
+          width: 50%;
+
+          .layer-title {
+            text-decoration: underline;
+            line-height: 20px;
+          }
+
+          label {
+            display: block;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+
+  .image-download-error-panel {
+    margin: 10px 0 10px auto;
+    padding: 0 10px;
+    text-align: center;
+    font-size: 14px;
+
+    .image-download-error-header {
+      margin-bottom: 5px;
+      color: orange;
+
+      .fa {
+        margin-right: 6px;
+      }
+    }
+
+    .textarea-wrapper {
+      .error-container {
+        color: $textColor;
+        background-color: $mainLight;
+        padding: 5px;
+        text-align: left;
+        white-space: pre-wrap;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+    }
+  }
+}

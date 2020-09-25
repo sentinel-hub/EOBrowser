@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayersFactory, BYOCLayer, S1GRDAWSEULayer } from '@sentinel-hub/sentinelhub-js';
+import { CacheTarget, LayersFactory, BYOCLayer, S1GRDAWSEULayer } from '@sentinel-hub/sentinelhub-js';
 
 import store, { themesSlice } from '../../../store';
 
@@ -97,9 +97,21 @@ async function updateLayersFromServiceIfNeeded(layers) {
   await Promise.all(
     updateLayersFromService.map(async l => {
       try {
-        await l.updateLayerFromServiceIfNeeded();
+        await l.updateLayerFromServiceIfNeeded({
+          timeout: 30000,
+          cache: {
+            expiresIn: Number.POSITIVE_INFINITY,
+            targets: [CacheTarget.MEMORY],
+          },
+        });
         if (l instanceof BYOCLayer) {
-          const availableBands = await l.getAvailableBands();
+          const availableBands = await l.getAvailableBands({
+            timeout: 30000,
+            cache: {
+              expiresIn: Number.POSITIVE_INFINITY,
+              targets: [CacheTarget.MEMORY],
+            },
+          });
           l.availableBands = availableBands;
         }
       } catch (e) {
@@ -120,7 +132,13 @@ export async function prepareDataSourceHandlers(theme) {
       );
 
       try {
-        const layers = await LayersFactory.makeLayers(dataSourceUrl, null, null, { timeout: 30000 });
+        const layers = await LayersFactory.makeLayers(dataSourceUrl, null, null, {
+          timeout: 30000,
+          cache: {
+            expiresIn: Number.POSITIVE_INFINITY,
+            targets: [CacheTarget.MEMORY],
+          },
+        });
         await updateLayersFromServiceIfNeeded(layers);
         return layers;
       } catch (e) {

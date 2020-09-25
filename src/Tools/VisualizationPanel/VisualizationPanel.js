@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import { EOBVisualizationTimeSelect } from '../../junk/EOBCommon/EOBVisualizationTimeSelect/EOBVisualizationTimeSelect';
 import { EOBEffectsPanel } from '../../junk/EOBEffectsPanel/EOBEffectsPanel';
-import EOBAdvancedHolder from '../../junk/EOBAdvancedHolder/EOBAdvancedHolder';
+import EOBAdvancedHolder, {
+  CUSTOM_VISUALIZATION_URL_ROUTES,
+} from '../../junk/EOBAdvancedHolder/EOBAdvancedHolder';
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
 import { LayersFactory, BBox, CRS_EPSG4326, Interpolator } from '@sentinel-hub/sentinelhub-js';
 import Rodal from 'rodal';
@@ -13,6 +14,7 @@ import { t } from 'ttag';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/dracula.css';
+import { withRouter } from 'react-router-dom';
 
 import store, { mainMapSlice, visualizationSlice, tabsSlice, compareLayersSlice } from '../../store';
 import Visualizations from './Visualizations';
@@ -27,11 +29,12 @@ import {
   S2L2A,
 } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { VisualizationPanelHeaderActions } from './VisualizationPanelHeaderActions';
-import { b64EncodeUnicode } from '../../utils/base64MDN';
-import { parseEvalscriptBands } from '../../utils';
+import { parseEvalscriptBands, parseIndexEvalscript } from '../../utils';
 import ZoomInNotification from './ZoomInNotification';
 import { getAppropriateAuthToken } from '../../App';
 import { EDUCATION_MODE } from '../../const';
+import { VisualizationTimeSelect } from '../../components/VisualizationTimeSelect/VisualizationTimeSelect';
+import VisualizationErrorPanel from './VisualizationErrorPanel';
 
 const _legacySLSTRActiveLayer = {
   groupChannels: channels => {
@@ -46,7 +49,6 @@ class VisualizationPanel extends Component {
     visualizations: null,
     bands: null,
     selectedLayer: undefined,
-    displayBandSelection: false,
     supportsCustom: true,
     sibling: {},
     noSiblingDataModal: false,
@@ -84,6 +86,14 @@ class VisualizationPanel extends Component {
 
     if (this.props.fromTime !== prevProps.fromTime || this.props.toTime !== prevProps.toTime) {
       this.manageSiblings();
+    }
+
+    if (this.props.selectedVisualizationId && this.props.customSelected) {
+      store.dispatch(
+        visualizationSlice.actions.setVisualizationParams({
+          customSelected: false,
+        }),
+      );
     }
   }
 
@@ -149,22 +159,25 @@ class VisualizationPanel extends Component {
     );
   };
 
-  setCustomVisualization = ({ displayBandSelection = true } = {}) => {
-    if (displayBandSelection) {
-      this.setState({
-        displayBandSelection: true,
-      });
-    }
-    if (!this.props.visualizationUrl) {
-      store.dispatch(visualizationSlice.actions.setVisualizationUrl(this.state.visualizations[0].url));
-    }
+  setCustomVisualization = () => {
     store.dispatch(
       visualizationSlice.actions.setVisualizationParams({
         layerId: null,
         customSelected: true,
         visibleOnMap: true,
+        visualizationUrl: this.state.visualizations[0].url,
       }),
     );
+  };
+
+  goToCustom = () => {
+    const evalscript =
+      this.props.evalscript && !this.props.evalscripturl
+        ? this.props.evalscript
+        : this.generateEvalscript(this.state.selectedBands, this.props.datasetId);
+
+    store.dispatch(visualizationSlice.actions.setEvalscript(evalscript));
+    this.setCustomVisualization();
   };
 
   onDataFusionChange = value => {
@@ -174,10 +187,13 @@ class VisualizationPanel extends Component {
   };
 
   onBack = () => {
-    this.setState({
-      currentCustomView: false,
-      displayBandSelection: false,
-    });
+    store.dispatch(
+      visualizationSlice.actions.setVisualizationParams({
+        customSelected: false,
+        visibleOnMap: false,
+      }),
+    );
+    window.location.hash = '';
   };
 
   toggleValue = key => {
@@ -207,7 +223,7 @@ class VisualizationPanel extends Component {
   };
 
   createVisualizations = async () => {
-    const { datasetId, selectedVisualizationId, customSelected, toTime, evalscripturl } = this.props;
+    const { datasetId, selectedVisualizationId, toTime, evalscripturl } = this.props;
     if (!datasetId) {
       console.error('Cannot create a visualization without a datasetId');
       return;
@@ -235,11 +251,25 @@ class VisualizationPanel extends Component {
 
     if (supportsCustom) {
       let bands;
+
       if (this.props.evalscript) {
+        // Composite evalscript
         bands = parseEvalscriptBands(this.props.evalscript).filter(
           band => !!allBands.find(b => b.name === band),
         );
+
+        // Index evalscript
+        if (window.location.hash === '#custom-index') {
+          let parsedData = parseIndexEvalscript(this.props.evalscript);
+          if (parsedData !== null) {
+            this.setState({ selectedIndexBands: parsedData.bands });
+          }
+        } else if (bands.length === 0) {
+          // probably Custom evalscript
+          window.location.hash = '#custom-script';
+        }
       }
+
       if (!bands || bands.length !== 3) {
         // Some datasets might have only 1 or 2 available bands. This assures `bands` always contains exactly 3.
         bands = [...allBands, ...allBands, ...allBands].slice(0, 3).map(b => b.name);
@@ -251,11 +281,6 @@ class VisualizationPanel extends Component {
         b: bands[2],
       };
 
-      const evalscript =
-        this.props.evalscript && !evalscripturl
-          ? this.props.evalscript
-          : this.generateEvalscript(selectedBands, datasetId);
-
       if (evalscripturl) {
         axios
           .get(evalscripturl, { timeout: 10000 })
@@ -265,14 +290,12 @@ class VisualizationPanel extends Component {
             });
           })
           .catch();
-      } else {
-        store.dispatch(visualizationSlice.actions.setEvalscript(evalscript));
       }
 
       this.setState({
         visualizations: allLayers,
         bands: allBands,
-        evalscript: evalscript,
+        evalscript: this.props.evalscript,
         evalscripturl: evalscripturl,
         selectedBands: selectedBands,
         supportsCustom: true,
@@ -285,13 +308,17 @@ class VisualizationPanel extends Component {
       });
     }
 
-    if (!customSelected) {
+    if (
+      (this.props.location.hash &&
+        CUSTOM_VISUALIZATION_URL_ROUTES.indexOf(this.props.location.hash) !== -1) ||
+      (supportsCustom && this.props.evalscript)
+    ) {
+      this.setCustomVisualization();
+    } else {
       const selectedLayer = selectedVisualizationId
         ? allLayers.find(l => l.layerId === selectedVisualizationId)
         : allLayers[0];
       this.setSelectedVisualization(selectedLayer || allLayers[0]);
-    } else {
-      this.setCustomVisualization({ displayBandSelection: false });
     }
   };
 
@@ -307,7 +334,7 @@ class VisualizationPanel extends Component {
       evalscript: evalscript,
     });
     store.dispatch(
-      visualizationSlice.actions.setVisualizationParams({ evalscript: evalscript, dataFusion: {} }),
+      visualizationSlice.actions.setVisualizationParams({ evalscript: evalscript, dataFusion: [] }),
     );
   };
 
@@ -328,7 +355,7 @@ class VisualizationPanel extends Component {
         evalscript: evalscript,
       });
       store.dispatch(
-        visualizationSlice.actions.setVisualizationParams({ evalscript: evalscript, dataFusion: {} }),
+        visualizationSlice.actions.setVisualizationParams({ evalscript: evalscript, dataFusion: [] }),
       );
     }
   };
@@ -412,9 +439,9 @@ class VisualizationPanel extends Component {
     return dates;
   };
 
-  onQueryDatesForActiveMonth = async date => {
-    const monthStart = moment(date).startOf('month');
-    const monthEnd = moment(date).endOf('month');
+  onQueryDatesForActiveMonth = async day => {
+    const monthStart = day.clone().startOf('month');
+    const monthEnd = day.clone().endOf('month');
     const dates = await this.onFetchAvailableDates(monthStart, monthEnd);
     return dates;
   };
@@ -427,60 +454,50 @@ class VisualizationPanel extends Component {
     });
   };
 
-  onGetAndSetNextPrev = async direction => {
-    const { toTime } = this.props;
+  onGetAndSetNextPrev = async (direction, currentDay) => {
     const { minDate, maxDate } = this.getMinMaxDates(true);
-    let dates;
+    let newSelectedDay;
     const NO_DATES_FOUND = 'No dates found';
 
     if (direction === 'prev') {
       const start = minDate.utc().startOf('day');
-      const end = toTime
+      const end = currentDay
         .clone()
         .subtract(1, 'day')
         .endOf('day');
-      dates = await this.onFetchAvailableDates(start, end).catch(err => {
+      const dates = await this.onFetchAvailableDates(start, end).catch(err => {
         throw NO_DATES_FOUND;
       });
       // if no previous date is found throw no dates found
       if (dates.length < 1) {
         throw NO_DATES_FOUND;
       }
-      return dates[0];
+      newSelectedDay = dates[0];
     }
 
     if (direction === 'next') {
-      const start = toTime
+      const start = currentDay
         .clone()
         .utc()
         .add(1, 'day')
         .startOf('day');
       const end = maxDate.utc();
-      dates = await this.onFetchAvailableDates(start, end).catch(err => {
+      const dates = await this.onFetchAvailableDates(start, end).catch(err => {
         throw NO_DATES_FOUND;
       });
       // if no future date is found throw no dates found
       if (dates.length < 1) {
         throw NO_DATES_FOUND;
       }
-      return dates[dates.length - 1];
+      newSelectedDay = dates[dates.length - 1];
     }
+    this.updateSelectedTime(
+      moment.utc(newSelectedDay).startOf('day'),
+      moment.utc(newSelectedDay).endOf('day'),
+    );
   };
 
-  updateSelectedTime = time => {
-    time = time.split('/');
-    let fromTime;
-    let toTime;
-    if (time.length === 1) {
-      fromTime = moment.utc(time[0]).startOf('day');
-      toTime = moment.utc(time[0]).endOf('day');
-      this.props.setTimeSpanExpanded(false);
-    }
-    if (time.length === 2) {
-      fromTime = moment(time[0]);
-      toTime = moment(time[1]);
-      this.props.setTimeSpanExpanded(true);
-    }
+  updateSelectedTime = (fromTime, toTime) => {
     if (!getDataSourceHandler(this.props.datasetId).supportsTimeRange()) {
       fromTime = null;
     }
@@ -518,8 +535,12 @@ class VisualizationPanel extends Component {
         evalscript: undefined,
         evalscripturl: undefined,
         datasetId: datasetId,
+        dataFusion: [],
       }),
     );
+    this.setState({
+      dataFusion: [],
+    });
   };
 
   searchForSiblingData = async (datasetId, showProgress = true) => {
@@ -550,7 +571,7 @@ class VisualizationPanel extends Component {
       mapBounds.getNorth(),
     );
 
-    const data = await layer.findTiles(bbox, fromTime, toTime);
+    const data = await layer.findTiles(bbox, fromTime, toTime, 1, 0);
     hasData = !!data.tiles.length;
     if (showProgress) {
       this.setState({
@@ -610,6 +631,17 @@ class VisualizationPanel extends Component {
   updateBlueRangeEffect = range => {
     store.dispatch(visualizationSlice.actions.setBlueRangeEffect(range));
   };
+
+  updateRedCurveEffect = curve => {
+    store.dispatch(visualizationSlice.actions.setRedCurveEffect(curve));
+  };
+  updateGreenCurveEffect = curve => {
+    store.dispatch(visualizationSlice.actions.setGreenCurveEffect(curve));
+  };
+  updateBlueCurveEffect = curve => {
+    store.dispatch(visualizationSlice.actions.setBlueCurveEffect(curve));
+  };
+
   updateMinQa = x => {
     store.dispatch(visualizationSlice.actions.setMinQa(parseInt(x)));
   };
@@ -624,6 +656,10 @@ class VisualizationPanel extends Component {
 
   resetEffects = () => {
     store.dispatch(visualizationSlice.actions.resetEffects());
+  };
+
+  resetRgbEffects = () => {
+    store.dispatch(visualizationSlice.actions.resetRgbEffects());
   };
 
   doesDatasetSupportMinQa = datasetId => {
@@ -701,7 +737,7 @@ class VisualizationPanel extends Component {
   renderHeader = () => {
     const { datasetId, selectedModeId, fromTime, toTime } = this.props;
     const { siblingShortName, siblingId, isSiblingDataAvailable } = this.state.sibling;
-    const { minDate, maxDate } = this.getMinMaxDates();
+    const { minDate, maxDate } = this.getMinMaxDates(true);
     let timespanSupported = false;
     const dsh = getDataSourceHandler(datasetId);
     if (dsh) {
@@ -727,11 +763,11 @@ class VisualizationPanel extends Component {
           {this.state.noSiblingDataModal && this.renderNoSibling(siblingId)}
         </div>
         <div className="date-selection">
-          <EOBVisualizationTimeSelect
+          <VisualizationTimeSelect
             maxDate={maxDate}
             minDate={minDate}
             showNextPrev={true}
-            onGetAndSetNextPrev={this.onGetAndSetNextPrev}
+            getAndSetNextPrevDate={this.onGetAndSetNextPrev}
             onQueryDatesForActiveMonth={this.onQueryDatesForActiveMonth}
             fromTime={fromTime}
             toTime={toTime}
@@ -752,6 +788,9 @@ class VisualizationPanel extends Component {
       redRangeEffect,
       greenRangeEffect,
       blueRangeEffect,
+      redCurveEffect,
+      greenCurveEffect,
+      blueCurveEffect,
       minQa,
       upsampling,
       downsampling,
@@ -792,6 +831,9 @@ class VisualizationPanel extends Component {
               redRangeEffect: redRangeEffect,
               greenRangeEffect: greenRangeEffect,
               blueRangeEffect: blueRangeEffect,
+              redCurveEffect: redCurveEffect,
+              greenCurveEffect: greenCurveEffect,
+              blueCurveEffect: blueCurveEffect,
               minQa: minQa !== undefined ? minQa : this.getDefaultMinQa(datasetId),
               upsampling: upsampling,
               downsampling: downsampling,
@@ -806,14 +848,20 @@ class VisualizationPanel extends Component {
             onUpdateRedRangeEffect={this.updateRedRangeEffect}
             onUpdateGreenRangeEffect={this.updateGreenRangeEffect}
             onUpdateBlueRangeEffect={this.updateBlueRangeEffect}
+            onUpdateRedCurveEffect={this.updateRedCurveEffect}
+            onUpdateGreenCurveEffect={this.updateGreenCurveEffect}
+            onUpdateBlueCurveEffect={this.updateBlueCurveEffect}
             onUpdateMinQa={this.updateMinQa}
             onUpdateUpsampling={this.updateUpsampling}
             onUpdateDownsampling={this.updateDownsampling}
             onResetEffects={this.resetEffects}
+            onResetRgbEffects={this.resetRgbEffects}
           />
         ) : (
           <div className="layer-datasource-picker">
-            {this.props.datasetId && !this.state.displayBandSelection && (
+            <ZoomInNotification />
+            <VisualizationErrorPanel />
+            {this.props.datasetId && !this.props.customSelected && (
               <div>
                 {!visualizations ? (
                   <Loader />
@@ -822,21 +870,19 @@ class VisualizationPanel extends Component {
                     visualizations={visualizations}
                     selectedLayer={this.state.selectedLayer}
                     setSelectedVisualization={this.setSelectedVisualization}
-                    setCustomVisualization={this.setCustomVisualization}
+                    setCustomVisualization={this.goToCustom}
                     supportsCustom={this.state.supportsCustom}
                   />
                 )}
-                <ZoomInNotification />
               </div>
             )}
-            {this.state.displayBandSelection && this.props.customSelected && (
+            {this.props.customSelected && (
               <EOBAdvancedHolder
-                currView={this.state.currentCustomView}
                 channels={this.state.bands}
                 evalscripturl={this.state.evalscripturl}
-                evalscript={b64EncodeUnicode(this.state.evalscript)}
+                evalscript={this.state.evalscript}
                 dataFusion={this.state.dataFusion}
-                initialTimespan={`${this.props.fromTime.toISOString()}/${this.props.toTime.toISOString()}`}
+                initialTimespan={{ fromTime: this.props.fromTime, toTime: this.props.toTime }}
                 layers={this.state.selectedBands}
                 indexLayers={this.state.selectedIndexBands}
                 activeLayer={legacyActiveLayer}
@@ -877,6 +923,9 @@ const mapStoreToProps = store => ({
   redRangeEffect: store.visualization.redRangeEffect,
   greenRangeEffect: store.visualization.greenRangeEffect,
   blueRangeEffect: store.visualization.blueRangeEffect,
+  redCurveEffect: store.visualization.redCurveEffect,
+  greenCurveEffect: store.visualization.greenCurveEffect,
+  blueCurveEffect: store.visualization.blueCurveEffect,
   minQa: store.visualization.minQa,
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
@@ -889,4 +938,4 @@ const mapStoreToProps = store => ({
   selectedLanguage: store.language.selectedLanguage,
 });
 
-export default connect(mapStoreToProps, null)(VisualizationPanel);
+export default withRouter(connect(mapStoreToProps, null)(VisualizationPanel));

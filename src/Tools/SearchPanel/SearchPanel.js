@@ -28,7 +28,7 @@ class SearchPanel extends Component {
       .utc()
       .subtract(1, 'month')
       .startOf('day'),
-    toMoment: moment.utc().endOf('day'),
+    toMoment: moment.utc(),
     datepickerIsExpanded: false,
     filterMonths: null,
     searchInProgress: false,
@@ -65,14 +65,8 @@ class SearchPanel extends Component {
   setTimeFrom = selectedFromMoment => {
     this.setState(oldState => {
       let newState = {
-        fromMoment: selectedFromMoment.startOf('day'),
+        fromMoment: selectedFromMoment.clone().startOf('day'),
       };
-      if (selectedFromMoment.isAfter(oldState.toMoment)) {
-        newState.toMoment = selectedFromMoment
-          .clone()
-          .add(1, 'month')
-          .endOf('day');
-      }
       return newState;
     });
   };
@@ -80,14 +74,8 @@ class SearchPanel extends Component {
   setTimeTo = selectedToMoment => {
     this.setState(oldState => {
       let newState = {
-        toMoment: selectedToMoment.endOf('day'),
+        toMoment: selectedToMoment.clone().endOf('day'),
       };
-      if (selectedToMoment.isBefore(oldState.fromMoment)) {
-        newState.fromMoment = selectedToMoment
-          .clone()
-          .subtract(1, 'month')
-          .startOf('day');
-      }
       return newState;
     });
   };
@@ -204,7 +192,7 @@ class SearchPanel extends Component {
     return (
       <div className="theme-select top">
         <div className="top-label">
-          {t`Theme`}:
+          {t`Theme`}
           {!isEducationModeSelected && (
             <ExternalLink
               className="configurations-settings"
@@ -297,7 +285,7 @@ class SearchPanel extends Component {
 
           <div className={`discover-tab ${isSearchSelected ? '' : 'hidden'}`}>
             <div className="top-label">
-              {t`Data sources`}:
+              {t`Data sources`}
               <div>
                 <div className="checkbox-group">
                   <div className="column" key={selectedThemeId || ''}>
@@ -312,7 +300,7 @@ class SearchPanel extends Component {
             </div>
             <div className="clear" />
             <div className="select-time-range">
-              <div className="top-label">{t`Time range [UTC]`}:</div>
+              <div className="top-label">{t`Time range [UTC]`}</div>
               <div className="date-pickers-wrapper">
                 <DatePicker
                   id="from-search-datepicker"
@@ -320,7 +308,7 @@ class SearchPanel extends Component {
                   setSelectedDay={this.setTimeFrom}
                   calendarContainer={this.calendarHolder}
                   minDate={minDateRange}
-                  maxDate={maxDateRange}
+                  maxDate={toMoment}
                 />
 
                 <span className="date-picker-separator">-</span>
@@ -329,7 +317,7 @@ class SearchPanel extends Component {
                   selectedDay={toMoment}
                   setSelectedDay={this.setTimeTo}
                   calendarContainer={this.calendarHolder}
-                  minDate={minDateRange}
+                  minDate={fromMoment}
                   maxDate={maxDateRange}
                 />
                 <div className="calendar-holder" ref={e => (this.calendarHolder = e)} />
@@ -387,8 +375,6 @@ class SearchPanel extends Component {
               type="error"
             />
           ) : null}
-
-          {this.state.datepickerIsExpanded && <div id="datepicker-expansion" />}
         </div>
       </>
     );

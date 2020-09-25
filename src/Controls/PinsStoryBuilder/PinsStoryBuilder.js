@@ -25,7 +25,11 @@ import {
   getDataSourceHandler,
   datasourceForDatasetId,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
-import { drawMapOverlaysOnCanvas, getScaleBarInfo } from '../ImgDownload/ImgDownload';
+import {
+  drawMapOverlaysOnCanvas,
+  getScaleBarInfo,
+  createSVGLegend,
+} from '../ImgDownload/ImageDownload.utils';
 import { applyBlobToCanvas } from '../../junk/EOB3TimelapsePanel/imageOverlays.js';
 import {
   SENTINEL_COPYRIGHT_TEXT,
@@ -34,7 +38,6 @@ import {
   loadImage,
 } from '../../junk/EOB3ImageDownloadPanel/utils/downloadZip';
 import { b64EncodeUnicode } from '../../utils/base64MDN';
-import { createSVGLegend } from '../ImgDownload/ImgDownload.utils';
 import { findMatchingLayerMetadata } from '../../Tools/VisualizationPanel/legendUtils';
 import { constructDataFusionLayer } from '../../junk/EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
@@ -79,7 +82,7 @@ class PinsStoryBuilder extends React.Component {
       speedFps: 1,
       imagesOptions: {
         showCaptions: false,
-        showSlideDescriptions: false,
+        showSlideTitle: false,
         addMapOverlays: true,
         showLegend: false,
       },
@@ -130,7 +133,7 @@ class PinsStoryBuilder extends React.Component {
     const {
       slides,
       dimensions: { imageWidth, imageHeight },
-      imagesOptions: { showCaptions, addMapOverlays, showSlideDescriptions, showLegend },
+      imagesOptions: { showCaptions, addMapOverlays, showSlideTitle, showLegend },
     } = this.state;
     const { lat, lng, zoom, enabledOverlaysId } = this.props;
 
@@ -140,7 +143,7 @@ class PinsStoryBuilder extends React.Component {
     const ctx = canvas.getContext('2d');
 
     if (addMapOverlays) {
-      await drawMapOverlaysOnCanvas(ctx, lat, lng, zoom, enabledOverlaysId);
+      await drawMapOverlaysOnCanvas(ctx, lat, lng, zoom, imageWidth, enabledOverlaysId);
     }
 
     if (showCaptions) {
@@ -153,7 +156,7 @@ class PinsStoryBuilder extends React.Component {
       await drawCaptions(ctx, null, null, copyrightText, scaleBar, true);
     }
 
-    if (showSlideDescriptions) {
+    if (showSlideTitle) {
       await drawCaptions(ctx, null, slideTitle, null, null, false);
     }
 
@@ -233,7 +236,6 @@ class PinsStoryBuilder extends React.Component {
 
         if (isDataFusionEnabled(dataFusion)) {
           const dataFusionLayer = await constructDataFusionLayer(
-            layer,
             dataFusion,
             evalscript,
             evalscripturl,
@@ -297,7 +299,7 @@ class PinsStoryBuilder extends React.Component {
       slides[index].title = title;
       return slides;
     });
-    if (this.state.imagesOptions.showSlideDescriptions) {
+    if (this.state.imagesOptions.showSlideTitle) {
       this.resetImages();
     }
   };
@@ -349,6 +351,7 @@ class PinsStoryBuilder extends React.Component {
         closeOnEsc={true}
       >
         <div className="pins-story-builder">
+          <h1>Story</h1>
           <div className="horizontal-stack">
             <SlidesSelector
               slides={slides}
@@ -411,7 +414,7 @@ class ImagesOptions extends React.Component {
   };
 
   render() {
-    const { showCaptions, showSlideDescriptions, addMapOverlays, showLegend } = this.props.values;
+    const { showCaptions, showSlideTitle, addMapOverlays, showLegend } = this.props.values;
     return (
       <div className="slides-options">
         <div className="field">
@@ -419,11 +422,11 @@ class ImagesOptions extends React.Component {
           <Toggle checked={showCaptions} icons={false} onChange={() => this.toggleOption('showCaptions')} />
         </div>
         <div className="field">
-          <label>{t`Show slide descriptions`}</label>
+          <label>{t`Show slide title`}</label>
           <Toggle
-            checked={showSlideDescriptions}
+            checked={showSlideTitle}
             icons={false}
-            onChange={() => this.toggleOption('showSlideDescriptions')}
+            onChange={() => this.toggleOption('showSlideTitle')}
           />
         </div>
         <div className="field">

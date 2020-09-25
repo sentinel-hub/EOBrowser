@@ -147,7 +147,6 @@ class PinPreviewImage extends React.Component {
 
       if (isDataFusionEnabled(dataFusion)) {
         const dataFusionLayer = await constructDataFusionLayer(
-          layer,
           dataFusion,
           evalscript,
           evalscripturl,

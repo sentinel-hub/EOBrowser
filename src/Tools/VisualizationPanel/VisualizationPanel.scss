@@ -1,7 +1,7 @@
 @import '../../variables';
 
 .visualization-panel {
-  background-color: $mainLight;
+  background-color: $mainMedium;
   color: $textCol;
 
   .header {
@@ -45,8 +45,7 @@
 
       .visualization-time-select {
         padding: 0 10px;
-        margin-bottom: 10px;
-        margin-top: 15px;
+        margin: 10px 0;
       }
 
       .timespan-toggle {
@@ -58,13 +57,12 @@
 
   .actions {
     justify-content: space-around;
-    border-bottom: 2px solid $primaryCol;
+    border-bottom: 1px solid $primaryCol;
     padding: 10px;
     display: flex;
     flex: 1;
     flex-flow: wrap;
     flex-direction: row;
-    cursor: pointer;
 
     i {
       color: $primaryCol;
@@ -72,10 +70,9 @@
     }
 
     .action-wrapper {
-      margin-left: 12px;
       display: inline-block;
-      min-width: 25px;
       text-align: center;
+      cursor: pointer;
     }
   }
 
@@ -106,7 +103,7 @@
         margin-top: -5px;
         border-radius: 50px;
         display: block;
-        background: $mainMedium;
+        background: $mainLight;
         border: 3px solid transparent;
       }
 
@@ -122,7 +119,7 @@
 
     .layer:hover {
       color: #fff;
-      background-color: #434554;
+      background-color: $mainLight;
 
       small {
         color: #fff;
@@ -134,6 +131,7 @@
       color: #b6bf00;
       opacity: 1;
       border-right: solid 4px #b6bf00;
+      background-color: $mainLight;
 
       .icon {
         border: 3px solid #b6bf00;

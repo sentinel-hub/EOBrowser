@@ -1,3 +1,5 @@
+@import '../../variables.scss';
+
 .effects-panel {
   padding: 10px;
 
@@ -37,7 +39,7 @@
         padding: 0;
         font-size: 0.9em;
         color: white;
-        background-color: #3b3d4d;
+        background-color: $mainMedium;
         border: none;
         border-bottom: 1px solid white;
 
@@ -71,6 +73,56 @@
         }
       }
     }
+  }
+
+  .rgb-effects-chooser {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+
+    label {
+      color: #868fa0;
+    }
+
+    .react-toggle {
+      vertical-align: middle;
+    }
+    /* stylelint-disable */
+    .react-toggle--checked .react-toggle-track,
+    .react-toggle.react-toggle--checked:hover .react-toggle-track {
+      background: $primaryCol;
+    }
+
+    .react-toggle--focus .react-toggle-thumb {
+      box-shadow: 0 0 2px 3px $primaryCol;
+    }
+
+    .react-toggle:active .react-toggle-thumb {
+      box-shadow: 0 0 5px 5px $primaryCol;
+    }
+
+    .react-toggle.react-toggle--focus .react-toggle-thumb {
+      box-shadow: 0 0 3px $primaryCol;
+    }
+
+    .react-toggle--checked .react-toggle-thumb {
+      border-color: $primaryCol;
+    }
+
+    .react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb {
+      box-shadow: 0 0 2px 2px #fff;
+    }
+
+    .react-toggle:hover:not(.react-toggle--disabled) .react-toggle-track {
+      background-color: #4d4d4d;
+    }
+
+    .react-toggle.react-toggle--checked:hover .react-toggle-track {
+      background-color: $primaryCol;
+    }
+    /* stylelint-enable */
   }
 
   @media screen and (max-width: 400px) {

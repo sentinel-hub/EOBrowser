@@ -1,35 +1,41 @@
 import moment from 'moment';
 
 export const isNextMonthAvailable = (maxDate, selectedDay) => {
-  // check if we can go forward another year
-  if (maxDate.year() - selectedDay.year() > 0) {
-    return true;
-  }
-
-  // if this is the last year, check if another month is available
-  return maxDate.month() - selectedDay.month() > 0;
+  return (
+    selectedDay
+      .clone()
+      .add(1, 'month')
+      .startOf('month') <= maxDate
+  );
 };
 
 export const isPreviousMonthAvailable = (minDate, selectedDay) => {
-  // check if we can go back another year
-  if (selectedDay.year() - minDate.year() > 0) {
-    return true;
-  }
-
-  // if this is the last year, check if another month is available
-  return selectedDay.month() - minDate.month() > 0;
+  return (
+    selectedDay
+      .clone()
+      .subtract(1, 'month')
+      .endOf('month') >= minDate
+  );
 };
 
 export const getAvailableYears = (fromDate, toDate) => {
-  const fromDateMoment = moment(fromDate);
-  const toDateMoment = moment(toDate);
-
   const years = [];
-  for (let i = fromDateMoment.year(); i <= toDateMoment.year(); i += 1) {
+  for (let i = fromDate.year(); i <= toDate.year(); i += 1) {
     years.push(i);
   }
 
   return years;
+};
+
+export const getAvailableMonths = (allMonths, minDate, maxDate, selectedDay) => {
+  minDate = moment.max(minDate, selectedDay.clone().startOf('year'));
+  maxDate = moment.min(maxDate, selectedDay.clone().endOf('year'));
+
+  let months = [];
+  for (let i = minDate.get('month'); i <= maxDate.get('month'); i++) {
+    months.push({ name: allMonths[i], index: i });
+  }
+  return months;
 };
 
 export function convertDateToUTC(date) {

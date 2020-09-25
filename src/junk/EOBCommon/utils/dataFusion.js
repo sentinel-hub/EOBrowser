@@ -1,8 +1,6 @@
 import {
   ApiType,
   parseLegacyWmsGetMapParams,
-  MosaickingOrder,
-  LayersFactory,
   DATASET_AWSEU_S1GRD,
   DATASET_S2L1C,
   DATASET_S2L2A,
@@ -24,13 +22,9 @@ import {
   ProcessingDataFusionLayer,
 } from '@sentinel-hub/sentinelhub-js';
 
-export async function getMapDataFusion(baseUrl, wmsParams, dataFusionSettings, effects = null) {
-  const { layers: primaryLayerId, evalscript, evalscriptUrl, getMapParams } = parseLegacyWmsGetMapParams(
-    wmsParams,
-  );
-  const primaryLayer = await LayersFactory.makeLayer(baseUrl, primaryLayerId);
+export async function getMapDataFusion(wmsParams, dataFusionSettings, effects = null) {
+  const { evalscript, evalscriptUrl, getMapParams } = parseLegacyWmsGetMapParams(wmsParams);
   const dataFusionLayer = await constructDataFusionLayer(
-    primaryLayer,
     dataFusionSettings,
     evalscript,
     evalscriptUrl,
@@ -44,43 +38,29 @@ export async function getMapDataFusion(baseUrl, wmsParams, dataFusionSettings, e
 }
 
 export async function constructDataFusionLayer(
-  primaryLayer,
   dataFusionSettings,
   evalscript,
   evalscriptUrl,
   fromTime,
   toTime,
 ) {
-  // supplementary layers:
-  const enabledDatasetsIds = Object.keys(dataFusionSettings.supplementalDatasets).filter(
-    supDatasetId => dataFusionSettings.supplementalDatasets[supDatasetId].enabled,
-  );
-  const supplementalLayers = enabledDatasetsIds.map(supDatasetId => {
-    const settings = dataFusionSettings.supplementalDatasets[supDatasetId];
-    const mosaickingOrder =
-      settings && settings.mosaickingOrder ? settings.mosaickingOrder : MosaickingOrder.MOST_RECENT;
-    const layer = constructLayerFromDatasetId(supDatasetId, mosaickingOrder);
-    const timespan = settings.isCustomTimespan && settings.timespan ? settings.timespan : [fromTime, toTime];
-    return {
+  const layers = [];
+
+  for (let dataset of dataFusionSettings) {
+    let { id, alias, mosaickingOrder, timespan } = dataset;
+    const layer = constructLayerFromDatasetId(id, mosaickingOrder);
+    layers.push({
       layer: layer,
-      id: layer.dataset.shProcessingApiDatasourceAbbreviation.toLowerCase(),
-      fromTime: timespan[0],
-      toTime: timespan[1],
-    };
-  });
+      id: alias,
+      fromTime: timespan ? timespan[0] : fromTime,
+      toTime: timespan ? timespan[1] : toTime,
+    });
+  }
 
   const dataFusionLayer = new ProcessingDataFusionLayer({
     evalscript: evalscript,
     evalscriptUrl: evalscriptUrl,
-    layers: [
-      {
-        layer: primaryLayer,
-        id: primaryLayer.dataset.shProcessingApiDatasourceAbbreviation.toLowerCase(),
-        fromTime: fromTime,
-        toTime: toTime,
-      },
-      ...supplementalLayers,
-    ],
+    layers: layers,
   });
   return dataFusionLayer;
 }
@@ -91,11 +71,11 @@ export function constructLayerFromDatasetId(datasetId, mosaickingOrder) {
     case DATASET_AWSEU_S1GRD.id:
       // we are setting evalscript to avoid exception when the layer is initialized without any parameters
       // (this should be fixed in sentinelhub-js)
-      return new S1GRDAWSEULayer({ evalscript: '//---', mosaickingOrder: mosaickingOrder });
+      return new S1GRDAWSEULayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_S2L1C.id:
-      return new S2L1CLayer({ evalscript: '//---', mosaickingOrder: mosaickingOrder });
+      return new S2L1CLayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_S2L2A.id:
-      return new S2L2ALayer({ evalscript: '//---', mosaickingOrder: mosaickingOrder });
+      return new S2L2ALayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_S3OLCI.id:
       return new S3OLCILayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_S3SLSTR.id:

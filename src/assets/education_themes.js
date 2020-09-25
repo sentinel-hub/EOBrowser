@@ -129,7 +129,7 @@ export const EDUCATION_THEMES = [
         evalscripturl: '',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/4e7f01-YOUR-INSTANCEID-HERE',
         description:
-          '[In summer of 2017, [dozens of wildfires erupted](https://www.channelnewsasia.com/news/world/croatia-fights-dozens-of-fires-along-adriatic-coast-9144906) along the Adriatic coast. Soaring heat wave temperatures accompanied by a lack of rainfall led to a drought, which resulted in dry, hot forest floor, extremely vulnerable to wildfires. The cause of many wildfires were careless people, while strong winds made the situation worse by making fires spread much faster. The firefighters struggled to contain the fires and keep them from dwellings. Althogether, an astonishing 83.000 hectares of forest burnt down. ',
+          'In summer of 2017, [dozens of wildfires erupted](https://www.channelnewsasia.com/news/world/croatia-fights-dozens-of-fires-along-adriatic-coast-9144906) along the Adriatic coast. Soaring heat wave temperatures accompanied by a lack of rainfall led to a drought, which resulted in dry, hot forest floor, extremely vulnerable to wildfires. The cause of many wildfires were careless people, while strong winds made the situation worse by making fires spread much faster. The firefighters struggled to contain the fires and keep them from dwellings. Althogether, an astonishing 83.000 hectares of forest burnt down.',
       },
     ],
   },
@@ -163,9 +163,11 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          'The desert country of Saudi Arabia highly relies on irrigation farming for growing crops, due to its arid and warm climate. The circular shape of the fields is a result of the irrigation system (center-pivot irrigation), which uses water from a huge fossil aquifer. The size of the field ranges from a few hundred meters up to almost one kilometer, limited by the size of the irrigation system. What started more than 40 years ago as a huge success story, ensuring domestic food security for the kingdom, is becoming more and more problematic as the once rich water reserves are depleting. As a result, Saudi Arabia is buying more and more fields abroad to satisfy domestic demand. [More...](https://www.nationalgeographic.de/photography/2018/04/wasser-nahrung-energie-die-wuesten-werden-gruen?image=61750)',
       },
       {
-        title: 'Agriculture in Italy (Barren Soil)',
+        title: 'Agriculture in the Veneto Region, Italy (Barren Soil)',
         lat: 45.7955,
         lng: 13.0957,
         zoom: 11,
@@ -176,9 +178,11 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          '[Veneto agriculture](https://www.recare-hub.eu/news/45-06-bioforsk) is one of the most productive in Italy, producing mainly cereals, fruits, and wine. Small, hand farmed fields present a contrast to the growing industrialization of the sector, which suffers from soil degradation. The Barren Soil visualization shows that in the middle of spring still a lot of fields lie fallow indicated by the red color.',
       },
       {
-        title: 'Agriculture in California (NDVI)',
+        title: 'Agriculture in California, USA (NDVI)',
         lat: 36.70772,
         lng: -120.60242,
         zoom: 13,
@@ -189,6 +193,8 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          'The [Central Valley](https://ca.water.usgs.gov/projects/central-valley/about-central-valley.html), located west of California’s famous Sierra Nevada, is home to the states biggest and most important agricultural region. The fields are irrigated from the two major rivers of the valley (Sacramento and San Joaquin Rivers) on the one hand, and with groundwater on the other. Despite using less than 1% of the nation’s total farmland, the valley produces 25% of U.S. food. In total more than 250 different crops are grown, the most important being cereal grains, hay, cotton, different fruits and vegetable, and nuts.',
       },
       {
         title: 'Agriculture in Ethiopia (False Color)',
@@ -202,9 +208,11 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          'The area around Meraro in the Arsi zone, which is part of the Ethiopian Highlands, plays an important role in food security in Ethiopia. The agriculture in the region (and the country) was for a long time an [intensive subsistence farming zone](https://reliefweb.int/report/ethiopia/cluster-farming-improving-farmers-productivity-food-security-arsi-zone), with 12 million smallholder farming households producing 95% of the country’s agricultural products. To become less dependent on foreign food imports and foster the countries development, the agricultural sector was subject to big changes in the past years. [More](http://www.fao.org/ethiopia/fao-in-ethiopia/ethiopia-at-a-glance/en/)',
       },
       {
-        title: 'Agriculture in India (False Color 11,8,2)',
+        title: 'Agriculture in West Bengal, India (False Color 11,8,2)',
         lat: 22.05565,
         lng: 87.34354,
         zoom: 13,
@@ -215,6 +223,8 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          'The state of West Bengal, where Belda is located, is the most important rice and vegetable producer in the whole India. Taking only 2.7% of the countries area, it provides food for almost 8% of the population. The state is dominated by small and marginal farms, accounting for 96% of all farms. [More](https://wb.gov.in/departments-details.aspx?id=D170907140022669&page=Agriculture)',
       },
       {
         title: 'Agriculture in Vietnam (False Color 11,8,2)',
@@ -228,6 +238,8 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          'Agriculture in the Ca Mau district, located in the Mekong Delta in Vietnam, consist mainly of aquacultures (shrimps, mud crabs), rice, and wood. The whole area is highly drained either by small streams or by channels derived from the streams. Ca Mau district is Vietnam’s largest shrimp producer, covering 280.000 ha with shrimp farms, which in 2019, exported around 1.2 billion dollars worth of shrimps. [More]( https://vietnamnews.vn/society/523132/ca-mau-amends-list-of-key-agricultural-products.html)',
       },
       {
         title: 'Agriculture in Poland (Moisture Stress)',
@@ -241,6 +253,8 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          'Located next to the banks of the Warta river, this pin shows different moisture stress and field arrangements on the opposite banks of the river. On the northern bank, the fields are more regularly distributed and show a lower moisture content, while on the southern shore, the fields are more diverse, both in size and alignment, and show a higher level of moisture. As the region has, in general, a quite low annual precipitation (~500 mm/yr), one explanation for the difference in moisture could be the higher prominence of lakes south of the river, but different field management techniques could also play a role. Crops grown in the region are mainly cereals, to a smaller extend also rape, sugar beet, and potatoes. [More]( http://www.agribenchmark.org/fileadmin/Dateiablage/B-Cash-Crop/Countries/Poland/Poland_crop_production.pdf)',
       },
       {
         title: 'Agriculture along the Nile river (EVI)',
@@ -254,6 +268,8 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          'Due to fertile soil and regular flooding, the Nile river basin has supported agriculture for thousands of years. Close to 90 percent of the land currently used for agriculture is under rainfed farming systems (farming systems, that rely on rainfall). These systems are characterized by subsistence-level production and low yields of crops and livestock. There are about 5.6 million hectares of land under irrigation or equipped with irrigation facilities in the Nile Basin. A large proportion – 97 percent – of the land is located in Egypt and Sudan. Three countries – Egypt, Tanzania, and Uganda – produce large quantities of fish, but the freshwater fisheries resources of the basin are showing signs of being overfished. The top three crops grown in the basin are wheat, fodder, and maize. Livestock farming is also thriving, Ethiopia leading with more than 50 million heads of cattle. [Learn more.](http://nileis.nilebasin.org/system/files/Nile%20SoB%20Report%20Chapter%205%20-%20Agriculture.pdf)',
       },
       {
         title: 'Agriculture in Zambia (Enhanced True Color)',
@@ -269,9 +285,11 @@ export const EDUCATION_THEMES = [
         themeId: 'AGRICULTURE',
         gain: '2',
         gamma: '1.7',
+        description:
+          'The agriculture north-east of the city [Mumbwa](https://www.investincentralzambia.com/wordpress/mumbwa-district-profile/), located in Zambia’s Central Province, is blessed by good climatic conditions, as well as fertile soils. The main crops in the region are maize, cotton, soy beans, and sunflowers. Next to growing vegetables, the region hosts favorable conditions for livestock farming. The main species are cattle, sheep, and goats. In the western part of the pin, several round structures can be observed; a result of center-pivot irrigation using groundwater.',
       },
       {
-        title: 'Agriculture in Kansas (False Color)',
+        title: 'Agriculture in Kansas, USA (False Color)',
         lat: 37.79317,
         lng: -95.39549,
         zoom: 13,
@@ -282,9 +300,11 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          "The soils in Allen County, located in the state of Kansas, are deep and fertile, providing the county and the state good conditions for a strong agriculture economy. It thus isn't surprising, that agriculture accounts for more than 40% of the state’s total income. The main crops are wheat, corn, sorghum, and soybeans, as well as sunflowers. Livestock raised is mainly cattle and calves. [More]( https://www.farmflavor.com/kansas-agriculture/)",
       },
       {
-        title: 'Agriculture in Limpopo (Enhanced True Color)',
+        title: 'Agriculture in Limpopo, South Africa (Enhanced True Color)',
         lat: -24.8591,
         lng: 28.78847,
         zoom: 13,
@@ -297,6 +317,8 @@ export const EDUCATION_THEMES = [
         themeId: 'AGRICULTURE',
         gain: '2',
         gamma: '1.7',
+        description:
+          "South African agriculture's biggest challenge is the absence of water since rainfall doesn't come regularly. Hence, [most agricultural fields are irrigated](http://www.limpopo.riverawarenesskit.org/LIMPOPORAK_COM/EN/MANAGEMENT/WATER_INFRASTRUCTURE/IRRIGATION_INFRASTRUCTURE/SOUTH_AFRICA.HTM), helping make Limpopo an important part of the country's agriculture. [Learn more](https://www.globalafricanetwork.com/company-news/a-2020-vision-of-the-agricultural-sector-in-limpopo/).",
       },
       {
         title: 'Agriculture in Cambodia (False Color 11,8,2)',
@@ -310,9 +332,11 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          "[Tonle Sap Lake](http://hdr.undp.org/sites/default/files/olli_varis_tonlesap_study.pdf) with its surroundings is one of the most productive large wetland ecosystems in the world. People in the area are highly dependent on the natural resources the ecosystem provides and live mainly from farming and fishery. In total, 70% of Cambodians work in agriculture. In the wet season, which is mainly influenced by the monsoon, predominantly rice is cultivated. In the dry season, also other vegetables and fruits. Due to the poor infrastructure in the region and no industrial management, the productivity was traditionally quite low. In recent years the region experienced rapid development. More and more irrigation structures have been built and the access to the lake's floodplains has been improved, leading to more bountiful harvests. [More](https://tel.archives-ouvertes.fr/tel-02275089/document)",
       },
       {
-        title: 'Agriculture in Australia (False Color 11,8,2)',
+        title: 'Agriculture in the Burdekin River Delta, Australia (False Color 11,8,2)',
         lat: -19.6355,
         lng: 147.2532,
         zoom: 12,
@@ -323,9 +347,11 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          "Burdekin Shire, situated in the Burdekin River delta, is one of Queensland's biggest sugar cane producing shires, accounting for [20% of the state’s total sugar cane production](https://economy.id.com.au/burdekin/value-of-agriculture). On shire level, sugar cane accounts for more than 75% of the agricultural output (in value terms), making it the most important agricultural plant in the region. On the pin, agricultural fields are found on both sides of the Burdekin river and are displayed either in a bright green (vegetated), or in a dark brown (harvested/bare fields).",
       },
       {
-        title: 'Agriculture in Amsterdam (Barren Soil)',
+        title: 'Agriculture in Ontario, Canada (Barren Soil)',
         lat: 43.6926,
         lng: -81.0152,
         zoom: 12,
@@ -336,6 +362,8 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          'Agriculture is the dominant land use in southern Ontario, even though only a small percentage of the total population is employed in this sector. Still, the whole province has around 50.000 farms (2016) and the average number of farms has been increasing over the last years. The main crops cultivated are oilseeds and different grains, and the main livestock is cattle. Next to the crops mentioned, Ontario is the country’s main leader in growing greenhouse vegetables. [More](https://www150.statcan.gc.ca/n1/daily-quotidien/170510/dq170510a-eng.htm?indid=10441-1&indgeo=6)',
       },
       {
         title: 'Agriculture at the Israel-Jordan border',
@@ -349,12 +377,14 @@ export const EDUCATION_THEMES = [
         evalscript: '',
         evalscripturl: '',
         themeId: 'AGRICULTURE',
+        description:
+          'Agriculture in the southern part of the dead sea region, is dominated by [salt ponds](https://gizmodo.com/salt-ponds-at-the-dead-sea-1560507635). Several fields are located next to both sides of the Jordan Valley Highway. Due to rising global demand for sodium chloride and potassium salts, both found in the dead sea’s salt ponds, the ponds have grown rapidly in number towards the end of the last century. Since then, their number stayed at a stable amount of around 50 ponds. The main crop grown on the field is dates, while among other, tomatoes, eggplants, or olives are being cultivated as well. [More]( https://www.deadsea.com/articles-tips/interesting-facts/desert-wonders-dead-sea-production/)',
       },
     ],
   },
 
   {
-    name: t`Atmosphere and Pollution`,
+    name: t`Atmosphere and Air Pollution`,
     id: 'ATMOSPHERE',
     content: [
       {
@@ -530,7 +560,7 @@ export const EDUCATION_THEMES = [
           "After carbon dioxide (CO2), methane is the most important contributor to the anthropogenically enhanced greenhouse effect. Roughly three-quarters of methane emissions are anthropogenic and as such it is important to continue recording satellite based measurements. TROPOMI aims at providing CH4 column concentrations with high sensitivity to the Earth’s surface, good spatiotemporal coverage, and sufficient accuracy to facilitate inverse modelling of sources and sinks. TROPOMI uses absorption information from the Oxygen-A Band (760nm) and the SWIR spectral range to monitor CH4 abundances in the Earth's atmosphere. [More...](http://www.tropomi.eu/data-products/methane)",
       },
       {
-        title: 'High SO2 concentrations, Europe',
+        title: 'High SO2 concentrations, Andorra and Marseille',
         lat: 42.306,
         lng: 2.538,
         zoom: 7,
@@ -909,7 +939,7 @@ export const EDUCATION_THEMES = [
   },
 
   {
-    name: t`Flooding and Droughts`,
+    name: t`Floods and Droughts`,
     id: 'FLOODING',
     content: [
       {
@@ -1584,18 +1614,18 @@ export const EDUCATION_THEMES = [
           '[Sermeq Kujalleq](https://www.atlasobscura.com/articles/worlds-fastest-glacier-sermeq-kujalleq), also called Jakobshavn glacier, is known as the world’s fastest glacier. It travels an average of 130 feet in 24 hours and calves more than 45 cubic kilometers of icebergs each year into the Ilulissat Icefjord. Its front is an enormous ice wall—stretching 91 meters at its peak, that constantly explodes. Icebergs break off the glacier accompanied by blasts and roars akin to a rocket launch. When they hit the sea below, the calved icebergs can create huge waves that threaten to swallow people, boats, and buildings. The icebergs from Sermeq Kujalleq have crashed so violently that they have even caused earthquakes. Because the glacier is so large, the breaks seem to occur in __slow motion__.',
       },
       {
-        title: 'Glaciers of western Greeenland (Enhanced Agriculture 11,8,2) ',
+        title: 'Glaciers of western Greeenland (Tonemapped Natural Color) ',
         lat: 72.9559,
         lng: -54.5735,
         zoom: 10,
         datasetId: 'S2L2A',
-        layerId: '6_AGRICULTURE',
+        layerId: '3_TONEMAPPED-NATURAL-COLOR',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/08bc6d-YOUR-INSTANCEID-HERE',
         toTime: '2019-07-10',
         evalscript: '',
         evalscripturl: '',
         themeId: 'SNOW',
-        gain: '0.7',
+        gain: '1.2',
         description:
           'On Greenland’s western shore numerous glaciers enter the Baffin Bay. Several of them find their way to the bay via the Upernavik Icefjord which can be seen on the image. The biggest glacier is the  Upernavik glacier from which also the fjord’s name was derived. Until 1980 the glacier consisted of one main termini but with its retread since then it has four main calving termini today [more]( https://blogs.agu.org/fromaglaciersperspective/2017/05/30/upernavik/).',
       },
@@ -1986,7 +2016,7 @@ export const EDUCATION_THEMES = [
         themeId: 'URBAN',
       },
       {
-        title: 'Seul, South Korea',
+        title: 'Seoul, South Korea',
         lat: 37.5307,
         lng: 126.8392,
         zoom: 11,
@@ -2160,17 +2190,19 @@ export const EDUCATION_THEMES = [
         themeId: 'FORESTRY',
       },
       {
-        title: 'Forestry; Indonesian rainforest (ARVI)',
+        title: 'Forestry; Indonesian rainforest (Enhanced True Color)',
         lat: -9.3756,
         lng: -52.1178,
         zoom: 11,
         datasetId: 'S2L2A',
-        layerId: '5_ARVI',
+        layerId: '1_TRUE-COLOR',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2730da-YOUR-INSTANCEID-HERE',
         toTime: '2019-07-18',
         evalscript: '',
         evalscripturl: '',
         themeId: 'FORESTRY',
+        gain: '3.3',
+        gamma: '1.5',
       },
       {
         title: 'Sundarbans, Mangrove forest (EVI)',

@@ -3,7 +3,6 @@
 .pin-tools {
   display: flex;
   justify-content: space-between;
-  background-color: $mainLight;
   color: #fff;
 
   > div,
@@ -11,7 +10,7 @@
     cursor: pointer;
     color: $primaryCol;
     text-decoration: none;
-    margin: 0 5px;
+    margin: 1px 5px;
     text-align: center;
   }
 

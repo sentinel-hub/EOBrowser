@@ -3,7 +3,7 @@ import cloneDeep from 'lodash.clonedeep';
 import dragula from 'react-dragula';
 import moment from 'moment';
 import React, { Component } from 'react';
-import { t } from 'ttag';
+import { t, ngettext, msgid } from 'ttag';
 
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
 import { NotificationPanel } from '../../junk/NotificationPanel/NotificationPanel';
@@ -58,10 +58,18 @@ class PinPanel extends Component {
 
   componentDidMount() {
     if (this.props.user) {
-      this.fetchUserPins().then(pins => {
-        this.setPinsInArray(pins, SAVED_PINS);
-        this.setState({});
-      });
+      this.fetchUserPins()
+        .then(pins => {
+          this.setPinsInArray(pins, SAVED_PINS);
+          this.setState({
+            operation: null,
+            selectedPins: [],
+            sharePins: false,
+            updatingPins: false,
+            updatingPinsError: null,
+          });
+        })
+        .catch(() => {});
     } else {
       let pins = getPinsFromSessionStorage();
       this.setPinsInArray(pins, UNSAVED_PINS);
@@ -79,6 +87,7 @@ class PinPanel extends Component {
       this.setState({
         updatingPinsError: e.message,
       });
+      throw e;
     } finally {
       this.setState({
         updatingPins: false,
@@ -98,6 +107,7 @@ class PinPanel extends Component {
       this.setState({
         updatingPinsError: e.message,
       });
+      throw e;
     } finally {
       this.setState({
         updatingPins: false,
@@ -117,6 +127,7 @@ class PinPanel extends Component {
       this.setState({
         updatingPinsError: e.message,
       });
+      throw e;
     } finally {
       this.setState({
         updatingPins: false,
@@ -136,6 +147,7 @@ class PinPanel extends Component {
       this.setState({
         updatingPinsError: e.message,
       });
+      throw e;
     } finally {
       this.setState({
         updatingPins: false,
@@ -155,20 +167,26 @@ class PinPanel extends Component {
           if (!pins.length) {
             return;
           }
-          this.saveLocalUserPins(pins).then(pins => {
-            sessionStorage.setItem(PINS_LC_NAME, JSON.stringify([]));
-            this.removePinsFromArray(UNSAVED_PINS);
-            this.setPinsInArray(pins.pins, SAVED_PINS);
-          });
+          this.saveLocalUserPins(pins)
+            .then(pins => {
+              sessionStorage.setItem(PINS_LC_NAME, JSON.stringify([]));
+              this.removePinsFromArray(UNSAVED_PINS);
+              this.setPinsInArray(pins.pins, SAVED_PINS);
+            })
+            .catch(() => {});
         } else {
-          this.fetchUserPins().then(pins => this.setPinsInArray(pins, SAVED_PINS));
+          this.fetchUserPins()
+            .then(pins => this.setPinsInArray(pins, SAVED_PINS))
+            .catch(() => {});
         }
       }
     }
 
     if (prevProps.lastAddedPin !== this.props.lastAddedPin) {
       if (this.props.user) {
-        this.fetchUserPins().then(pins => this.setPinsInArray(pins, SAVED_PINS));
+        this.fetchUserPins()
+          .then(pins => this.setPinsInArray(pins, SAVED_PINS))
+          .catch(() => {});
       } else {
         let pins = getPinsFromSessionStorage();
         this.setPinsInArray(pins, UNSAVED_PINS);
@@ -224,13 +242,13 @@ class PinPanel extends Component {
       savePinsToSessionStorage(pins, true);
     }
     if (pinItem.type === SAVED_PINS) {
-      this.savePins(pins, true);
+      this.savePins(pins, true)
+        .then(() => store.dispatch(pinsSlice.actions.updateItems(pinItems)))
+        .catch(() => {});
     }
-
-    store.dispatch(pinsSlice.actions.updateItems(pinItems));
   };
 
-  onRemovePin = async index => {
+  onRemovePin = index => {
     const confirmation = window.confirm(t`WARNING: You're about to delete a pin. Do you wish to continue?`);
     if (!confirmation) {
       return;
@@ -242,21 +260,20 @@ class PinPanel extends Component {
       if (!pins.length) {
         return;
       }
-
       pins = pins.filter(p => p._id !== pin._id);
       sessionStorage.setItem(PINS_LC_NAME, JSON.stringify(pins));
+      store.dispatch(pinsSlice.actions.removeItem(index));
     } else if (type === SAVED_PINS) {
-      await this.deleteUserPins([pin._id]);
+      this.deleteUserPins([pin._id])
+        .then(() => {
+          store.dispatch(pinsSlice.actions.removeItem(index));
+          this.props.setLastAddedPin(null);
+        })
+        .catch(() => {});
     }
-
-    const pinItems = [...this.props.pinItems];
-    pinItems.splice(index, 1); // remove pinItem
-    store.dispatch(pinsSlice.actions.updateItems(pinItems));
-
-    this.props.setLastAddedPin(null);
   };
 
-  onRemoveAllPins = async () => {
+  onRemoveAllPins = () => {
     if (this.props.pinItems.length === 0) {
       return;
     }
@@ -270,15 +287,23 @@ class PinPanel extends Component {
 
     this.cancelSharePins();
 
-    const pinIds = this.props.pinItems
-      .filter(p => p.type === SAVED_PINS && !!p.item._id)
-      .map(p => p.item._id);
-    if (pinIds.length) {
-      await this.deleteUserPins(pinIds);
+    if (this.props.user) {
+      const pinIds = this.props.pinItems
+        .filter(p => p.type === SAVED_PINS && !!p.item._id)
+        .map(p => p.item._id);
+
+      if (pinIds.length) {
+        this.deleteUserPins(pinIds)
+          .then(() => {
+            store.dispatch(pinsSlice.actions.updateItems([]));
+            this.props.setLastAddedPin(null);
+          })
+          .catch(() => {});
+      }
+    } else {
+      sessionStorage.setItem(PINS_LC_NAME, JSON.stringify([]));
+      store.dispatch(pinsSlice.actions.updateItems([]));
     }
-    sessionStorage.setItem(PINS_LC_NAME, JSON.stringify([]));
-    store.dispatch(pinsSlice.actions.updateItems([]));
-    this.props.setLastAddedPin(null);
   };
 
   onPinSelect = async (pin, arePinsSelectable) => {
@@ -443,11 +468,13 @@ class PinPanel extends Component {
 
     if (pinType === UNSAVED_PINS) {
       savePinsToSessionStorage(pins, true);
+      store.dispatch(pinsSlice.actions.updateItems(pinItems));
     }
     if (pinType === SAVED_PINS) {
-      this.savePins(pins, true);
+      this.savePins(pins, true)
+        .then(() => store.dispatch(pinsSlice.actions.updateItems(pinItems)))
+        .catch(() => {});
     }
-    store.dispatch(pinsSlice.actions.updateItems(pinItems));
   };
 
   cancelSharePins = () => {
@@ -472,8 +499,10 @@ class PinPanel extends Component {
       return;
     }
 
+    const { pinItems } = this.props;
     this.setState(prevState => ({
       operation: prevState.operation === OPERATION_SHARE ? null : OPERATION_SHARE,
+      selectedPins: prevState.operation === OPERATION_SHARE ? [] : pinItems.map(pin => pin.item),
     }));
   };
 
@@ -499,6 +528,7 @@ class PinPanel extends Component {
   resetSelectedPins = () => {
     this.setState({
       selectedPins: [],
+      operation: null,
     });
   };
 
@@ -511,10 +541,25 @@ class PinPanel extends Component {
     );
   };
 
+  toggleSelectAllPins = areAllPinsSelected => {
+    if (areAllPinsSelected) {
+      this.setState({
+        selectedPins: [],
+      });
+    } else {
+      const { pinItems } = this.props;
+      const allPins = pinItems.map(pin => pin.item);
+      this.setState({
+        selectedPins: [...allPins],
+      });
+    }
+  };
+
   render() {
     const { operation, selectedPins, updatingPins, updatingPinsError } = this.state;
     const { pinItems } = this.props;
     const arePinsSelectable = operation === OPERATION_SHARE;
+    const areAllPinsSelected = pinItems && selectedPins && selectedPins.length === pinItems.length;
 
     const loggedIn = this.props.user ? true : false;
     const noPinMsg = t`No pins. Go to the Visualize tab to save a pin or upload a JSON file with saved pins.`;
@@ -535,6 +580,12 @@ class PinPanel extends Component {
               onAnimateClick={this.openAnimatePanel}
             />
           </div>
+          {operation === OPERATION_SHARE && (
+            <div className="select-all-share" onClick={() => this.toggleSelectAllPins(areAllPinsSelected)}>
+              <i className={`fas fa-${areAllPinsSelected ? 'times-circle' : 'check-circle'}`}></i>
+              {areAllPinsSelected ? t`Deselect all` : t`Select all`}
+            </div>
+          )}
         </div>
 
         <div className="pins-container" key={this.props.lastAddedPin} ref={this.dragulaDecorator}>
@@ -559,17 +610,7 @@ class PinPanel extends Component {
               selectedForSharing={!!selectedPins.find(sharedPin => sharedPin === pin.item)}
             />
           ))}
-          {operation === OPERATION_SHARE && (
-            <div className="pins-selection-confirm">
-              <EOBButton
-                disabled={!selectedPins || selectedPins.length === 0}
-                fluid
-                text={t`Create link`}
-                onClick={this.createSharePinsLink}
-              />
-            </div>
-          )}
-          {/* no pins found and not logged in  notification banner */}
+          {/* no pins found and not logged in notification banner */}
           {pinItems.length === 0 && loggedIn && <NotificationPanel type="info" msg={noPinMsg} />}
           {/* not logged in notification banner */}
           {!loggedIn && pinItems.length === 0 && (
@@ -580,6 +621,20 @@ class PinPanel extends Component {
             <NotificationPanel type="info" msg={NOT_LOGGED_IN_AND_TEMP_PIN_MSG} />
           )}
         </div>
+        {operation === OPERATION_SHARE && (
+          <div className="pins-selection-confirm">
+            <EOBButton
+              disabled={!selectedPins || selectedPins.length === 0}
+              fluid
+              text={ngettext(
+                msgid`Create link (${selectedPins.length} pin selected)`,
+                `Create link (${selectedPins.length} pins selected)`,
+                selectedPins.length,
+              )}
+              onClick={this.createSharePinsLink}
+            />
+          </div>
+        )}
       </div>
     );
   }

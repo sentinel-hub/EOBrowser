@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import FileSaver from 'file-saver';
+import { t } from 'ttag';
 
 import { EOBCCSlider } from '../../junk/EOBCommon/EOBCCSlider/EOBCCSlider';
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
@@ -15,8 +17,9 @@ import {
   getDataSourceHandler,
   getDatasetLabel,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { constructCSVFromData } from './FIS.utils';
+
 import './FIS.scss';
-import { t } from 'ttag';
 
 class FIS extends Component {
   state = { fetchingInProgress: true, maxCCAllowed: 1.0 };
@@ -189,6 +192,39 @@ class FIS extends Component {
     }
   }
 
+  exportCSV = () => {
+    const { lineData: data, fromTime, isCloudCoverageDataAvailable } = this.state;
+
+    const nicename = this.getNicename('csv');
+    const filteredData = this.filterDataAfterTime(data, fromTime);
+
+    let dropColumns = ['seriesIndex'];
+    if (!isCloudCoverageDataAvailable) {
+      dropColumns.push('cloudCoveragePercent');
+    }
+
+    const csv = constructCSVFromData(filteredData, dropColumns);
+
+    FileSaver.saveAs(new Blob([csv]), nicename);
+  };
+
+  getNicename = extension => {
+    const { datasetId, layerId, customSelected } = this.props;
+    const { fromTime, toTime } = this.state;
+
+    return `${getDatasetLabel(datasetId)}-${
+      customSelected ? 'Custom' : layerId
+    }-${fromTime.toISOString()}-${toTime.toISOString()}.${extension}`;
+  };
+
+  filterDataAfterTime = (data, fromTime) => {
+    const filteredData = {};
+    for (let band of data) {
+      filteredData[band.title] = band.coordinates.filter(v => moment(v.date).isSameOrAfter(fromTime));
+    }
+    return filteredData;
+  };
+
   onDataReceived(fromTime, toTime, responseData, lastChannelIsCloudCoverage) {
     // merge newly received data with existing:
     const lastChannelId =
@@ -245,6 +281,7 @@ class FIS extends Component {
           median: drawDistribution ? stat.histogram.bins[5].lowEdge : null,
           p10: drawDistribution ? stat.histogram.bins[1].lowEdge : null,
           p90: drawDistribution ? stat.histogram.bins[9].lowEdge : null,
+          cloudCoveragePercent: isCloudCoverageDataAvailable ? cloudCoveragePerDays[stat.date] * 100 : null
         }))
       }
 
@@ -440,7 +477,7 @@ class FIS extends Component {
 
         {drawLegend && (
           <div>
-            <svg width={600} height={50} className="legend">
+            <svg width={600} height={30} className="legend">
               {/* Semiotic's Legend only supports vertical placing of elements, so we must construct our own SVG: */}
               {lineData.map((serie, index) => {
                 const DIST_HORIZ = 50;
@@ -520,7 +557,14 @@ class FIS extends Component {
   };
 
   render() {
-    const { fetchingInProgress, lineData, maxCCAllowed, isCloudCoverageDataAvailable, errorMsg } = this.state;
+    const {
+      fetchingInProgress,
+      fetchingBatches,
+      lineData,
+      maxCCAllowed,
+      isCloudCoverageDataAvailable,
+      errorMsg,
+    } = this.state;
     const { datasetId, layerId, customSelected } = this.props;
 
     const drawLegend = lineData && lineData.length > 1;
@@ -529,7 +573,7 @@ class FIS extends Component {
         animation="slideUp"
         visible={true}
         width={700}
-        height={460 + (drawLegend ? 30 : 0)}
+        height={500 + (drawLegend ? 30 : 0)}
         onClose={this.onClose}
         closeOnEsc={true}
       >
@@ -560,6 +604,14 @@ class FIS extends Component {
               </div>
             )}
           </div>
+          {!fetchingInProgress && !fetchingBatches && !errorMsg && lineData.length > 0 && (
+            <EOBButton
+              text={t`Export CSV`}
+              icon="download"
+              className="export-csv-button"
+              onClick={this.exportCSV}
+            />
+          )}
         </div>
       </Rodal>
     );

@@ -4,7 +4,7 @@
   .leaflet-control-container {
     .leaflet-bottom.leaflet-left {
       .leaflet-control-attribution {
-        background: $mainMedium;
+        background: $mainDark;
         color: hsla(0, 0%, 100%, 0.6);
 
         a {
@@ -19,12 +19,6 @@
       }
 
       @media screen and (max-width: 780px) {
-        .leaflet-control-attribution {
-          bottom: 25px;
-        }
-      }
-
-      @media screen and (max-width: 400px) {
         .leaflet-control-attribution {
           bottom: 25px;
         }
@@ -46,15 +40,15 @@
 
         .leaflet-control-zoom-in,
         .leaflet-control-zoom-out {
-          background-color: $mainMedium;
-          color: #ddd;
+          background-color: $mainDark;
+          color: $primaryCol;
           box-shadow: $boxShadow;
           border-radius: 0;
         }
 
         .leaflet-control-zoom-in:hover,
         .leaflet-control-zoom-out:hover {
-          background: $primaryCol;
+          background: $mainMedium;
           color: #fff;
         }
       }
@@ -69,7 +63,7 @@
         margin-bottom: 0;
 
         .leaflet-control-scale-line {
-          background: $mainMedium;
+          background: $mainDark;
           color: #fff;
           border-color: #fff;
         }
@@ -92,7 +86,7 @@
         margin-bottom: 0;
         clear: unset;
         font-size: 10px;
-        background: $mainMedium;
+        background: $mainDark;
         color: $textCol;
         padding: 1px;
         min-width: 160px;

@@ -34,6 +34,7 @@ import {
   getDataSourceHandler,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getAppropriateAuthToken } from '../App';
+import { constructErrorMessage } from '../utils';
 
 import { DEFAULT_ZOOM_CONFIGURATION } from '../Tools/SearchPanel/dataSourceHandlers/DataSourceHandler';
 
@@ -65,7 +66,12 @@ class Map extends React.Component {
   };
 
   setBounds = ev => {
-    store.dispatch(mainMapSlice.actions.setBounds(ev.target.getBounds()));
+    store.dispatch(
+      mainMapSlice.actions.setBounds({
+        bounds: ev.target.getBounds(),
+        pixelBounds: ev.target.getPixelBounds(),
+      }),
+    );
   };
 
   onPreviewClick = e => {
@@ -88,6 +94,18 @@ class Map extends React.Component {
     } catch (e) {
       // this catches a race condition where datasetId is not defined when rendering the component
       return DEFAULT_ZOOM_CONFIGURATION;
+    }
+  };
+
+  onTileError = async error => {
+    const message = await constructErrorMessage(error);
+    store.dispatch(visualizationSlice.actions.setError(message));
+  };
+
+  onTileLoad = () => {
+    const { error } = this.props;
+    if (error) {
+      store.dispatch(visualizationSlice.actions.setError(null));
     }
   };
 
@@ -116,6 +134,9 @@ class Map extends React.Component {
       redRangeEffect,
       greenRangeEffect,
       blueRangeEffect,
+      redCurveEffect,
+      greenCurveEffect,
+      blueCurveEffect,
       minQa,
       upsampling,
       downsampling,
@@ -202,9 +223,14 @@ class Map extends React.Component {
                   redRangeEffect={redRangeEffect}
                   greenRangeEffect={greenRangeEffect}
                   blueRangeEffect={blueRangeEffect}
+                  redCurveEffect={redCurveEffect}
+                  greenCurveEffect={greenCurveEffect}
+                  blueCurveEffect={blueCurveEffect}
                   minQa={minQa}
                   upsampling={upsampling}
                   downsampling={downsampling}
+                  onTileImageError={this.onTileError}
+                  onTileImageLoad={this.onTileLoad}
                 />
               </Overlay>
             )}
@@ -293,6 +319,8 @@ class Map extends React.Component {
                     pane={SENTINELHUB_LAYER_PANE_ID}
                     progress={this.progress}
                     accessToken={getAppropriateAuthToken(auth, themeId)}
+                    onTileImageError={this.onTileError}
+                    onTileImageLoad={this.onTileLoad}
                   />
                 );
               })}
@@ -397,9 +425,13 @@ const mapStoreToProps = store => {
     redRangeEffect: store.visualization.redRangeEffect,
     greenRangeEffect: store.visualization.greenRangeEffect,
     blueRangeEffect: store.visualization.blueRangeEffect,
+    redCurveEffect: store.visualization.redCurveEffect,
+    greenCurveEffect: store.visualization.greenCurveEffect,
+    blueCurveEffect: store.visualization.blueCurveEffect,
     minQa: store.visualization.minQa,
     upsampling: store.visualization.upsampling,
     downsampling: store.visualization.downsampling,
+    error: store.visualization.error,
     comparedLayers: store.compare.comparedLayers,
     comparedOpacity: store.compare.comparedOpacity,
     comparedClipping: store.compare.comparedClipping,

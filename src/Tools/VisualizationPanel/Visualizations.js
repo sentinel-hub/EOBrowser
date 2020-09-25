@@ -16,7 +16,10 @@ class Visualizations extends Component {
         {!this.props.supportsCustom ? null : (
           <div>
             <div
-              onClick={() => this.props.setCustomVisualization()}
+              onClick={() => {
+                window.location.hash = '#custom-composite'; // default accordion option
+                this.props.setCustomVisualization();
+              }}
               className={this.props.customSelected ? 'layer active' : 'layer'}
             >
               <i className="icon fa fa-paint-brush" />

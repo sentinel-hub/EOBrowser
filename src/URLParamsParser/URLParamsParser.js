@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 
-import { getUrlParams, parsePosition } from '../utils';
+import { getUrlParams, parsePosition, parseDataFusion } from '../utils';
 import {
   datasourceToDatasetId,
   dataSourceToThemeId,
@@ -9,6 +9,8 @@ import {
 } from '../utils/handleOldUrls';
 import store, { mainMapSlice, visualizationSlice, themesSlice } from '../store';
 import { b64DecodeUnicode } from '../utils/base64MDN';
+
+import { computeNewValuesFromPoints } from '../junk/EOBEffectsPanel/AdvancedRgbEffects/CurveEditor/utils';
 
 class URLParamsParser extends React.Component {
   state = {
@@ -144,6 +146,9 @@ class URLParamsParser extends React.Component {
       redRange,
       greenRange,
       blueRange,
+      redCurve,
+      greenCurve,
+      blueCurve,
       minQa,
       upsampling,
       downsampling,
@@ -167,10 +172,21 @@ class URLParamsParser extends React.Component {
       redRangeEffect: redRange ? JSON.parse(redRange) : undefined,
       greenRangeEffect: greenRange ? JSON.parse(greenRange) : undefined,
       blueRangeEffect: blueRange ? JSON.parse(blueRange) : undefined,
+
+      redCurveEffect: redCurve
+        ? { points: JSON.parse(redCurve), values: computeNewValuesFromPoints(JSON.parse(redCurve)) }
+        : undefined,
+      greenCurveEffect: greenCurve
+        ? { points: JSON.parse(greenCurve), values: computeNewValuesFromPoints(JSON.parse(greenCurve)) }
+        : undefined,
+      blueCurveEffect: blueCurve
+        ? { points: JSON.parse(blueCurve), values: computeNewValuesFromPoints(JSON.parse(blueCurve)) }
+        : undefined,
+
       minQa: minQa ? parseInt(minQa) : undefined,
       upsampling: upsampling,
       downsampling: downsampling,
-      dataFusion: dataFusion ? JSON.parse(dataFusion) : undefined,
+      dataFusion: dataFusion ? parseDataFusion(dataFusion, datasetId) : undefined,
     };
     store.dispatch(visualizationSlice.actions.setVisualizationParams(newVisualizationParams));
 

@@ -12,6 +12,7 @@ import {
   getDataSourceHandler,
   getEvalsource,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { b64EncodeUnicode } from '../../utils/base64MDN';
 
 export const timelapseBorders = (width, height, bbox) => ({
   sortIndex: 1,
@@ -33,7 +34,8 @@ class Timelapse extends Component {
       time: this.props.time.toISOString(),
       evalsource: getEvalsource(this.props.datasetId),
       preset: this.props.layerId ? this.props.layerId : 'CUSTOM',
-      evalscript: this.props.evalscript ? btoa(this.props.evalscript) : null,
+      evalscript: this.props.evalscript ? b64EncodeUnicode(this.props.evalscript) : null,
+      evalscripturl: this.props.evalscripturl ? this.props.evalscripturl : null,
     };
   };
 
@@ -134,6 +136,7 @@ class Timelapse extends Component {
       downsampling,
       minQa,
       dataFusion,
+      evalscripturl,
     } = this.props;
     const { minDate, maxDate } = this.getMinMaxDates();
 
@@ -174,10 +177,10 @@ class Timelapse extends Component {
           onQueryDatesForActiveMonth={this.onQueryDatesForActiveMonth}
           overlayLayers={timelapseOverlayLayers}
           canWeFilterByClouds={this.state.canWeFilterByClouds}
+          isEvalUrl={!!evalscripturl}
+          effects={effects}
           // TO DO
           evalscriptoverrides={''}
-          effects={effects}
-          isEvalUrl={false}
           aoiBounds={undefined}
           cloudCoverageLayers={null}
         />
@@ -197,6 +200,7 @@ const mapStoreToProps = store => ({
   customSelected: store.visualization.customSelected,
   visualizationUrl: store.visualization.visualizationUrl,
   evalscript: store.visualization.evalscript,
+  evalscripturl: store.visualization.evalscripturl,
   authToken: getAppropriateAuthToken(store.auth, store.themes.selectedThemeId),
   gainEffect: store.visualization.gainEffect,
   gammaEffect: store.visualization.gammaEffect,

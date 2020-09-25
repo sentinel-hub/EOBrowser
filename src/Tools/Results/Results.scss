@@ -11,13 +11,15 @@ $headerPadding: 10px;
 
   .results-heading {
     border-bottom: $headerBorderWidth solid #b6bf00;
-    background-color: $mainLight;
+    background-color: $mainMedium;
     z-index: 501;
     padding: $headerPadding;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     font-size: 14px;
+    position: sticky;
+    top: 0;
 
     .showing-n-results {
       text-align: right;
@@ -26,28 +28,18 @@ $headerPadding: 10px;
     .back-to-search {
       max-width: 45%;
       text-align: center;
+      padding: 6px 12px;
     }
   }
 
-  .results-panel {
-    background-color: $mainLight;
-    padding: 0 10px 10px 10px;
-    color: $textCol;
+  .img-info {
+    display: flex;
+    flex-direction: row;
+  }
 
-    & > .btn {
-      display: block;
-      text-align: center;
-    }
-
-    .rodal .results-panel {
-      height: calc(100% - 20px);
-      overflow: auto;
-      background: $mainMedium;
-    }
-
-    .results-controls {
-      width: 100%;
-    }
+  .img-btn {
+    display: flex;
+    flex-direction: column;
   }
 
   .result-item {
@@ -55,8 +47,9 @@ $headerPadding: 10px;
     position: relative;
     transition: all ease 0.4s;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    align-items: center;
+    background: $mainLight;
+    display: flex;
+    flex-direction: column;
 
     &:first-of-type {
       margin-top: 10px;
@@ -68,17 +61,16 @@ $headerPadding: 10px;
       justify-content: center;
       opacity: 0.6;
       max-width: none !important;
+      padding: 0 0 5px 0;
     }
 
     & > * {
-      width: calc(100% - 140px);
       margin-right: 0;
-      display: inline-block;
       vertical-align: top;
     }
 
     .preview-image {
-      width: 140px;
+      width: 125px;
     }
 
     .show-link-panel {
@@ -103,14 +95,13 @@ $headerPadding: 10px;
     .path-link-icon {
       float: right;
       margin-left: 6px;
-      border-radius: 30px;
       width: 30px;
       height: 30px;
       text-align: center;
       line-height: 30px;
       position: absolute;
-      top: 8px;
-      right: 8px;
+      top: 10px;
+      right: 10px;
       cursor: pointer;
 
       &.active {
@@ -134,9 +125,12 @@ $headerPadding: 10px;
     .details {
       padding: 0 0 0 10px;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
 
       .detail {
-        margin-bottom: 4px;
+        padding: 3px 0;
 
         &.bold {
           font-weight: bold;
@@ -157,6 +151,36 @@ $headerPadding: 10px;
       svg path {
         fill: $textCol;
       }
+    }
+  }
+
+  .results-panel {
+    background-color: $mainMedium;
+    padding: 0 10px 10px 10px;
+    color: $textCol;
+
+    & > .btn {
+      display: block;
+      text-align: center;
+    }
+
+    .rodal .results-panel {
+      height: calc(100% - 20px);
+      overflow: auto;
+      background: $mainDark;
+
+      .results-heading {
+        background: $mainDark;
+        padding-left: 0;
+      }
+
+      .result-item {
+        background: $mainMedium;
+      }
+    }
+
+    .results-controls {
+      width: 100%;
     }
   }
 }

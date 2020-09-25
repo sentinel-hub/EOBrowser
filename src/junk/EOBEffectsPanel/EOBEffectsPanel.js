@@ -1,6 +1,10 @@
 import React from 'react';
 import RCSlider from 'rc-slider';
+import Toggle from 'react-toggle';
 import { t } from 'ttag';
+import 'react-toggle/style.css';
+
+import AdvancedRgbEffects from './AdvancedRgbEffects/AdvancedRgbEffects';
 
 import './EOBEffectsPanel.scss';
 
@@ -9,9 +13,30 @@ export class EOBEffectsPanel extends React.Component {
     effects: {
       gainEffect: 1,
       gammaEffect: 1,
+
       redRangeEffect: [0, 1],
       greenRangeEffect: [0, 1],
       blueRangeEffect: [0, 1],
+
+      redCurveEffect: {
+        points: [
+          { x: 0, y: 0 },
+          { x: 1, y: 1 },
+        ],
+      },
+      greenCurveEffect: {
+        points: [
+          { x: 0, y: 0 },
+          { x: 1, y: 1 },
+        ],
+      },
+      blueCurveEffect: {
+        points: [
+          { x: 0, y: 0 },
+          { x: 1, y: 1 },
+        ],
+      },
+
       minQa: 50,
       upsampling: '',
       downsampling: '',
@@ -19,11 +44,18 @@ export class EOBEffectsPanel extends React.Component {
     isFISLayer: undefined,
     doesDatasetSupportMinQa: undefined,
     doesDatasetSupportInterpolation: undefined,
+
     onUpdateGainEffect: value => {},
     onUpdateGammaEffect: value => {},
+
     onUpdateRedRangeEffect: value => {},
     onUpdateGreenRangeEffect: value => {},
     onUpdateBlueRangeEffect: value => {},
+
+    onUpdateRedCurveEffect: value => {},
+    onUpdateGreenCurveEffect: value => {},
+    onUpdateBlueCurveEffect: value => {},
+
     onUpdateMinQa: value => {},
     onResetEffects: () => {},
   };
@@ -31,12 +63,36 @@ export class EOBEffectsPanel extends React.Component {
   constructor(props) {
     super(props);
 
+    const { redCurveEffect: rce, greenCurveEffect: gce, blueCurveEffect: bce } = this.props.effects;
+    const advancedRgbEffectsOpen = rce || gce || bce ? true : false;
+
     const {
       gainEffect = 1,
       gammaEffect = 1,
+
       redRangeEffect = [0, 1],
       greenRangeEffect = [0, 1],
       blueRangeEffect = [0, 1],
+
+      redCurveEffect = {
+        points: [
+          { x: 0, y: 0 },
+          { x: 1, y: 1 },
+        ],
+      },
+      greenCurveEffect = {
+        points: [
+          { x: 0, y: 0 },
+          { x: 1, y: 1 },
+        ],
+      },
+      blueCurveEffect = {
+        points: [
+          { x: 0, y: 0 },
+          { x: 1, y: 1 },
+        ],
+      },
+
       minQa = 50,
       upsampling = '',
       downsampling = '',
@@ -55,11 +111,17 @@ export class EOBEffectsPanel extends React.Component {
       blueRangeEffect: blueRangeEffect,
       blueRangeEffectLabels: blueRangeEffect,
 
+      redCurveEffect: redCurveEffect,
+      greenCurveEffect: greenCurveEffect,
+      blueCurveEffect: blueCurveEffect,
+
       minQa: minQa,
       minQaLabels: minQa,
 
       upsampling: upsampling,
       downsampling: downsampling,
+
+      advancedRgbEffectsOpen: advancedRgbEffectsOpen,
     };
   }
 
@@ -75,6 +137,25 @@ export class EOBEffectsPanel extends React.Component {
     greenRangeEffectLabels: [0, 1],
     blueRangeEffect: [0, 1],
     blueRangeEffectLabels: [0, 1],
+
+    redCurveEffect: {
+      points: [
+        { x: 0, y: 0 },
+        { x: 1, y: 1 },
+      ],
+    },
+    greenCurveEffect: {
+      points: [
+        { x: 0, y: 0 },
+        { x: 1, y: 1 },
+      ],
+    },
+    blueCurveEffect: {
+      points: [
+        { x: 0, y: 0 },
+        { x: 1, y: 1 },
+      ],
+    },
 
     minQa: this.props.defaultMinQaValue ? this.props.defaultMinQaValue : 50,
     minQaLabels: this.props.defaultMinQaValue ? this.props.defaultMinQaValue : 50,
@@ -174,6 +255,7 @@ export class EOBEffectsPanel extends React.Component {
   updateGammaEffect = () => {
     this.props.onUpdateGammaEffect(this.state.gammaEffectLabels);
   };
+
   updateRedRangeEffect = () => {
     this.props.isFISLayer
       ? this.props.onUpdateRedRangeEffect(undefined)
@@ -190,6 +272,16 @@ export class EOBEffectsPanel extends React.Component {
       : this.props.onUpdateBlueRangeEffect(this.state.blueRangeEffectLabels);
   };
 
+  updateRedCurveEffect = e => {
+    this.setState({ redCurveEffect: e }, this.props.onUpdateRedCurveEffect(e));
+  };
+  updateGreenCurveEffect = e => {
+    this.setState({ greenCurveEffect: e }, this.props.onUpdateGreenCurveEffect(e));
+  };
+  updateBlueCurveEffect = e => {
+    this.setState({ blueCurveEffect: e }, this.props.onUpdateBlueCurveEffect(e));
+  };
+
   updateMinQa = () => {
     this.props.onUpdateMinQa(this.state.minQa);
   };
@@ -197,7 +289,6 @@ export class EOBEffectsPanel extends React.Component {
   updateUpsampling = e => {
     this.setState({ upsampling: e.target.value }, this.props.onUpdateUpsampling(e.target.value));
   };
-
   updateDownsampling = e => {
     this.setState({ downsampling: e.target.value }, this.props.onUpdateDownsampling(e.target.value));
   };
@@ -214,6 +305,7 @@ export class EOBEffectsPanel extends React.Component {
       gammaEffectLabels: this.calcLog(e, 0.1, 10),
     });
   };
+
   changeRedRangeEffect = e => {
     this.setState({
       redRangeEffect: e,
@@ -244,6 +336,35 @@ export class EOBEffectsPanel extends React.Component {
     this.setState({ ...this.getDefaultState() }, () => {
       this.props.onResetEffects();
     });
+  };
+
+  toggleAdvancedRgbEffectsOpened = () => {
+    const {
+      redRangeEffect,
+      redRangeEffectLabels,
+      greenRangeEffect,
+      greenRangeEffectLabels,
+      blueRangeEffect,
+      blueRangeEffectLabels,
+      redCurveEffect,
+      greenCurveEffect,
+      blueCurveEffect,
+    } = this.getDefaultState();
+    this.setState(
+      oldState => ({
+        redRangeEffect,
+        redRangeEffectLabels,
+        greenRangeEffect,
+        greenRangeEffectLabels,
+        blueRangeEffect,
+        blueRangeEffectLabels,
+        redCurveEffect,
+        greenCurveEffect,
+        blueCurveEffect,
+        advancedRgbEffectsOpen: !oldState.advancedRgbEffectsOpen,
+      }),
+      this.props.onResetRgbEffects(),
+    );
   };
 
   renderGainSlider() {
@@ -500,7 +621,27 @@ export class EOBEffectsPanel extends React.Component {
         {this.renderGainSlider()}
         {this.renderGammaSlider()}
 
-        {!this.props.isFISLayer && this.renderColorSliders()}
+        <div className="rgb-effects-chooser">
+          <label>Advanced RGB effects:</label>
+          <Toggle
+            checked={this.state.advancedRgbEffectsOpen}
+            icons={false}
+            onChange={this.toggleAdvancedRgbEffectsOpened}
+          />
+        </div>
+
+        {!this.props.isFISLayer && !this.state.advancedRgbEffectsOpen && this.renderColorSliders()}
+
+        {this.state.advancedRgbEffectsOpen && (
+          <AdvancedRgbEffects
+            redCurveEffect={this.state.redCurveEffect}
+            greenCurveEffect={this.state.greenCurveEffect}
+            blueCurveEffect={this.state.blueCurveEffect}
+            updateRedCurveEffect={this.updateRedCurveEffect}
+            updateGreenCurveEffect={this.updateGreenCurveEffect}
+            updateBlueCurveEffect={this.updateBlueCurveEffect}
+          />
+        )}
 
         {this.props.doesDatasetSupportMinQa && this.renderMinQaSlider()}
 

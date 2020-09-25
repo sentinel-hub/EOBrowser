@@ -21,7 +21,7 @@ export const VisualizationPanelHeaderActions = ({
   const actions = [
     {
       id: 'savePin',
-      title: () => t`Pin to your favourite items`,
+      title: () => t`Add to Pins`,
       onClick: () => onSavePin(),
       icon: () => 'fa fa-thumb-tack',
       visible: () => true,

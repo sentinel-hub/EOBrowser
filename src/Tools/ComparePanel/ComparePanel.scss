@@ -1,7 +1,7 @@
 @import '../../variables';
 
 .compare-panel {
-  background-color: $mainLight;
+  background-color: $mainMedium;
   color: $textCol;
   display: flex;
   flex-flow: column;
@@ -45,11 +45,11 @@
   border-bottom: 1px solid $mainDark;
   user-select: none;
   color: $textColor;
-  background-color: $mainLight;
+  background-color: $mainMedium;
   font-size: 14px;
 
   &.normal-mode:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: $mainLight;
     cursor: pointer;
 
     & > div:first-child {

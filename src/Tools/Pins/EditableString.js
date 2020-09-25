@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from 'ttag';
 
 const BLOCKABLE_OUTSIDE_EVENTS = ['click', 'mousedown', 'mouseup', 'touch', 'touchstart', 'touchend'];
 
@@ -126,13 +127,13 @@ class EditableString extends React.Component {
             this.props.text
           )}
         </div>
-        <div className="pin-edit-controls">
+        <div className="pin-edit-controls" title={t`Rename pin`}>
           {this.state.editing ? (
             <React.Fragment>
-              <div className="clickable cancel" onClick={this.onCancelClick}>
+              <div className="clickable cancel" title={t`Reject changes`} onClick={this.onCancelClick}>
                 <i className="fa fa-close" />
               </div>
-              <div className="clickable confirm" onClick={this.onSaveClick}>
+              <div className="clickable confirm" title={t`Confirm changes`} onClick={this.onSaveClick}>
                 <i className="fa fa-check" />
               </div>
             </React.Fragment>

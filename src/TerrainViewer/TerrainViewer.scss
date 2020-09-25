@@ -1,0 +1,76 @@
+@import '../variables';
+
+.terrain-viewer-button {
+  z-index: 400;
+  cursor: pointer;
+  position: absolute;
+  top: 310px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  background: $mainDark;
+  padding: 0;
+  color: #fff;
+  margin: 0;
+  height: 40px;
+  width: 40px;
+  border: none;
+  overflow: visible;
+  right: 10px;
+  text-align: center;
+
+  i {
+    font-size: 20px;
+    line-height: 40px;
+    width: 40px;
+    cursor: pointer;
+    color: $primaryCol;
+
+    &.disabled {
+      opacity: 0.5;
+    }
+  }
+}
+
+.terrain-visualization {
+  color: $textCol;
+  padding-top: 10px;
+
+  .title {
+    font-size: 20px;
+    font-weight: normal;
+    margin: 0 0 1px;
+    height: 50px;
+    padding: 0 15px;
+    line-height: 50px;
+  }
+
+  .canvas-holder {
+    text-align: center;
+
+    canvas {
+      width: 100%;
+    }
+  }
+
+  .height-info {
+    display: flex;
+    flex-direction: column;
+
+    span {
+      margin: 10px;
+
+      label {
+        font-weight: bold;
+      }
+    }
+  }
+
+  .download-button-holder {
+    margin-top: 10px;
+    text-align: center;
+
+    .download-button {
+      margin: 0 auto;
+      width: 20%;
+    }
+  }
+}

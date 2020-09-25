@@ -1,6 +1,7 @@
 import React from 'react';
 import { DATASET_S5PL2, S5PL2Layer } from '@sentinel-hub/sentinelhub-js';
 
+import { t } from 'ttag';
 import DataSourceHandler from './DataSourceHandler';
 import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/GenericSearchGroup';
 import Sentinel5Tooltip from './DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
@@ -22,15 +23,15 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
   S5PDATASETS = [S5_O3, S5_NO2, S5_SO2, S5_CO, S5_HCHO, S5_CH4, S5_AER_AI, S5_CLOUD];
 
   datasetSearchLabels = {
-    [S5_O3]: 'O3',
-    [S5_NO2]: 'NO2',
-    [S5_SO2]: 'SO2',
-    [S5_CO]: 'CO',
-    [S5_HCHO]: 'HCHO',
-    [S5_CH4]: 'CH4',
-    [S5_AER_AI]: 'AER_AI',
-    [S5_CLOUD]: 'CLOUD',
-    [S5_OTHER]: 'Other',
+    [S5_O3]: t`O3 (Ozone)`,
+    [S5_NO2]: t`NO2 (Nitrogen dioxide)`,
+    [S5_SO2]: t`SO2 (Sulfur dioxide)`,
+    [S5_CO]: t`CO (Carbon monoxide)`,
+    [S5_HCHO]: t`HCHO (Formaldehyde)`,
+    [S5_CH4]: t`CH4 (Methane)`,
+    [S5_AER_AI]: t`AER AI (Aerosol Index)`,
+    [S5_CLOUD]: t`Cloud`,
+    [S5_OTHER]: t`Other`,
   };
   datasetSearchIds = {
     [S5_O3]: 'O3',

@@ -1,5 +1,5 @@
 /* stylelint-disable */
-@import './EOBCommon/variables.scss';
+@import '../variables.scss';
 
 .panelButton {
   position: absolute !important;
@@ -7,7 +7,7 @@
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
   z-index: 10;
-  background: #3b3d4d;
+  background: $mainDark;
   color: #fff;
   height: 40px;
   -webkit-box-shadow: 0 2px 5px #000;
@@ -53,7 +53,7 @@
   }
 
   .drawGeometry {
-    background-color: #191a25;
+    background-color: $mainDark;
     height: 40px;
   }
 
@@ -79,7 +79,7 @@
 
 .floatItem {
   position: relative;
-  background: $mainLight;
+  background: $mainMedium;
   padding: 0;
   color: #fff;
   margin: 0;
@@ -129,7 +129,7 @@
       bottom: 0;
       line-height: 28px;
       text-align: center;
-      background: $mainLight;
+      background: $mainMedium;
       white-space: nowrap;
       padding: 2px 5px;
       box-shadow: 0 2px 10px #000;

@@ -6,6 +6,7 @@ import { DraggableBand } from './DraggableBand';
 import { DraggableBandGhost } from './DraggableBandGhost';
 import { SliderThreshold } from './SliderThreshold';
 import { pickColor, spreadHandlersEvenly } from './utils';
+import { parseIndexEvalscript } from '../../utils';
 
 import './BandsToRGB.scss';
 
@@ -24,16 +25,40 @@ const DEFAULT_DOMAIN = { min: 0, max: 1 };
 const EQUATIONS = ['(A-B)/(A+B)', '(A/B)'];
 const DEFAULT_VALUES = spreadHandlersEvenly(8, DEFAULT_DOMAIN.min, DEFAULT_DOMAIN.max);
 
-export const IndexBands = ({ bands, layers, onChange }) => {
+export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   const [equation, setEquation] = React.useState(EQUATIONS[0]);
   const [gradient, setGradient] = React.useState(DEFAULT_GRADIENT);
   const [values, setValues] = React.useState(DEFAULT_VALUES); //
   const [min, setMin] = React.useState(DEFAULT_DOMAIN.min);
   const [max, setMax] = React.useState(DEFAULT_DOMAIN.max);
-  const [colorRamp, setColorRamp] = React.useState();
+  const [colorRamp, setColorRamp] = React.useState(); // [ "#000000", "#242424", ... , "#ffffff" ]
   const [open, setOpen] = React.useState(false);
 
   const equationArray = [...equation]; // split string into array
+
+  React.useEffect(() => {
+    if (evalscript) {
+      const parsed = parseIndexEvalscript(evalscript);
+
+      if (parsed !== null) {
+        initEvalFromUrl(parsed);
+      }
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  const initEvalFromUrl = parsed => {
+    setValues(parsed.positions);
+    setGradient([
+      parsed.colors[0].replace('#', '0x'),
+      parsed.colors[parsed.colors.length - 1].replace('#', '0x'),
+    ]);
+    setEquation(parsed.equation);
+    setColorRamp(parsed.colors);
+    setMin(parsed.positions[0]); // because we don't save slider min/max use first/last values from evalscript
+    setMax(parsed.positions[parsed.positions.length - 1]);
+    onChange(layers, { equation: parsed.equation, colorRamp: parsed.colors, values: parsed.positions });
+  };
 
   const initColors = (values, currentGradient, min, max) => {
     return values.map(item => pickColor(currentGradient[0], currentGradient[1], item, min, max));
@@ -134,7 +159,12 @@ export const IndexBands = ({ bands, layers, onChange }) => {
       {/* Equation select */}
       <p>
         {t`Index `}
-        <select className="dropdown index" onChange={e => onEquationChange(e.target.value)}>
+        <select
+          key={equation}
+          defaultValue={equation}
+          className="dropdown index"
+          onChange={e => onEquationChange(e.target.value)}
+        >
           {EQUATIONS.map((equation, i) => (
             <option key={i}>{equation}</option>
           ))}

@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  LayersFactory,
   DATASET_AWSEU_S1GRD,
   DATASET_S2L1C,
   DATASET_S2L2A,
@@ -12,142 +11,178 @@ import {
   DATASET_AWS_DEM,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
+import { connect } from 'react-redux';
 
-import DataFusionSupplementalDataset from './DataFusionSupplementalDataset';
+import SupplementalDatasets from './SupplementalDatasets';
+import DataFusionPrimaryDataset from './DataFusionPrimaryDataset';
+import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
-export default class DataFusion extends React.Component {
-  state = {
-    primaryLayer: null,
-  };
-
-  async componentDidMount() {
-    const { baseUrlWms } = this.props;
-    const layers = await LayersFactory.makeLayers(baseUrlWms);
-    this.setState({
-      primaryLayer: layers[0],
-    });
-  }
-
+class DataFusion extends React.Component {
   toggleDataFusionEnabled = () => {
-    const {
-      settings,
-      settings: { enabled = false },
-    } = this.props;
-    this.props.onChange({
-      ...settings,
-      enabled: !enabled,
-    });
-  };
-
-  onSupplementalDatasetChange = (datasetId, values) => {
     const { settings } = this.props;
-    const { supplementalDatasets: supplementalDatasetsSettings = {} } = settings;
-    this.props.onChange({
-      ...settings,
-      supplementalDatasets: {
-        ...supplementalDatasetsSettings,
-        [datasetId]: values,
-      },
-    });
+    const enabled = settings && settings.length > 0;
+
+    if (enabled) {
+      this.props.onChange([]);
+    } else {
+      const primaryDataset = this.getPrimaryDataset();
+      this.props.onChange([primaryDataset]);
+    }
   };
 
-  supportsDataFusion(dataset) {
-    return [
-      'https://services.sentinel-hub.com/',
-      'https://creodias.sentinel-hub.com/',
-      'https://services-uswest2.sentinel-hub.com/',
-    ].includes(dataset.shServiceHostname);
+  getPrimaryDataset = () => {
+    const { datasetId } = this.props;
+    const dataset = getDataSourceHandler(datasetId).getSentinelHubDataset(datasetId);
+    const alias = this.constructAlias(dataset, []);
+    return {
+      id: dataset.id,
+      alias: alias,
+    };
+  };
+
+  getAvailableDatasets(dataset) {
+    return {
+      [DATASET_AWSEU_S1GRD.id]: {
+        label: 'S-1 GRD',
+        dataset: DATASET_AWSEU_S1GRD,
+        additionalMosaickingOrders: [],
+      },
+      [DATASET_S2L1C.id]: {
+        label: 'S-2 L1C',
+        dataset: DATASET_S2L1C,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_S2L2A.id]: {
+        label: 'S-2 L2A',
+        dataset: DATASET_S2L2A,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_S3SLSTR.id]: {
+        label: 'S-3 SLSTR',
+        dataset: DATASET_S3SLSTR,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_S3OLCI.id]: {
+        label: 'S-3 OLCI',
+        dataset: DATASET_S3OLCI,
+        additionalMosaickingOrders: [],
+      },
+      [DATASET_S5PL2.id]: {
+        label: 'S-5P L2',
+        dataset: DATASET_S5PL2,
+        additionalMosaickingOrders: [],
+      },
+      [DATASET_AWS_DEM.id]: {
+        label: 'DEM',
+        dataset: DATASET_AWS_DEM,
+        additionalMosaickingOrders: [],
+      },
+      [DATASET_AWS_L8L1C.id]: {
+        label: 'Landsat 8 L1C',
+        dataset: DATASET_AWS_L8L1C,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_AWS_L8L1C.id]: {
+        label: 'Landsat 8 L1C',
+        dataset: DATASET_AWS_L8L1C,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_MODIS.id]: {
+        label: 'MODIS',
+        dataset: DATASET_MODIS,
+        additionalMosaickingOrders: [],
+      },
+      [DATASET_AWS_DEM.id]: {
+        label: 'DEM',
+        dataset: DATASET_AWS_DEM,
+        additionalMosaickingOrders: [],
+      },
+    };
   }
 
-  getSupplementalLayers(dataset) {
-    // - services: S1GRD, S2L2A, S2L1C
-    // - creodias: S3SLSTR, S3OLCI, S5PL2
-    // - uswest: L8, MODIS, DEM
-    switch (dataset) {
-      case DATASET_AWSEU_S1GRD:
-      case DATASET_S2L1C:
-      case DATASET_S2L2A:
-      case DATASET_S3SLSTR:
-      case DATASET_S3OLCI:
-      case DATASET_S5PL2:
-        return {
-          [DATASET_AWSEU_S1GRD.id]: {
-            label: 'S-1 GRD',
-            dataset: DATASET_AWSEU_S1GRD,
-            additionalMosaickingOrders: [],
-          },
-          [DATASET_S2L1C.id]: {
-            label: 'S-2 L1C',
-            dataset: DATASET_S2L1C,
-            additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
-          },
-          [DATASET_S2L2A.id]: {
-            label: 'S-2 L2A',
-            dataset: DATASET_S2L2A,
-            additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
-          },
-          [DATASET_S3SLSTR.id]: {
-            label: 'S-3 SLSTR',
-            dataset: DATASET_S3SLSTR,
-            additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
-          },
-          [DATASET_S3OLCI.id]: {
-            label: 'S-3 OLCI',
-            dataset: DATASET_S3OLCI,
-            additionalMosaickingOrders: [],
-          },
-          [DATASET_S5PL2.id]: {
-            label: 'S-5P L2',
-            dataset: DATASET_S5PL2,
-            additionalMosaickingOrders: [],
-          },
-        };
-      case DATASET_AWS_L8L1C:
-      case DATASET_MODIS:
-      case DATASET_AWS_DEM:
-        return {
-          [DATASET_AWS_L8L1C.id]: {
-            label: 'Landsat 8 L1C',
-            dataset: DATASET_AWS_L8L1C,
-            additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
-          },
-          [DATASET_MODIS.id]: {
-            label: 'MODIS',
-            dataset: DATASET_MODIS,
-            additionalMosaickingOrders: [],
-          },
-          [DATASET_AWS_DEM.id]: {
-            label: 'DEM',
-            dataset: DATASET_AWS_DEM,
-            additionalMosaickingOrders: [],
-          },
-        };
-      default:
-        return {};
+  constructAlias = (dataset, settings) => {
+    const existingAliases = settings.filter(d => d.id === dataset.id).map(d => d.alias);
+    const newAliasBase = `${dataset.shProcessingApiDatasourceAbbreviation.toUpperCase()}`;
+    let serialNumber = existingAliases.length;
+    let newAlias = serialNumber ? `${newAliasBase}-${serialNumber}` : newAliasBase;
+    while (existingAliases.includes(newAlias)) {
+      serialNumber += 1;
+      newAlias = `${newAliasBase}-${serialNumber}`;
     }
-  }
+    return newAlias;
+  };
+
+  onAddSupplementalDataset = newDatasetId => {
+    const {
+      settings: [...settings],
+    } = this.props;
+
+    const dataset = this.getAvailableDatasets()[newDatasetId].dataset;
+    const newAlias = this.constructAlias(dataset, settings);
+    const newDataset = {
+      id: newDatasetId,
+      alias: newAlias,
+    };
+    settings.push(newDataset);
+
+    this.props.onChange(settings);
+  };
+
+  onRemoveSupplementalDataset = alias => {
+    const {
+      settings: [...settings],
+    } = this.props;
+    const newSettings = settings.filter(d => d.alias !== alias);
+    this.props.onChange(newSettings);
+  };
+
+  updateAlias = (oldAlias, newAlias) => {
+    this.setNewSettings(oldAlias, 'alias', newAlias);
+  };
+
+  updateMosaickingOrder = (alias, mosaickingOrder) => {
+    this.setNewSettings(alias, 'mosaickingOrder', mosaickingOrder);
+  };
+
+  updateTimespan = (alias, fromTime, toTime) => {
+    this.setNewSettings(alias, 'timespan', [fromTime, toTime]);
+  };
+
+  setNewSettings = (alias, key, newValue) => {
+    let {
+      settings: [...newSettings],
+    } = this.props;
+    const datasetIndex = newSettings.findIndex(d => d.alias === alias);
+    const datasetSettings = { ...newSettings[datasetIndex] };
+    datasetSettings[key] = newValue;
+    newSettings[datasetIndex] = datasetSettings;
+    this.props.onChange(newSettings);
+  };
+
+  checkAliasValidity = alias => {
+    const { settings } = this.props;
+    return !!alias && !settings.some(d => d.alias === alias);
+  };
 
   render() {
-    const { primaryLayer } = this.state;
-    const {
-      settings: { enabled = false, supplementalDatasets: supplementalDatasetsSettings = {} },
-      initialTimespan,
-    } = this.props;
+    const { initialTimespan, datasetId } = this.props;
+    let settings = [...this.props.settings];
 
-    if (primaryLayer === null) {
-      return <i className="fa fa-spinner fa-spin fa-fw" />;
-    }
+    const availableDatasets = this.getAvailableDatasets();
+    const dataset = getDataSourceHandler(datasetId).getSentinelHubDataset(datasetId);
 
-    if (!primaryLayer.dataset) {
+    if (!dataset || !availableDatasets[dataset.id]) {
       return null;
     }
 
-    if (!this.supportsDataFusion(primaryLayer.dataset)) {
-      return null;
-    }
+    const primaryDatasetIndex = settings.findIndex(d => d.id === dataset.id);
+    const primaryDataset = settings[primaryDatasetIndex];
+    const supplementalDatasets = [
+      ...settings.slice(0, primaryDatasetIndex),
+      ...settings.slice(primaryDatasetIndex + 1),
+    ];
 
-    const dataset = primaryLayer.dataset;
-    const supplementalDatasets = this.getSupplementalLayers(primaryLayer.dataset);
+    const enabled = settings && settings.length > 0;
 
     return (
       <div style={{ padding: '5px 0px 5px 0px', fontSize: 12, marginTop: '5px' }}>
@@ -163,29 +198,37 @@ export default class DataFusion extends React.Component {
 
         {enabled && (
           <div className="insert-url-block">
-            <div className="primary-dataset">
-              <label>{`Primary dataset: ${supplementalDatasets[dataset.id].label}`}</label>
-              <div className="datasource-info">
-                <i className="fa fa-info-circle" />
-                <span>{`Datasource alias in evalscript: "${dataset.shProcessingApiDatasourceAbbreviation.toLowerCase()}"`}</span>
-              </div>
-            </div>
-            {Object.keys(supplementalDatasets).map(supDatasetId =>
-              supDatasetId === dataset.id ? null : (
-                <DataFusionSupplementalDataset
-                  key={supDatasetId}
-                  label={supplementalDatasets[supDatasetId].label}
-                  dataset={supplementalDatasets[supDatasetId].dataset}
-                  additionalMosaickingOrders={supplementalDatasets[supDatasetId].additionalMosaickingOrders}
-                  initialTimespan={initialTimespan}
-                  settings={supplementalDatasetsSettings[supDatasetId] || {}}
-                  onChange={values => this.onSupplementalDatasetChange(supDatasetId, values)}
-                />
-              ),
-            )}
+            <DataFusionPrimaryDataset
+              alias={primaryDataset.alias}
+              label={availableDatasets[dataset.id].label}
+              updateAlias={this.updateAlias}
+              supplementalDatasets={supplementalDatasets}
+              checkAliasValidity={this.checkAliasValidity}
+              updateMosaickingOrder={this.updateMosaickingOrder}
+              mosaickingOrder={primaryDataset.mosaickingOrder}
+              additionalMosaickingOrders={availableDatasets[dataset.id].additionalMosaickingOrders}
+            />
+
+            <SupplementalDatasets
+              initialTimespan={initialTimespan}
+              availableSupplementalDatasets={availableDatasets}
+              supplementalDatasets={supplementalDatasets}
+              onAddSupplementalDataset={this.onAddSupplementalDataset}
+              onRemoveSupplementalDataset={this.onRemoveSupplementalDataset}
+              updateAlias={this.updateAlias}
+              updateTimespan={this.updateTimespan}
+              updateMosaickingOrder={this.updateMosaickingOrder}
+              checkAliasValidity={this.checkAliasValidity}
+            />
           </div>
         )}
       </div>
     );
   }
 }
+
+const mapStoreToProps = store => ({
+  datasetId: store.visualization.datasetId,
+});
+
+export default connect(mapStoreToProps, null)(DataFusion);

@@ -1,102 +1,110 @@
-import React from 'react';
-import moment from 'moment';
+import React, { useState, useEffect } from 'react';
 import { t } from 'ttag';
+import { MosaickingOrder } from '@sentinel-hub/sentinelhub-js';
 
-import { EOBTimespanPicker } from '../EOBCommon/EOBTimespanPicker/EOBTimespanPicker';
+import { TimespanPicker } from '../../components/TimespanPicker/TimespanPicker';
 
-export default class DataFusionSupplementalDataset extends React.Component {
-  toggleEnabled = () => {
-    const { settings } = this.props;
-    const { enabled = false } = settings;
-    this.props.onChange({
-      ...settings,
-      enabled: !enabled,
-    });
-  };
+function DataFusionSupplementalDataset(props) {
+  const {
+    alias,
+    mosaickingOrder = MosaickingOrder.MOST_RECENT,
+    additionalMosaickingOrders,
+    minDate,
+    maxDate,
+    initialTimespan,
+    label,
+  } = props;
 
-  updateMosaickingOrder = ev => {
-    const { settings } = this.props;
-    this.props.onChange({
-      ...settings,
-      mosaickingOrder: ev.target.value,
-    });
-  };
+  const [isCustomTimespan, setIsCustomTimespan] = useState(!!props.timespan);
+  const [settingsExpanded, setSettingsExpanded] = useState(true);
+  const [isValid, setIsValid] = useState(true);
+  const [currentAlias, setCurrentAlias] = useState(alias);
 
-  toggleCustomTimespan = () => {
-    const { settings } = this.props;
-    const { isCustomTimespan = false } = settings;
-    this.props.onChange({
-      ...settings,
-      isCustomTimespan: !isCustomTimespan,
-    });
-  };
+  useEffect(() => {
+    if (isValid) {
+      props.updateAlias(alias, currentAlias);
+    }
+    // Disable warning for values used not in the dependency array (we only want useEffect to run on currentAlias change)
+    // eslint-disable-next-line
+  }, [currentAlias]);
 
-  onTimespanChange = value => {
-    const { settings } = this.props;
-    const [from, to] = value.split('/');
-    this.props.onChange({
-      ...settings,
-      timespan: [moment.utc(from), moment.utc(to)],
-    });
-  };
-
-  render() {
-    const {
-      label,
-      dataset,
-      initialTimespan,
-      additionalMosaickingOrders,
-      settings: { enabled = false, mosaickingOrder = 'mostRecent', isCustomTimespan = false },
-    } = this.props;
-    return (
-      <div className="supplemental-dataset">
-        <input type="checkbox" id={`use-${dataset.id}`} checked={enabled} onChange={this.toggleEnabled} />
-        <label htmlFor={`use-${dataset.id}`}>{label}</label>
-
-        {enabled ? (
-          <div className="datasource-info">
-            <i className="fa fa-info-circle" />
-            <span>{`Datasource alias in evalscript: "${dataset.shProcessingApiDatasourceAbbreviation.toLowerCase()}"`}</span>
-          </div>
-        ) : null}
-
-        {enabled && (
-          <div className="supplemental-dataset-settings">
-            <div className="mosaicking-order">
-              {t`Mosaicking order`}:
-              <select className="dropdown" value={mosaickingOrder} onChange={this.updateMosaickingOrder}>
-                <option value="mostRecent">{t`Most recent`}</option>
-                <option value="leastRecent">{t`Least recent`}</option>
-                {additionalMosaickingOrders.map(mo => (
-                  <option key={mo.id} value={mo.id}>
-                    {mo.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="timespan">
-              <input
-                type="checkbox"
-                id={`custom-timespan-${dataset.id}`}
-                checked={isCustomTimespan}
-                onChange={this.toggleCustomTimespan}
-              />
-              <label htmlFor={`custom-timespan-${dataset.id}`}>{t`Customize timespan`}</label>
-              {isCustomTimespan && (
-                <EOBTimespanPicker
-                  initialTimespan={initialTimespan}
-                  maxDate={dataset.maxDate === null ? new Date() : dataset.maxDate}
-                  minDate={dataset.minDate}
-                  applyTimespan={this.onTimespanChange}
-                  autoApply={true}
-                  searchAvailableDays={false}
-                />
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    );
+  function updateAlias(e) {
+    const isValid = props.checkAliasValidity(e.target.value);
+    if (isValid) {
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+    }
+    setCurrentAlias(e.target.value);
   }
+
+  const timespan = props.timespan
+    ? { fromTime: props.timespan[0], toTime: props.timespan[1] }
+    : initialTimespan;
+  return (
+    <div className="supplemental-dataset">
+      <div className="supplemental-dataset-header" onClick={() => setSettingsExpanded(!settingsExpanded)}>
+        {settingsExpanded ? (
+          <i className="fa fa-chevron-up open-close" />
+        ) : (
+          <i className="fa fa-chevron-down open-close" />
+        )}
+        <span>{`${alias} (${label})`}</span>
+        <i className="fa fa-trash remove" onClick={() => props.onRemoveSupplementalDataset(alias)} />
+      </div>
+
+      {settingsExpanded && (
+        <div className="supplemental-dataset-info">
+          <div className="supplemental-dataset-alias-input">
+            <label htmlFor={`${alias}-alias`}>Datasource alias: </label>
+            <input
+              id={`${alias}-alias`}
+              value={currentAlias}
+              className={isValid ? '' : 'invalid'}
+              onChange={updateAlias}
+            />
+          </div>
+
+          <div className="mosaicking-order">
+            {t`Mosaicking order`}:
+            <select
+              className="dropdown"
+              value={mosaickingOrder}
+              onChange={e => props.updateMosaickingOrder(alias, e.target.value)}
+            >
+              <option value={MosaickingOrder.MOST_RECENT}>{t`Most recent`}</option>
+              <option value={MosaickingOrder.LEAST_RECENT}>{t`Least recent`}</option>
+              {additionalMosaickingOrders.map(mo => (
+                <option key={mo.id} value={mo.id}>
+                  {mo.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="timespan">
+            <input
+              type="checkbox"
+              id={`custom-timespan-${alias}`}
+              checked={isCustomTimespan}
+              onChange={() => setIsCustomTimespan(!isCustomTimespan)}
+            />
+            <label htmlFor={`custom-timespan-${alias}`}>{t`Customize timespan`}</label>
+            {isCustomTimespan && (
+              <TimespanPicker
+                id={alias}
+                timespan={timespan}
+                maxDate={maxDate}
+                minDate={minDate}
+                applyTimespan={(fromTime, toTime) => props.updateTimespan(alias, fromTime, toTime)}
+                autoApply={true}
+              />
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
+
+export default DataFusionSupplementalDataset;

@@ -337,4 +337,8 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
   updateLayersOnVisualization() {
     return false;
   }
+
+  supportsV3Evalscript() {
+    return false;
+  }
 }

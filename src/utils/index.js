@@ -1,5 +1,20 @@
-import { b64EncodeUnicode } from './base64MDN';
 import round from 'lodash.round';
+import moment from 'moment';
+import {
+  DATASET_AWS_L8L1C,
+  DATASET_MODIS,
+  DATASET_S2L1C,
+  DATASET_S2L2A,
+  DATASET_S3OLCI,
+  DATASET_S3SLSTR,
+  DATASET_S5PL2,
+  DATASET_AWSEU_S1GRD,
+  DATASET_AWS_DEM,
+} from '@sentinel-hub/sentinelhub-js';
+
+import { b64EncodeUnicode } from './base64MDN';
+import { getDataSourceHandler } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+
 export function getUrlParams() {
   const urlParamString = window.location.search.length > 0 ? window.location.search : window.location.hash;
   const searchParams = new URLSearchParams(urlParamString);
@@ -37,6 +52,15 @@ export function userCanAccessLockedFunctionality(user, selectedTheme) {
   - evalscripturl: evalscripturl of the layer (if layerId is not specified)
   - gain: gain effect
   - gamma: gamma effect
+  - redRangeEffect: red range effect (slider)
+  - greenRangeEffect: green range effect (slider)
+  - blueRangeEffect: blue range effect (slider)
+  - redCurveEffect: part of the advanced rgb effects / manipulation 
+  - greenCurveEffect: part of the advanced rgb effects / manipulation
+  - blueCurveEffect: part of the advanced rgb effects / manipulation
+  - minQa: minQa (min quality) for Sentinel-5P
+  - upsampling: upsampling (SH datasets only)
+  - downsampling: downsampling (SH datasets only)
   - dataFusion: dataFusion settings
 */
 export function updatePath(props) {
@@ -60,6 +84,9 @@ export function updatePath(props) {
     redRangeEffect,
     greenRangeEffect,
     blueRangeEffect,
+    redCurveEffect,
+    greenCurveEffect,
+    blueCurveEffect,
     minQa,
     upsampling,
     downsampling,
@@ -119,6 +146,17 @@ export function updatePath(props) {
     if (blueRangeEffect && !(blueRangeEffect[0] === 0 && blueRangeEffect[1] === 1)) {
       params.blueRange = JSON.stringify(blueRangeEffect);
     }
+
+    if (redCurveEffect && redCurveEffect.points) {
+      params.redCurve = JSON.stringify(redCurveEffect.points);
+    }
+    if (greenCurveEffect && greenCurveEffect.points) {
+      params.greenCurve = JSON.stringify(greenCurveEffect.points);
+    }
+    if (blueCurveEffect && blueCurveEffect.points) {
+      params.blueCurve = JSON.stringify(blueCurveEffect.points);
+    }
+
     if (minQa !== undefined) {
       params.minQa = minQa;
     }
@@ -136,7 +174,8 @@ export function updatePath(props) {
   const escapedParams = Object.keys(params)
     .map(k => `${k}=${encodeURIComponent(params[k])}`)
     .join('&');
-  const newUrl = window.location.origin + window.location.pathname + '?' + escapedParams;
+  const newUrl =
+    window.location.origin + window.location.pathname + '?' + escapedParams + window.location.hash;
   window.history.pushState({}, '', newUrl);
 }
 // eslint-disable-next-line
@@ -159,38 +198,38 @@ export function constructV3Evalscript(bands, config) {
 
     // temp fix with index instead of actual positions, to be removed in next commit
     return `//VERSION=3
-      const colorRamp = [${colorRamp.map((color, index) => `[${values[index]},${color.replace('#', '0x')}]`)}]
+const colorRamp = [${colorRamp.map((color, index) => `[${values[index]},${color.replace('#', '0x')}]`)}]
     
-      let viz = new ColorRampVisualizer(colorRamp);
+let viz = new ColorRampVisualizer(colorRamp);
       
-      function setup() {
-        return {
-          input: ["${[...new Set(Object.values(bands))].join('","')}", "dataMask"],
-          output: { bands: 4 }
-        };
-      }
+function setup() {
+  return {
+    input: ["${[...new Set(Object.values(bands))].join('","')}", "dataMask"],
+    output: { bands: 4 }
+  };
+}
 
-      function evaluatePixel(samples) {
-        let index = ${indexEquation}
-          return [...viz.process(index),samples.dataMask]; 
-      }`;
+function evaluatePixel(samples) {
+  let index = ${indexEquation}
+    return [...viz.process(index),samples.dataMask]; 
+}`;
   }
 
   // If no configuration is passed a default evalscript gets generated
   // NOTE: changing the format will likely break parseEvalscriptBands method.
   return `//VERSION=3
-    function setup() {
-      return {
-        input: ["${[...new Set(Object.values(bands))].join('","')}", "dataMask"],
-        output: { bands: 4 }
-      };
-    }
+function setup() {
+  return {
+    input: ["${[...new Set(Object.values(bands))].join('","')}", "dataMask"],
+    output: { bands: 4 }
+  };
+}
 
-    function evaluatePixel(sample) {
-      return [${Object.values(bands)
-        .map(e => '2.5 * sample.' + e)
-        .join(',')}, sample.dataMask ];
-    }`;
+function evaluatePixel(sample) {
+  return [${Object.values(bands)
+    .map(e => '2.5 * sample.' + e)
+    .join(',')}, sample.dataMask ];
+}`;
 }
 
 export function constructBasicEvalscript(bands, config) {
@@ -203,11 +242,11 @@ export function constructBasicEvalscript(bands, config) {
       .join('');
 
     return `var index = ${indexEquation};
-    return colorBlend(
-      index,
-      [${values.map(value => value)}],
-      [${colorRamp.map(color => hexToRgb(color.replace('#', '0x')))}]
-    );`;
+return colorBlend(
+  index,
+    [${values.map(value => value)}],
+    [${colorRamp.map(color => hexToRgb(color.replace('#', '0x')))}]
+);`;
   }
   // NOTE: changing the format will likely break parseEvalscriptBands method.
   return `return [${Object.values(bands)
@@ -237,6 +276,60 @@ export function parseEvalscriptBands(evalscript) {
   }
 }
 
+export function parseIndexEvalscript(evalscript) {
+  try {
+    if (evalscript.startsWith('//VERSION=3')) {
+      let equation = '';
+      let bands = evalscript
+        .split('\n')[13]
+        .split('=')[1]
+        .split('/')
+        .map(item =>
+          item
+            .replace('(', '')
+            .replace(')', '')
+            .replace(' ', ''),
+        );
+
+      if (bands[0].indexOf('-') !== -1) {
+        equation = '(A-B)/(A+B)';
+        bands = bands[0].split('-').map(item => item.replace('samples.', ''));
+      } else {
+        equation = '(A/B)';
+        bands = bands.map(item => item.replace('samples.', ''));
+      }
+
+      bands = { a: bands[0], b: bands[1] };
+
+      // positions and coresponding color
+      let values = evalscript
+        .split('\n')[1]
+        .split('=')[1]
+        .split(',')
+        .map(item =>
+          item
+            .replace(/\[/g, '')
+            .replace(/]/g, '')
+            .replace(' ', ''),
+        );
+
+      let colors = values.filter(item => item.indexOf('0x') !== -1).map(item => item.replace('0x', '#'));
+      let positions = values.filter(item => item.indexOf('0x') === -1).map(item => parseFloat(item));
+
+      return {
+        bands: bands,
+        equation: equation,
+        positions: positions,
+        colors: colors,
+      };
+    } else {
+      return null;
+    }
+  } catch (e) {
+    return null;
+  }
+}
+
 export function parsePosition(lat, lng, zoom) {
   zoom = isNaN(parseInt(zoom)) ? undefined : parseInt(zoom);
   lat = isNaN(parseFloat(lat)) ? undefined : parseFloat(lat);
@@ -245,12 +338,128 @@ export function parsePosition(lat, lng, zoom) {
 }
 
 export function isDataFusionEnabled(dataFusionOptions) {
-  return Boolean(
-    dataFusionOptions &&
-      dataFusionOptions.enabled &&
-      dataFusionOptions.supplementalDatasets &&
-      Object.keys(dataFusionOptions.supplementalDatasets).some(
-        supDatasetId => dataFusionOptions.supplementalDatasets[supDatasetId].enabled,
-      ),
-  );
+  return Boolean(dataFusionOptions && dataFusionOptions.length > 0);
 }
+
+export async function constructErrorMessage(error) {
+  const DEFAULT_ERROR = JSON.stringify(error);
+
+  if (error.response && error.response.data) {
+    let errorObj;
+
+    if (error.response.data instanceof Blob) {
+      const errorJson = await readBlob(error.response.data);
+      errorObj = errorJson.error;
+      if (!errorObj) {
+        return DEFAULT_ERROR;
+      }
+    } else {
+      errorObj = error.response.data.error;
+    }
+
+    let errorMsg = '';
+
+    if (errorObj.errors) {
+      for (let err of errorObj.errors) {
+        for (let key in err) {
+          errorMsg += `${key}:\n${JSON.stringify(err[key])}\n\n`;
+        }
+      }
+    } else {
+      errorMsg = errorObj.message;
+    }
+    return errorMsg;
+  } else {
+    return error.message ? error.message : DEFAULT_ERROR;
+  }
+}
+
+export function readBlob(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      try {
+        const json = JSON.parse(e.target.result);
+        resolve(json);
+      } catch (err) {
+        reject({});
+      }
+    };
+
+    reader.readAsText(blob);
+  });
+}
+
+export function parseDataFusion(dataFusionString, datasetId) {
+  const dataFusion = JSON.parse(dataFusionString);
+  return ensureCorrectDataFusionFormat(dataFusion, datasetId);
+}
+
+export function ensureCorrectDataFusionFormat(dataFusion, datasetId) {
+  if (Array.isArray(dataFusion)) {
+    for (let dataset of dataFusion) {
+      if (dataset.timespan) {
+        const [fromTime, toTime] = dataset.timespan;
+        const parsedTimespan = [moment.utc(fromTime), moment.utc(toTime)];
+        dataset.timespan = parsedTimespan;
+      }
+    }
+    return dataFusion;
+  } else if (dataFusion && typeof dataFusion === 'object') {
+    /*
+      Converts legacy data fusion format to the new format
+    */
+    const dataFusionInNewFormat = [];
+
+    if (Object.keys(dataFusion).length === 0) {
+      return dataFusionInNewFormat;
+    }
+
+    const shDataset = getDataSourceHandler(datasetId).getSentinelHubDataset(datasetId);
+    const primaryLayerAlias = dataFusion.primaryLayerAlias || shDataset.shProcessingApiDatasourceAbbreviation;
+
+    dataFusionInNewFormat.push({
+      id: shDataset.id,
+      alias: primaryLayerAlias,
+    });
+
+    for (let [id, settings] of Object.entries(dataFusion.supplementalDatasets)) {
+      const dataset = shJSdatasetIdToDataset(id);
+      dataFusionInNewFormat.push({
+        id: id,
+        alias: settings.alias || dataset.shProcessingApiDatasourceAbbreviation,
+        mosaickingOrder: settings.mosaickingOrder,
+        timespan: settings.timespan
+          ? [moment.utc(settings.timespan[0]), moment.utc(settings.timespan[1])]
+          : undefined,
+      });
+    }
+    return dataFusionInNewFormat;
+  }
+}
+
+const shJSdatasetIdToDataset = datasetId => {
+  switch (datasetId) {
+    case DATASET_S2L1C.id:
+      return DATASET_S2L1C;
+    case DATASET_S2L2A.id:
+      return DATASET_S2L2A;
+    case DATASET_S3OLCI.id:
+      return DATASET_S3OLCI;
+    case DATASET_S3SLSTR.id:
+      return DATASET_S3SLSTR;
+    case DATASET_AWSEU_S1GRD.id:
+      return DATASET_AWSEU_S1GRD;
+    case DATASET_AWS_L8L1C.id:
+      return DATASET_AWS_L8L1C;
+    case DATASET_S5PL2.id:
+      return DATASET_S5PL2;
+    case DATASET_MODIS.id:
+      return DATASET_MODIS;
+    case DATASET_AWS_DEM.id:
+      return DATASET_AWS_DEM;
+    default:
+      return null;
+  }
+};

@@ -1,11 +1,10 @@
 /* stylelint-disable */
-@import '../variables.scss';
+@import '../../../variables.scss';
 
 .btn {
   background: $primaryCol;
-  border-radius: 6px;
   border: none;
-  color: $mainMedium;
+  color: $mainDark;
   cursor: pointer;
   display: inline-block;
   font-size: 16px;
@@ -37,17 +36,21 @@
   }
 
   &.secondary {
-    background: $mainMedium;
+    background: $mainDark;
     color: #fff;
 
     &:hover {
-      background: rgba($mainMedium, 0.8);
+      background: rgba($mainDark, 0.8);
     }
   }
 
   &.small {
     padding: 6px 10px;
     font-size: 15px;
+  }
+
+  &.visualize {
+    text-align: center;
   }
 
   &.disabled,

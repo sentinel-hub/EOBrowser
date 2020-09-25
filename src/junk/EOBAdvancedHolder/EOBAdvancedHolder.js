@@ -4,14 +4,16 @@ import { t } from 'ttag';
 import { BandsToRGB } from '../BandsToRGB/BandsToRGB';
 import { GroupedBandsToRGB } from '../BandsToRGB/GroupedBandsToRGB';
 import { EvalScriptInput } from './EvalScriptInput';
-import { b64DecodeUnicode } from '../EOBCommon/utils/Base64MDM';
 import DataFusion from './DataFusion';
 import Accordion from '../../components/Accordion/Accordion';
 import { IndexBands } from '../BandsToRGB/IndexBands';
+import { withRouter } from 'react-router-dom';
 
 import './EOBAdvancedHolder.scss';
 
-export default class EOBAdvancedHolder extends React.Component {
+export const CUSTOM_VISUALIZATION_URL_ROUTES = ['#custom-composite', '#custom-index', '#custom-script'];
+
+class EOBAdvancedHolder extends React.Component {
   state = {
     openAccordion: 0, // composite accordion displayed by default
   };
@@ -19,10 +21,30 @@ export default class EOBAdvancedHolder extends React.Component {
   toggleAccordion = index => {
     if (index !== this.state.openAccordion) {
       this.setState({ openAccordion: index });
+      window.location.hash = CUSTOM_VISUALIZATION_URL_ROUTES[index];
     } else {
       this.setState({ openAccordion: null });
     }
   };
+
+  initAccordion = () => {
+    const hashIndex = CUSTOM_VISUALIZATION_URL_ROUTES.indexOf(this.props.location.hash);
+    if (hashIndex !== -1) {
+      this.setState({ openAccordion: hashIndex });
+    }
+  };
+
+  componentDidMount() {
+    if (this.props.location.hash) {
+      this.initAccordion();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.location.hash !== prevProps.location.hash) {
+      this.initAccordion();
+    }
+  }
 
   render() {
     const {
@@ -30,7 +52,7 @@ export default class EOBAdvancedHolder extends React.Component {
       layers,
       evalscript,
       evalscripturl,
-      dataFusion = {},
+      dataFusion = [],
       activeLayer: activeDatasource,
       initialTimespan,
       isEvalUrl,
@@ -52,7 +74,7 @@ export default class EOBAdvancedHolder extends React.Component {
         <header>
           {
             // eslint-disable-next-line
-            <a onClick={onBack} className="btn secondary">
+            <a onClick={onBack} className="btn primary">
               <i className="fa fa-arrow-left" />
               {t`Back`}
             </a>
@@ -74,7 +96,12 @@ export default class EOBAdvancedHolder extends React.Component {
           title="Index"
           toggleOpen={() => this.toggleAccordion(1)}
         >
-          <IndexBands bands={channels} layers={indexLayers} onChange={onIndexScriptChange} />
+          <IndexBands
+            bands={channels}
+            layers={indexLayers}
+            onChange={onIndexScriptChange}
+            evalscript={evalscript}
+          />
         </Accordion>
         <Accordion
           open={this.state.openAccordion === 2}
@@ -91,7 +118,7 @@ export default class EOBAdvancedHolder extends React.Component {
             />
           )}
           <EvalScriptInput
-            evalscript={b64DecodeUnicode(evalscript)}
+            evalscript={evalscript}
             evalscripturl={window.decodeURIComponent(evalscripturl || '')}
             isEvalUrl={isEvalUrl}
             onRefresh={onCodeMirrorRefresh}
@@ -104,3 +131,5 @@ export default class EOBAdvancedHolder extends React.Component {
     );
   }
 }
+
+export default withRouter(EOBAdvancedHolder);

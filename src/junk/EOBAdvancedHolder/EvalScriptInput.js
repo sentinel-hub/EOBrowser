@@ -4,6 +4,7 @@ import Codemirror from 'react-codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/dracula.css';
+import './EvalScriptInput.scss';
 import { t } from 'ttag';
 
 export class EvalScriptInput extends React.Component {
@@ -34,8 +35,13 @@ export class EvalScriptInput extends React.Component {
   };
 
   onKeyDown = e => {
+    const { evalscripturl } = this.state;
+    if (!evalscripturl || evalscripturl.trim() === '') {
+      return;
+    }
     e.key === 'Enter' && this.loadCode();
   };
+
   loadCode = () => {
     const { loading, evalscripturl } = this.state;
     if (loading) return;
@@ -63,16 +69,28 @@ export class EvalScriptInput extends React.Component {
       });
   };
 
+  refreshEvalscriptDisabled = () => {
+    const { evalscript, evalscripturl, isEvalUrl } = this.state;
+    return (isEvalUrl && !evalscripturl) || (!isEvalUrl && !evalscript);
+  };
+
+  handleRefreshClick = e => {
+    if (this.refreshEvalscriptDisabled()) {
+      return;
+    }
+    this.props.onRefresh();
+  };
+
   render() {
-    var options = {
+    const { error, loading, success, evalscript, evalscripturl, isEvalUrl } = this.state;
+    const hasWarning = evalscripturl.length > 0 && !evalscripturl.startsWith('https://');
+    const options = {
       lineNumbers: true,
       mode: 'javascript',
       lint: true,
+      readOnly: !!isEvalUrl,
+      theme: `default${!!isEvalUrl ? ' readonly' : ''}`,
     };
-    const { error, loading, success, evalscript, evalscripturl, isEvalUrl } = this.state;
-    // const cleanUrl = window.decodeURIComponent(evalscripturl)
-    const hasWarning = evalscripturl.length > 0 && !evalscripturl.startsWith('https://');
-
     return (
       <div style={{ clear: 'both' }}>
         <Codemirror
@@ -81,6 +99,12 @@ export class EvalScriptInput extends React.Component {
           options={options}
           ref={el => (this._CM = el)}
         />
+        {isEvalUrl && (
+          <div className="info-uncheck-url">
+            <i className="fa fa-info" />
+            {t`Uncheck Load script from URL to edit the code`}
+          </div>
+        )}
         {error && (
           <div className="notification">
             <i className="fa fa-warning" /> {error}
@@ -117,7 +141,11 @@ export class EvalScriptInput extends React.Component {
               ) : evalscripturl ? (
                 // eslint-disable-next-line
                 <a onClick={this.loadCode}>
-                  <i className={`fa fa-refresh ${loading && 'fa-spin'}`} style={{ marginLeft: 7 }} />
+                  <i
+                    className={`fa fa-refresh ${loading && 'fa-spin'}`}
+                    style={{ marginLeft: 7 }}
+                    title={t`Load script into code editor`}
+                  />
                 </a>
               ) : null}
             </div>
@@ -125,9 +153,9 @@ export class EvalScriptInput extends React.Component {
         </div>
         <div className="scriptBtnPanel">
           <button
-            onClick={() => this.props.onRefresh()}
+            onClick={this.handleRefreshClick}
             className="btn"
-            disabled={(isEvalUrl && !evalscripturl) || (!isEvalUrl && !evalscript)}
+            disabled={this.refreshEvalscriptDisabled()}
           >
             <i className="fa fa-refresh" />
             {t`Refresh`}

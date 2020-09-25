@@ -1,11 +1,14 @@
 @import '../../variables';
 
 .pins-header {
-  border-bottom: 2px solid $primaryCol;
-  padding: 10px;
+  border-bottom: 1px solid $primaryCol;
+  background-color: $mainMedium;
+  position: sticky;
+  top: 0;
+  z-index: 501;
 
   .pins-controls {
-    width: 100%;
+    padding: 10px;
 
     .compare-pin-button {
       color: $primaryCol;
@@ -102,7 +105,7 @@
   min-height: 65px;
 
   &.normal-mode:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: #333440;
     cursor: pointer;
 
     & > div:first-child {
@@ -328,7 +331,7 @@
 }
 
 .pin-panel {
-  background-color: $mainLight;
+  background-color: $mainMedium;
   color: $pinTextCol;
   display: flex;
   flex-flow: column;
@@ -358,11 +361,6 @@
 
   .pins-container {
     position: relative;
-
-    .pins-selection-confirm {
-      width: 85%;
-      margin: 20px 20px 10px;
-    }
   }
 
   .compare-toggle-panel {
@@ -372,4 +370,23 @@
     text-align: center;
     color: $pinTextCol;
   }
+}
+
+.select-all-share {
+  font-size: 14px;
+  font-weight: bold;
+  width: 100%;
+  text-align: center;
+  padding: 4px 0;
+  box-shadow: $boxShadow;
+  color: $mainMedium;
+  cursor: pointer;
+  background-color: $primaryCol;
+}
+
+.pins-selection-confirm {
+  background-color: $mainMedium;
+  padding: 20px 20px 10px;
+  position: sticky;
+  bottom: 0;
 }

@@ -155,4 +155,8 @@ export default class DataSourceHandler {
   };
 
   getDatasetLabel = datasetId => datasetLabels[datasetId];
+
+  supportsV3Evalscript() {
+    return true;
+  }
 }

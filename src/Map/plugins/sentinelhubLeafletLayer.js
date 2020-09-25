@@ -15,7 +15,6 @@ import {
   S5PL2Layer,
   Landsat8AWSLayer,
   MODISLayer,
-  MosaickingOrder,
   ProcessingDataFusionLayer,
   CancelToken,
   isCancelled,
@@ -145,6 +144,8 @@ class SentinelHubLayer extends L.TileLayer {
 
     const individualTileParams = { ...this.options, width: tileSize, height: tileSize };
     individualTileParams.bbox = bbox;
+    const onTileImageError = this.options.onTileImageError;
+    const onTileImageLoad = this.options.onTileImageLoad;
 
     this.layer.then(async layer => {
       let reqConfig = { cancelToken: cancelToken };
@@ -162,6 +163,9 @@ class SentinelHubLayer extends L.TileLayer {
         .then(blob => {
           tile.onload = function() {
             URL.revokeObjectURL(tile.src);
+            if (onTileImageLoad) {
+              onTileImageLoad();
+            }
             done(null, tile);
           };
           const objectURL = URL.createObjectURL(blob);
@@ -169,6 +173,9 @@ class SentinelHubLayer extends L.TileLayer {
         })
         .catch(function(error) {
           if (!isCancelled(error)) {
+            if (onTileImageError) {
+              onTileImageError(error);
+            }
             console.error('There has been a problem with your fetch operation: ', error.message);
           }
           done(error, null);
@@ -242,44 +249,24 @@ class SentinelHubLayer extends L.TileLayer {
     return layer;
   };
 
-  createDataFusionLayer = async (
-    url,
-    { datasetId, dataFusion, evalscript, evalscripturl, fromTime, toTime },
-  ) => {
-    // supplementary layers:
-    const enabledDatasetsIds = Object.keys(dataFusion.supplementalDatasets).filter(
-      supDatasetId => dataFusion.supplementalDatasets[supDatasetId].enabled,
-    );
-    const supplementalLayers = enabledDatasetsIds.map(supDatasetId => {
-      const settings = dataFusion.supplementalDatasets[supDatasetId];
-      const mosaickingOrder =
-        settings && settings.mosaickingOrder ? settings.mosaickingOrder : MosaickingOrder.MOST_RECENT;
-      const layer = constructLayerFromDatasetId(supDatasetId, mosaickingOrder);
-      const timespan =
-        settings.isCustomTimespan && settings.timespan ? settings.timespan : [fromTime, toTime];
-      return {
-        layer: layer,
-        id: layer.dataset.shProcessingApiDatasourceAbbreviation.toLowerCase(),
-        fromTime: timespan[0],
-        toTime: timespan[1],
-      };
-    });
+  createDataFusionLayer = async (url, { dataFusion, evalscript, evalscripturl, fromTime, toTime }) => {
+    const layers = [];
 
-    // primary layer:
-    const primaryLayer = await this.createCustomLayer(url, { datasetId, evalscript: '//VERSION=3 ---' });
+    for (let dataFusionEntry of dataFusion) {
+      let { id, alias, mosaickingOrder, timespan } = dataFusionEntry;
+      const layer = constructLayerFromDatasetId(id, mosaickingOrder);
+      layers.push({
+        layer: layer,
+        id: alias,
+        fromTime: timespan ? timespan[0] : fromTime,
+        toTime: timespan ? timespan[1] : toTime,
+      });
+    }
 
     const dataFusionLayer = new ProcessingDataFusionLayer({
       evalscript: evalscript,
       evalscriptUrl: evalscripturl,
-      layers: [
-        {
-          layer: primaryLayer,
-          id: primaryLayer.dataset.shProcessingApiDatasourceAbbreviation.toLowerCase(),
-          fromTime: fromTime,
-          toTime: toTime,
-        },
-        ...supplementalLayers,
-      ],
+      layers: layers,
     });
     return dataFusionLayer;
   };
@@ -524,6 +511,34 @@ class SentinelHubLayerComponent extends GridLayer {
     if (params.blueRangeEffect !== undefined) {
       effects.blueRange = { from: params.blueRangeEffect[0], to: params.blueRangeEffect[1] };
     }
+
+    if (
+      (params.redCurveEffect && params.redCurveEffect.values) ||
+      (params.greenCurveEffect && params.greenCurveEffect.values) ||
+      (params.blueCurveEffect && params.blueCurveEffect.values)
+    ) {
+      const customEffect = ({ r, g, b, a }) => {
+        let newR = r;
+        let newG = g;
+        let newB = b;
+        if (params.redCurveEffect && params.redCurveEffect.values) {
+          let redId = Math.round(r * (params.redCurveEffect.values.length - 1));
+          newR = params.redCurveEffect.values[redId].y;
+        }
+        if (params.greenCurveEffect && params.greenCurveEffect.values) {
+          let greenId = Math.round(g * (params.greenCurveEffect.values.length - 1));
+          newG = params.greenCurveEffect.values[greenId].y;
+        }
+        if (params.blueCurveEffect && params.blueCurveEffect.values) {
+          let blueId = Math.round(b * (params.blueCurveEffect.values.length - 1));
+          newB = params.blueCurveEffect.values[blueId].y;
+        }
+        return { r: newR, g: newG, b: newB, a: a };
+      };
+
+      effects.customEffect = customEffect;
+    }
+
     if (Object.keys(effects).length) {
       options.effects = effects;
     }
@@ -554,6 +569,14 @@ class SentinelHubLayerComponent extends GridLayer {
 
     if (params.accessToken) {
       options.accessToken = params.accessToken;
+    }
+
+    if (params.onTileImageError) {
+      options.onTileImageError = params.onTileImageError;
+    }
+
+    if (params.onTileImageLoad) {
+      options.onTileImageLoad = params.onTileImageLoad;
     }
 
     return options;

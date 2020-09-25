@@ -14,6 +14,7 @@ import SHlogo from '../EOBCommon/assets/shLogo.png';
 import { applyFilterMonthsToDateRange } from '../EOBCommon/utils/filterDates';
 import { getMapDataFusion } from '../EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
+import { b64EncodeUnicode } from '../../utils/base64MDN';
 
 const PADDING = 80;
 const REQUEST_RETRY_LIMIT = 2;
@@ -265,7 +266,7 @@ export function getCurrentBboxUrl(
     preset === 'CUSTOM' ? datasetLayers[0].id : preset
   }&evalscript=${
     preset !== 'CUSTOM' ? '' : isEvalUrl ? '' : window.encodeURIComponent(evalscript)
-  }&evalscripturl=${isEvalUrl ? evalscripturl : ''}&evalscriptoverrides=${btoa(
+  }&evalscripturl=${isEvalUrl ? evalscripturl : ''}&evalscriptoverrides=${b64EncodeUnicode(
     evalscriptoverrides,
   )}&evalsource=${evalsource}&atmfilter=${
     atmFilter ? atmFilter : ''
@@ -328,9 +329,8 @@ export async function fetchBlobObj(
       if (effects.gammaEffect) {
         shjsEffects.gamma = effects.gammaEffect;
       }
-      const baseUrl = `${url.origin}${url.pathname}`;
 
-      blob = await getMapDataFusion(baseUrl, params, dataFusion, shjsEffects);
+      blob = await getMapDataFusion(params, dataFusion, shjsEffects);
     } else {
       blob = await legacyGetMapFromUrl(
         request.url,

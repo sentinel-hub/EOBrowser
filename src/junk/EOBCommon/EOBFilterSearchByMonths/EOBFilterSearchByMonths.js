@@ -52,6 +52,7 @@ export default class EOBFilterSearchByMonths extends React.Component {
             checked={doFiltering}
             onChange={this.handleFilterCheckboxChange}
           />{' '}
+          &nbsp;
           {t`filter by months`}
         </label>
         <div className="months">

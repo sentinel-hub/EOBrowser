@@ -72,7 +72,9 @@ export const mainMapSlice = createSlice({
       state.zoom = zoom;
     },
     setBounds: (state, action) => {
-      state.bounds = action.payload;
+      const { bounds, pixelBounds } = action.payload;
+      state.bounds = bounds;
+      state.pixelBounds = pixelBounds;
     },
     addOverlay: (state, action) => {
       state.enabledOverlaysId.push(action.payload);
@@ -275,15 +277,19 @@ export const visualizationSlice = createSlice({
     customSelected: false,
     evalscript: undefined,
     evalscripturl: undefined,
-    dataFusion: {},
+    dataFusion: [],
     gainEffect: 1,
     gammaEffect: 1,
     redRangeEffect: [0, 1],
     greenRangeEffect: [0, 1],
     blueRangeEffect: [0, 1],
+    redCurveEffect: undefined,
+    greenCurveEffect: undefined,
+    blueCurveEffect: undefined,
     minQa: undefined,
     upsampling: undefined,
     downsampling: undefined,
+    error: undefined,
   },
   reducers: {
     setVisualizationTime: (state, action) => {
@@ -339,6 +345,15 @@ export const visualizationSlice = createSlice({
         state.blueRangeEffect = action.payload;
       }
     },
+    setRedCurveEffect: (state, action) => {
+      state.redCurveEffect = action.payload;
+    },
+    setGreenCurveEffect: (state, action) => {
+      state.greenCurveEffect = action.payload;
+    },
+    setBlueCurveEffect: (state, action) => {
+      state.blueCurveEffect = action.payload;
+    },
     setMinQa: (state, action) => {
       if (action.payload !== undefined) {
         state.minQa = action.payload;
@@ -366,6 +381,15 @@ export const visualizationSlice = createSlice({
       if (action.payload.blueRangeEffect !== undefined) {
         state.blueRangeEffect = action.payload.blueRangeEffect;
       }
+      if (action.payload.redCurveEffect !== undefined) {
+        state.redCurveEffect = action.payload.redCurveEffect;
+      }
+      if (action.payload.greenCurveEffect !== undefined) {
+        state.greenCurveEffect = action.payload.greenCurveEffect;
+      }
+      if (action.payload.blueCurveEffect !== undefined) {
+        state.blueCurveEffect = action.payload.blueCurveEffect;
+      }
       if (action.payload.minQa !== undefined) {
         state.minQa = action.payload.minQa;
       }
@@ -376,15 +400,29 @@ export const visualizationSlice = createSlice({
         state.downsampling = action.payload.downsampling;
       }
     },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
     resetEffects: state => {
       state.gainEffect = 1;
       state.gammaEffect = 1;
       state.redRangeEffect = [0, 1];
       state.greenRangeEffect = [0, 1];
       state.blueRangeEffect = [0, 1];
+      state.redCurveEffect = undefined;
+      state.greenCurveEffect = undefined;
+      state.blueCurveEffect = undefined;
       state.minQa = undefined;
       state.upsampling = undefined;
       state.downsampling = undefined;
+    },
+    resetRgbEffects: state => {
+      state.redRangeEffect = [0, 1];
+      state.greenRangeEffect = [0, 1];
+      state.blueRangeEffect = [0, 1];
+      state.redCurveEffect = undefined;
+      state.greenCurveEffect = undefined;
+      state.blueCurveEffect = undefined;
     },
     setVisualizationParams: (state, action) => {
       if (action.payload.fromTime !== undefined) {
@@ -433,6 +471,15 @@ export const visualizationSlice = createSlice({
       if (action.payload.blueRangeEffect !== undefined) {
         state.blueRangeEffect = action.payload.blueRangeEffect;
       }
+      if (action.payload.redCurveEffect !== undefined) {
+        state.redCurveEffect = action.payload.redCurveEffect;
+      }
+      if (action.payload.greenCurveEffect !== undefined) {
+        state.greenCurveEffect = action.payload.greenCurveEffect;
+      }
+      if (action.payload.blueCurveEffect !== undefined) {
+        state.blueCurveEffect = action.payload.blueCurveEffect;
+      }
       if (action.payload.minQa !== undefined) {
         state.minQa = action.payload.minQa;
       }
@@ -452,13 +499,16 @@ export const visualizationSlice = createSlice({
       state.customSelected = false;
       state.evalscript = undefined;
       state.evalscripturl = undefined;
-      state.dataFusion = {};
+      state.dataFusion = [];
       state.visibleOnMap = false;
       state.gainEffect = 1;
       state.gammaEffect = 1;
       state.redRangeEffect = [0, 1];
       state.greenRangeEffect = [0, 1];
       state.blueRangeEffect = [0, 1];
+      state.redCurveEffect = undefined;
+      state.greenCurveEffect = undefined;
+      state.blueCurveEffect = undefined;
       state.minQa = undefined;
       state.upsampling = undefined;
       state.downsampling = undefined;
@@ -609,6 +659,12 @@ export const pinsSlice = createSlice({
     clearByType: (state, action) => {
       const pinType = action.payload;
       state.items = state.items.filter(item => item.type !== pinType);
+    },
+    removeItem: (state, action) => {
+      const index = action.payload;
+      const pinItems = [...state.items];
+      pinItems.splice(index, 1);
+      state.items = pinItems;
     },
   },
 });

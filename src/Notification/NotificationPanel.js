@@ -20,7 +20,7 @@ export const NotificationPanel = ({ type, msg, className }) => {
 
   return (
     <div className={`notification-panel ${className || ''}`}>
-      {icon && <i className={`fa fa-${icon}`} />}
+      {icon && <i className={`fas fa-${icon}`} />}
       {msg}
     </div>
   );

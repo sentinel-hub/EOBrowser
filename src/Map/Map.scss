@@ -9,7 +9,7 @@
   .leaflet-control-container {
     .leaflet-top.leaflet-right {
       .leaflet-control-layers {
-        background: #22232d;
+        background: $mainDark;
         color: #fff;
         border-radius: 0;
         border: none;
@@ -70,8 +70,7 @@
 .poi-wrapper > .poiPanel,
 .aoi-wrapper > .aoiPanel,
 .measure-wrapper > .measurePanel,
-.img-download-wrapper > .screenshotPanelButton,
-.timelapse-wrapper > .timelapsePanelButton {
+.timelapse-wrapper > .timelapsePanelButton, {
   z-index: 400;
   cursor: pointer;
 }
@@ -144,6 +143,6 @@
   z-index: 9999;
   padding: 15px;
   border-radius: 3px;
-  background: #22232d;
+  background: $mainDark;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }

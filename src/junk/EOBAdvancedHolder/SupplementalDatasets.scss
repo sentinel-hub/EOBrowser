@@ -1,0 +1,101 @@
+@import '../../variables.scss';
+
+.supplemental-datasets {
+  .add-dataset {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+
+    i {
+      font-size: 15px;
+      padding-top: 5px;
+      cursor: pointer;
+    }
+
+    select {
+      max-width: 200px;
+      margin-left: 10px;
+    }
+  }
+
+  .supplemental-dataset {
+    background: $mainLighter;
+    margin-top: 5px;
+
+    .supplemental-dataset-header {
+      background: $mainMedium;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-weight: bold;
+      border-bottom: 1px solid $primaryCol;
+      padding: 5px 10px;
+      cursor: pointer;
+      align-items: center;
+
+      span {
+        max-width: 200px;
+      }
+
+      i {
+        height: 15px;
+        width: 15px;
+
+        &.open-close {
+          font-size: 15px;
+        }
+
+        &.remove {
+          padding-top: 3px;
+        }
+      }
+    }
+
+    .supplemental-dataset-info {
+      padding: 0 10px 10px 10px;
+
+      .supplemental-dataset-alias-input {
+        .invalid {
+          background: #fdd;
+        }
+      }
+
+      .timespan {
+        margin-bottom: 10px;
+
+        input[type='checkbox'] {
+          margin-left: 0;
+        }
+
+        .timespan-picker {
+          background-color: $mainLighter;
+          margin-top: 2px;
+          padding: 10px 0;
+
+          .input-value {
+            background: $mainLighter;
+          }
+
+          .date-time-input {
+            display: flex;
+            flex-wrap: nowrap;
+
+            .date-time-input-label {
+              display: none;
+            }
+
+            .numeric-input input {
+              max-width: 30px;
+              background-color: inherit;
+            }
+          }
+
+          .date-input {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+}

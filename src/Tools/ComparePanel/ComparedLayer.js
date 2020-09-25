@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Slider, { Range } from 'rc-slider';
-import moment from 'moment';
 import { t } from 'ttag';
 
 import store, { mainMapSlice, compareLayersSlice } from '../../store';
 import { parsePosition } from '../../utils';
 import { COMPARE_SPLIT, COMPARE_OPACITY } from './ComparePanel';
 import PinPreviewImage from '../Pins/PinPreviewImage';
+import { constructTimespanString } from '../Pins/Pin.utils';
 
 class ComparedLayer extends Component {
   zoomToPin = () => {
@@ -36,7 +36,7 @@ class ComparedLayer extends Component {
 
   render() {
     const { layer, compareMode, opacity, clipping, index } = this.props;
-    const { title, toTime, lat, lng, zoom } = layer;
+    const { title, lat, lng, zoom } = layer;
     return (
       <div className={`compare-layer normal-mode`} id={index}>
         <div className="order-layers">
@@ -50,8 +50,7 @@ class ComparedLayer extends Component {
           <div className="compare-layer-info">
             <span>{title}</span>
             <div>
-              <label>{t`Date`}:</label>{' '}
-              <span className="pin-date">{moment(toTime).format('YYYY-MM-DD')}</span>
+              <label>{t`Date`}:</label> <span className="pin-date">{constructTimespanString(layer)}</span>
             </div>
             <div>
               <label>{t`Lat/Lon`}:</label> {parseFloat(lat).toFixed(2)}, {parseFloat(lng).toFixed(2)} |{' '}

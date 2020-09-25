@@ -1,15 +1,129 @@
+@import '../../variables.scss';
+
 .calendar-wrapper {
   color: #fff;
+  margin-top: 10px;
 
   .year-month-form {
+    padding: 0 2.5rem;
+    display: table-caption;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  // stylelint-disable selector-class-pattern
+  .DayPicker-wrapper {
+    background-color: $mainMedium;
+    padding-bottom: 10px;
+
+    select {
+      background: $mainMedium;
+      color: #fff;
+      cursor: default;
+      border: 1px solid #797373;
+      font-size: 14px;
+      text-transform: capitalize;
+      padding: 1px 2px;
+      margin: 0 2px;
+      max-width: 100px;
+    }
+  }
+
+  .DayPicker {
+    display: block;
+    width: 100%;
+    font-size: 0.8rem;
+  }
+
+  .DayPicker-Day {
+    padding: 0.5em;
+    border: 2px solid $mainMedium;
+    min-width: 30px;
+  }
+
+  .DayPicker-Month {
+    margin: 1rem 0;
+    width: 100%;
+  }
+
+  .DayPicker-Weekday {
+    font-size: 0.9rem;
+  }
+
+  .DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside) {
+    position: relative;
+    color: #f0f8ff;
+    background-color: $primaryCol;
+    border-radius: 0;
+    cursor: default;
+  }
+
+  .DayPicker-Day--available {
+    background-color: #585b5e;
+    color: white;
+    border-radius: 0;
+  }
+
+  .DayPicker:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside):hover {
+    background-color: $mainDark;
+    border-radius: 0;
+  }
+
+  .DayPicker-Day--disabled {
+    color: #5f6363;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .DayPicker-Day--highlighted {
+    background-color: $mainLight;
+    color: white;
+    border-radius: 0;
+  }
+
+  .DayPicker-Weekdays {
+    margin-top: 1rem;
+    display: table-header-group;
+    text-transform: capitalize;
+  }
+
+  .DayPicker-Caption {
     padding: 0 2.5rem;
     display: table-caption;
     text-align: center;
     margin-bottom: 1px;
   }
 
-  // stylelint-disable-next-line
-  .DayPicker-wrapper {
-    padding-bottom: 10px;
+  .DayPicker-Day--today {
+    color: #b6bf00;
+    font-weight: 600;
+  }
+
+  // stylelint-enable selector-class-pattern
+
+  .date-nav-button {
+    background-color: #eee0;
+    border: none;
+    cursor: pointer;
+    padding: 19px 14px 14px 14px;
+    position: relative;
+
+    i {
+      color: #eaeaea;
+    }
+  }
+
+  .date-nav-button.left {
+    float: left;
+  }
+
+  .date-nav-button.right {
+    float: right;
+  }
+
+  .date-nav-button.disabled {
+    i {
+      color: #aaa;
+    }
   }
 }

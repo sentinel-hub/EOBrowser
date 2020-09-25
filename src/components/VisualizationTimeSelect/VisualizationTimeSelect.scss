@@ -1,0 +1,44 @@
+/* stylelint-disable */
+@import '../../variables';
+
+.visualization-time-select {
+  display: flex;
+  align-items: center;
+  text-transform: none;
+  color: white;
+  text-align: center;
+  margin-top: 25px;
+
+  .time-select-type {
+    text-transform: none;
+    font-weight: normal;
+    color: $textColor;
+    margin-left: 0;
+  }
+
+  div:last-child {
+    margin-left: auto;
+  }
+
+  .timespan-label {
+    border-bottom: 1px solid white;
+    display: flex;
+    font-size: 13px;
+    height: 15px;
+    align-items: flex-end;
+    margin: 0 15px;
+    padding: 0 5px 3px 5px;
+    line-height: 10px;
+
+    &:hover {
+      cursor: pointer;
+      border-color: $primaryCol;
+    }
+  }
+
+  .timespan-toggle {
+    color: $primaryCol;
+    font-size: 13px;
+    cursor: pointer;
+  }
+}

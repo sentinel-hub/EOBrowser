@@ -28,8 +28,8 @@ class HeaderWithLogin extends Component {
             <i className="fa fa-chevron-left" />
           </div>
           <div className="app-title">
-            <ExternalLink className="sgLogo" href="https://www.sinergise.com">
-              <img src={sgLogo} alt="Sinergise" />
+            <ExternalLink className="sgLogo" href="https://www.sentinel-hub.com/">
+              <img src={sgLogo} alt="Sentinel Hub" />
             </ExternalLink>
             EO Browser
           </div>

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import moment from 'moment';
 import { t } from 'ttag';
 
 import store, { mainMapSlice, compareLayersSlice } from '../../store';
@@ -7,6 +6,7 @@ import EditableString from './EditableString';
 import Description from './Description';
 import { parsePosition } from '../../utils';
 import PinPreviewImage from './PinPreviewImage';
+import { constructTimespanString } from './Pin.utils';
 
 export default class Pin extends Component {
   state = { showDescription: false };
@@ -38,7 +38,7 @@ export default class Pin extends Component {
 
   render() {
     const { allowRemove, arePinsSelectable, index, item, pinType, selectedForSharing } = this.props;
-    const { description, title, toTime, lat, lng, zoom } = item;
+    const { description, title, lat, lng, zoom } = item;
 
     return (
       <div className={`pin-item normal-mode ${pinType}`} id={`${index}`}>
@@ -80,19 +80,22 @@ export default class Pin extends Component {
               )}
             </div>
             <div className="pin-info-row pin-date">
-              <label>{t`Date`}:</label>{' '}
-              <span className="pin-date">{moment(toTime).format('YYYY-MM-DD')}</span>
+              <label>{t`Date`}:</label> <span className="pin-date">{constructTimespanString(item)}</span>
               <div className="add-to-compare" title={t`Add to compare`} onClick={this.addToCompare}>
                 <i className="fas fa-exchange-alt"></i>
               </div>
             </div>
-            <div className="pin-info-row pin-location">
+            <div className="pin-info-row pin-location" title={t`Zoom to pinned location`}>
               <label>{t`Lat/Lon`}:&nbsp;</label>
               <span className="pin-lat-lng-link" onClick={this.zoomToPin}>
                 {parseFloat(lat).toFixed(2)}, {parseFloat(lng).toFixed(2)}
                 &nbsp;|&nbsp;{t`Zoom`}:&nbsp;{zoom}
               </span>
-              <div className="pin-description-toggle" onClick={this.toggleDescription}>
+              <div
+                className="pin-description-toggle"
+                title={this.state.showDescription ? t`Hide description` : t`Show description`}
+                onClick={this.toggleDescription}
+              >
                 <i
                   className={
                     this.state.showDescription ? 'fa fa-angle-double-up' : 'fa fa-angle-double-down '

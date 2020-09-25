@@ -1,3 +1,5 @@
+@import '../../variables.scss';
+
 /* stylelint-disable */
 .advancedPanel {
   padding: 10px;
@@ -74,61 +76,17 @@
   .insert-url-block {
     padding: 2px 20px;
 
-    .primary-dataset {
+    .primary-dataset-info {
       margin-bottom: 5px;
-    }
-  }
 
-  .datasource-info {
-    font-style: italic;
-    padding-left: 20px;
-    margin-top: 5px;
-
-    span {
-      margin-left: 5px;
-    }
-  }
-
-  .supplemental-dataset-settings {
-    padding-left: 20px;
-
-    .mosaicking-order {
-      margin-top: 5px;
-
-      select {
-        margin-left: 10px;
-      }
-    }
-
-    .timespan {
-      margin-bottom: 10px;
-
-      input[type='checkbox'] {
-        margin-left: 0;
+      input {
+        &.invalid {
+          background: #fdd;
+        }
       }
 
-      .timespan-picker {
-        background-color: inherit;
-        margin-top: 0;
-        padding: 0;
-
-        .date-time-input {
-          display: flex;
-          flex-wrap: nowrap;
-
-          .date-time-input-label {
-            display: none;
-          }
-
-          .numeric-input input {
-            max-width: 30px;
-            background-color: inherit;
-          }
-        }
-
-        .date-input {
-          margin-right: 0;
-        }
+      .primary-dataset-label {
+        margin-bottom: 2px;
       }
     }
   }

@@ -6,20 +6,15 @@ import ExternalLink from '../../../../../ExternalLink/ExternalLink';
 import logoCreodias from './images/logo-tooltips-creodias.png';
 
 const getMarkdown = () => t`
-**MERIS** (Medium-resolution spectrometer) was a sensor on board the ENVISAT satellite with the
-primary mission to observe land and ocean colour and the atmosphere. It is no longer active and has
-been succeeded by Sentinel-3. EO Browser provides data processed at level 1B (the Top Of Atmosphere
-(TOA) reflectance).
+**MERIS** (Medium-resolution spectrometer) was a sensor on board the [ENVISAT](https://earth.esa.int/web/guest/missions/esa-operational-eo-missions/envisat) satellite with the primary mission to observe land and ocean colour and the atmosphere. It is no longer active and has been succeeded by Sentinel-3.
 
-**Spatial resolution:** Full Resolution 260m across track 290m along track.
+**Spatial resolution:** Full resolution land & coast: 260m x 290m (that is only details bigger than 260m x 290m can be seen).
 
-**Revisit time:** <= 3 days.
+**Revisit time:** maximum 3 days to revisit the same area.
 
-**Data availability:** June 2002 – April 2012.
+**Data availability:** From June 2002 to April 2012.
 
-**Common usage:** Ocean monitoring (phytoplankton, yellow substance, suspended matter),
-atmosphere (water vapour, CO2, clouds, aerosols), and land (vegetation index, global coverage,
-moisture).
+**Common usage:** Ocean monitoring (phytoplankton, suspended matter), atmosphere (water vapour, CO2, clouds, aerosols), and land (vegetation index, global coverage, moisture).
 `;
 
 const EnvisatTooltip = () => {

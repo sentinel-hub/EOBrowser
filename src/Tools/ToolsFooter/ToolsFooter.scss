@@ -27,6 +27,12 @@
     }
   }
 
+  @media screen and (max-width: 768px) {
+    .footer-info {
+      display: none;
+    }
+  }
+
   .footer-banner {
     .banner-link {
       .banner-img {

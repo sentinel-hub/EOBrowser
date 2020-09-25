@@ -1,7 +1,7 @@
 @import '../../variables.scss';
 
 .accordion-wrap {
-  border-bottom: 2px solid $mainLight;
+  border-bottom: 2px solid $mainMedium;
 
   &:last-of-type {
     padding-bottom: 8px;
@@ -10,7 +10,7 @@
 
 .accordion-title {
   align-items: center;
-  background-color: $mainDark;
+  background-color: $mainLight;
   display: flex;
   justify-content: space-between;
   padding: 12px;
@@ -19,13 +19,13 @@
   cursor: pointer;
 
   &:hover {
-    background-color: $mainMedium;
+    background-color: $mainDark;
     color: $primaryCol;
   }
 }
 
 .accordion-content {
-  background-color: $mainMedium;
+  background-color: $mainLight;
   padding: 8px 12px;
   border-top: none;
 }

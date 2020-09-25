@@ -225,4 +225,8 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
   updateLayersOnVisualization() {
     return false;
   }
+
+  supportsV3Evalscript() {
+    return false;
+  }
 }

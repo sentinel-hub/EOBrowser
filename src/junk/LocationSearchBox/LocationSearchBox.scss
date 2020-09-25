@@ -1,13 +1,15 @@
+@import '../../variables.scss';
+
 /* stylelint-disable */
 .location-search-box {
-  background-color: #191a25;
+  background-color: $mainDark;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 40px;
 
   .icon-search {
-    background-color: #191a25;
+    background-color: $mainDark;
     color: white;
     width: 20px;
     height: 20px;
@@ -16,7 +18,7 @@
   }
 
   .autocomplete {
-    background-color: #191a25;
+    background-color: $mainLight;
 
     input {
       width: 100%;
@@ -25,7 +27,7 @@
       flex-direction: column;
       box-sizing: border-box;
       font-size: 15px;
-      background-color: #3b3d4d;
+      background-color: $mainMedium;
       border: 0;
       border-radius: 0;
       box-shadow: none;
@@ -37,7 +39,7 @@
     }
 
     .search-item {
-      background-color: #3b3d4d;
+      background-color: $mainMedium;
       border-bottom: 1px solid #636679;
       padding: 4px;
       cursor: pointer;

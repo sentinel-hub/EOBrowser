@@ -8,6 +8,7 @@ import { momentToDate } from './Datepicker.utils';
 import Navbar from './Navbar';
 import YearMonthForm from './YearMonthForm';
 
+import 'react-day-picker/lib/style.css';
 import './Calendar.scss';
 
 function Calendar(props) {
@@ -20,13 +21,19 @@ function Calendar(props) {
     handleMonthChange,
     handleDayClick,
     onMonthOrYearDropdownChange,
+    highlightedDays,
   } = props;
+
+  const modifiers = {
+    highlighted: highlightedDays,
+  };
 
   return ReactDOM.createPortal(
     <div className="calendar-wrapper">
       <DayPicker
         showOutsideDays
         selectedDays={momentToDate(selectedDay)}
+        modifiers={modifiers}
         month={momentToDate(selectedDay)}
         onMonthChange={handleMonthChange}
         onDayClick={handleDayClick}
@@ -37,13 +44,13 @@ function Calendar(props) {
           },
         ]}
         navbarElement={<Navbar minDate={minDate} maxDate={maxDate} selectedDate={selectedDay} />}
-        captionElement={({ date, locale }) => (
+        captionElement={({ locale }) => (
           <YearMonthForm
             minFromDate={minDate}
             maxToDate={maxDate}
-            date={date}
             onChange={onMonthOrYearDropdownChange}
             locale={locale}
+            selectedDay={selectedDay}
           />
         )}
         locale={locale}

@@ -59,7 +59,7 @@ class SharePinsLink extends Component {
         animation="slideUp"
         visible={true}
         width={500}
-        height={140}
+        height={170}
         onClose={this.onClose}
         closeOnEsc={true}
       >

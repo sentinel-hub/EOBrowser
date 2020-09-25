@@ -1,11 +1,15 @@
 import React from 'react';
-import request from 'axios';
-import { DATASET_S2L2A, DATASET_S2L1C } from '@sentinel-hub/sentinelhub-js';
+import { DATASET_S2L2A, DATASET_S2L1C, LinkType } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
 import DataSourceHandler from './DataSourceHandler';
 import Sentinel2SearchGroup from './DatasourceRenderingComponents/searchGroups/Sentinel2SearchGroup';
-import Sentinel2Tooltip from './DatasourceRenderingComponents/dataSourceTooltips/Sentinel2Tooltip';
+import {
+  Sentinel2Tooltip,
+  S2L1CTooltip,
+  S2L2ATooltip,
+} from './DatasourceRenderingComponents/dataSourceTooltips/Sentinel2Tooltip';
+import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 import { FetchingFunction } from '../search';
 import { S2L1C, S2L2A } from './dataSourceHandlers';
 
@@ -95,6 +99,25 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
     this.isChecked = checkedState;
   };
 
+  renderOptionsHelpTooltips = option => {
+    switch (option) {
+      case S2L1C:
+        return (
+          <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+            <S2L1CTooltip />
+          </HelpTooltip>
+        );
+      case S2L2A:
+        return (
+          <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+            <S2L2ATooltip />
+          </HelpTooltip>
+        );
+      default:
+        return null;
+    }
+  };
+
   getSearchFormComponents() {
     if (!this.isHandlingAnyUrl()) {
       return null;
@@ -112,6 +135,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
         optionsLabels={this.datasetSearchLabels}
         preselectedOptions={Array.from(this.preselectedDatasets)}
         hasMaxCCFilter={true}
+        renderOptionsHelpTooltips={this.renderOptionsHelpTooltips}
       />
     );
   }
@@ -149,31 +173,16 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
       datasource: this.datasource,
       datasetId,
       metadata: {
-        previewUrl: this.getUrl(t.links, 'preview'),
-        AWSPath: this.getUrl(t.links, 'aws'),
-        hasSciHubLink: true,
+        previewUrl: this.getUrl(t.links, LinkType.PREVIEW),
+        AWSPath: this.getUrl(t.links, LinkType.AWS),
+        sciHubLink: this.getUrl(t.links, LinkType.SCIHUB),
         tileId: t.meta.tileId,
-        getSciHubLink: datasetId === S2L1C ? this.getS2L1CSciHubLink : this.getS2L2ASciHubLink,
         cloudCoverage: t.meta.cloudCoverPercent,
         tileCRS: 'EPSG:4326', //When we search results, this CRS is in accept headers
         MGRSLocation: t.meta.MGRSLocation,
       },
     }));
     return tiles;
-  };
-
-  getS2L1CSciHubLink = function(tileId) {
-    return request.get(`https://services.sentinel-hub.com/index/s2/v3/tiles/${tileId}`).then(res => {
-      return `https://scihub.copernicus.eu/dhus/odata/v1/Products('${
-        res.data.product['@ref'].split('/').splice(-1)[0]
-      }')/$value`;
-    });
-  };
-
-  getS2L2ASciHubLink = function(tileId) {
-    return request.get(`https://services.sentinel-hub.com/index/s2/v3/processedtiles/${tileId}`).then(res => {
-      return `https://scihub.copernicus.eu/dhus/odata/v1/Products('${res.data.productId}')/$value`;
-    });
   };
 
   getBands = datasetId => {
