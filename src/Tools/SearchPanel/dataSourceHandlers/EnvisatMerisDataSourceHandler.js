@@ -8,6 +8,7 @@ import EnvisatTooltip from './DatasourceRenderingComponents/dataSourceTooltips/E
 import { FetchingFunction } from '../search';
 import { constructBasicEvalscript } from '../../../utils';
 import { ENVISAT_MERIS } from './dataSourceHandlers';
+import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 
 export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
   KNOWN_BANDS = [
@@ -18,7 +19,7 @@ export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
     },
     {
       name: 'B02',
-      description: t`Band 2 - Chlorophyll absoption maximum - 442 nm`,
+      description: t`Band 2 - Chlorophyll absorption maximum - 442 nm`,
       color: '#000AFF',
     },
     {
@@ -63,7 +64,7 @@ export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
     },
     {
       name: 'B11',
-      description: t`Band 11 - O2 R- branch absoption band - 761 nm`,
+      description: t`Band 11 - O2 R- branch absorption band - 761 nm`,
       color: '#880000',
     },
     {
@@ -115,14 +116,6 @@ export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
   isHandlingAnyUrl() {
     return this.urls.length > 0;
   }
-
-  saveSearchFilters = searchFilters => {
-    this.searchFilters = searchFilters;
-  };
-
-  saveCheckedState = checkedState => {
-    this.isChecked = checkedState;
-  };
 
   getSearchFormComponents() {
     if (!this.isHandlingAnyUrl()) {
@@ -202,5 +195,11 @@ export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
 
   supportsV3Evalscript() {
     return false;
+  }
+
+  getSupportedImageFormats() {
+    return Object.values(IMAGE_FORMATS).filter(
+      f => f !== IMAGE_FORMATS.KMZ_JPG && f !== IMAGE_FORMATS.KMZ_PNG,
+    );
   }
 }

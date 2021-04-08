@@ -32,7 +32,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
 
   L2A_BANDS = [...this.L1C_BANDS].filter(b => b.name !== 'B10');
 
-  datasetSearchLabels = { [S2L1C]: 'L1C', [S2L2A]: 'L2A (atmospherically corrected)' };
+  getDatasetSearchLabels = () => ({ [S2L1C]: 'L1C', [S2L2A]: t`L2A (atmospherically corrected)` });
   datasetSearchIds = { [S2L1C]: 'L1C', [S2L2A]: 'L2A' };
 
   urls = { L2A: [], L1C: [] };
@@ -91,14 +91,6 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
     return Object.values(this.urls).flat().length > 0;
   }
 
-  saveSearchFilters = searchFilters => {
-    this.searchFilters = searchFilters;
-  };
-
-  saveCheckedState = checkedState => {
-    this.isChecked = checkedState;
-  };
-
   renderOptionsHelpTooltips = option => {
     switch (option) {
       case S2L1C:
@@ -132,7 +124,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
         dataSourceTooltip={<Sentinel2Tooltip />}
         saveFiltersValues={this.saveSearchFilters}
         options={this.datasets}
-        optionsLabels={this.datasetSearchLabels}
+        optionsLabels={this.getDatasetSearchLabels()}
         preselectedOptions={Array.from(this.preselectedDatasets)}
         hasMaxCCFilter={true}
         renderOptionsHelpTooltips={this.renderOptionsHelpTooltips}
@@ -220,17 +212,6 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
 
   tilesHaveCloudCoverage() {
     return true;
-  }
-
-  getFISLayer(url, datasetId, layerId, isCustom) {
-    if (isCustom) {
-      return true;
-    }
-    return super.getFISLayer(url, datasetId, layerId);
-  }
-
-  hasFISLayer(url, datasetId, layerId, isCustom) {
-    return !!this.getFISLayer(url, datasetId, layerId, isCustom);
   }
 
   getResolutionLimits(datasetId) {

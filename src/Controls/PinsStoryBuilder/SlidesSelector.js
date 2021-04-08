@@ -5,6 +5,7 @@ import { t } from 'ttag';
 import PinPreviewImage from '../../Tools/Pins/PinPreviewImage';
 import EditableString from '../../Tools/Pins/EditableString';
 import { NotificationPanel } from '../../Notification/NotificationPanel';
+import { constructEffectsFromPinOrHighlight } from '../../utils/effectsUtils';
 
 export default class SlidesSelector extends React.Component {
   render() {
@@ -50,12 +51,16 @@ export default class SlidesSelector extends React.Component {
 class Slide extends React.Component {
   render() {
     const { pin, title, onClick, selected, saveNewSlideTitle } = this.props;
+
+    const effects = constructEffectsFromPinOrHighlight(pin);
+    const pinItem = { ...pin, ...effects };
+
     return (
       <div className="pin-item">
         <div className="pin-content" onClick={onClick}>
           <div className="slide-image">
             <span className={`pin-selector ${selected ? 'selected' : ''}`} />
-            <PinPreviewImage pin={pin} />
+            <PinPreviewImage pin={pinItem} />
           </div>
           <div className="pin-info">
             <EditableString text={title} onEditSave={saveNewSlideTitle} />

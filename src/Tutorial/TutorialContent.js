@@ -59,7 +59,7 @@ const userAccountMd = () => t`
 **Logged-in users** can use their custom themes, save and load pins, create a pin story, measure distances, create a
 timelapse and use the advanced image download.
 
-To create a free account simply click [here](https://services.sentinel-hub.com/oauth/subscription)
+To create a free account simply click [here]
 or within the app on **Login** and then "Sign Up".
 `;
 
@@ -227,13 +227,13 @@ icon. Your data will be clipped to match this area.
 const timelapseMd = () => t`
 With this tool you can create a timelapse animation of the visualized layer and displayed location.
 
-First, choose a time range. You can define you search results further by filtering them by months
+First, choose a time range. You can define your search results further by filtering them by months
 (filter by months checkbox) and/or selecting one image per defined period (orbit, day, week, month,
 year).
 
 Then press <span class="btn" style="font-size: 12px; padding: 4px 6px 4px 6px"> <i className="fa fa-search" /> Search </span> and select your images.
 You can select all by checking the checkbox or filter the images by cloud coverage by moving the slider. Or you can pick images one by
-one by scrolling through the list and selecting them. Via the **Borders** checkbox you can enable/disable the boarders on your image.
+one by scrolling through the list and selecting them. Via the **Borders** checkbox you can enable/disable the borders on your image.
 
 You can preview the timelapse by pressing the play button on the bottom. You can also set the speed
 (frames per second).
@@ -302,7 +302,14 @@ export const TUTORIAL_STEPS = () => [
     title: t`User Account`,
     content: (
       <div className="content-div-style">
-        <ReactMarkdown source={userAccountMd()} escapeHtml={false} linkTarget="_blank" />
+        <ReactMarkdown
+          source={userAccountMd()}
+          escapeHtml={false}
+          linkTarget="_blank"
+          transformLinkUri={() =>
+            `${process.env.REACT_APP_AUTH_BASEURL}oauth/subscription?origin=EOBrowser&param_client_id=${process.env.REACT_APP_CLIENTID}`
+          }
+        />
       </div>
     ),
     target: '.user-panel',

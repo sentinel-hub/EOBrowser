@@ -1,4 +1,5 @@
 import { t } from 'ttag';
+import { EDUCATION_MODE } from '../const';
 
 export const PREDEFINED_LAYERS_METADATA = [
   {
@@ -241,7 +242,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Effective radiometric cloud fraction\n\nCloud fraction is the portion of Earth's surface covered by cloud relative to the portion of Earth not covered by cloud. Clouds have shielding, albedo, and in-cloud absorption effects on trace gas retrieval. The effective radiometric cloud fraction is an important parameter to correct these effects.`,
+      t`# Effective radiometric cloud fraction\n\nEffective radiometric cloud fraction represents the portion of the Earth's surface covered by clouds, divided by the total surface. Clouds have shielding, albedo, and in-cloud absorption effects on trace gas retrieval. The effective radiometric cloud fraction is an important parameter to correct these effects.`,
   },
 
   {
@@ -321,7 +322,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Thermal band 10\n\nThis thermal visualization is based on band 10 (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). At the central wavelength of 10895 nm it measures in the thermal infrared, or TIR. Instead of measuring the temperature of the air, like weather stations do, band 10 reports on the ground itself, which is often much hotter. Thermal band 10 is useful in providing surface temperatures and is collected at 100 meters above the surface.\n\n\n\nMore info [here](https://www.usgs.gov/faqs/what-are-band-designations-landsat-satellites?qt-news_science_products=0#qt-news_science_products) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
+      t`# Thermal band 10\n\nThis thermal visualization is based on band 10 (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). At the central wavelength of 10895 nm it measures in the thermal infrared, or TIR. Instead of measuring the temperature of the air, like weather stations do, band 10 reports on the ground itself, which is often much hotter. Thermal band 10 is useful in providing surface temperatures and is collected with a 100-meter resolution.\n\n\n\nMore info [here](https://www.usgs.gov/faqs/what-are-band-designations-landsat-satellites?qt-news_science_products=0#qt-news_science_products) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
   },
 
   {
@@ -390,6 +391,12 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 1.1, color: 'rgb(0%,27%,0%)', label: ' 1' },
       ],
     },
+    titles: () => ({
+      [EDUCATION_MODE.id]: 'NDVI',
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: 'Normalized Difference Vegetation Index',
+    }),
     description: () =>
       t`# Normalized Difference Vegetation Index (NDVI)\n\nThe normalized difference vegetation index is a simple, but effective index for quantifying green vegetation. It is a measure of the state of vegetation health based on how plants reflect light at certain wavelengths. The value range of the NDVI is -1 to 1. Negative values of NDVI (values approaching -1) correspond to water. Values close to zero (-0.1to 0.1) generally correspond to barren areas of rock, sand, or snow. Low, positive values represent shrub and grassland (approximately 0.2 to 0.4), while high values indicate temperate and tropical rainforests (values approaching 1).\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/ndvi/) and [here.](https://eos.com/ndvi/)`,
   },
@@ -399,7 +406,12 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L1C', layerId: '4_EVI' },
       { datasourceId: 'S2L2A', layerId: '4_EVI' },
     ],
-
+    titles: () => ({
+      [EDUCATION_MODE.id]: `EVI`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Enhanced Vegetation Index`,
+    }),
     description: () =>
       t`# Enhanced Vegetation Index (EVI)\n\nThe enhanced vegetation index (EVI) is an 'optimized' vegetation index as it corrects for soil background signals and atmospheric influences. It is very useful in areas of dense canopy cover. The range of values for EVI is -1 to 1, with healthy vegetation generally around 0.20 to 0.80.\n\n\n\n\n\nMore infos [here](https://custom-scripts.sentinel-hub.com/sentinel-2/evi/) and [here.](https://earthobservatory.nasa.gov/features/MeasuringVegetation/measuring_vegetation_4.php)`,
   },
@@ -408,7 +420,12 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L1C', layerId: '5_ARVI', themeId: 'FORESTRY' },
       { datasourceId: 'S2L2A', layerId: '5_ARVI', themeId: 'FORESTRY' },
     ],
-
+    titles: () => ({
+      [EDUCATION_MODE.id]: `ARVI`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Atmospherically Resistant Vegetation Index `,
+    }),
     description: () =>
       t`# Atmospherically Resistant Vegetation Index (ARVI)\n\nThe Atmospherically Resistant Vegetation Index (ARVI) is a vegetation index that minimizes the effects of atmospheric scattering. It is most useful for regions with high content of atmospheric aerosol (fog, dust, smoke, air pollution). The range for an ARVI is -1 to 1 where green vegetation generally falls between values of 0.20 to 0.80.\n\n\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/arvi/) and [here.](https://eos.com/blog/6-spectral-indexes-on-top-of-ndvi-to-make-your-vegetation-analysis-complete/)`,
   },
@@ -419,7 +436,12 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L1C', layerId: 'SAVI', themeId: 'AGRICULTURE' },
       { datasourceId: 'S2L2A', layerId: 'SAVI', themeId: 'AGRICULTURE' },
     ],
-
+    titles: () => ({
+      [EDUCATION_MODE.id]: `SAVI`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Soil Adjusted Vegetation Index`,
+    }),
     description: () =>
       t`# Soil Adjusted Vegetation Index (SAVI)\n\n The Soil Adjusted Vegetation Index is similar to Normalized Difference Vegetation Index (NDVI) but is used in areas where vegetative cover is low (< 40%). The index is a transformation technique that minimizes soil brightness influences from spectral vegetation indices involving red and near-infrared (NIR) wavelengths. The index is helpful when analysing young crops, arid regions with sparse vegetation and exposed soil surfaces.\n\n\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/savi/) and [here.](https://eos.com/blog/6-spectral-indexes-on-top-of-ndvi-to-make-your-vegetation-analysis-complete/)`,
   },
@@ -429,7 +451,12 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L1C', layerId: '7_MARI' },
       { datasourceId: 'S2L2A', layerId: '7_MARI' },
     ],
-
+    titles: () => ({
+      [EDUCATION_MODE.id]: `MARI`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Modified Anthocyanin Reflectance Index`,
+    }),
     description: () =>
       t`# Modified Anthocyanin Reflectance Index (mARI/ARI2)\n\nAnthocyanins are pigments common in higher plants, causing their red, blue and purple coloration. They provide valuable information about the physiological status of plants, as they are considered indicators of various types of plant stresses. The reflectance of anthocyanin is highest around 550nm. However, the same wavelengths are reflected by chlorophyll as well. To isolate the anthocyanins, the 700nm spectral band, that reflects only chlorophyll and not anthocyanins, is subtracted.\n\nTo correct for leaf density and thickness, the near infrared spectral band (in the recommended wavelengths of 760-800nm), which is related to leaf scattering, is added to the basic ARI index. The new index is called modified ARI or mARI (also ARI2).\n\nmARI values for the examined trees in [this original article](https://custom-scripts.sentinel-hub.com/sentinel-2/mari/) ranged in values from 0 to 8.\n\n\n\n\n\nMore info [here.](https://digitalcommons.unl.edu/cgi/viewcontent.cgi?article=1227&context=natrespapers)`,
   },
@@ -500,6 +527,12 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 0.8, color: 'rgb(0%,0%,50%)', label: '> 0.8' },
       ],
     },
+    titles: () => ({
+      [EDUCATION_MODE.id]: `NDMI`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Normalized Difference Moisture Index`,
+    }),
     description: () =>
       t`# Normalized Difference Moisture Index (NDMI)\n\nThe normalized difference moisture Index (NDMI) is used to determine vegetation water content and monitor droughts. The value range of the NDMI is -1 to 1. Negative values of NDMI (values approaching -1) correspond to barren soil. Values around zero (-0.2 to 0.4) generally correspond to water stress. High, positive values represent high canopy without water stress (approximately 0.4 to 1).\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/ndmi/)`,
   },
@@ -521,6 +554,12 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 0.8, color: 'rgb(0%,0%,100%)', label: '0.8' },
       ],
     },
+    titles: () => ({
+      [EDUCATION_MODE.id]: `NDWI`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Normalized Difference Water Index`,
+    }),
     description: () =>
       t`# Normalized Difference Water Index (NDWI)\n\nThe normalized difference water index is most appropriate for water body mapping. Values of water bodies are larger than 0.5. Vegetation has smaller values. Built-up features have positive values between zero and 0.2.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/ndwi/)`,
   },
@@ -537,6 +576,12 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 0.8, color: 'rgb(0%,0%,100%)', label: '0.8' },
       ],
     },
+    titles: () => ({
+      [EDUCATION_MODE.id]: `NDWI`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Normalized Difference Water Index`,
+    }),
     description: () =>
       t`# Normalized Difference Water Index (NDWI)\n\nThe normalized difference water index is most appropriate for water body mapping. Values of water bodies are larger than 0.5. Vegetation has smaller values. Built-up features have positive values between zero and 0.2.`,
   },
@@ -615,7 +660,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# rue color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 8 has 11 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 8 has 11 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
   },
 
   {
@@ -630,6 +675,13 @@ export const PREDEFINED_LAYERS_METADATA = [
 
     description: () =>
       t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum . Each region in the spectrum is referred to as a band. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here.](https://sentinel.esa.int/web/sentinel/user-guides/sentinel-3-olci/overview/heritage)`,
+  },
+
+  {
+    match: [{ datasourceId: 'S3OLCI', layerId: '6_TRUE-COLOR-HIGLIGHT-OPTIMIZED' }],
+
+    description: () =>
+      t`# Enhanced True Color Visualization\n\nThis script uses highlight optimization to avoid burnt out pixels and to even out the exposure. It makes clouds look natural and keep as much visual information as possible. Sentinel-3 OLCI tiles cover large areas, making it possible to observe large cloud formations, such as hurricanes.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-3/true_color_highlight_optimized/)`,
   },
 
   {
@@ -698,10 +750,17 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: '6-SWIR' },
       { datasourceId: 'S2L1C', layerId: '5_SWIR' },
       { datasourceId: 'S2L2A', layerId: '5_SWIR' },
+      { datasourceId: 'S2L1C', layerId: 'SWIR' },
+      { datasourceId: 'S2L2A', layerId: 'SWIR' },
     ],
-
+    titles: () => ({
+      [EDUCATION_MODE.id]: `SWIR`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Short Wave Infrared Composite`,
+    }),
     description: () =>
-      t`# Short wave infrared composite (SWIR)\n\nShort wave infrared (SWIR) measurements can help scientists estimate how much water is present in plants and soil, as water reflects SWIR wavelengths. Short wave infrared bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. In this composite vegetation appears in shades of red, soils vary from dark to light brown and urban areas are cyan blue. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/)`,
+      t`# Short wave infrared composite (SWIR)\n\nShort wave infrared (SWIR) measurements can help scientists estimate how much water is present in plants and soil, as water reflects SWIR wavelengths. Short wave infrared bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. In this composite vegetation appears in shades of green, soils and built-up areas are in various shades of brown, and water appears black. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/)`,
   },
 
   {
@@ -711,9 +770,14 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L1C', layerId: '4_NDSI' },
       { datasourceId: 'S2L2A', layerId: '4_NDSI' },
     ],
-
+    titles: () => ({
+      [EDUCATION_MODE.id]: `NDSI`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Normalised Difference Snow Index`,
+    }),
     description: () =>
-      t`# Normalised Difference Snow Index (NDSI)\n\nThe Sentinel-2 normalised difference snow index can be used to differentiate between cloud and snow cover as snow absorbs in the short-wave infrared light, but reflects in the visible-infrared, whereas cloud is generally reflective in both wavelengths. Snow cover is represented in bright vivid blue.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/ndsi/) and [here.](https://earth.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-2a/algorithm)`,
+      t`# Normalised Difference Snow Index (NDSI)\n\nThe Sentinel-2 normalised difference snow index can be used to differentiate between cloud and snow cover as snow absorbs in the short-wave infrared light, but reflects the visible light, whereas cloud is generally reflective in both wavelengths. Snow cover is represented in bright vivid blue.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/ndsi/) and [here.](https://earth.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-2a/algorithm)`,
   },
 
   {
@@ -789,6 +853,12 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 100, color: 'rgb(0%,0%,0%)', label: '6' },
       ],
     },
+    titles: () => ({
+      [EDUCATION_MODE.id]: `BAI`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Burned Area Index`,
+    }),
     description: () =>
       t`# Burned Area Index\n\nBurned Area Index takes advantage of the wider spectrum of Visible, Red-Edge, NIR and SWIR bands.\n\nValues description:()=> The range of values for the index is \`-1\` to \`1\` for burn scars, and \`1\` - \`6\` for active fires. Different fire intensities may result in different thresholds; the current values were calibrated, as per original author, on mostly Mediterranen regions.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/bais2/)`,
   },
@@ -812,6 +882,12 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 100, color: 'rgb(0%,0%,0%)', label: '1' },
       ],
     },
+    titles: () => ({
+      [EDUCATION_MODE.id]: `NBR`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Normalized Burn Ratio`,
+    }),
     description: () =>
       t`# Normalized Burn Ratio (NBR)\n\nNormalized Burn Ratio is frequently used to estimate burn severity. It uses near-infrared (NIR) and shortwave-infrared (SWIR) wavelengths. Healthy vegetation has a high reflectance in the near-infrared portion of the spectrum, and a low short-wave infrared reflectance. On the other hand, burned areas have a high shortwave infrared reflectance but low reflectance in the near infrared Darker pixels indicate burned areas.\n\n\n\nMore info [here](http://gsp.humboldt.edu/OLM/Courses/GSP_216_Online/lesson5-1/NBR.html) and [here.](https://mybinder.org/v2/gh/sentinel-hub/education/master?filepath=wildfires%2FWildfires%20from%20Satellite%20Images.ipynb)`,
   },
@@ -914,7 +990,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Scene classification\n\n\n\nScene classification was developed to distinguish between cloudy pixels, clear pixels and water pixels of Sentinel-2 data as a result of ESA's Scene classification algorithm. Twelve different classifications are provided including classes of clouds, vegetation, soils/desert, water and snow. It does not constitute a land cover classification map in a strict sense.\n\n\n\nMore info [here.](http://step.esa.int/thirdparties/sen2cor/2.5.5/docs/S2-PDGS-MPC-L2A-SUM-V2.5.5_V2.pdf)`,
+      t`# Scene classification\n\n\n\nScene classification was developed to distinguish between cloudy pixels, clear pixels and water pixels of Sentinel-2 data and is a result of ESA's Scene classification algorithm. Twelve different classifications are provided including classes of clouds, vegetation, soils/desert, water and snow. It does not constitute a land cover classification map in a strict sense.\n\n\n\nMore info [here.](https://earth.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-2a/algorithm)`,
   },
 
   {
@@ -999,6 +1075,630 @@ export const PREDEFINED_LAYERS_METADATA = [
     },
     description: () =>
       t`# Normalized Difference Salinity Index\n\nThe index visualizes the amount of salt present in soils. Soil salinization is one of the most common land degradation processes, especially in arid and semi-arid regions, where precipitation exceeds evaporation. \n\n Higher values indicate higher salinity and low values indicate lower salinity.\n\nRead more [here,](https://webapps.itc.utwente.nl/librarywww/papers_2003/msc/wrem/khaier.pdf) [here](https://modis.gsfc.nasa.gov/sci_team/pubs/abstract_new.php?id=29271) and [here.](https://www.indexdatabase.de/db/i-single.php?id=57)`,
+  },
+
+  {
+    match: [{ datasourceId: 'COPERNICUS_GLOBAL_LAND_COVER', layerId: 'DISCRETE-CLASSIFICATION-MAP' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#282828',
+          label: 'No input data',
+        },
+        {
+          color: '#ffbb22',
+          label: 'Shrubs',
+        },
+        {
+          color: '#ffff4c',
+          label: 'Herbaceous\nvegetation',
+        },
+        {
+          color: '#f096ff',
+          label: 'Cropland',
+        },
+        {
+          color: '#fa0000',
+          label: 'Urban built up',
+        },
+        {
+          color: '#b4b4b4',
+          label: 'Bare sparse\nvegetation',
+        },
+        {
+          color: '#f0f0f0',
+          label: 'Snow and Ice',
+        },
+        {
+          color: '#0032c8',
+          label: 'Permanent\nwater bodies',
+        },
+        {
+          color: '#0096a0',
+          label: 'Herbaceous\nwetland',
+        },
+        {
+          color: '#fae6a0',
+          label: 'Moss and lichen',
+        },
+        {
+          color: '#58481f',
+          label: 'Closed forest,\nevergreen needle leaf',
+        },
+        {
+          color: '#009900',
+          label: 'Closed forest,\nevergreen, broad leaf',
+        },
+        {
+          color: '#70663e',
+          label: 'Closed forest,\ndeciduous needle leaf',
+        },
+        {
+          color: '#00cc00',
+          label: 'Closed forest,\ndeciduous broad leaf',
+        },
+        {
+          color: '#4e751f',
+          label: 'Closed forest,\nmixed',
+        },
+        {
+          color: '#007800',
+          label: 'Closed forest,\nunknown',
+        },
+        {
+          color: '#666000',
+          label: 'Open forest,\nevergreen needle leafs',
+        },
+        {
+          color: '#8db400',
+          label: 'Open forest,\nevergreen broad leaf',
+        },
+        {
+          color: '#8d7400',
+          label: 'Open forest,\ndeciduous needle leaf',
+        },
+        {
+          color: '#a0dc00',
+          label: 'Open forest,\ndeciduous broad leaf',
+        },
+        {
+          color: '#929900',
+          label: 'Open forest,\nmixed',
+        },
+        {
+          color: '#648c00',
+          label: 'Open forest,\nunknown',
+        },
+        {
+          color: '#000080',
+          label: 'Open sea',
+        },
+      ],
+    },
+    description: () =>
+      t`# Discrete Classification Map\n\n\n\nThis layer visualises Global Land Cover discrete classification map with 23 classes defined using the UN-FAO Land Cover Classification System (LCCS) and with color scheme defined in the Product User Manual. Map [here.](https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_PUM_LC100m-V3_I3.3.pdf)`,
+  },
+
+  {
+    match: [{ datasourceId: 'COPERNICUS_GLOBAL_LAND_COVER', layerId: 'FOREST-TYPE' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#ffffff',
+          label: 'Not a forest',
+        },
+        {
+          color: '#58481f',
+          label: 'Evergreen niddle leaf',
+        },
+        {
+          color: '#009900',
+          label: 'Evergreen broad leaf',
+        },
+        {
+          color: '#70663e',
+          label: 'Deciduous needle leaf',
+        },
+        {
+          color: '#00cc00',
+          label: 'Deciduous broad leaf',
+        },
+        {
+          color: '#4e751f',
+          label: 'Mix of forest type ',
+        },
+      ],
+    },
+    description: () =>
+      t`# Forest Types\n\n\n\nVisualized forest types based on 6 classes, as defined in the UN-FAO Land Cover Classification System (LCCS). More [here.](https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_PUM_LC100m-V3_I3.3.pdf).`,
+  },
+
+  {
+    match: [{ datasourceId: 'COPERNICUS_CORINE_LAND_COVER', layerId: '1_CORINE-LAND-COVER' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#e6004d',
+          label: 'Continuous\nurban fabric',
+        },
+        {
+          color: '#ff0000',
+          label: 'Discontinuous\nurban fabric',
+        },
+        {
+          color: '#cc4df2',
+          label: 'Industrial or\ncommercial units',
+        },
+        {
+          color: '#cc0000',
+          label: 'Road and rail\nnetworks',
+        },
+        {
+          color: '#e6cccc',
+          label: 'Port areas',
+        },
+        {
+          color: '#e6cce6',
+          label: 'Airports',
+        },
+        {
+          color: '#a600cc',
+          label: 'Mineral\nextraction sites',
+        },
+        {
+          color: '#a64d00',
+          label: 'Dump sites',
+        },
+        {
+          color: '#ff4dff',
+          label: 'Construction\nsites',
+        },
+        {
+          color: '#ffa6ff',
+          label: 'Green urban\nareas',
+        },
+        {
+          color: '#ffe6ff',
+          label: 'Sport and leisure\nfacilities',
+        },
+        {
+          color: '#ffffa8',
+          label: 'Non-irrigated\narable land',
+        },
+        {
+          color: '#ffff00',
+          label: 'Permanently\nirrigated land',
+        },
+        {
+          color: '#e6e600',
+          label: 'Rice fields',
+        },
+        {
+          color: '#e68000',
+          label: 'Vineyards',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Fruit trees and\nberry plantations',
+        },
+        {
+          color: '#e6a600',
+          label: 'Olive groves',
+        },
+        {
+          color: '#e6e64d',
+          label: 'Pastures',
+        },
+        {
+          color: '#ffe6a6',
+          label: 'Annual crops\nassociated with\npermanent crops',
+        },
+        {
+          color: '#ffe64d',
+          label: 'Complex cultivation\npatterns',
+        },
+        {
+          color: '#e6cc4d',
+          label: 'Land principally\noccupied by\nagriculture with\n significant areas\nof natural vegetation',
+        },
+        {
+          color: '#f2cca6',
+          label: 'Agro-forestry\nareas',
+        },
+        {
+          color: '#80ff00',
+          label: 'Broad-leaved\nforest',
+        },
+        {
+          color: '#00a600',
+          label: 'Coniferous\nforest',
+        },
+        {
+          color: '#4dff00',
+          label: 'Mixed forest',
+        },
+        {
+          color: '#ccf24d',
+          label: 'Natural\ngrasslands',
+        },
+        {
+          color: '#a6ff80',
+          label: 'Moors and\nheathland',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Sclerophyllous\nvegetation',
+        },
+        {
+          color: '#a6f200',
+          label: 'Transitional\nwoodland-shrub',
+        },
+        {
+          color: '#e6e6e6',
+          label: 'Beaches, dunes\nand sands',
+        },
+        {
+          color: '#cccccc',
+          label: 'Bare rocks',
+        },
+        {
+          color: '#ccffcc',
+          label: 'Sparsely\nvegetated areas',
+        },
+        {
+          color: '#000000',
+          label: 'Burnt areas',
+        },
+        {
+          color: '#a6e6cc',
+          label: 'Glaciers and\nperpetual snow',
+        },
+        {
+          color: '#a6a6ff',
+          label: 'Inland marshes',
+        },
+        {
+          color: '#4d4dff',
+          label: 'Peat bogs',
+        },
+        {
+          color: '#ccccff',
+          label: 'Salt marshes',
+        },
+        {
+          color: '#e6e6ff',
+          label: 'Salines',
+        },
+        {
+          color: '#a6a6e6',
+          label: 'Intertidal\nflats',
+        },
+        {
+          color: '#00ccf2',
+          label: 'Water courses',
+        },
+        {
+          color: '#80f2e6',
+          label: 'Water bodies',
+        },
+        {
+          color: '#00ffa6',
+          label: 'Coastal lagoons',
+        },
+        {
+          color: '#a6ffe6',
+          label: 'Estuaries',
+        },
+        {
+          color: '#e6f2ff',
+          label: 'Sea and ocean',
+        },
+        {
+          color: '#ffffff',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Corine Land Cover (CLC)\n\n\n\nIn this Corine Land Cover layer, all 44 classes are shown. Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+  },
+
+  {
+    match: [{ datasourceId: 'COPERNICUS_CORINE_LAND_COVER', layerId: '2_ARTIFICIAL-SURFACES' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#e6004d',
+          label: 'Continuous\nurban fabric',
+        },
+        {
+          color: '#ff0000',
+          label: 'Discontinuous\nurban fabric',
+        },
+        {
+          color: '#cc4df2',
+          label: 'Industrial or\ncommercial units',
+        },
+        {
+          color: '#cc0000',
+          label: 'Road and rail\nnetworks',
+        },
+        {
+          color: '#e6cccc',
+          label: 'Port areas',
+        },
+        {
+          color: '#e6cce6',
+          label: 'Airports',
+        },
+        {
+          color: '#a600cc',
+          label: 'Mineral\nextraction sites',
+        },
+        {
+          color: '#a64d00',
+          label: 'Dump sites',
+        },
+        {
+          color: '#ff4dff',
+          label: 'Construction\nsites',
+        },
+        {
+          color: '#ffa6ff',
+          label: 'Green urban\nareas',
+        },
+        {
+          color: '#ffe6ff',
+          label: 'Sport and leisure\nfacilities',
+        },
+      ],
+    },
+    description: () =>
+      t`# Corine Land Cover (CLC) - Artificial Surfaces\n\n\n\nIn this Corine Land Cover layer, only the 11 artificial surface classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+  },
+
+  {
+    match: [{ datasourceId: 'COPERNICUS_CORINE_LAND_COVER', layerId: '3_AGRICULTURAL-AREAS' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#ffffa8',
+          label: 'Non-irrigated\narable land',
+        },
+        {
+          color: '#ffff00',
+          label: 'Permanently\nirrigated land',
+        },
+        {
+          color: '#e6e600',
+          label: 'Rice fields',
+        },
+        {
+          color: '#e68000',
+          label: 'Vineyards',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Fruit trees and\nberry plantations',
+        },
+        {
+          color: '#e6a600',
+          label: 'Olive groves',
+        },
+        {
+          color: '#e6e64d',
+          label: 'Pastures',
+        },
+        {
+          color: '#ffe6a6',
+          label: 'Annual crops\nassociated with\npermanent crops',
+        },
+        {
+          color: '#ffe64d',
+          label: 'Complex cultivation\npatterns',
+        },
+        {
+          color: '#e6cc4d',
+          label: 'Land principally\noccupied by\nagriculture with\n significant areas\nof natural vegetation',
+        },
+        {
+          color: '#f2cca6',
+          label: 'Agro-forestry\nareas',
+        },
+      ],
+    },
+    description: () =>
+      t`# Corine Land Cover (CLC) - Agricultural Areas\n\n\n\nIn this Corine Land Cover layer, only the 11 agricultural classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+  },
+
+  {
+    match: [{ datasourceId: 'COPERNICUS_CORINE_LAND_COVER', layerId: '4_FOREST-AND-SEMINATURAL-AREAS' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#80ff00',
+          label: 'Broad-leaved\nforest',
+        },
+        {
+          color: '#00a600',
+          label: 'Coniferous\nforest',
+        },
+        {
+          color: '#4dff00',
+          label: 'Mixed forest',
+        },
+        {
+          color: '#ccf24d',
+          label: 'Natural\ngrasslands',
+        },
+        {
+          color: '#a6ff80',
+          label: 'Moors and\nheathland',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Sclerophyllous\nvegetation',
+        },
+        {
+          color: '#a6f200',
+          label: 'Transitional\nwoodland-shrub',
+        },
+        {
+          color: '#e6e6e6',
+          label: 'Beaches, dunes\nand sands',
+        },
+        {
+          color: '#cccccc',
+          label: 'Bare rocks',
+        },
+        {
+          color: '#ccffcc',
+          label: 'Sparsely\nvegetated areas',
+        },
+        {
+          color: '#000000',
+          label: 'Burnt areas',
+        },
+        {
+          color: '#a6e6cc',
+          label: 'Glaciers and\nperpetual snow',
+        },
+      ],
+    },
+    description: () =>
+      t`# Corine Land Cover (CLC) - Forest and Seminatural Areas\n\n\n\nIn this Corine Land Cover layer, only the 12 Forest and Seminatural Area classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+  },
+
+  {
+    match: [{ datasourceId: 'COPERNICUS_CORINE_LAND_COVER', layerId: '5_WETLANDS' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#a6a6ff',
+          label: 'Inland marshes',
+        },
+        {
+          color: '#4d4dff',
+          label: 'Peat bogs',
+        },
+        {
+          color: '#ccccff',
+          label: 'Salt marshes',
+        },
+        {
+          color: '#e6e6ff',
+          label: 'Salines',
+        },
+        {
+          color: '#a6a6e6',
+          label: 'Intertidal\nflats',
+        },
+      ],
+    },
+    description: () =>
+      t`# Corine Land Cover (CLC) - Wetlands\n\n\n\nIn this Corine Land Cover layer, only the 5 Wetland classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). 
+      Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+  },
+
+  {
+    match: [{ datasourceId: 'COPERNICUS_CORINE_LAND_COVER', layerId: '6_WATER-BODIES' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00ccf2',
+          label: 'Water courses',
+        },
+        {
+          color: '#80f2e6',
+          label: 'Water bodies',
+        },
+        {
+          color: '#00ffa6',
+          label: 'Coastal lagoons',
+        },
+        {
+          color: '#a6ffe6',
+          label: 'Estuaries',
+        },
+        {
+          color: '#e6f2ff',
+          label: 'Sea and ocean',
+        },
+        {
+          color: '#ffffff',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Corine Land Cover (CLC) - Water Bodies\n\n\n\nIn this Corine Land Cover layer, only the 6 Water body classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+  },
+  {
+    match: [{ datasourceId: 'COPERNICUS_WATER_BODIES', layerId: 'WATER-BODIES-OCCURENCE' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#ff0000',
+          label: 'Very low',
+        },
+        {
+          color: '#8e35ef',
+          label: 'Low',
+        },
+        {
+          color: '#a6a6e6',
+          label: 'Medium',
+        },
+        {
+          color: '#00ffff',
+          label: 'High',
+        },
+        {
+          color: '#3bb9ff',
+          label: 'Very High',
+        },
+        {
+          color: '#0032c8',
+          label: 'Permanent',
+        },
+      ],
+    },
+    description: () =>
+      t`# Water Bodies - Occurrence\n\n\n\nThis layer displays the 6 occurrence levels of the Quality layer (QUAL), providing information on the seasonal dynamics of the detected water bodies. QUAL is generated from water body occurrence statistics computed from previous monthly Water Bodies products. The occurrence statistics is ranked from low occurrence to permanent occurrence. More information [here](https://collections.sentinel-hub.com/water-bodies/readme.html), and [here](https://custom-scripts.sentinel-hub.com/copernicus_services/water-bodies-occurence/#).`,
+  },
+
+  {
+    match: [{ datasourceId: 'COPERNICUS_WATER_BODIES', layerId: 'WATER-BODIES' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#344ACD',
+          label: 'Water',
+        },
+      ],
+    },
+    description: () =>
+      t`# Water Bodies\n\n\n\nThis layer visualizes the Water Bodies detection layer (WB), which shows water bodies detected using the Modified Normalized Difference Water Index (MNDWI) derived from Sentinel-2 Level 1C data. More information [here](https://collections.sentinel-hub.com/water-bodies/readme.html), and [here](https://custom-scripts.sentinel-hub.com/copernicus_services/water-bodies/).`,
   },
 
   {

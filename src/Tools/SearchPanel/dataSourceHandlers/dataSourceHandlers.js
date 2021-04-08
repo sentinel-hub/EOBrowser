@@ -1,8 +1,15 @@
 import React from 'react';
-import { CacheTarget, LayersFactory, BYOCLayer, S1GRDAWSEULayer } from '@sentinel-hub/sentinelhub-js';
+import {
+  CacheTarget,
+  LayersFactory,
+  BYOCLayer,
+  S1GRDAWSEULayer,
+  DEMLayer,
+} from '@sentinel-hub/sentinelhub-js';
 
 import store, { themesSlice } from '../../../store';
 
+import CopernicusServicesDataSourceHandler from './CopernicusServicesDataSourceHandler';
 import Sentinel1DataSourceHandler from './Sentinel1DataSourceHandler';
 import Sentinel2AWSDataSourceHandler from './Sentinel2AWSDataSourceHandler';
 import Sentinel3DataSourceHandler from './Sentinel3DataSourceHandler';
@@ -13,6 +20,9 @@ import ModisDataSourceHandler from './ModisDataSourceHandler';
 import ProbaVDataSourceHandler from './ProbaVDataSourceHandler';
 import GibsDataSourceHandler from './GibsDataSourceHandler';
 import BYOCDataSourceHandler from './BYOCDataSourceHandler';
+import DEMDataSourceHandler from './DEMDataSourceHandler';
+
+import { getCollectionInformation } from '../../../utils/collections';
 
 export const S1_AWS_IW_VVVH = 'S1_AWS_IW_VVVH',
   S1_AWS_IW_VV = 'S1_AWS_IW_VV',
@@ -47,12 +57,19 @@ export const S1_AWS_IW_VVVH = 'S1_AWS_IW_VVVH',
   GIBS_MODIS_AQUA = 'GIBS_MODIS_AQUA',
   GIBS_VIIRS_SNPP_CORRECTED_REFLECTANCE = 'GIBS_VIIRS_SNPP_CORRECTED_REFLECTANCE',
   GIBS_VIIRS_SNPP_DAYNIGHTBAND_ENCC = 'GIBS_VIIRS_SNPP_DAYNIGHTBAND_ENCC',
+  GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE = 'GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE',
   GIBS_CALIPSO_WWFC_V3_01 = 'GIBS_CALIPSO_WWFC_V3_01',
   GIBS_CALIPSO_WWFC_V3_02 = 'GIBS_CALIPSO_WWFC_V3_02',
   GIBS_BLUEMARBLE = 'GIBS_BLUEMARBLE',
   GIBS_LANDSAT_WELD = 'GIBS_LANDSAT_WELD',
   GIBS_MISR = 'GIBS_MISR',
   GIBS_ASTER_GDEM = 'GIBS_ASTER_GDEM',
+  DEM_MAPZEN = 'DEM_MAPZEN',
+  DEM_COPERNICUS_30 = 'DEM_COPERNICUS_30',
+  DEM_COPERNICUS_90 = 'DEM_COPERNICUS_90',
+  COPERNICUS_CORINE_LAND_COVER = 'COPERNICUS_CORINE_LAND_COVER',
+  COPERNICUS_GLOBAL_LAND_COVER = 'COPERNICUS_GLOBAL_LAND_COVER',
+  COPERNICUS_WATER_BODIES = 'COPERNICUS_WATER_BODIES',
   CUSTOM = 'CUSTOM';
 
 export let dataSourceHandlers;
@@ -67,6 +84,8 @@ export function initializeDataSourceHandlers() {
     new LandsatDataSourceHandler(),
     new EnvisatMerisDataSourceHandler(),
     new ModisDataSourceHandler(),
+    new DEMDataSourceHandler(),
+    new CopernicusServicesDataSourceHandler(),
     new ProbaVDataSourceHandler(),
     new GibsDataSourceHandler(),
     new BYOCDataSourceHandler(),
@@ -92,7 +111,10 @@ hardcoding collectionIds or without assuming there will always be only one diffe
 collectionId and only way to get it is to query service.
 */
 async function updateLayersFromServiceIfNeeded(layers) {
-  const updateLayersFromService = layers.filter(l => l instanceof BYOCLayer || l instanceof S1GRDAWSEULayer);
+  const updateLayersFromService = layers.filter(
+    l => l instanceof BYOCLayer || l instanceof S1GRDAWSEULayer || l instanceof DEMLayer,
+  );
+  const collectionTitles = {};
 
   await Promise.all(
     updateLayersFromService.map(async l => {
@@ -105,6 +127,16 @@ async function updateLayersFromServiceIfNeeded(layers) {
           },
         });
         if (l instanceof BYOCLayer) {
+          if (collectionTitles[l.collectionId]) {
+            l.collectionTitle = collectionTitles[l.collectionId];
+          } else {
+            const collectionInfo = await getCollectionInformation(l.collectionId, l.locationId).then(
+              r => r.data,
+            );
+            collectionTitles[l.collectionId] = collectionInfo.title;
+            l.collectionTitle = collectionInfo.title;
+          }
+
           const availableBands = await l.getAvailableBands({
             timeout: 30000,
             cache: {
@@ -216,7 +248,16 @@ export function datasourceForDatasetId(datasetId) {
     case GIBS_LANDSAT_WELD:
     case GIBS_MISR:
     case GIBS_ASTER_GDEM:
+    case GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE:
       return 'GIBS';
+    case DEM_MAPZEN:
+    case DEM_COPERNICUS_30:
+    case DEM_COPERNICUS_90:
+      return 'DEM';
+    case COPERNICUS_CORINE_LAND_COVER:
+    case COPERNICUS_GLOBAL_LAND_COVER:
+    case COPERNICUS_WATER_BODIES:
+      return 'Copernicus Services';
     default:
       return null;
   }
@@ -282,7 +323,14 @@ export const datasetLabels = {
   [GIBS_LANDSAT_WELD]: 'Landsat WELD',
   [GIBS_MISR]: 'MISR',
   [GIBS_ASTER_GDEM]: 'ASTER GDEM',
+  [GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE]: 'VIIRS NOAA-20 Corrected Reflectance',
   [CUSTOM]: 'CUSTOM',
+  [DEM_MAPZEN]: 'DEM MAPZEN',
+  [DEM_COPERNICUS_30]: 'DEM COPERNICUS 30',
+  [DEM_COPERNICUS_90]: 'DEM COPERNICUS 90',
+  [COPERNICUS_CORINE_LAND_COVER]: 'CORINE Land Cover',
+  [COPERNICUS_GLOBAL_LAND_COVER]: 'Global Land Cover',
+  [COPERNICUS_WATER_BODIES]: 'Water Bodies',
 };
 
 export function getDatasetLabel(datasetId) {
@@ -343,7 +391,11 @@ export function getEvalsource(datasetId) {
 
 export function supportsFIS(visualizationUrl, datasetId, layerId, isCustom) {
   const dsh = getDataSourceHandler(datasetId);
-  return dsh.hasFISLayer(visualizationUrl, datasetId, layerId, isCustom);
+  if (!dsh) {
+    return false;
+  }
+  const hasFISLayer = !!dsh.getFISLayer(visualizationUrl, datasetId, layerId, isCustom);
+  return hasFISLayer;
 }
 
 export function datasetHasAnyFISLayer(datasetId) {
@@ -400,6 +452,7 @@ export function getDataSourceHashtags(datasetId) {
     case GIBS_LANDSAT_WELD:
     case GIBS_MISR:
     case GIBS_ASTER_GDEM:
+    case GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE:
       return 'GIBS,NASA';
     default:
       if (checkIfCustom(datasetId)) {

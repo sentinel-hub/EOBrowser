@@ -71,14 +71,6 @@ export default class ModisDataSourceHandler extends DataSourceHandler {
     return this.urls.length > 0;
   }
 
-  saveSearchFilters = searchFilters => {
-    this.searchFilters = searchFilters;
-  };
-
-  saveCheckedState = checkedState => {
-    this.isChecked = checkedState;
-  };
-
   getSearchFormComponents() {
     if (!this.isHandlingAnyUrl()) {
       return null;
@@ -144,17 +136,6 @@ export default class ModisDataSourceHandler extends DataSourceHandler {
 
   getResolutionLimits() {
     return { resolution: 500 };
-  }
-
-  getFISLayer(url, datasetId, layerId, isCustom) {
-    if (isCustom) {
-      return true;
-    }
-    return super.getFISLayer(url, datasetId, layerId);
-  }
-
-  hasFISLayer(url, datasetId, layerId, isCustom) {
-    return !!this.getFISLayer(url, datasetId, layerId, isCustom);
   }
 
   supportsInterpolation() {

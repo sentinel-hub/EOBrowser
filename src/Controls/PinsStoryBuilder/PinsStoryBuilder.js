@@ -18,7 +18,7 @@ import store, { modalSlice } from '../../store';
 import SlidesSelector from './SlidesSelector';
 import SlidesPreview from './SlidesPreview';
 import SlidesDownload from './SlidesDownload';
-import { layerFromPin, constructSHJSEffects } from '../../Tools/Pins/Pin.utils';
+import { layerFromPin } from '../../Tools/Pins/Pin.utils';
 import { getMapDOMSize } from '../../junk/EOBCommon/utils/coords';
 import { getAppropriateAuthToken } from '../../App';
 import {
@@ -29,11 +29,11 @@ import {
   drawMapOverlaysOnCanvas,
   getScaleBarInfo,
   createSVGLegend,
+  drawCaptions,
 } from '../ImgDownload/ImageDownload.utils';
 import { applyBlobToCanvas } from '../../junk/EOB3TimelapsePanel/imageOverlays.js';
 import {
   SENTINEL_COPYRIGHT_TEXT,
-  drawCaptions,
   drawLegendImage,
   loadImage,
 } from '../../junk/EOB3ImageDownloadPanel/utils/downloadZip';
@@ -41,6 +41,7 @@ import { b64EncodeUnicode } from '../../utils/base64MDN';
 import { findMatchingLayerMetadata } from '../../Tools/VisualizationPanel/legendUtils';
 import { constructDataFusionLayer } from '../../junk/EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
+import { constructEffectsFromPinOrHighlight, constructGetMapParamsEffects } from '../../utils/effectsUtils';
 
 import './PinsStoryBuilder.scss';
 
@@ -147,13 +148,18 @@ class PinsStoryBuilder extends React.Component {
     }
 
     if (showCaptions) {
-      const copyrightText = slides.find(
-        s => s.withinBounds && s.selected && datasourceForDatasetId(s.pin.datasetId).includes('Sentinel'),
-      )
+      const copyrightText = slides.find(s => {
+        const ds = datasourceForDatasetId(s.pin.datasetId);
+        return s.withinBounds && s.selected && ds && ds.includes('Sentinel');
+      })
         ? SENTINEL_COPYRIGHT_TEXT
         : '';
+      const drawCopernicusLogo = slides.some(s => {
+        const ds = datasourceForDatasetId(s.pin.datasetId);
+        return s.withinBounds && s.selected && ds && ds.includes('Sentinel');
+      });
       const scaleBar = getScaleBarInfo();
-      await drawCaptions(ctx, null, null, copyrightText, scaleBar, true);
+      await drawCaptions(ctx, null, null, copyrightText, scaleBar, true, drawCopernicusLogo);
     }
 
     if (showSlideTitle) {
@@ -217,16 +223,24 @@ class PinsStoryBuilder extends React.Component {
               .utc(toTime)
               .endOf('day')
               .toDate();
+
+        const supportsTimeRange = dsh ? dsh.supportsTimeRange() : true;
+        const effects = constructEffectsFromPinOrHighlight(pin);
+        const getMapParamsEffects = constructGetMapParamsEffects(effects);
+
         const getMapParams = {
           bbox: bbox,
-          fromTime: dsh && dsh.supportsTimeRange() ? pinFromTime : null,
+          fromTime: supportsTimeRange ? pinFromTime : null,
           toTime: pinToTime,
           width: imageWidth,
           height: imageHeight,
           format: MimeTypes.JPEG,
           preview: 2,
-          effects: constructSHJSEffects(pin),
         };
+        if (getMapParamsEffects) {
+          getMapParams.effects = getMapParamsEffects;
+        }
+
         const reqConfig = {
           authToken: authToken,
           cancelToken: this.cancelToken,
@@ -351,7 +365,7 @@ class PinsStoryBuilder extends React.Component {
         closeOnEsc={true}
       >
         <div className="pins-story-builder">
-          <h1>Story</h1>
+          <h1>{t`Story`}</h1>
           <div className="horizontal-stack">
             <SlidesSelector
               slides={slides}

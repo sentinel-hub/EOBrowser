@@ -45,7 +45,7 @@ class Description extends React.Component {
         {this.state.editing ? (
           <textarea name="description" rows={8} onChange={this.handleContentChange} value={newContent} />
         ) : content === '' || !content ? (
-          <NotificationPanel type="info" msg={'This pin currently has no description.'} />
+          <NotificationPanel type="info" msg={t`This pin currently has no description.`} />
         ) : (
           <ReactMarkdown
             escapeHtml={true}

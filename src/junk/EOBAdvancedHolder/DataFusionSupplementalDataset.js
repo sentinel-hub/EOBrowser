@@ -9,6 +9,8 @@ function DataFusionSupplementalDataset(props) {
     alias,
     mosaickingOrder = MosaickingOrder.MOST_RECENT,
     additionalMosaickingOrders,
+    additionalParametersComponent: AdditionalParametersComponent = null,
+    additionalParameters = {},
     minDate,
     maxDate,
     initialTimespan,
@@ -56,9 +58,10 @@ function DataFusionSupplementalDataset(props) {
       {settingsExpanded && (
         <div className="supplemental-dataset-info">
           <div className="supplemental-dataset-alias-input">
-            <label htmlFor={`${alias}-alias`}>Datasource alias: </label>
+            <label htmlFor={`${alias}-alias`}>Datasource alias:</label>
             <input
               id={`${alias}-alias`}
+              type="text"
               value={currentAlias}
               className={isValid ? '' : 'invalid'}
               onChange={updateAlias}
@@ -68,7 +71,7 @@ function DataFusionSupplementalDataset(props) {
           <div className="mosaicking-order">
             {t`Mosaicking order`}:
             <select
-              className="dropdown"
+              className="dropdown-normal-ui"
               value={mosaickingOrder}
               onChange={e => props.updateMosaickingOrder(alias, e.target.value)}
             >
@@ -81,6 +84,13 @@ function DataFusionSupplementalDataset(props) {
               ))}
             </select>
           </div>
+
+          {AdditionalParametersComponent && (
+            <AdditionalParametersComponent
+              onChange={v => props.updateAdditionalParameters(alias, v)}
+              additionalParameters={additionalParameters}
+            />
+          )}
 
           <div className="timespan">
             <input

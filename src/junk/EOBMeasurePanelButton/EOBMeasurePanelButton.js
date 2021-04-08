@@ -35,7 +35,7 @@ export class EOBMeasurePanelButton extends React.Component {
     const errMsg = this.props.isLoggedIn ? null : getLoggedInErrorMsg();
     const isEnabled = errMsg === null;
     const errorMessage = errMsg ? `(${errMsg})` : '';
-    const title = t`Measure distances` + ` ${errorMessage}`;
+    const title = t`Measure` + ` ${errorMessage}`;
     return (
       // jsx-a11y/anchor-is-valid
       // eslint-disable-next-line
@@ -88,7 +88,7 @@ const PrettyArea = ({ area }) => {
   const areaKM = area / 1000000;
   return (
     <span>
-      {areaKM.toFixed(3)} {t`km`}
+      {areaKM.toFixed(2)} {t`km`}
       <sup>2</sup>
     </span>
   );

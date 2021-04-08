@@ -121,6 +121,16 @@ class Tutorial extends Component {
     if (showTutorialBool) {
       this.setState({ run: true });
     }
+    this.setTutorialContent();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.selectedLanguage !== prevProps.selectedLanguage) {
+      this.setTutorialContent();
+    }
+  }
+
+  setTutorialContent() {
     this.chooseBigSmallTutorial();
   }
 

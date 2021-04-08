@@ -238,16 +238,8 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
     return Object.values(this.urls).flat().length > 0;
   }
 
-  saveSearchFilters = searchFilters => {
-    this.searchFilters = searchFilters;
-  };
-
   saveSLSTRSearchFilters = searchFilters => {
     this.searchFiltersSLSTR = searchFilters;
-  };
-
-  saveCheckedState = checkedState => {
-    this.isChecked = checkedState;
   };
 
   renderOptionsHelpTooltips = option => {
@@ -424,10 +416,6 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
 
   getResolutionLimits() {
     return { resolution: 300 };
-  }
-
-  hasFISLayer(url, datasetId, layerId, isCustom) {
-    return !!this.getFISLayer(url, datasetId, layerId, isCustom);
   }
 
   supportsInterpolation() {

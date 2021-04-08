@@ -3,11 +3,12 @@ import { BYOCLayer, DATASET_BYOC } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
 import DataSourceHandler from './DataSourceHandler';
+import CopernicusServicesDataSourceHandler from './CopernicusServicesDataSourceHandler';
 import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/GenericSearchGroup';
 import { FetchingFunction } from '../search';
 import { convertGeoJSONToEPSG4326 } from '../../../utils/coords';
 import { filterLayers } from './filter';
-import { constructV3Evalscript } from '../../../utils/index';
+import { constructV3Evalscript, isFunction } from '../../../utils';
 
 const CRS_EPSG4326_urn = 'urn:ogc:def:crs:EPSG::4326';
 
@@ -24,17 +25,25 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
   datasource = 'CUSTOM';
 
   leafletZoomConfig = {
-    CUSTOM: { min: 7, max: 25 },
+    CUSTOM: { min: 0, max: 25 },
   };
 
+  COPERNICUS_SERVICES_KNOWN_COLLECTIONS = new CopernicusServicesDataSourceHandler().getKnownCollectionsList();
+
   willHandle(service, url, name, layers, preselected) {
-    const customLayers = layers.filter(l => l instanceof BYOCLayer && l.collectionId);
+    name = isFunction(name) ? name() : name;
+    const customLayers = layers.filter(
+      l =>
+        l instanceof BYOCLayer &&
+        l.collectionId &&
+        !this.COPERNICUS_SERVICES_KNOWN_COLLECTIONS.includes(l.collectionId),
+    );
     if (customLayers.length === 0) {
       return false;
     }
     customLayers.forEach(layer => {
       this.collections[layer.collectionId] = {
-        title: layer.title,
+        title: layer.collectionTitle || layer.title,
         url: url,
         themeName: name.replace(t`Based on: `, ''),
         availableBands: layer.availableBands,
@@ -54,20 +63,13 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
     });
 
     this.urls.push(url);
+    this.saveFISLayers(url, layers);
     return true;
   }
 
   isHandlingAnyUrl() {
     return this.urls.length > 0;
   }
-
-  saveSearchFilters = searchFilters => {
-    this.searchFilters = searchFilters;
-  };
-
-  saveCheckedState = checkedState => {
-    this.isChecked = checkedState;
-  };
 
   getSearchFormComponents() {
     if (!this.isHandlingAnyUrl()) {
@@ -102,10 +104,13 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
     }
 
     datasets.forEach(datasetId => {
-      // instanceId and layerId are required parameters, although we don't need them for findTiles
+      // InstanceId, layerId and evalscript are required parameters, although we don't need them for findTiles.
+      // As we don't have any layer related information at this stage, some dummy values are set for those 3 params to prevent
+      // querying configuration service for dataset defaults
       const searchLayer = new BYOCLayer({
         instanceId: true,
         layerId: true,
+        evalscript: '//',
         collectionId: datasetId,
       });
       const ff = new FetchingFunction(

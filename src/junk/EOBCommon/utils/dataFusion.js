@@ -47,8 +47,8 @@ export async function constructDataFusionLayer(
   const layers = [];
 
   for (let dataset of dataFusionSettings) {
-    let { id, alias, mosaickingOrder, timespan } = dataset;
-    const layer = constructLayerFromDatasetId(id, mosaickingOrder);
+    let { id, alias, mosaickingOrder, timespan, additionalParameters = {} } = dataset;
+    const layer = constructLayerFromDatasetId(id, mosaickingOrder, additionalParameters);
     layers.push({
       layer: layer,
       id: alias,
@@ -66,12 +66,20 @@ export async function constructDataFusionLayer(
 }
 
 // given the dataset ID, construct an empty sentinelhub-js layer:
-export function constructLayerFromDatasetId(datasetId, mosaickingOrder) {
+export function constructLayerFromDatasetId(datasetId, mosaickingOrder, additionalParameters) {
   switch (datasetId) {
     case DATASET_AWSEU_S1GRD.id:
       // we are setting evalscript to avoid exception when the layer is initialized without any parameters
       // (this should be fixed in sentinelhub-js)
-      return new S1GRDAWSEULayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
+      const { orthorectification = '' } = additionalParameters;
+      const orthorectify = orthorectification === '' ? false : true;
+      const demInstanceType = orthorectification === '' ? null : orthorectification;
+      return new S1GRDAWSEULayer({
+        evalscript: '//VERSION=3 ---',
+        mosaickingOrder: mosaickingOrder,
+        orthorectify: orthorectify,
+        demInstanceType: demInstanceType,
+      });
     case DATASET_S2L1C.id:
       return new S2L1CLayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_S2L2A.id:

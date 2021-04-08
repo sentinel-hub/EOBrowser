@@ -22,10 +22,11 @@
       cursor: default;
     }
   }
+}
 
-  i {
-    margin-right: 5px;
-  }
+.error {
+  color: orange;
+  text-align: center;
 }
 
 .pin-top-container {
@@ -111,6 +112,10 @@
     & > div:first-child {
       color: #fff;
     }
+  }
+
+  &.invalid {
+    background: $mainLighter;
   }
 
   .pin-left-controls-container {

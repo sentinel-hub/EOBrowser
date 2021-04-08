@@ -195,7 +195,6 @@ export function constructV3Evalscript(bands, config) {
     const indexEquation = [...equation]
       .map(item => (item === 'B' && `samples.${bands.b}`) || (item === 'A' && `samples.${bands.a}`) || item)
       .join('');
-
     // temp fix with index instead of actual positions, to be removed in next commit
     return `//VERSION=3
 const colorRamp = [${colorRamp.map((color, index) => `[${values[index]},${color.replace('#', '0x')}]`)}]
@@ -211,7 +210,14 @@ function setup() {
 
 function evaluatePixel(samples) {
   let index = ${indexEquation}
-    return [...viz.process(index),samples.dataMask]; 
+  const minIndex = ${values[0]}
+  const maxIndex = ${values[values.length - 1]}
+  
+  if(index > maxIndex || index < minIndex) {
+    return [0, 0, 0, 0]
+  }
+  
+  return [...viz.process(index),samples.dataMask]; 
 }`;
   }
 
@@ -264,6 +270,7 @@ export function parseEvalscriptBands(evalscript) {
         .split(',')
         .map(b => b.replace('2.5 * sample.', ''))
         .map(b => b.replace('factor * sample.', ''))
+        .map(b => b.replace('sample.CLC === ', ''))
         .slice(0, -1);
     }
     return evalscript
@@ -463,3 +470,14 @@ const shJSdatasetIdToDataset = datasetId => {
       return null;
   }
 };
+
+export function isFunction(functionToCheck) {
+  return typeof functionToCheck === 'function';
+}
+
+export function getThemeName(theme) {
+  if (!(theme && theme.name)) {
+    return null;
+  }
+  return isFunction(theme.name) ? theme.name() : theme.name;
+}

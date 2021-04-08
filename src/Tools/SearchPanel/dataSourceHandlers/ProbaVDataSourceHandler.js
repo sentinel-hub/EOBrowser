@@ -54,14 +54,6 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
     return this.urls.length > 0;
   }
 
-  saveSearchFilters = searchFilters => {
-    this.searchFilters = searchFilters;
-  };
-
-  saveCheckedState = checkedState => {
-    this.isChecked = checkedState;
-  };
-
   getSearchFormComponents() {
     if (!this.isHandlingAnyUrl()) {
       return null;
@@ -92,7 +84,10 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
     const selectedDatasets = this.searchFilters.selectedOptions;
 
     selectedDatasets.forEach(selectedDataset => {
-      const url = `${this.KNOWN_URL}?SERVICE=WMS&REQUEST=GetCapabilities&time=${new Date().valueOf()}`;
+      // Performance optimization - instead of WMS GetCapabilities request:
+      //   const url = `${this.KNOWN_URL}?SERVICE=WMS&REQUEST=GetCapabilities&time=${new Date().valueOf()}`;
+      // we use a cached version:
+      const url = 'https://eob-getcapabilities-cache.s3.eu-central-1.amazonaws.com/probav.xml';
       const func = this.getResultsFromProbaV;
       const ff = new FetchingFunction(
         selectedDataset,
@@ -229,4 +224,8 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
   supportsV3Evalscript() {
     return false;
   }
+
+  supportsIndex = () => {
+    return false;
+  };
 }

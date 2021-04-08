@@ -26,7 +26,7 @@ $headerPadding: 10px;
     }
 
     .back-to-search {
-      max-width: 45%;
+      max-width: 50%;
       text-align: center;
       padding: 6px 12px;
     }
@@ -62,6 +62,7 @@ $headerPadding: 10px;
       opacity: 0.6;
       max-width: none !important;
       padding: 0 0 5px 0;
+      width: 125px;
     }
 
     & > * {
@@ -71,6 +72,10 @@ $headerPadding: 10px;
 
     .preview-image {
       width: 125px;
+
+      &:hover {
+        cursor: pointer;
+      }
     }
 
     .show-link-panel {

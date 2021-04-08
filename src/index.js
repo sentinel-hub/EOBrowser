@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import 'react-app-polyfill/stable';
 
 import store from './store';
 import App from './App';
-import { initLanguage } from './LanguageSelector/langUtils';
+import LanguageProvider from './LanguageSelector/LanguageProvider';
 import AuthProvider from './Auth/AuthProvider';
 import URLParamsParser from './URLParamsParser/URLParamsParser';
 import ThemesProvider from './ThemesProvider/ThemesProvider';
@@ -14,21 +15,22 @@ import { BrowserRouter } from 'react-router-dom';
 
 import './index.scss';
 
-initLanguage();
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
-      <DndProvider options={HTML5toTouch}>
-        <AuthProvider>
-          <URLParamsParser>
-            {(themeId, sharedPinsListId) => (
-              <ThemesProvider themeIdFromUrlParams={themeId}>
-                <App sharedPinsListIdFromUrlParams={sharedPinsListId} />
-              </ThemesProvider>
-            )}
-          </URLParamsParser>
-        </AuthProvider>
-      </DndProvider>
+      <LanguageProvider>
+        <DndProvider options={HTML5toTouch}>
+          <AuthProvider>
+            <URLParamsParser>
+              {(themeId, sharedPinsListId) => (
+                <ThemesProvider themeIdFromUrlParams={themeId}>
+                  <App sharedPinsListIdFromUrlParams={sharedPinsListId} />
+                </ThemesProvider>
+              )}
+            </URLParamsParser>
+          </AuthProvider>
+        </DndProvider>
+      </LanguageProvider>
     </BrowserRouter>
   </Provider>,
   document.getElementById('root'),

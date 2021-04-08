@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Slider, Rail, Handles, Tracks } from 'react-compound-slider';
 import { SliderRail, KeyboardHandle, Track } from './SliderComponents';
+import { pickColor } from './utils';
 
 const sliderStyle = {
   position: 'relative',
@@ -28,9 +29,26 @@ export class SliderThreshold extends Component {
     return values.map(item => item * SLIDER_BUG_OFFSET);
   };
 
-  render() {
-    const { values, colors, domain, gradient, invalidMinMax } = this.props;
+  calculateGradient = (sliderOffset, gradient, values) => {
+    const firstValue = values[0];
+    const lastValue = values[values.length - 1];
+    const range = lastValue - firstValue;
 
+    const offsetLeftInPercent = `${((sliderOffset.left - firstValue) * 100) / range}%`;
+    const offsetRightInPercent = `${100 - ((lastValue - sliderOffset.right) * 100) / range}%`;
+
+    const leftGradientColor = pickColor(gradient[0], gradient[1], sliderOffset.left, firstValue, lastValue);
+    const rightGradientColor = pickColor(gradient[0], gradient[1], sliderOffset.right, firstValue, lastValue);
+
+    const transparentLeft = `rgba(0,0,0,0) ${offsetLeftInPercent},`;
+    const fullGradient = `${leftGradientColor} ${offsetLeftInPercent}, ${rightGradientColor} ${offsetRightInPercent},`;
+    const transparentRight = `rgba(0,0,0,0) ${offsetRightInPercent}`;
+
+    return `linear-gradient(90deg, ${transparentLeft} ${fullGradient} ${transparentRight})`;
+  };
+
+  render() {
+    const { sliderOffset, values, colors, domain, gradient, invalidMinMax } = this.props;
     // because of lib bug read above
     const fixedValues = this.multiplyWithOffset(values);
     let fixedDomain = domain;
@@ -39,56 +57,58 @@ export class SliderThreshold extends Component {
       fixedDomain = [domain[0] * SLIDER_BUG_OFFSET, domain[1] * SLIDER_BUG_OFFSET];
     }
 
-    const gradientStyle = `linear-gradient(90deg, ${gradient.map(item => item.replace('0x', '#'))} 100%)`;
+    const gradientStyle = this.calculateGradient(sliderOffset, gradient, values);
 
     return (
-      <div className="slider">
-        <Slider
-          domain={fixedDomain}
-          mode={3}
-          onChange={this.onChange}
-          onUpdate={this.onUpdate}
-          rootStyle={sliderStyle}
-          step={1}
-          values={fixedValues}
-        >
-          <Rail>
-            {({ getRailProps }) => <SliderRail getRailProps={getRailProps} gradient={gradientStyle} />}
-          </Rail>
-          <Handles>
-            {({ handles, getHandleProps }) => (
-              <div className="slider-handles">
-                {!invalidMinMax() &&
-                  handles.map((handle, index) => (
-                    <KeyboardHandle
-                      key={handle.id}
-                      handle={handle}
-                      domain={fixedDomain}
-                      rampValue={values[index]}
-                      getHandleProps={getHandleProps}
-                      pointingToColor={colors && colors[index]}
+      <div className="slider-transparent-background">
+        <div className="slider">
+          <Slider
+            domain={fixedDomain}
+            mode={3}
+            onChange={this.onChange}
+            onUpdate={this.onUpdate}
+            rootStyle={sliderStyle}
+            step={1}
+            values={fixedValues}
+          >
+            <Rail>
+              {({ getRailProps }) => <SliderRail getRailProps={getRailProps} gradient={gradientStyle} />}
+            </Rail>
+            <Handles>
+              {({ handles, getHandleProps }) => (
+                <div className="slider-handles">
+                  {!invalidMinMax() &&
+                    handles.map((handle, index) => (
+                      <KeyboardHandle
+                        key={handle.id}
+                        handle={handle}
+                        domain={fixedDomain}
+                        rampValue={values[index]}
+                        getHandleProps={getHandleProps}
+                        pointingToColor={colors && colors[index]}
+                      />
+                    ))}
+                </div>
+              )}
+            </Handles>
+            <Tracks left={false} right={false}>
+              {({ tracks, getTrackProps }) => (
+                <div className="slider-tracks">
+                  {tracks.map(({ id, source, target }, index) => (
+                    <Track
+                      key={id}
+                      source={source}
+                      target={target}
+                      getTrackProps={getTrackProps}
+                      first={index === 0}
+                      last={index === tracks.length - 1}
                     />
                   ))}
-              </div>
-            )}
-          </Handles>
-          <Tracks left={false} right={false}>
-            {({ tracks, getTrackProps }) => (
-              <div className="slider-tracks">
-                {tracks.map(({ id, source, target }, index) => (
-                  <Track
-                    key={id}
-                    source={source}
-                    target={target}
-                    getTrackProps={getTrackProps}
-                    first={index === 0}
-                    last={index === tracks.length - 1}
-                  />
-                ))}
-              </div>
-            )}
-          </Tracks>
-        </Slider>
+                </div>
+              )}
+            </Tracks>
+          </Slider>
+        </div>
       </div>
     );
   }

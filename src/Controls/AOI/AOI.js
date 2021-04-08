@@ -133,7 +133,7 @@ class AOI extends Component {
     if (!layerId && !customSelected) {
       return null;
     }
-    if (!datasetHasAnyFISLayer(datasetId)) {
+    if (!customSelected && !datasetHasAnyFISLayer(datasetId)) {
       return { name: getDatasetLabel(datasetId), preset: layerId, baseUrls: { FIS: false } };
     }
     if (!supportsFIS(visualizationUrl, datasetId, layerId, customSelected)) {

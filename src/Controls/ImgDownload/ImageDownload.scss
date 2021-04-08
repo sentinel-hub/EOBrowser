@@ -33,7 +33,7 @@
   .image-download-forms {
     overflow: auto;
 
-    .data-fusion-image-download-warning {
+    .image-download-warning {
       margin: 10px 0 10px auto;
       padding: 0 10px;
       text-align: center;
@@ -61,6 +61,7 @@
         i {
           margin-left: 5px;
           color: #fff;
+          cursor: pointer;
         }
       }
     }
@@ -158,6 +159,25 @@
         white-space: pre-wrap;
         max-height: 150px;
         overflow-y: auto;
+      }
+    }
+  }
+
+  .image-download-warning-panel {
+    margin: 10px 0 10px auto;
+    padding: 0 10px;
+    text-align: center;
+    font-size: 14px;
+    color: orange;
+
+    .fa-warning {
+      margin-right: 6px;
+    }
+
+    div {
+      ul {
+        display: inline-block;
+        text-align: left;
       }
     }
   }

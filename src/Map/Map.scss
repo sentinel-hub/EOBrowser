@@ -6,6 +6,28 @@
   min-height: 406px;
   z-index: 0;
 
+  .maptiler-logo {
+    position: fixed;
+    bottom: 25px;
+    left: 10px;
+    z-index: 999;
+    width: 10%;
+    width: 100px;
+    filter: drop-shadow($boxShadow);
+  }
+
+  @media (max-width: 1200px) {
+    .maptiler-logo {
+      bottom: 30px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .maptiler-logo {
+      bottom: 15px;
+    }
+  }
+
   .leaflet-control-container {
     .leaflet-top.leaflet-right {
       .leaflet-control-layers {

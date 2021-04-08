@@ -34,7 +34,7 @@
     padding: 5px;
     height: auto;
     background-color: $mainMedium;
-    min-width: 100px;
+    min-width: 115px;
     -webkit-box-shadow: 0 2px 5px #000;
     box-shadow: 0 2px 5px #000;
 
@@ -43,6 +43,7 @@
       flex-direction: row;
       justify-content: space-between;
       font-size: 16px;
+      padding: 0 2px;
     }
 
     .items {

@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Map as LeafletMap,
-  Pane,
-  TileLayer,
-  LayersControl,
-  GeoJSON,
-  Marker,
-  FeatureGroup,
-} from 'react-leaflet';
+import { Map as LeafletMap, Pane, LayersControl, GeoJSON, Marker, FeatureGroup } from 'react-leaflet';
 import inside from 'turf-inside';
 import { connect } from 'react-redux';
 import NProgress from 'nprogress';
@@ -26,7 +18,6 @@ import PreviewLayer from '../Tools/Results/PreviewLayer';
 import LeafletControls from './LeafletControls/LeafletControls';
 import AboutSHLinks from './AboutSHLinks/AboutSHLinks';
 import SentinelHubLayerComponent from './plugins/sentinelhubLeafletLayer';
-import MakeLabelsReadable from './plugins/color-labels';
 import GlTileLayer from './plugins/GlTileLayer';
 import { baseLayers, overlayTileLayers } from './Layers';
 import {
@@ -35,8 +26,10 @@ import {
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getAppropriateAuthToken } from '../App';
 import { constructErrorMessage } from '../utils';
+import TimelapseAreaPreview from '../Controls/Timelapse/TimelapseAreaPreview';
 
 import { DEFAULT_ZOOM_CONFIGURATION } from '../Tools/SearchPanel/dataSourceHandlers/DataSourceHandler';
+import MaptilerLogo from './maptiler-logo-adaptive.svg';
 
 const BASE_PANE_ID = 'baseMapPane';
 const BASE_PANE_ZINDEX = 5;
@@ -111,6 +104,10 @@ class Map extends React.Component {
 
   render() {
     const {
+      lat,
+      lng,
+      zoom,
+      mapBounds,
       datasetId,
       enabledOverlaysId,
       visibleOnMap,
@@ -125,12 +122,12 @@ class Map extends React.Component {
       dataFusion,
       dataSourcesInitialized,
       selectedTabIndex,
-      gainEffect,
-      gammaEffect,
       displayingTileGeometries,
       comparedLayers,
       comparedOpacity,
       comparedClipping,
+      gainEffect,
+      gammaEffect,
       redRangeEffect,
       greenRangeEffect,
       blueRangeEffect,
@@ -142,6 +139,7 @@ class Map extends React.Component {
       downsampling,
       selectedLanguage,
       auth,
+      displayTimelapseAreaPreview,
     } = this.props;
 
     const zoomConfig = this.getZoomConfiguration(datasetId);
@@ -190,7 +188,14 @@ class Map extends React.Component {
         >
           {baseLayers.map(baseLayer => (
             <BaseLayer checked={baseLayer.checked} name={baseLayer.name} key={baseLayer.name}>
-              <TileLayer url={baseLayer.url} attribution={baseLayer.attribution} pane={BASE_PANE_ID} />
+              <GlTileLayer
+                style={baseLayer.url}
+                accessToken={process.env.REACT_APP_MAPBOX_KEY}
+                attribution={baseLayer.attribution}
+                pane={BASE_PANE_ID}
+                preserveDrawingBuffer={baseLayer.preserveDrawingBuffer}
+              />
+              )
             </BaseLayer>
           ))}
 
@@ -250,11 +255,14 @@ class Map extends React.Component {
                   dataFusion,
                   visualizationUrl,
                   layerId,
-                  gain,
-                  gamma,
-                  redRange,
-                  greenRange,
-                  blueRange,
+                  gainEffect,
+                  gammaEffect,
+                  redRangeEffect,
+                  greenRangeEffect,
+                  blueRangeEffect,
+                  redCurveEffect,
+                  greenCurveEffect,
+                  blueCurveEffect,
                   minQa,
                   upsampling,
                   downsampling,
@@ -306,13 +314,16 @@ class Map extends React.Component {
                     minZoom={minZoom}
                     maxZoom={maxZoom}
                     allowOverZoomBy={allowOverZoomBy}
-                    gainEffect={gain}
-                    gammaEffect={gamma}
                     opacity={comparedOpacity[index]}
                     clipping={comparedClipping[index]}
-                    redRangeEffect={redRange}
-                    greenRangeEffect={greenRange}
-                    blueRangeEffect={blueRange}
+                    gainEffect={gainEffect}
+                    gammaEffect={gammaEffect}
+                    redRangeEffect={redRangeEffect}
+                    greenRangeEffect={greenRangeEffect}
+                    blueRangeEffect={blueRangeEffect}
+                    redCurveEffect={redCurveEffect}
+                    greenCurveEffect={greenCurveEffect}
+                    blueCurveEffect={blueCurveEffect}
                     minQa={minQa}
                     upsampling={upsampling}
                     downsampling={downsampling}
@@ -332,36 +343,14 @@ class Map extends React.Component {
               checked={enabledOverlaysId.includes(overlayTileLayer.id)}
             >
               <Pane name={overlayTileLayer.pane} style={{ zIndex: overlayTileLayer.zIndex }}>
-                {overlayTileLayer.makeReadable ? (
-                  <MakeLabelsReadable
-                    url={overlayTileLayer.url}
-                    attribution={overlayTileLayer.attribution}
-                    zIndex={overlayTileLayer.zIndex}
-                    overlayTileLayerId={overlayTileLayer.id}
-                    tileSize={overlayTileLayer.tileSize || 256}
-                    zoomOffset={overlayTileLayer.zoomOffset || 0}
-                    pane={overlayTileLayer.pane}
-                  />
-                ) : overlayTileLayer.urlType === 'VECTOR' ? (
-                  <GlTileLayer
-                    style={overlayTileLayer.url}
-                    accessToken={process.env.REACT_APP_MAPBOX_KEY}
-                    attribution={overlayTileLayer.attribution}
-                    overlayTileLayerId={overlayTileLayer.id}
-                    pane={overlayTileLayer.pane}
-                    preserveDrawingBuffer={overlayTileLayer.preserveDrawingBuffer}
-                  />
-                ) : (
-                  <TileLayer
-                    url={overlayTileLayer.url}
-                    attribution={overlayTileLayer.attribution}
-                    zIndex={overlayTileLayer.zIndex}
-                    overlayTileLayerId={overlayTileLayer.id}
-                    tileSize={overlayTileLayer.tileSize || 256}
-                    zoomOffset={overlayTileLayer.zoomOffset || 0}
-                    pane={overlayTileLayer.pane}
-                  />
-                )}
+                <GlTileLayer
+                  style={overlayTileLayer.url}
+                  accessToken={process.env.REACT_APP_MAPBOX_KEY}
+                  attribution={overlayTileLayer.attribution}
+                  overlayTileLayerId={overlayTileLayer.id}
+                  pane={overlayTileLayer.pane}
+                  preserveDrawingBuffer={overlayTileLayer.preserveDrawingBuffer}
+                />
               </Pane>
             </Overlay>
           ))}
@@ -385,13 +374,19 @@ class Map extends React.Component {
         {this.props.highlightedTile ? (
           <GeoJSON data={this.props.highlightedTile.geometry} style={() => highlightedTileStyle} />
         ) : null}
-        <LeafletControls key={selectedLanguage} />
+        {displayTimelapseAreaPreview && selectedTabIndex === 2 && (
+          <TimelapseAreaPreview lat={lat} lng={lng} zoom={zoom} mapBounds={mapBounds} />
+        )}
 
+        <LeafletControls key={selectedLanguage} />
         <SearchBox />
-        <Tutorial />
+        <Tutorial selectedLanguage={this.props.selectedLanguage} />
         <Controls selectedLanguage={this.props.selectedLanguage} />
 
         <AboutSHLinks />
+        <a href="https://www.maptiler.com/" target="_blank" rel="noopener noreferrer">
+          <img className="maptiler-logo" src={MaptilerLogo} alt="" />
+        </a>
       </LeafletMap>
     );
   }
@@ -402,9 +397,11 @@ const mapStoreToProps = store => {
     lat: store.mainMap.lat,
     lng: store.mainMap.lng,
     zoom: store.mainMap.zoom,
+    mapBounds: store.mainMap.bounds,
     enabledOverlaysId: store.mainMap.enabledOverlaysId,
     aoiGeometry: store.aoi.geometry,
     aoiLastEdited: store.aoi.lastEdited,
+    displayTimelapseAreaPreview: store.timelapse.displayTimelapseAreaPreview,
     poiPosition: store.poi.position,
     poiLastEdited: store.poi.lastEdited,
     datasetId: store.visualization.datasetId,

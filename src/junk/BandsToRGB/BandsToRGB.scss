@@ -177,6 +177,35 @@ select:-moz-focusring {
     }
   }
 
+  .slider-transparent-background {
+    background: url('./assets/transparent-background.png');
+    height: 34px;
+    box-sizing: border-box;
+    padding: 0 20px;
+    width: 100%;
+    position: relative;
+
+    &::after,
+    &::before {
+      content: '';
+      display: block;
+      background: $errorCol;
+      height: 34px;
+      width: 4px;
+      position: absolute;
+    }
+
+    &::before {
+      left: 16px;
+      top: 0;
+    }
+
+    &::after {
+      top: 0;
+      right: 16px;
+    }
+  }
+
   .slider {
     width: 100%;
     height: 42px;

@@ -7,7 +7,7 @@ import { getLoggedInErrorMsg } from '../../junk/ConstMessages';
 
 import './PinTools.scss';
 
-import { convertToNewFormat, savePinsToSessionStorage, savePinsToServer } from './Pin.utils';
+import { convertToNewFormat, savePinsToSessionStorage, savePinsToServer, isPinValid } from './Pin.utils';
 
 class PinTools extends Component {
   state = {
@@ -24,6 +24,7 @@ class PinTools extends Component {
 
   onCloseModal = () => {
     this.setState({
+      error: null,
       displayModal: false,
     });
   };
@@ -70,6 +71,18 @@ class PinTools extends Component {
       }
 
       pins = pins.map(pin => convertToNewFormat(pin));
+
+      let allErrors = '';
+      for (let pin of pins) {
+        const { isValid, error } = isPinValid(pin);
+        if (!isValid) {
+          allErrors += `${error}\n`;
+        }
+      }
+      if (allErrors.length > 0) {
+        throw new Error(allErrors);
+      }
+
       const existingIds = this.props.pins.map(pin => pin._id);
       pins = pins.filter(pin => !existingIds.includes(pin._id));
       const replaceExisting = !this.state.keepExisting;
@@ -131,14 +144,74 @@ class PinTools extends Component {
           </label>
         </p>
 
-        {this.state.error && <p className="error">{this.state.error}</p>}
+        {this.state.error && <pre className="error">{this.state.error}</pre>}
       </div>
     </Rodal>
   );
 
+  preparePinForExport = pin => {
+    // Orders pin attributes in the format for export
+    // Fields "group" and "highResImageUrl" are added here to simplify Pin Library usage
+    // It should be removed when adding functionality for them
+    const {
+      _id,
+      title,
+      datasetId,
+      themeId,
+      layerId,
+      lat,
+      lng,
+      zoom,
+      fromTime,
+      toTime,
+      visualizationUrl,
+      evalscript,
+      evalscripturl,
+      dataFusion,
+      tag,
+      gain,
+      gamma,
+      redRange,
+      greenRange,
+      blueRange,
+    } = pin;
+    return {
+      _id: _id,
+      title: title,
+      group: null,
+      highResImageUrl: null,
+      datasetId: datasetId,
+      themeId: themeId,
+      layerId: layerId,
+      lat: lat,
+      lng: lng,
+      zoom: zoom,
+      fromTime: fromTime,
+      toTime: toTime,
+      visualizationUrl: visualizationUrl,
+      evalscript: evalscript,
+      evalscripturl: evalscripturl,
+      dataFusion: dataFusion,
+      tag: tag,
+      gain: gain,
+      gamma: gamma,
+      redRange: redRange,
+      greenRange: greenRange,
+      blueRange: blueRange,
+      ...pin,
+    };
+  };
+
+  getPinsDataURI = pins => {
+    const pinsForExport = pins.map(pin => this.preparePinForExport(pin));
+    const data =
+      'data: text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(pinsForExport, null, 4));
+    return data;
+  };
+
   render() {
     const { isUserLoggedIn, pins } = this.props;
-    const data = 'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(pins));
+    const pinsDataURI = this.getPinsDataURI(pins);
     const notLoggedInMsg = getLoggedInErrorMsg();
     const sharePinsTitle = t`Share pins` + (!isUserLoggedIn ? ` (${notLoggedInMsg})` : '');
     const animatePinsTitle = t`Create a story from pins` + (!isUserLoggedIn ? ` (${notLoggedInMsg})` : '');
@@ -172,12 +245,7 @@ class PinTools extends Component {
             {t`Export`}
           </div>
         ) : (
-          <a
-            href={`data: ${data}`}
-            download="pins.json"
-            className="pins-export enabled"
-            title={exportPinsTitle}
-          >
+          <a href={pinsDataURI} download="pins.json" className="pins-export enabled" title={exportPinsTitle}>
             <i className="fa fa-cloud-download" />
             {t`Export`}
           </a>

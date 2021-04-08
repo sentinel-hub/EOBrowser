@@ -9,7 +9,6 @@ import { IMAGE_FORMATS } from './consts';
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
 import { getDimensionsInMeters } from './ImageDownload.utils';
 import store, { notificationSlice } from '../../store';
-import ExternalLink from '../../ExternalLink/ExternalLink';
 
 export const TABS = {
   BASIC: 'basic',
@@ -27,13 +26,14 @@ export function ImageDownloadForms(props) {
   });
   const [analyticalFormState, setAnalyticalFormState] = useState({
     imageFormat: IMAGE_FORMATS.JPG,
-    selectedCrs: CRS_EPSG3857.authId,
-    showLogo: true,
+    selectedCrs: props.hasAOI ? CRS_EPSG4326.authId : CRS_EPSG3857.authId,
+    showLogo: props.allowShowLogoAnalytical,
     resolutionDivisor: 2,
     selectedLayers: props.currentLayerId ? [props.currentLayerId] : [],
     selectedBands: [],
     customSelected: props.isCurrentLayerCustom,
     addDataMask: false,
+    clipExtraBandsTiff: true,
   });
   const [printFormState, setPrintFormState] = useState({
     showCaptions: true,
@@ -139,19 +139,23 @@ export function ImageDownloadForms(props) {
     ) {
       if (isKMZ(imageFormat)) {
         return (
-          <div className="data-fusion-image-download-warning">
+          <div className="image-download-warning">
             <i className="fa fa-exclamation-circle" />
             {t`Error: Data fusion does not support KMZ/JPG and KMZ/PNG formats.`}
           </div>
         );
       }
+    }
+    return null;
+  }
+
+  function displayEffectsWarning() {
+    const { imageFormat } = analyticalFormState;
+    if (selectedTab === TABS.ANALYTICAL && props.areEffectsSet && !isJPGorPNG(imageFormat)) {
       return (
-        <div className="data-fusion-image-download-warning">
-          <i className="fa fa-warning" />
-          {t`Warning: You can only download data fusion visualization in JPEG, PNG or TIFF formats. TIFF will have 8-bit depth, unless specificied differently in the evalscript. Documentation: `}
-          <ExternalLink href="https://docs.sentinel-hub.com/api/latest/evalscript/v3/#sampletype">
-            <i class="fas fa-external-link-alt" />
-          </ExternalLink>
+        <div className="image-download-warning">
+          <i className="fa fa-exclamation-circle" />
+          {t`Error: You can only download visualization with effects in JPEG or PNG formats.`}
         </div>
       );
     }
@@ -170,6 +174,9 @@ export function ImageDownloadForms(props) {
     defaultWidth,
     defaultHeight,
     isDataFusionEnabled,
+    allowShowLogoAnalytical,
+    areEffectsSet,
+    hasAOI,
   } = props;
 
   const isAnalyticalModeAndNothingSelected =
@@ -178,15 +185,21 @@ export function ImageDownloadForms(props) {
     analyticalFormState.selectedLayers.length === 0 &&
     analyticalFormState.selectedBands.length === 0;
 
+  const isAnalyticalModeAndLayersNotLoaded = selectedTab === TABS.ANALYTICAL && allLayers.length === 0;
+
   const isDataFusionAndKMZSelected =
     selectedTab === TABS.ANALYTICAL &&
     isDataFusionEnabled &&
     analyticalFormState.customSelected &&
     isKMZ(analyticalFormState.imageFormat);
 
+  const areEffectsSetAndFormatNotJpgPng =
+    selectedTab === TABS.ANALYTICAL && areEffectsSet && !isJPGorPNG(analyticalFormState.imageFormat);
+
   return (
     <div className="image-download-forms">
       {displayDataFusionWarning()}
+      {displayEffectsWarning()}
 
       <h3>{t`Image download`}</h3>
 
@@ -212,6 +225,8 @@ export function ImageDownloadForms(props) {
           renderCRSResolution={renderCRSResolution}
           onErrorMessage={onErrorMessage}
           supportedImageFormats={supportedImageFormats}
+          allowShowLogoAnalytical={allowShowLogoAnalytical}
+          hasAOI={hasAOI}
         />
       )}
       {selectedTab === TABS.PRINT && (
@@ -227,7 +242,13 @@ export function ImageDownloadForms(props) {
       <EOBButton
         fluid
         loading={loading}
-        disabled={loading || isAnalyticalModeAndNothingSelected || isDataFusionAndKMZSelected}
+        disabled={
+          loading ||
+          isAnalyticalModeAndNothingSelected ||
+          isDataFusionAndKMZSelected ||
+          isAnalyticalModeAndLayersNotLoaded ||
+          areEffectsSetAndFormatNotJpgPng
+        }
         onClick={() => onDownloadImage(selectedTab)}
         icon="download"
         text={t`Download`}

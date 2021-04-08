@@ -3,7 +3,11 @@
 
   .menu-flags {
     color: white;
-    background-color: #525e73;
+    background-color: #2a2c38;
+  }
+
+  .flag-select {
+    padding: 2px;
   }
   /* stylelint-disable selector-class-pattern  */
   .flag-select__options {
@@ -19,6 +23,9 @@
     border: none;
     background: transparent;
     padding: 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
   }
 
   .flag-select__option {
@@ -27,6 +34,22 @@
 
   .flag-select__option__icon {
     top: 0.2em;
+  }
+
+  .flag-select__option.flag-select__option--placeholder {
+    padding: 1px 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .flag-select__option__icon {
+      top: auto;
+    }
+  }
+
+  .flag-select__option__label {
+    font-size: 0.8em;
+    text-transform: uppercase;
   }
 
   .flag-select__btn::after {

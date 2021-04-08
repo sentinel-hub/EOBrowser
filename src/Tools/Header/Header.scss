@@ -4,7 +4,7 @@
   display: flex;
   background-color: $mainDark;
   padding: 12px 10px;
-  min-height: 42px;
+  height: 45px;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
@@ -21,6 +21,10 @@
     display: flex;
     align-items: center;
     padding-bottom: 2px;
+
+    .replace-services-hostname {
+      font-size: 12px;
+    }
   }
 
   .user-hello {

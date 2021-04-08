@@ -1,6 +1,11 @@
 @import '../../variables.scss';
 
 .supplemental-datasets {
+  .supplemental-dataset-label {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
   .add-dataset {
     display: flex;
     flex-direction: row;
@@ -8,8 +13,9 @@
 
     i {
       font-size: 15px;
-      padding-top: 5px;
+      padding: 2.5px 0;
       cursor: pointer;
+      margin-left: 5px;
     }
 
     select {
@@ -21,6 +27,7 @@
   .supplemental-dataset {
     background: $mainLighter;
     margin-top: 5px;
+    margin-bottom: 5px;
 
     .supplemental-dataset-header {
       background: $mainMedium;
@@ -56,13 +63,32 @@
       padding: 0 10px 10px 10px;
 
       .supplemental-dataset-alias-input {
+        display: flex;
+        align-items: center;
+
+        input[type="text"] {
+          flex-grow: 1;
+          margin-left: 5px;
+        }
+
         .invalid {
           background: #fdd;
         }
       }
 
+      .mosaicking-order {
+        display: flex;
+        align-items: center;
+        padding-top: 3px;
+
+        select {
+          margin-left: 5px;
+          flex-grow: 1;
+        }
+      }
+
       .timespan {
-        margin-bottom: 10px;
+        padding-top: 2px;
 
         input[type='checkbox'] {
           margin-left: 0;
@@ -71,7 +97,6 @@
         .timespan-picker {
           background-color: $mainLighter;
           margin-top: 2px;
-          padding: 10px 0;
 
           .input-value {
             background: $mainLighter;
@@ -80,6 +105,8 @@
           .date-time-input {
             display: flex;
             flex-wrap: nowrap;
+            margin-left: 5px;
+            margin-right: 5px;
 
             .date-time-input-label {
               display: none;

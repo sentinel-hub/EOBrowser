@@ -1,17 +1,21 @@
 import { useLocale, addLocale } from 'ttag';
+import moment from 'moment';
 
 export const LOCAL_STORAGE_KEY = 'eobrowser_lang';
 export const DEFAULT_LANG = 'en';
 export const SUPPORTED_LANGUAGES = [
-  { langCode: 'en', text: 'English', flagCode: 'US' },
-  { langCode: 'sl', text: 'Slovene', flagCode: 'SI' },
+  { langCode: 'en', text: 'English', flagCode: 'GB' },
   { langCode: 'de', text: 'Deutsch', flagCode: 'DE' },
+  { langCode: 'es', text: 'español', flagCode: 'ES' },
+  { langCode: 'el', text: 'ελληνικά', flagCode: 'GR' },
+  { langCode: 'pl', text: 'polski', flagCode: 'PL' },
 ];
 
 export const changeLanguage = locale => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useLocale(locale);
   saveLang(locale);
+  moment.locale(locale);
 };
 
 export const getLanguage = () => {
@@ -27,11 +31,10 @@ const saveLang = locale => {
   localStorage.setItem(LOCAL_STORAGE_KEY, locale);
 };
 
-export const initLanguage = () => {
-  const locale = getLanguage();
+export const initLanguages = () => {
   SUPPORTED_LANGUAGES.forEach(locale => {
     if (locale.langCode !== DEFAULT_LANG) {
-      // require(`moment/locale/${locale.langCode}`);
+      require(`moment/locale/${locale.langCode}`);
       const ttagObject = require(`../translations/${locale.langCode}.po.json`);
       if (process.env.REACT_APP_DEBUG_TRANSLATIONS === 'true') {
         makeDebugTranslations(ttagObject);
@@ -39,8 +42,6 @@ export const initLanguage = () => {
       addLocale(locale.langCode, ttagObject);
     }
   });
-
-  changeLanguage(locale);
 };
 
 function makeDebugTranslations(ttagObject) {

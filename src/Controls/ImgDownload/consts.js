@@ -45,6 +45,7 @@ export const IMAGE_FORMATS_INFO = {
     mimeTypeProcessing: 'image/tiff',
     ext: 'tiff',
     sampleType: 'UINT8',
+    scaleFactor: 256,
   },
   [IMAGE_FORMATS.TIFF_UINT16]: {
     text: 'TIFF (16-bit)',
@@ -52,6 +53,7 @@ export const IMAGE_FORMATS_INFO = {
     mimeTypeProcessing: 'image/tiff',
     ext: 'tiff',
     sampleType: 'UINT16',
+    scaleFactor: 65536,
   },
   [IMAGE_FORMATS.TIFF_FLOAT32]: {
     text: 'TIFF (32-bit float)',

@@ -24,6 +24,7 @@ import {
 } from './dataSourceHandlers';
 import { constructBasicEvalscript, constructV3Evalscript } from '../../../utils';
 import { filterLayers } from './filter';
+import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 
 export default class Sentinel1DataSourceHandler extends DataSourceHandler {
   KNOWN_BANDS = [
@@ -112,20 +113,21 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
       this.urls.EOC.push(url);
     }
     this.capabilities[url] = layers;
+    this.saveFISLayers(url, layers);
     return true;
+  }
+
+  saveFISLayers(url, layers) {
+    this.FISLayers[url] = {};
+    const fisLayers = layers.filter(l => l.layerId.startsWith('__FIS_'));
+    for (let l of fisLayers) {
+      this.FISLayers[url][l.dataset.id] = [...(this.FISLayers[url][l.dataset.id] || []), l.layerId];
+    }
   }
 
   isHandlingAnyUrl() {
     return Object.values(this.urls).flat().length > 0;
   }
-
-  saveSearchFilters = searchFilters => {
-    this.searchFilters = searchFilters;
-  };
-
-  saveCheckedState = checkedState => {
-    this.isChecked = checkedState;
-  };
 
   getSearchFormComponents() {
     if (!this.isHandlingAnyUrl()) {
@@ -429,6 +431,11 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
     }
   };
 
+  getFISLayer(url, datasetId, layerId, isCustom) {
+    const shDataset = this.getSentinelHubDataset(datasetId);
+    return super.getFISLayer(url, shDataset.id, layerId, isCustom);
+  }
+
   getResolutionLimits(datasetId) {
     switch (datasetId) {
       case S1:
@@ -460,4 +467,17 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
         return false;
     }
   };
+
+  getSupportedImageFormats(datasetId) {
+    switch (datasetId) {
+      case S1:
+      case S1_EW:
+      case S1_EW_SH:
+        return Object.values(IMAGE_FORMATS).filter(
+          f => f !== IMAGE_FORMATS.KMZ_JPG && f !== IMAGE_FORMATS.KMZ_PNG,
+        );
+      default:
+        return Object.values(IMAGE_FORMATS);
+    }
+  }
 }

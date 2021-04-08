@@ -15,6 +15,7 @@ import { applyFilterMonthsToDateRange } from '../EOBCommon/utils/filterDates';
 import { getMapDataFusion } from '../EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
 import { b64EncodeUnicode } from '../../utils/base64MDN';
+import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
 
 const PADDING = 80;
 const REQUEST_RETRY_LIMIT = 2;
@@ -246,19 +247,14 @@ export function getCurrentBboxUrl(
   });
 
   let effectsUrlParams = '';
-  if (effects.gainEffect !== undefined) {
-    effectsUrlParams += `&gain=${effects.gainEffect}`;
-  }
-  if (effects.gammaEffect !== undefined) {
-    effectsUrlParams += `&gamma=${effects.gammaEffect}`;
-  }
   if (effects.upsampling) {
     effectsUrlParams += `&upsampling=${effects.upsampling}`;
   }
   if (effects.downsampling) {
     effectsUrlParams += `&downsampling=${effects.downsampling}`;
   }
-  // RGB effects and minQa are not WMS params
+  // gain, gamma, RGB effects, minQa are not WMS params, they are used for
+  // overrideGetMapParams and overrideLayerConstructorParams in fetchBlobObj
 
   return `${
     baseUrls.WMS
@@ -283,6 +279,9 @@ export async function fetchBlobObj(
   apiType,
   effects,
   dataFusion,
+  supportsTimeRange,
+  showSHLogo,
+  showCopernicusLogo,
 ) {
   try {
     // something here went wrong, time is added here and in EOB3TimelapsePanel.js where it is called from
@@ -295,18 +294,18 @@ export async function fetchBlobObj(
       .toISOString()}&preview=3`;
 
     const overrideGetMapParams = {};
-    const shjsEffects = {};
-    if (effects.redRangeEffect) {
-      shjsEffects.redRange = { from: effects.redRangeEffect[0], to: effects.redRangeEffect[1] };
-    }
-    if (effects.greenRangeEffect) {
-      shjsEffects.greenRange = { from: effects.greenRangeEffect[0], to: effects.greenRangeEffect[1] };
-    }
-    if (effects.blueRangeEffect) {
-      shjsEffects.blueRange = { from: effects.blueRangeEffect[0], to: effects.blueRangeEffect[1] };
-    }
-    if (Object.keys(shjsEffects).length) {
+
+    const shjsEffects = constructGetMapParamsEffects(effects);
+    if (shjsEffects) {
       overrideGetMapParams.effects = shjsEffects;
+    }
+
+    if (!supportsTimeRange) {
+      overrideGetMapParams.fromTime = null;
+      overrideGetMapParams.toTime = moment
+        .utc(request.date)
+        .endOf('day')
+        .toDate();
     }
 
     const overrideLayerConstructorParams = {};
@@ -322,13 +321,6 @@ export async function fetchBlobObj(
       url.searchParams.forEach((value, key) => {
         params[key] = value;
       });
-
-      if (effects.gainEffect) {
-        shjsEffects.gain = effects.gainEffect;
-      }
-      if (effects.gammaEffect) {
-        shjsEffects.gamma = effects.gammaEffect;
-      }
 
       blob = await getMapDataFusion(params, dataFusion, shjsEffects);
     } else {
@@ -346,21 +338,32 @@ export async function fetchBlobObj(
       blob = await addOverlays(blob, width, height, bbox, overlayLayers, TIMELAPSE_SIZE, TIMELAPSE_SIZE);
     }
 
-    return decorateBlob(request.date, request.dateToBeShown, blob);
+    return decorateBlob(request.date, request.dateToBeShown, blob, showSHLogo, showCopernicusLogo);
   } catch (err) {
     if (axios.isCancel(err)) {
       throw err;
     } else {
       if (request.try < REQUEST_RETRY_LIMIT) {
         request.try++;
-        fetchBlobObj(request, width, height, bbox, overlayLayers, cancelToken, apiType, effects);
+        fetchBlobObj(
+          request,
+          width,
+          height,
+          bbox,
+          overlayLayers,
+          cancelToken,
+          apiType,
+          effects,
+          dataFusion,
+          supportsTimeRange,
+        );
         throw err;
       }
     }
   }
 }
 
-function decorateBlob(date, dateToBeShown, blob) {
+function decorateBlob(date, dateToBeShown, blob, showSHLogo = true, showCopernicusLogo = true) {
   const canvas = document.createElement('canvas');
   const height = TIMELAPSE_SIZE;
   const width = TIMELAPSE_SIZE;
@@ -425,21 +428,26 @@ function decorateBlob(date, dateToBeShown, blob) {
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
 
-        //sentinel hub logo
-        const shResizeFactor = 0.85;
-        const shWidth = sh.width * shResizeFactor;
-        const shHeight = sh.height * shResizeFactor;
-        const shXpos = canvas.width - shWidth - 10;
-        const shYpos = canvas.height - shHeight - 4;
-        ctx.drawImage(sh, shXpos, shYpos, shWidth, shHeight);
+        let shXpos = canvas.width - 10;
 
-        //copernicus logo
-        const cpImgResizeFactor = 0.8;
-        const cpImgWidth = cpImg.width * cpImgResizeFactor;
-        const cpImgHeight = cpImg.height * cpImgResizeFactor;
-        const cpImgXpos = shXpos - cpImgWidth - 8;
-        const cpImgYpos = canvas.height - cpImgHeight - 8;
-        ctx.drawImage(cpImg, cpImgXpos, cpImgYpos, cpImgWidth, cpImgHeight);
+        if (showSHLogo) {
+          //sentinel hub logo
+          const shResizeFactor = 0.85;
+          const shWidth = sh.width * shResizeFactor;
+          const shHeight = sh.height * shResizeFactor;
+          shXpos = canvas.width - shWidth - 10;
+          const shYpos = canvas.height - shHeight - 4;
+          ctx.drawImage(sh, shXpos, shYpos, shWidth, shHeight);
+        }
+        if (showCopernicusLogo) {
+          //copernicus logo
+          const cpImgResizeFactor = 0.8;
+          const cpImgWidth = cpImg.width * cpImgResizeFactor;
+          const cpImgHeight = cpImg.height * cpImgResizeFactor;
+          const cpImgXpos = shXpos - cpImgWidth - 8;
+          const cpImgYpos = canvas.height - cpImgHeight - 8;
+          ctx.drawImage(cpImg, cpImgXpos, cpImgYpos, cpImgWidth, cpImgHeight);
+        }
 
         const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
         URL.revokeObjectURL(mainImg.src);

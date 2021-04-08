@@ -18,7 +18,7 @@ class Controls extends Component {
         <Measure map={this.props.leaflet.map} locale={this.props.selectedLanguage} />
         <ImageDownloadBtn locale={this.props.selectedLanguage} />
         <TimelapseButton locale={this.props.selectedLanguage} />
-        <TerrainViewerButton />
+        <TerrainViewerButton locale={this.props.selectedLanguage} />
       </div>
     );
   }

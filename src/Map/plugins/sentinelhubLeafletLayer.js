@@ -15,6 +15,7 @@ import {
   S5PL2Layer,
   Landsat8AWSLayer,
   MODISLayer,
+  DEMLayer,
   ProcessingDataFusionLayer,
   CancelToken,
   isCancelled,
@@ -49,9 +50,18 @@ import {
   AWS_L8L1C,
   ENVISAT_MERIS,
   checkIfCustom,
+  DEM_MAPZEN,
+  DEM_COPERNICUS_30,
+  DEM_COPERNICUS_90,
+  COPERNICUS_CORINE_LAND_COVER,
+  COPERNICUS_GLOBAL_LAND_COVER,
+  COPERNICUS_WATER_BODIES,
+  getDataSourceHandler,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import DEMDataSourceHandler from '../../Tools/SearchPanel/dataSourceHandlers/DEMDataSourceHandler';
 import { constructLayerFromDatasetId } from '../../junk/EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
+import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
 
 class SentinelHubLayer extends L.TileLayer {
   constructor(options) {
@@ -155,7 +165,16 @@ class SentinelHubLayer extends L.TileLayer {
       }
 
       if (!layer.evalscript && !layer.evalscriptUrl) {
-        await layer.updateLayerFromServiceIfNeeded(reqConfig);
+        try {
+          await layer.updateLayerFromServiceIfNeeded(reqConfig);
+        } catch (error) {
+          if (!isCancelled(error)) {
+            if (onTileImageError) {
+              onTileImageError(error);
+            }
+            console.error('There has been a problem with your fetch operation: ', error.message);
+          }
+        }
       }
       const apiType = layer.supportsApiType(ApiType.PROCESSING) ? ApiType.PROCESSING : ApiType.WMS;
       layer
@@ -253,8 +272,8 @@ class SentinelHubLayer extends L.TileLayer {
     const layers = [];
 
     for (let dataFusionEntry of dataFusion) {
-      let { id, alias, mosaickingOrder, timespan } = dataFusionEntry;
-      const layer = constructLayerFromDatasetId(id, mosaickingOrder);
+      let { id, alias, mosaickingOrder, timespan, additionalParameters = {} } = dataFusionEntry;
+      const layer = constructLayerFromDatasetId(id, mosaickingOrder, additionalParameters);
       layers.push({
         layer: layer,
         id: alias,
@@ -360,6 +379,22 @@ class SentinelHubLayer extends L.TileLayer {
         });
       case ENVISAT_MERIS:
         return await this.createSH12Layer(url, evalscript, evalscripturl, upsampling, downsampling);
+      case DEM_MAPZEN:
+      case DEM_COPERNICUS_30:
+      case DEM_COPERNICUS_90:
+        const { demInstance } = DEMDataSourceHandler.getDatasetParams(datasetId);
+        return await new DEMLayer({
+          evalscript: evalscript,
+          evalscriptUrl: evalscripturl,
+          upsampling: upsampling,
+          downsampling: downsampling,
+          demInstance: demInstance,
+        });
+      case COPERNICUS_CORINE_LAND_COVER:
+      case COPERNICUS_GLOBAL_LAND_COVER:
+      case COPERNICUS_WATER_BODIES:
+        const dsh = getDataSourceHandler(datasetId);
+        return await this.createBYOCLayer(url, dsh.KNOWN_COLLECTIONS[datasetId], evalscript, evalscripturl);
       default:
         const isBYOC = !!checkIfCustom(datasetId);
         if (isBYOC) {
@@ -369,11 +404,15 @@ class SentinelHubLayer extends L.TileLayer {
     }
   };
 
-  createBYOCLayer = (url, datasetId, evalscript, evalscripturl, upsampling, downsampling) => {
+  createBYOCLayer = (url, collectionId, evalscript, evalscripturl, upsampling, downsampling) => {
     return LayersFactory.makeLayers(url).then(async layers => {
       for (let layer of layers) {
         await layer.updateLayerFromServiceIfNeeded();
-        if (layer.collectionId === datasetId) {
+        if (
+          Array.isArray(collectionId)
+            ? collectionId.includes(layer.collectionId)
+            : layer.collectionId === collectionId
+        ) {
           layer.evalscript = evalscript;
           layer.evalscripturl = evalscripturl;
           layer.upsampling = upsampling;
@@ -495,52 +534,11 @@ class SentinelHubLayerComponent extends GridLayer {
       options.pane = params.pane || params.leaflet.pane;
     }
 
-    const effects = {};
-    if (params.gainEffect !== undefined) {
-      effects.gain = params.gainEffect;
-    }
-    if (params.gammaEffect !== undefined) {
-      effects.gamma = params.gammaEffect;
-    }
-    if (params.redRangeEffect !== undefined) {
-      effects.redRange = { from: params.redRangeEffect[0], to: params.redRangeEffect[1] };
-    }
-    if (params.greenRangeEffect !== undefined) {
-      effects.greenRange = { from: params.greenRangeEffect[0], to: params.greenRangeEffect[1] };
-    }
-    if (params.blueRangeEffect !== undefined) {
-      effects.blueRange = { from: params.blueRangeEffect[0], to: params.blueRangeEffect[1] };
-    }
-
-    if (
-      (params.redCurveEffect && params.redCurveEffect.values) ||
-      (params.greenCurveEffect && params.greenCurveEffect.values) ||
-      (params.blueCurveEffect && params.blueCurveEffect.values)
-    ) {
-      const customEffect = ({ r, g, b, a }) => {
-        let newR = r;
-        let newG = g;
-        let newB = b;
-        if (params.redCurveEffect && params.redCurveEffect.values) {
-          let redId = Math.round(r * (params.redCurveEffect.values.length - 1));
-          newR = params.redCurveEffect.values[redId].y;
-        }
-        if (params.greenCurveEffect && params.greenCurveEffect.values) {
-          let greenId = Math.round(g * (params.greenCurveEffect.values.length - 1));
-          newG = params.greenCurveEffect.values[greenId].y;
-        }
-        if (params.blueCurveEffect && params.blueCurveEffect.values) {
-          let blueId = Math.round(b * (params.blueCurveEffect.values.length - 1));
-          newB = params.blueCurveEffect.values[blueId].y;
-        }
-        return { r: newR, g: newG, b: newB, a: a };
-      };
-
-      effects.customEffect = customEffect;
-    }
-
-    if (Object.keys(effects).length) {
+    const effects = constructGetMapParamsEffects(params);
+    if (effects) {
       options.effects = effects;
+    } else {
+      options.effects = null;
     }
 
     if (params.minQa !== undefined) {

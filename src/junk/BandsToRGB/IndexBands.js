@@ -15,6 +15,7 @@ const GRADIENTS = [
   ['0xd73027', '0x1a9850'],
   ['0xffffff', '0x005824'],
   ['0xffffff', '0xFF0000'],
+  ['0x2079B5', '0x2079B5'],
 ];
 
 const DEFAULT_GRADIENT = GRADIENTS[0];
@@ -23,7 +24,7 @@ const FLOAT_REGEX = /^[-]?\d{0,2}\.?\d{0,2}$/; // limited on two decimals
 const ALLOWED_CHARS_REGEX = /^$|^\.$|^-$/; // if empty string or first char is dot or minus
 const DEFAULT_DOMAIN = { min: 0, max: 1 };
 const EQUATIONS = ['(A-B)/(A+B)', '(A/B)'];
-const DEFAULT_VALUES = spreadHandlersEvenly(8, DEFAULT_DOMAIN.min, DEFAULT_DOMAIN.max);
+const DEFAULT_VALUES = spreadHandlersEvenly(2, DEFAULT_DOMAIN.min, DEFAULT_DOMAIN.max);
 
 export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   const [equation, setEquation] = React.useState(EQUATIONS[0]);
@@ -31,9 +32,15 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   const [values, setValues] = React.useState(DEFAULT_VALUES); //
   const [min, setMin] = React.useState(DEFAULT_DOMAIN.min);
   const [max, setMax] = React.useState(DEFAULT_DOMAIN.max);
-  const [colorRamp, setColorRamp] = React.useState(); // [ "#000000", "#242424", ... , "#ffffff" ]
+  const [colorRamp, setColorRamp] = React.useState([
+    GRADIENTS[0][0].replace('0x', '#'),
+    GRADIENTS[0][1].replace('0x', '#'),
+  ]); // [ "#000000", "#ffffff"]
   const [open, setOpen] = React.useState(false);
-
+  const [sliderOffset, setSliderOffset] = React.useState({
+    left: DEFAULT_DOMAIN.min,
+    right: DEFAULT_DOMAIN.max,
+  });
   const equationArray = [...equation]; // split string into array
 
   React.useEffect(() => {
@@ -46,6 +53,10 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
     }
     // eslint-disable-next-line
   }, []);
+
+  React.useEffect(() => {
+    setSliderOffset({ left: values[0], right: values[values.length - 1] });
+  }, [values]);
 
   const initEvalFromUrl = parsed => {
     setValues(parsed.positions);
@@ -74,7 +85,9 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   };
 
   const onGradientChange = selectedGradient => {
-    const newColors = initColors(values, selectedGradient, min, max);
+    const { left, right } = sliderOffset;
+    const sliderOffsetArr = [left, right];
+    const newColors = initColors(sliderOffsetArr, selectedGradient, min, max);
     onChange(layers, { equation, colorRamp: newColors, values });
     setGradient(selectedGradient);
     setColorRamp(newColors);
@@ -87,6 +100,9 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   };
 
   const onSliderUpdate = newValues => {
+    const firstSlider = newValues[0];
+    const lastSlider = newValues[newValues.length - 1];
+    setSliderOffset({ left: firstSlider, right: lastSlider });
     const newColors = initColors(newValues, gradient, min, max);
     setColorRamp(newColors);
   };
@@ -188,7 +204,6 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
           })}
         </div>
       </div>
-
       {/* Threshold gradient sliders */}
       <div className="treshold">
         <div style={{ padding: '20px 0' }}>
@@ -226,7 +241,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
             <i className="fas fa-plus-square" />
           </button>
         </div>
-        <div style={{ padding: '4px 10px' }}>
+        <div style={{ padding: '4px 0' }}>
           <SliderThreshold
             colors={colorRamp}
             domain={[min, max]}
@@ -235,6 +250,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
             onSliderChange={onSliderChange}
             values={values}
             invalidMinMax={invalidMinMax}
+            sliderOffset={sliderOffset}
           />
         </div>
         <div className="scale-wrap">

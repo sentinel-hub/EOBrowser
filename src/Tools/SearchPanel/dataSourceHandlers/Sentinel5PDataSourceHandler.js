@@ -153,14 +153,6 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
     return this.urls.length > 0;
   }
 
-  saveSearchFilters = searchFilters => {
-    this.searchFilters = searchFilters;
-  };
-
-  saveCheckedState = checkedState => {
-    this.isChecked = checkedState;
-  };
-
   getSearchFormComponents() {
     if (!this.isHandlingAnyUrl()) {
       return null;
@@ -301,10 +293,6 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
 
   getResolutionLimits() {
     return { resolution: 3500 };
-  }
-
-  hasFISLayer(url, datasetId, layerId, isCustom) {
-    return !!this.getFISLayer(url, datasetId, layerId, isCustom);
   }
 
   supportsCustomLayer(datasetId) {

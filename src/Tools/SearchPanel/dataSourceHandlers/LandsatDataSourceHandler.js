@@ -13,6 +13,7 @@ import LandsatTooltip from './DatasourceRenderingComponents/dataSourceTooltips/L
 import { FetchingFunction } from '../search';
 import { constructBasicEvalscript, constructV3Evalscript } from '../../../utils';
 import { ESA_L5, ESA_L7, ESA_L8, AWS_L8L1C } from './dataSourceHandlers';
+import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 
 export default class LandsatDataSourceHandler extends DataSourceHandler {
   L5_BANDS = [
@@ -103,6 +104,16 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
       description: t`Band 9 - Cirrus - 1360-1390 nm`,
       color: '#d71234',
     },
+    {
+      name: 'B10',
+      description: t`Band 10 - Thermal Infrared (TIRS) - 10895 nm`,
+      color: '#d51234',
+    },
+    {
+      name: 'B11',
+      description: t`Band 11 - Thermal Infrared (TIRS) - 12005 nm`,
+      color: '#f76244',
+    },
   ];
   urls = { ESA5: [], ESA7: [], ESA8: [], USGS8: [] };
   datasetSearchLabels = {
@@ -184,14 +195,6 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
   isHandlingAnyUrl() {
     return Object.values(this.urls).flat().length > 0;
   }
-
-  saveSearchFilters = searchFilters => {
-    this.searchFilters = searchFilters;
-  };
-
-  saveCheckedState = checkedState => {
-    this.isChecked = checkedState;
-  };
 
   getSearchFormComponents() {
     if (!this.isHandlingAnyUrl()) {
@@ -333,17 +336,6 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
     }
   }
 
-  getFISLayer(url, datasetId, layerId, isCustom) {
-    if (isCustom) {
-      return true;
-    }
-    return super.getFISLayer(url, datasetId, layerId);
-  }
-
-  hasFISLayer(url, datasetId, layerId, isCustom) {
-    return !!this.getFISLayer(url, datasetId, layerId, isCustom);
-  }
-
   supportsInterpolation() {
     return true;
   }
@@ -354,4 +346,25 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
     }
     return false;
   }
+
+  getSupportedImageFormats(datasetId) {
+    switch (datasetId) {
+      case ESA_L5:
+      case ESA_L7:
+      case ESA_L8:
+        return Object.values(IMAGE_FORMATS).filter(
+          f => f !== IMAGE_FORMATS.KMZ_JPG && f !== IMAGE_FORMATS.KMZ_PNG,
+        );
+      default:
+        return Object.values(IMAGE_FORMATS);
+    }
+  }
+
+  groupChannels = channels => {
+    const groupedBands = {
+      [t`Reflectance`]: this.L8_BANDS.filter(c => !['B10', 'B11'].includes(c.name)),
+      [t`Brightness temperature`]: this.L8_BANDS.filter(c => ['B10', 'B11'].includes(c.name)),
+    };
+    return groupedBands;
+  };
 }

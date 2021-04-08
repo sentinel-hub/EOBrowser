@@ -64,6 +64,8 @@ class EOBAdvancedHolder extends React.Component {
       onCodeMirrorRefresh,
       onCompositeChange,
       onIndexScriptChange,
+      areBandsClasses,
+      supportsIndex,
     } = this.props;
 
     const groupedChannels =
@@ -88,21 +90,29 @@ class EOBAdvancedHolder extends React.Component {
           {groupedChannels ? (
             <GroupedBandsToRGB groupedBands={groupedChannels} value={layers} onChange={onCompositeChange} />
           ) : (
-            <BandsToRGB bands={channels} value={layers} onChange={onCompositeChange} />
+            <BandsToRGB
+              bands={channels}
+              value={layers}
+              onChange={onCompositeChange}
+              areBandsClasses={areBandsClasses}
+            />
           )}
         </Accordion>
-        <Accordion
-          open={this.state.openAccordion === 1}
-          title="Index"
-          toggleOpen={() => this.toggleAccordion(1)}
-        >
-          <IndexBands
-            bands={channels}
-            layers={indexLayers}
-            onChange={onIndexScriptChange}
-            evalscript={evalscript}
-          />
-        </Accordion>
+
+        {supportsIndex && (
+          <Accordion
+            open={this.state.openAccordion === 1}
+            title="Index"
+            toggleOpen={() => this.toggleAccordion(1)}
+          >
+            <IndexBands
+              bands={channels}
+              layers={indexLayers}
+              onChange={onIndexScriptChange}
+              evalscript={evalscript}
+            />
+          </Accordion>
+        )}
         <Accordion
           open={this.state.openAccordion === 2}
           title="Custom script"

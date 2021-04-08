@@ -28,30 +28,38 @@ function DataFusionPrimaryDataset(props) {
 
   return (
     <div className="primary-dataset-info">
-      <div className="primary-dataset-label">{`Primary dataset: ${label}`}</div>
-      <label htmlFor={`${alias}-alias`}>Datasource alias: </label>
-      <input
-        id={`${alias}-alias`}
-        className={isValid ? '' : 'invalid'}
-        value={currentAlias}
-        onChange={updateAlias}
-      />
+      <div className="primary-dataset-label">
+        {t`Primary dataset:`} {label}
+      </div>
 
-      <div className="mosaicking-order">
-        {t`Mosaicking order`}:
-        <select
-          className="dropdown"
-          value={mosaickingOrder}
-          onChange={e => props.updateMosaickingOrder(alias, e.target.value)}
-        >
-          <option value={MosaickingOrder.MOST_RECENT}>{t`Most recent`}</option>
-          <option value={MosaickingOrder.LEAST_RECENT}>{t`Least recent`}</option>
-          {additionalMosaickingOrders.map(mo => (
-            <option key={mo.id} value={mo.id}>
-              {mo.label}
-            </option>
-          ))}
-        </select>
+      <div className="primary-dataset-details">
+        <div className="datasource-alias">
+          <label htmlFor={`${alias}-alias`}>{t`Datasource alias:`}</label>
+          <input
+            id={`${alias}-alias`}
+            type="text"
+            className={isValid ? '' : 'invalid'}
+            value={currentAlias}
+            onChange={updateAlias}
+          />
+        </div>
+
+        <div className="mosaicking-order">
+          {t`Mosaicking order`}:
+          <select
+            className="dropdown-normal-ui"
+            value={mosaickingOrder}
+            onChange={e => props.updateMosaickingOrder(alias, e.target.value)}
+          >
+            <option value={MosaickingOrder.MOST_RECENT}>{t`Most recent`}</option>
+            <option value={MosaickingOrder.LEAST_RECENT}>{t`Least recent`}</option>
+            {additionalMosaickingOrders.map(mo => (
+              <option key={mo.id} value={mo.id}>
+                {mo.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );

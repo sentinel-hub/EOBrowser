@@ -4,6 +4,12 @@ import { GridLayer, withLeaflet } from 'react-leaflet';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+// https://docs.mapbox.com/mapbox-gl-js/example/mapbox-gl-rtl-text/
+mapboxgl.setRTLTextPlugin(
+  'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js',
+  null,
+  true, // By setting the lazy parameter to true, the plugin is only loaded when the map first encounters Hebrew or Arabic text.
+);
 class GlTileLayer extends GridLayer {
   createLeafletElement(props) {
     return new MapboxGL(props);
@@ -46,7 +52,6 @@ const MapboxGL = L.Layer.extend({
     if (options.accessToken) {
       mapboxgl.accessToken = options.accessToken;
     }
-
     // setup throttling the update event when panning
     this._throttledUpdate = L.Util.throttle(this._update, this.options.updateInterval, this);
   },
@@ -73,7 +78,11 @@ const MapboxGL = L.Layer.extend({
       L.DomEvent.off(this._map._proxy, L.DomUtil.TRANSITION_END, this._transitionEnd, this);
     }
 
-    this.getPane().removeChild(this._container);
+    // when changing the language while looking at layer, `pane` is undefined
+    const pane = this.getPane();
+    if (pane) {
+      pane.removeChild(this._container);
+    }
     this._glMap.remove();
     this._glMap = null;
   },

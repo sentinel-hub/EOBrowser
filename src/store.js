@@ -7,6 +7,7 @@ import {
   USER_INSTANCES_THEMES_LIST,
   URL_THEMES_LIST,
   EDUCATION_MODE,
+  DEFAULT_LAT_LNG,
 } from './const';
 
 export const aoiSlice = createSlice({
@@ -46,8 +47,8 @@ export const poiSlice = createSlice({
 export const mainMapSlice = createSlice({
   name: 'mainMap',
   initialState: {
-    lat: 41.9,
-    lng: 12.5,
+    lat: DEFAULT_LAT_LNG.lat,
+    lng: DEFAULT_LAT_LNG.lng,
     zoom: 10,
     enabledOverlaysId: ['labels'],
   },
@@ -612,7 +613,7 @@ export const compareLayersSlice = createSlice({
 export const languageSlice = createSlice({
   name: 'language',
   initialState: {
-    selectedLanguage: 'en',
+    selectedLanguage: null,
   },
   reducers: {
     setLanguage: (state, action) => {
@@ -669,6 +670,21 @@ export const pinsSlice = createSlice({
   },
 });
 
+export const timelapseSlice = createSlice({
+  name: 'timelapse',
+  initialState: {
+    displayTimelapseAreaPreview: false,
+  },
+  reducers: {
+    toggleTimelapseAreaPreview: state => {
+      state.displayTimelapseAreaPreview = !state.displayTimelapseAreaPreview;
+    },
+    setTimelapseAreaPreview: (state, action) => {
+      state.displayTimelapseAreaPreview = action.payload;
+    },
+  },
+});
+
 const reducers = combineReducers({
   aoi: aoiSlice.reducer,
   poi: poiSlice.reducer,
@@ -683,6 +699,7 @@ const reducers = combineReducers({
   language: languageSlice.reducer,
   modes: modeSlice.reducer,
   pins: pinsSlice.reducer,
+  timelapse: timelapseSlice.reducer,
 });
 
 const store = configureStore({

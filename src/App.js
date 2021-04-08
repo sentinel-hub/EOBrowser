@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { setAuthToken } from '@sentinel-hub/sentinelhub-js';
+import {
+  setAuthToken,
+  registerHostnameReplacing,
+  setDefaultRequestsConfig,
+} from '@sentinel-hub/sentinelhub-js';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/css/v4-shims.css';
 import EOBModeSelection from './junk/EOBModeSelection/EOBModeSelection';
@@ -37,6 +41,31 @@ class App extends Component {
         this.setLastAddedPin(pins.uniqueId);
       }
     }
+
+    // this allows using an alternative hostname for SH services, which is useful for testing purposes:
+    if (process.env.REACT_APP_REPLACE_SERVICES_HOSTNAME) {
+      registerHostnameReplacing('services.sentinel-hub.com', process.env.REACT_APP_REPLACE_SERVICES_HOSTNAME);
+    }
+
+    setDefaultRequestsConfig({
+      rewriteUrlFunc: url => {
+        // performance optimization: instead of original GetCapabilities requests, use
+        // the proxied ones: (gzipped)
+        if (
+          url.startsWith('https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?') &&
+          url.includes('request=GetCapabilities')
+        ) {
+          return 'https://eob-getcapabilities-cache.s3.eu-central-1.amazonaws.com/gibs.xml';
+        }
+        if (
+          url.startsWith('https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows?') &&
+          url.includes('request=GetCapabilities')
+        ) {
+          return 'https://eob-getcapabilities-cache.s3.eu-central-1.amazonaws.com/probav.xml';
+        }
+        return url;
+      },
+    });
   }
 
   async componentDidUpdate(prevProps) {

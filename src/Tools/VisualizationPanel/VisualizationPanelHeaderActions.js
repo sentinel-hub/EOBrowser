@@ -11,7 +11,7 @@ export const VisualizationPanelHeaderActions = ({
   toggleVisible,
   showEffects,
   toggleValue,
-  addToCompare,
+  addVisualizationToCompare,
   toggleSocialSharePanel,
   displaySocialShareOptions,
   datasetId,
@@ -36,7 +36,7 @@ export const VisualizationPanelHeaderActions = ({
     {
       id: 'addToCompare',
       title: () => t`Add to compare`,
-      onClick: () => addToCompare(),
+      onClick: () => addVisualizationToCompare(),
       icon: () => 'fas fa-exchange-alt',
       visible: () => true,
     },

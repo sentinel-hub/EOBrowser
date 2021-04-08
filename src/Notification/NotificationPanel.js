@@ -18,10 +18,12 @@ export const NotificationPanel = ({ type, msg, className }) => {
       break;
   }
 
+  const paragraphs = msg && msg.split('\n');
+
   return (
     <div className={`notification-panel ${className || ''}`}>
       {icon && <i className={`fas fa-${icon}`} />}
-      {msg}
+      {paragraphs && paragraphs.map((item, i) => <p key={i}>{item}</p>)}
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { NotificationPanel } from '../../junk/NotificationPanel/NotificationPane
 import Pin from './Pin';
 import PinTools from './PinTools';
 import UpdatingStatus from './UpdatingStatus';
+import { constructEffectsFromPinOrHighlight } from '../../utils/effectsUtils';
 
 import store, {
   mainMapSlice,
@@ -263,6 +264,7 @@ class PinPanel extends Component {
       pins = pins.filter(p => p._id !== pin._id);
       sessionStorage.setItem(PINS_LC_NAME, JSON.stringify(pins));
       store.dispatch(pinsSlice.actions.removeItem(index));
+      this.props.setLastAddedPin(null);
     } else if (type === SAVED_PINS) {
       this.deleteUserPins([pin._id])
         .then(() => {
@@ -320,11 +322,6 @@ class PinPanel extends Component {
       evalscripturl,
       themeId,
       dataFusion,
-      gain,
-      gamma,
-      redRange,
-      greenRange,
-      blueRange,
       minQa,
       upsampling,
       downsampling,
@@ -413,21 +410,9 @@ class PinPanel extends Component {
       visualizationParams.layerId = layerId;
     }
 
-    if (gain !== undefined && gain !== 1) {
-      visualizationParams.gainEffect = gain;
-    }
-    if (gamma !== undefined && gamma !== 1) {
-      visualizationParams.gammaEffect = gamma;
-    }
-    if (redRange && !(redRange[0] === 0 && redRange[1] === 1)) {
-      visualizationParams.redRangeEffect = redRange;
-    }
-    if (greenRange && !(greenRange[0] === 0 && greenRange[1] === 1)) {
-      visualizationParams.greenRangeEffect = greenRange;
-    }
-    if (blueRange && !(blueRange[0] === 0 && blueRange[1] === 1)) {
-      visualizationParams.blueRangeEffect = blueRange;
-    }
+    const effects = constructEffectsFromPinOrHighlight(pin);
+    visualizationParams = { ...visualizationParams, ...effects };
+
     if (minQa !== undefined) {
       visualizationParams.minQa = minQa;
     }
@@ -652,6 +637,7 @@ const mapStoreToProps = store => ({
   urlThemesList: store.themes.themesLists[URL_THEMES_LIST],
   userInstancesThemesList: store.themes.themesLists[USER_INSTANCES_THEMES_LIST],
   pinItems: store.pins.items,
+  selectedLanguage: store.language.selectedLanguage,
 });
 
 export default connect(mapStoreToProps, null)(PinPanel);

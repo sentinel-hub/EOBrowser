@@ -5,6 +5,7 @@ import store, { compareLayersSlice } from '../../../store';
 import Description from '../../Pins/Description';
 
 import { constructTimespanString } from '../../Pins/Pin.utils';
+import { constructEffectsFromPinOrHighlight } from '../../../utils/effectsUtils';
 
 import './Highlight.scss';
 
@@ -26,9 +27,11 @@ class Highlight extends Component {
     return description !== '' && description;
   };
 
-  addToCompare = e => {
+  addHighlightToCompare = e => {
     e.stopPropagation();
-    store.dispatch(compareLayersSlice.actions.addToCompare(this.props.pin));
+    const effects = constructEffectsFromPinOrHighlight(this.props.pin);
+    const highlight = { ...this.props.pin, ...effects };
+    store.dispatch(compareLayersSlice.actions.addToCompare(highlight));
   };
 
   render() {
@@ -36,14 +39,17 @@ class Highlight extends Component {
     const { description, title } = pin;
     const { showDescription } = this.state;
 
+    const effects = constructEffectsFromPinOrHighlight(pin);
+    const highlight = { ...pin, ...effects };
+
     return (
       <div className="highlight-item normal-mode" id={`${index}`}>
         <div className="highlight-content" onClick={this.props.onSelect}>
-          <PinPreviewImage pin={pin} />
+          <PinPreviewImage pin={highlight} />
           <div className="highlight-info">
             <span className="highlight-info-row">
               {title}
-              <div className="add-to-compare" title={t`Add to compare`} onClick={this.addToCompare}>
+              <div className="add-to-compare" title={t`Add to compare`} onClick={this.addHighlightToCompare}>
                 <i className="fas fa-exchange-alt"></i>
               </div>
             </span>

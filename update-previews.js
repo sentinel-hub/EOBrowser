@@ -187,7 +187,7 @@ async function updatePreviews(previewsDir, previewsIndexFile) {
           }
           if (j === candidates.length) {
             console.log('  ...FAILED!');
-            throw new Error("No image found!");
+            console.error("No image found!");
           }
         }
         setDebugEnabled(false);

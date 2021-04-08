@@ -6,7 +6,9 @@ import EditableString from './EditableString';
 import Description from './Description';
 import { parsePosition } from '../../utils';
 import PinPreviewImage from './PinPreviewImage';
-import { constructTimespanString } from './Pin.utils';
+import { constructTimespanString, isPinValid } from './Pin.utils';
+import { constructEffectsFromPinOrHighlight } from '../../utils/effectsUtils';
+import InvalidPin from './InvalidPin';
 
 export default class Pin extends Component {
   state = { showDescription: false };
@@ -31,14 +33,24 @@ export default class Pin extends Component {
     });
   };
 
-  addToCompare = e => {
+  addPinToCompare = e => {
     e.stopPropagation();
-    store.dispatch(compareLayersSlice.actions.addToCompare(this.props.item));
+    const effects = constructEffectsFromPinOrHighlight(this.props.item);
+    const pin = { ...this.props.item, ...effects };
+    store.dispatch(compareLayersSlice.actions.addToCompare(pin));
   };
 
   render() {
     const { allowRemove, arePinsSelectable, index, item, pinType, selectedForSharing } = this.props;
     const { description, title, lat, lng, zoom } = item;
+    const { isValid, error } = isPinValid(item);
+
+    if (!isValid) {
+      return <InvalidPin index={index} error={error} item={item} onRemovePin={this.props.onRemovePin} />;
+    }
+
+    const effects = constructEffectsFromPinOrHighlight(item);
+    const pinItem = { ...item, ...effects };
 
     return (
       <div className={`pin-item normal-mode ${pinType}`} id={`${index}`}>
@@ -66,7 +78,7 @@ export default class Pin extends Component {
             {arePinsSelectable && item && (
               <span id={index} className={`pin-selector ${selectedForSharing ? 'selected' : ''}`} />
             )}
-            <PinPreviewImage pin={item} />
+            <PinPreviewImage pin={pinItem} />
           </div>
           <div className="pin-info">
             <div className="pin-info-row pin-info-title">
@@ -81,7 +93,7 @@ export default class Pin extends Component {
             </div>
             <div className="pin-info-row pin-date">
               <label>{t`Date`}:</label> <span className="pin-date">{constructTimespanString(item)}</span>
-              <div className="add-to-compare" title={t`Add to compare`} onClick={this.addToCompare}>
+              <div className="add-to-compare" title={t`Add to compare`} onClick={this.addPinToCompare}>
                 <i className="fas fa-exchange-alt"></i>
               </div>
             </div>

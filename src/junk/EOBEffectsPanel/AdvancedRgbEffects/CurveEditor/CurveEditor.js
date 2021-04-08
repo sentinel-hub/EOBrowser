@@ -1,7 +1,7 @@
 import React from 'react';
 import paper from 'paper';
 
-import { capToRange, computeNewValuesFromPaths, transformCurvePoints } from './utils';
+import { capToRange, computeNewValuesFromPaths, transformCurvePoints } from './CurveEditor.utils';
 
 import './CurveEditor.scss';
 

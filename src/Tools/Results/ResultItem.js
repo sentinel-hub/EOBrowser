@@ -33,9 +33,14 @@ class ResultItem extends React.Component {
         <div className="img-info">
           <div className="img-btn">
             {metadata.previewUrl ? (
-              <img className="preview-image" src={metadata.previewUrl} alt={`${datasource} ${datasetId}`} />
+              <img
+                className="preview-image"
+                src={metadata.previewUrl}
+                alt={`${datasource} ${datasetId}`}
+                onClick={this.handleClick}
+              />
             ) : (
-              <div className="no-image preview-image">{`${getDatasetLabel(datasetId)}`}</div>
+              <div className="no-image">{`${getDatasetLabel(datasetId)}`}</div>
             )}
             <EOBButton text={t`Visualize`} className="small visualize" onClick={this.handleClick} />
           </div>

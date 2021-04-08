@@ -29,6 +29,9 @@ class UserAuth extends Component {
     axios
       .get(process.env.REACT_APP_AUTH_BASEURL + 'oauth/logout', {
         withCredentials: true,
+        params: {
+          client_id: process.env.REACT_APP_CLIENTID,
+        },
       })
       .catch(e => {
         console.error(e);

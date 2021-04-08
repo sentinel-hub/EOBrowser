@@ -7,6 +7,7 @@ import store, { visualizationSlice, mainMapSlice, tabsSlice } from '../../../sto
 import { getDataSourceHandler } from '../../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { parsePosition } from '../../../utils';
 import { NotificationPanel } from '../../../junk/NotificationPanel/NotificationPanel';
+import { constructEffectsFromPinOrHighlight } from '../../../utils/effectsUtils';
 
 import './Highlights.scss';
 
@@ -24,8 +25,6 @@ class Highlights extends Component {
       evalscript,
       evalscripturl,
       dataFusion,
-      gain,
-      gamma,
     } = pin;
     if (comparingPins || sharePins) {
       return;
@@ -73,12 +72,8 @@ class Highlights extends Component {
       visualizationParams.layerId = layerId;
     }
 
-    if (gain !== undefined) {
-      visualizationParams.gainEffect = gain;
-    }
-    if (gamma !== undefined) {
-      visualizationParams.gammaEffect = gamma;
-    }
+    const effects = constructEffectsFromPinOrHighlight(pin);
+    visualizationParams = { ...visualizationParams, ...effects };
 
     store.dispatch(visualizationSlice.actions.setVisualizationParams(visualizationParams));
     this.props.setSelectedHighlight(this.props.item);

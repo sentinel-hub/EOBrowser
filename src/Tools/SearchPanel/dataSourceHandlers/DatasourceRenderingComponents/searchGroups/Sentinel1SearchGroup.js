@@ -100,7 +100,7 @@ class Sentinel1SearchGroup extends React.Component {
               <label>{t`Data location`}:</label>
               <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
                 <div>
-                  {t`<b>Sentinel-1</b> services are available both on EOCloud and AWS. The capabilities of each
+                  {t`Sentinel-1 services are available both on EOCloud and AWS. The capabilities of each
                   service differ. More infos at`}
                   <div>
                     <ExternalLink href="https://www.sentinel-hub.com/develop/documentation/eo_products/Sentinel1EOproducts">

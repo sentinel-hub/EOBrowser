@@ -15,6 +15,8 @@ import store, { notificationSlice, visualizationSlice, tabsSlice, compareLayersS
 import { savePinsToServer, savePinsToSessionStorage } from './Pins/Pin.utils';
 import { getDatasetLabel, checkIfCustom } from './SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { VERSION_INFO } from '../VERSION';
+import { getThemeName } from '../utils';
+
 import './Tools.scss';
 
 class Tools extends Component {
@@ -134,6 +136,9 @@ class Tools extends Component {
       redRangeEffect,
       greenRangeEffect,
       blueRangeEffect,
+      redCurveEffect,
+      greenCurveEffect,
+      blueCurveEffect,
       minQa,
       upsampling,
       downsampling,
@@ -152,7 +157,7 @@ class Tools extends Component {
       return null;
     }
     const isGIBS = !fromTime; //GIBS only has toTime
-    const themeName = themesLists[selectedThemesListId].find(t => t.id === selectedThemeId).name;
+    const themeName = getThemeName(themesLists[selectedThemesListId].find(t => t.id === selectedThemeId));
     let pin = {
       title: `${getDatasetLabel(datasetId)}: ${customSelected ? 'Custom' : layerId} (${themeName})`,
       lat: lat,
@@ -173,6 +178,9 @@ class Tools extends Component {
       redRange: redRangeEffect,
       greenRange: greenRangeEffect,
       blueRange: blueRangeEffect,
+      redCurve: redCurveEffect ? redCurveEffect.points : undefined,
+      greenCurve: greenCurveEffect ? greenCurveEffect.points : undefined,
+      blueCurve: blueCurveEffect ? blueCurveEffect.points : undefined,
       minQa: minQa,
       upsampling: upsampling,
       downsampling: downsampling,
@@ -333,6 +341,9 @@ const mapStoreToProps = store => ({
   redRangeEffect: store.visualization.redRangeEffect,
   greenRangeEffect: store.visualization.greenRangeEffect,
   blueRangeEffect: store.visualization.blueRangeEffect,
+  redCurveEffect: store.visualization.redCurveEffect,
+  greenCurveEffect: store.visualization.greenCurveEffect,
+  blueCurveEffect: store.visualization.blueCurveEffect,
   minQa: store.visualization.minQa,
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,

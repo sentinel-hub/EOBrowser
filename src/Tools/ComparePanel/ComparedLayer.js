@@ -61,7 +61,7 @@ class ComparedLayer extends Component {
         <div className="compare-layer-actions">
           <div
             className="zoom-to-layer"
-            title="Zoom to location"
+            title={t`Zoom to location`}
             onClick={e => {
               e.stopPropagation();
               this.zoomToPin();
@@ -75,7 +75,7 @@ class ComparedLayer extends Component {
               e.stopPropagation();
               this.removeLayer();
             }}
-            title="Remove layer"
+            title={t`Remove layer`}
           >
             <i className="fa fa-trash" />
           </div>
@@ -113,6 +113,7 @@ class ComparedLayer extends Component {
 const mapStoreToProps = store => ({
   anonToken: store.auth.anonToken,
   authToken: store.auth.user.access_token,
+  selectedLanguage: store.language.selectedLanguage,
 });
 
 export default connect(mapStoreToProps, null)(ComparedLayer);

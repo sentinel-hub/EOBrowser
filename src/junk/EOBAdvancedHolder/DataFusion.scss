@@ -1,0 +1,51 @@
+.data-fusion {
+  padding: 5px 0 5px 0;
+  font-size: 12px;
+  margin-top: 5px;
+
+  .checkbox-holder.data-fusion-enabled {
+    margin-bottom: 5px;
+  }
+
+  .data-fusion-details {
+    padding: 2px 20px;
+
+    .primary-dataset-info {
+      margin-bottom: 5px;
+
+      input {
+        margin-left: 5px;
+
+        &.invalid {
+          background: #fdd;
+        }
+      }
+
+      select {
+        margin-left: 5px;
+      }
+
+      .primary-dataset-label {
+        margin-bottom: 2px;
+      }
+
+      .primary-dataset-details {
+        padding-left: 20px;
+
+        & > * {
+          display: flex;
+          align-items: center;
+
+          select,
+          input[type="text"] {
+            flex-grow: 1;
+          }
+        }
+
+        .mosaicking-order {
+          padding-top: 3px;
+        }
+      }
+    }
+  }
+}

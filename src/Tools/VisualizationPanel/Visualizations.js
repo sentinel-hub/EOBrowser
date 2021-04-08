@@ -24,7 +24,7 @@ class Visualizations extends Component {
             >
               <i className="icon fa fa-paint-brush" />
               {t`Custom`}
-              <small>{t`Create custom rendering`}</small>
+              <small>{t`Create custom visualization`}</small>
             </div>
           </div>
         )}
@@ -38,6 +38,8 @@ const mapStoreToProps = store => ({
   customSelected: store.visualization.customSelected,
   datasetId: store.visualization.datasetId,
   selectedThemeId: store.themes.selectedThemeId,
+  selectedModeId: store.themes.selectedModeId,
+  selectedLanguage: store.language.selectedLanguage,
 });
 
 export default connect(mapStoreToProps, null)(Visualizations);

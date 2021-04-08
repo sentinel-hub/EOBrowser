@@ -128,7 +128,7 @@ function tileList(zoom, center, tileSize) {
   return coords;
 }
 
-async function stitchTiles(tiles, overlayUrl, width, height, makeReadable) {
+async function stitchTiles(tiles, overlayUrl, width, height, makeReadable, subdomain = 'a') {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -138,6 +138,7 @@ async function stitchTiles(tiles, overlayUrl, width, height, makeReadable) {
       let overlayUrlReplaced = overlayUrl.replace('{z}', tile.z);
       overlayUrlReplaced = overlayUrlReplaced.replace('{x}', tile.x);
       overlayUrlReplaced = overlayUrlReplaced.replace('{y}', tile.y);
+      overlayUrlReplaced = overlayUrlReplaced.replace('{s}', subdomain);
       const { data } = await axios.get(overlayUrlReplaced, { responseType: 'blob' });
       const img = new Image();
       img.crossOrigin = '';

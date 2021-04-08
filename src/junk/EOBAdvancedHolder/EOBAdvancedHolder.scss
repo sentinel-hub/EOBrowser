@@ -75,19 +75,5 @@
 
   .insert-url-block {
     padding: 2px 20px;
-
-    .primary-dataset-info {
-      margin-bottom: 5px;
-
-      input {
-        &.invalid {
-          background: #fdd;
-        }
-      }
-
-      .primary-dataset-label {
-        margin-bottom: 2px;
-      }
-    }
   }
 }

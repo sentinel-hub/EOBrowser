@@ -1,5 +1,48 @@
 @import '../variables';
 
+/* stylelint-disable */
+.web3dinfoPanel {
+  background: rgba(44, 48, 51, 0.7) !important;
+  color: $textCol !important;
+  border: none !important;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+
+  .coordsViewer {
+    margin-left: 10%;
+  }
+
+  .copyright {
+    .gwt-Anchor {
+      text-decoration: none;
+      color: $primaryCol;
+    }
+  }
+}
+
+.GPFUKGKCPO.position-top-right {
+  background: $mainDark;
+  border-radius: 0 !important;
+  padding: 0 !important;
+
+  .GPFUKGKCAP {
+    border: none;
+    color: $mainDark;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 12px;
+    text-decoration: none;
+
+    .gwt-Image {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+/* stylelint-enable */
+
 .terrain-viewer-button {
   z-index: 400;
   cursor: pointer;
@@ -32,45 +75,67 @@
 
 .terrain-visualization {
   color: $textCol;
-  padding-top: 10px;
 
   .title {
     font-size: 20px;
     font-weight: normal;
-    margin: 0 0 1px;
     height: 50px;
     padding: 0 15px;
     line-height: 50px;
   }
 
-  .canvas-holder {
+  #terrain-map-container {
     text-align: center;
-
-    canvas {
-      width: 100%;
-    }
-  }
-
-  .height-info {
-    display: flex;
-    flex-direction: column;
-
-    span {
-      margin: 10px;
-
-      label {
-        font-weight: bold;
-      }
-    }
   }
 
   .download-button-holder {
+    display: flex;
+    flex-direction: row;
     margin-top: 10px;
-    text-align: center;
+    align-items: center;
+    justify-content: center;
 
     .download-button {
-      margin: 0 auto;
       width: 20%;
+      min-width: 100px;
+    }
+
+    .toggle-captions {
+      margin-left: 20px;
+
+      label {
+        margin-left: 5px;
+      }
+    }
+  }
+}
+
+.terrain-viewer-help {
+  height: 95%;
+  overflow: auto;
+  margin-top: 5%;
+  color: $textCol;
+  background: $mainDark;
+
+  .help-controls {
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    div {
+      margin-bottom: 14px;
+      font-size: 12px;
+      padding-right: 5px;
+
+      .text {
+        margin-left: 60px;
+        min-height: 50px;
+      }
+
+      .right-img {
+        margin-top: 10px;
+        float: left;
+      }
     }
   }
 }

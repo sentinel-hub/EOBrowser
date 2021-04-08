@@ -27,6 +27,8 @@ import {
   getDatasetLabel,
   S2L1C,
   S2L2A,
+  AWS_L8L1C,
+  ESA_L8,
 } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { VisualizationPanelHeaderActions } from './VisualizationPanelHeaderActions';
 import { parseEvalscriptBands, parseIndexEvalscript } from '../../utils';
@@ -35,13 +37,6 @@ import { getAppropriateAuthToken } from '../../App';
 import { EDUCATION_MODE } from '../../const';
 import { VisualizationTimeSelect } from '../../components/VisualizationTimeSelect/VisualizationTimeSelect';
 import VisualizationErrorPanel from './VisualizationErrorPanel';
-
-const _legacySLSTRActiveLayer = {
-  groupChannels: channels => {
-    const datasourceHandler = getDataSourceHandler(S3SLSTR);
-    return datasourceHandler.groupChannels(channels);
-  },
-};
 
 class VisualizationPanel extends Component {
   defaultState = {
@@ -237,6 +232,9 @@ class VisualizationPanel extends Component {
     const { allLayers, allBands, supportsCustom, supportsTimeRange } = await this.getLayersAndBands();
 
     if (allLayers.length === 0) {
+      this.setState({
+        visualizations: [],
+      });
       return;
     }
 
@@ -461,17 +459,38 @@ class VisualizationPanel extends Component {
 
     if (direction === 'prev') {
       const start = minDate.utc().startOf('day');
+      const startDates = [
+        moment
+          .utc(currentDay)
+          .subtract(3, 'months')
+          .startOf('day'),
+        moment
+          .utc(currentDay)
+          .subtract(1, 'year')
+          .startOf('day'),
+        start,
+      ].filter(date => date.isSameOrAfter(start));
       const end = currentDay
         .clone()
         .subtract(1, 'day')
         .endOf('day');
-      const dates = await this.onFetchAvailableDates(start, end).catch(err => {
+      let dates = [];
+      try {
+        for (const startDate of startDates) {
+          dates = await this.onFetchAvailableDates(startDate, end);
+          if (dates.length > 0) {
+            break;
+          }
+        }
+      } catch (e) {
+        console.error(e);
         throw NO_DATES_FOUND;
-      });
-      // if no previous date is found throw no dates found
+      }
+
       if (dates.length < 1) {
         throw NO_DATES_FOUND;
       }
+
       newSelectedDay = dates[0];
     }
 
@@ -482,15 +501,39 @@ class VisualizationPanel extends Component {
         .add(1, 'day')
         .startOf('day');
       const end = maxDate.utc();
-      const dates = await this.onFetchAvailableDates(start, end).catch(err => {
+      const endDates = [
+        moment
+          .utc(currentDay)
+          .add(3, 'months')
+          .endOf('day'),
+        moment
+          .utc(currentDay)
+          .add(1, 'year')
+          .endOf('day'),
+        end,
+      ].filter(date => date.isSameOrBefore(end));
+
+      let dates = [];
+      try {
+        for (const endDate of endDates) {
+          dates = await this.onFetchAvailableDates(start, endDate);
+          if (dates.length > 0) {
+            break;
+          }
+        }
+      } catch (e) {
+        console.error(e);
         throw NO_DATES_FOUND;
-      });
+      }
+
       // if no future date is found throw no dates found
       if (dates.length < 1) {
         throw NO_DATES_FOUND;
       }
+
       newSelectedDay = dates[dates.length - 1];
     }
+
     this.updateSelectedTime(
       moment.utc(newSelectedDay).startOf('day'),
       moment.utc(newSelectedDay).endOf('day'),
@@ -692,7 +735,7 @@ class VisualizationPanel extends Component {
     }));
   };
 
-  addToCompare = () => {
+  addVisualizationToCompare = () => {
     const {
       zoom,
       lat,
@@ -705,8 +748,17 @@ class VisualizationPanel extends Component {
       evalscript,
       evalscripturl,
       dataFusion,
-      gain,
-      gamma,
+      gainEffect,
+      gammaEffect,
+      redRangeEffect,
+      greenRangeEffect,
+      blueRangeEffect,
+      redCurveEffect,
+      greenCurveEffect,
+      blueCurveEffect,
+      minQa,
+      upsampling,
+      downsampling,
       customSelected,
       selectedThemeId,
     } = this.props;
@@ -726,8 +778,17 @@ class VisualizationPanel extends Component {
       evalscript: customSelected ? evalscript : '',
       evalscripturl: customSelected ? evalscripturl : '',
       dataFusion,
-      gain,
-      gamma,
+      gainEffect,
+      gammaEffect,
+      redRangeEffect,
+      greenRangeEffect,
+      blueRangeEffect,
+      redCurveEffect,
+      greenCurveEffect,
+      blueCurveEffect,
+      minQa,
+      upsampling,
+      downsampling,
       themeId: selectedThemeId,
     };
 
@@ -779,6 +840,15 @@ class VisualizationPanel extends Component {
     );
   };
 
+  _getLegacyActiveLayer = datasetId => {
+    if (datasetId !== S3SLSTR && datasetId !== AWS_L8L1C && datasetId !== ESA_L8) {
+      return {};
+    }
+    return {
+      groupChannels: channels => getDataSourceHandler(datasetId).groupChannels(channels),
+    };
+  };
+
   render() {
     const { useEvalscriptUrl, visualizations } = this.state;
     const {
@@ -799,13 +869,16 @@ class VisualizationPanel extends Component {
     } = this.props;
 
     const legacyActiveLayer = {
-      ...(this.props.datasetId === S3SLSTR ? _legacySLSTRActiveLayer : {}),
+      ...this._getLegacyActiveLayer(this.props.datasetId),
       baseUrls: {
         WMS: this.props.visualizationUrl,
       },
     };
 
     const supportedInterpolations = [Interpolator.BILINEAR, Interpolator.BICUBIC, Interpolator.NEAREST];
+    const dsh = datasetId && getDataSourceHandler(datasetId);
+    const areBandsClasses = dsh && dsh.areBandsClasses(datasetId);
+    const supportsIndex = dsh && dsh.supportsIndex(datasetId);
 
     return (
       <div key={this.props.datasetId} className="visualization-panel">
@@ -818,7 +891,7 @@ class VisualizationPanel extends Component {
           toggleVisible={this.toggleVisible}
           showEffects={this.props.showEffects}
           toggleValue={this.toggleValue}
-          addToCompare={this.addToCompare}
+          addVisualizationToCompare={this.addVisualizationToCompare}
           toggleSocialSharePanel={this.toggleSocialSharePanel}
           displaySocialShareOptions={this.state.displaySocialShareOptions}
           datasetId={datasetId}
@@ -894,6 +967,8 @@ class VisualizationPanel extends Component {
                 onCodeMirrorRefresh={this.onVisualizeEvalscript}
                 onCompositeChange={this.onCompositeChange}
                 onIndexScriptChange={this.onIndexScriptChange}
+                supportsIndex={supportsIndex}
+                areBandsClasses={areBandsClasses}
               />
             )}
           </div>

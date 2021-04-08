@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import moment from 'moment';
+import { t } from 'ttag';
 
 import DataFusionSupplementalDataset from './DataFusionSupplementalDataset';
 
@@ -11,15 +12,21 @@ function SupplementalDatasets(props) {
 
   return (
     <div className="supplemental-datasets">
+      <div className="supplemental-dataset-label">{t`Additional datasets:`}</div>
+
       {supplementalDatasets.map((dataset, i) => {
-        const additionalMosaickingOrders =
-          availableSupplementalDatasets[dataset.id].additionalMosaickingOrders;
+        const {
+          additionalMosaickingOrders,
+          additionalParametersComponent = null,
+        } = availableSupplementalDatasets[dataset.id];
         const maxDate =
           availableSupplementalDatasets[dataset.id].dataset.maxDate === null
             ? moment.utc()
             : moment.utc(availableSupplementalDatasets[dataset.id].dataset.maxDate);
+
         const label = availableSupplementalDatasets[dataset.id].label;
         const minDate = moment.utc(availableSupplementalDatasets[dataset.id].dataset.minDate);
+        const { additionalParameters } = dataset;
 
         return (
           <DataFusionSupplementalDataset
@@ -30,21 +37,23 @@ function SupplementalDatasets(props) {
             timespan={dataset.timespan}
             initialTimespan={initialTimespan}
             additionalMosaickingOrders={additionalMosaickingOrders}
+            additionalParameters={additionalParameters}
+            additionalParametersComponent={additionalParametersComponent}
             mosaickingOrder={dataset.mosaickingOrder}
             minDate={minDate}
             maxDate={maxDate}
             updateAlias={props.updateAlias}
             updateTimespan={props.updateTimespan}
             updateMosaickingOrder={props.updateMosaickingOrder}
+            updateAdditionalParameters={props.updateAdditionalParameters}
             onRemoveSupplementalDataset={props.onRemoveSupplementalDataset}
           />
         );
       })}
 
       <div className="add-dataset">
-        <i className="fas fa-plus-circle" onClick={() => props.onAddSupplementalDataset(selectedDataset)} />
         <select
-          className="dropdown"
+          className="dropdown-normal-ui"
           value={selectedDataset}
           onChange={ev => setSelectedDataset(ev.target.value)}
         >
@@ -54,6 +63,7 @@ function SupplementalDatasets(props) {
             </option>
           ))}
         </select>
+        <i className="fas fa-plus-circle" onClick={() => props.onAddSupplementalDataset(selectedDataset)} />
       </div>
     </div>
   );

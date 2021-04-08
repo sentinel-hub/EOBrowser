@@ -15,6 +15,7 @@ import {
   EDUCATION_MODE,
   DEFAULT_MODE,
   MODES,
+  EXPIRED_ACCOUNT_DUMMY_INSTANCE_ID,
 } from '../const';
 
 const DEFAULT_SELECTED_MODE = process.env.REACT_APP_DEFAULT_MODE_ID
@@ -88,7 +89,7 @@ class ThemesProvider extends React.Component {
       );
 
       const modifiedUserInstances = response.data.map(inst => ({
-        name: 'Based on: ' + inst.name,
+        name: () => t`Based on: ` + inst.name,
         id: `${inst.id}`,
         content: [
           {
@@ -101,14 +102,21 @@ class ThemesProvider extends React.Component {
       store.dispatch(themesSlice.actions.setUserInstancesThemesList(modifiedUserInstances));
       store.dispatch(notificationSlice.actions.displayPanelError(null));
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        const account_expired_instance = [
+          {
+            name: () => t`User Instances`,
+            id: EXPIRED_ACCOUNT_DUMMY_INSTANCE_ID,
+            content: [],
+          },
+        ];
+        store.dispatch(themesSlice.actions.setUserInstancesThemesList(account_expired_instance));
+        return;
+      }
       let errorMessage =
         t`There was a problem downloading your instances` +
         `${error.response && error.message ? `: ${error.message}` : ''}`;
       let errorLink = null;
-      if (error.response && error.response.status === 403) {
-        errorMessage = t`Your instances could not be loaded as your account has expired. Consider subscribing to one of the plans: `;
-        errorLink = 'https://apps.sentinel-hub.com/dashboard/#/account/billing';
-      }
       store.dispatch(notificationSlice.actions.displayPanelError({ message: errorMessage, link: errorLink }));
     }
   }

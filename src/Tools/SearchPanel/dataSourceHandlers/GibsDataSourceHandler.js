@@ -17,8 +17,10 @@ import {
   GIBS_LANDSAT_WELD,
   GIBS_MISR,
   GIBS_ASTER_GDEM,
+  GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE,
 } from './dataSourceHandlers';
 import { filterLayers } from './filter';
+import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 
 function parseISO8601TimeIntervalFormat(ISO8601string) {
   const [startStr, endStr, periodStr] = ISO8601string.split('/');
@@ -35,6 +37,7 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
     GIBS_MODIS_AQUA,
     GIBS_VIIRS_SNPP_CORRECTED_REFLECTANCE,
     GIBS_VIIRS_SNPP_DAYNIGHTBAND_ENCC,
+    GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE,
     GIBS_CALIPSO_WWFC_V3_01,
     GIBS_CALIPSO_WWFC_V3_02,
     GIBS_BLUEMARBLE,
@@ -54,6 +57,7 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
     [GIBS_LANDSAT_WELD]: 'Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual',
     [GIBS_MISR]: 'MISR_AM1_Ellipsoid_Radiance_RGB_AA',
     [GIBS_ASTER_GDEM]: 'ASTER_GDEM',
+    [GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE]: 'VIIRS_NOAA20_CorrectedReflectance',
   };
 
   leafletZoomConfig = {
@@ -107,6 +111,11 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
       max: 12,
       allowOverZoomBy: 2,
     },
+    [GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE]: {
+      min: 0,
+      max: 9,
+      allowOverZoomBy: 2,
+    },
   };
 
   datasetSearchLabels = {
@@ -120,6 +129,7 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
     [GIBS_LANDSAT_WELD]: 'Landsat WELD',
     [GIBS_MISR]: 'MISR',
     [GIBS_ASTER_GDEM]: 'ASTER GDEM',
+    [GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE]: 'VIIRS NOAA-20 Corrected Reflectance',
   };
 
   preselectedDatasets = new Set([GIBS_MODIS_TERRA]);
@@ -141,14 +151,6 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
   isHandlingAnyUrl() {
     return this.urls.length > 0;
   }
-
-  saveSearchFilters = searchFilters => {
-    this.searchFilters = searchFilters;
-  };
-
-  saveCheckedState = checkedState => {
-    this.isChecked = checkedState;
-  };
 
   getSearchFormComponents() {
     if (!this.isHandlingAnyUrl()) {
@@ -181,7 +183,10 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
     const selectedDatasets = this.searchFilters.selectedOptions;
 
     selectedDatasets.forEach(dataset => {
-      const url = `${this.KNOWN_URL}?SERVICE=WMS&REQUEST=GetCapabilities`;
+      // Performance optimization - instead of WMS GetCapabilities request:
+      //   const url = `${this.KNOWN_URL}?SERVICE=WMS&REQUEST=GetCapabilities`;
+      // we use a cached version:
+      const url = 'https://eob-getcapabilities-cache.s3.eu-central-1.amazonaws.com/gibs.xml';
       const func = this.getResultsFromGIBS;
       const ff = new FetchingFunction(
         dataset,
@@ -225,21 +230,35 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
           else resolve(result);
         }),
       );
-      const allLayers = data.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layer => {
-        const dimension = layer.Dimension
-          ? {
-              name: layer.Dimension[0].$.name,
-              default: layer.Dimension[0].$.default,
-              units: layer.Dimension[0].$.units ? layer.Dimension[0].$.units : '',
-              values: layer.Dimension[0]._,
-            }
-          : null;
-        return {
-          name: layer.Name ? layer.Name[0] : null,
-          title: layer.Title ? layer.Title[0] : null,
-          dimension: dimension,
-        };
-      });
+
+      // GIBS GetCapabilities uses recursion to group layers, this function allows us to flatten them:
+      function flattenLayers(layers, result = []) {
+        layers.forEach(l => {
+          result.push(l);
+          if (l.Layer) {
+            flattenLayers(l.Layer, result);
+          }
+        });
+        return result;
+      }
+
+      const allLayers = flattenLayers(data.WMS_Capabilities.Capability[0].Layer)
+        .filter(layer => layer.Name)
+        .map(layer => {
+          const dimension = layer.Dimension
+            ? {
+                name: layer.Dimension[0].$.name,
+                default: layer.Dimension[0].$.default,
+                units: layer.Dimension[0].$.units ? layer.Dimension[0].$.units : '',
+                values: layer.Dimension[0]._,
+              }
+            : null;
+          return {
+            name: layer.Name ? layer.Name[0] : null,
+            title: layer.Title ? layer.Title[0] : null,
+            dimension: dimension,
+          };
+        });
       this.allResults = allLayers;
     }
     // We are mocking dataset and tiles here, by finding the first layer that's name starts with a "datasourceId" ie GIBS_MODIS_TERRA
@@ -330,10 +349,6 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
     return false;
   }
 
-  supportsTimelapse() {
-    return false;
-  }
-
   updateLayersOnVisualization() {
     return false;
   }
@@ -341,4 +356,12 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
   supportsV3Evalscript() {
     return false;
   }
+
+  getSupportedImageFormats() {
+    return [IMAGE_FORMATS.JPG, IMAGE_FORMATS.PNG];
+  }
+
+  supportsIndex = () => {
+    return false;
+  };
 }

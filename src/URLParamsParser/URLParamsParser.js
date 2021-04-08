@@ -10,7 +10,8 @@ import {
 import store, { mainMapSlice, visualizationSlice, themesSlice } from '../store';
 import { b64DecodeUnicode } from '../utils/base64MDN';
 
-import { computeNewValuesFromPoints } from '../junk/EOBEffectsPanel/AdvancedRgbEffects/CurveEditor/utils';
+import { computeNewValuesFromPoints } from '../junk/EOBEffectsPanel/AdvancedRgbEffects/CurveEditor/CurveEditor.utils';
+import { DEFAULT_LAT_LNG } from '../const';
 
 class URLParamsParser extends React.Component {
   state = {
@@ -155,7 +156,12 @@ class URLParamsParser extends React.Component {
       dataFusion,
     } = params;
 
-    const { lat: parsedLat, lng: parsedLng, zoom: parsedZoom } = parsePosition(lat, lng, zoom);
+    let { lat: parsedLat, lng: parsedLng, zoom: parsedZoom } = parsePosition(lat, lng, zoom);
+
+    if (parsedLat > 90 || parsedLat < -90 || parsedLng > 180 || parsedLng < -180) {
+      parsedLng = DEFAULT_LAT_LNG.lng;
+      parsedLat = DEFAULT_LAT_LNG.lat;
+    }
     store.dispatch(mainMapSlice.actions.setPosition({ zoom: parsedZoom, lat: parsedLat, lng: parsedLng }));
 
     const newVisualizationParams = {

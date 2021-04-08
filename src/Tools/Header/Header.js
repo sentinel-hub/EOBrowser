@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { t } from 'ttag';
 
 import UserAuth from '../../Auth/UserAuth';
-/* import LanguageSelector from '../../LanguageSelector/LanguageSelector'; */
+import LanguageSelector from '../../LanguageSelector/LanguageSelector';
 import sgLogo from './sgLogo.png';
 import './Header.scss';
 
@@ -31,13 +31,20 @@ class HeaderWithLogin extends Component {
             <ExternalLink className="sgLogo" href="https://www.sentinel-hub.com/">
               <img src={sgLogo} alt="Sentinel Hub" />
             </ExternalLink>
-            EO Browser
+            <span>
+              EO Browser
+              {process.env.REACT_APP_REPLACE_SERVICES_HOSTNAME && (
+                <div className="replace-services-hostname">
+                  <i className="fa fa-random" /> {process.env.REACT_APP_REPLACE_SERVICES_HOSTNAME}
+                </div>
+              )}
+            </span>
           </div>
         </div>
 
         <div className="right">
           <div className="row">
-            {/* <LanguageSelector /> */}
+            <LanguageSelector />
             <UserAuth onLogIn={this.onLogIn} onLogOut={this.onLogOut} user={user} />
           </div>
           {user && (
@@ -53,6 +60,7 @@ class HeaderWithLogin extends Component {
 
 const mapStoreToProps = store => ({
   user: store.auth.user.userdata,
+  selectedLanguage: store.language.selectedLanguage,
 });
 
 export default connect(mapStoreToProps, null)(HeaderWithLogin);

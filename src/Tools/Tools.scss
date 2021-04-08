@@ -292,16 +292,17 @@ $searchBorderColour: #6d7300;
   background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
   background-repeat: no-repeat;
   background-position-x: 100%;
-  background-position-y: -3px;
+  background-position-y: 0;
   border: none;
   border-bottom: 1px solid #fff;
   border-radius: 0;
-  padding: 2px;
+  padding: 7px 15px 2px 0;
   color: #cdd5e3;
   font-size: 0.9em;
   width: 100%;
-  margin: 5px 0;
   text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 
   :focus {
     outline-offset: 0;

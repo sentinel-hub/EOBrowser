@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { gettext } from 'ttag';
 
 import Legend from './Legend';
 import ExternalLink from '../../ExternalLink/ExternalLink';
-import { getDescription, findMatchingLayerMetadata } from './legendUtils';
+import {
+  findMatchingLayerMetadata,
+  getDescriptionFromMetadata,
+  getShortDescriptionFromMetadata,
+  getTitleFromMetadata,
+  getLegendDefinitionFromMetadata,
+} from './legendUtils';
 
 import md5 from '../../utils/md5';
 import previews from '../../previews.json';
@@ -28,16 +35,39 @@ export default class VisualizationLayer extends Component {
     return `${process.env.REACT_APP_ROOT_URL}previews/${filename}`;
   }
 
+  getTranslatedDynamicString(x) {
+    // we are using dynamic strings (fetched from SH service) to call gettext(), which causes
+    // `npm run translate` to break unless we disable ttag within this block:
+    /* disable ttag */
+    // empty string gets translated to .po file information, so we must guard against it here:
+    if (!x) {
+      return '';
+    }
+    return gettext(x);
+  }
+
   render() {
-    const viz = this.props.layer;
+    const {
+      layer: viz,
+      selectedVisualizationId,
+      customSelected,
+      datasetId,
+      selectedThemeId,
+      selectedModeId,
+    } = this.props;
+
     const iconSrc = this.getIconSrc(viz);
     const vizId = viz.duplicateLayerId ? viz.duplicateLayerId : viz.layerId;
-    const isActive = this.props.selectedVisualizationId === vizId && !this.props.customSelected;
-    const hasMetadata =
-      !!findMatchingLayerMetadata(this.props.datasetId, viz.layerId, this.props.selectedThemeId) ||
-      viz.legendUrl ||
-      viz.legend;
-    const longDescription = getDescription(this.props.datasetId, viz.layerId, this.props.selectedThemeId);
+    const isActive = selectedVisualizationId === vizId && !customSelected;
+
+    const layerMetadata = findMatchingLayerMetadata(datasetId, viz.layerId, selectedThemeId);
+    const longDescription = getDescriptionFromMetadata(layerMetadata);
+    const shortDescription =
+      getShortDescriptionFromMetadata(layerMetadata, selectedModeId) || viz.description;
+    const title = getTitleFromMetadata(layerMetadata, selectedModeId) || viz.title;
+    const legend = getLegendDefinitionFromMetadata(layerMetadata) || viz.legend;
+
+    const hasDetails = viz.legendUrl || legend || longDescription;
     return (
       <div key={vizId}>
         <div
@@ -45,21 +75,17 @@ export default class VisualizationLayer extends Component {
           className={isActive ? 'layer active' : 'layer'}
         >
           <img className="icon" crossOrigin="Anonymous" src={iconSrc} alt="" />
-          {isActive && hasMetadata && (
+          {isActive && hasDetails && (
             <i
               className={`fa fa-angle-double-down ${this.state.detailsOpen ? 'show' : ''}`}
               onClick={this.toggleDetails}
             />
           )}
-          {viz.title}
-          <small>{viz.description}</small>
+          {this.getTranslatedDynamicString(title)}
+          <small>{this.getTranslatedDynamicString(shortDescription)}</small>
           {isActive && this.state.detailsOpen && (
             <div className="layer-details">
-              <Legend
-                layerId={viz.layerId}
-                legendDefinitionFromLayer={viz.legend}
-                legendUrl={viz.legendUrl}
-              />
+              <Legend legendDefinitionFromLayer={legend} legendUrl={viz.legendUrl} />
               <div className="layer-description">
                 <ReactMarkdown
                   escapeHtml={true}

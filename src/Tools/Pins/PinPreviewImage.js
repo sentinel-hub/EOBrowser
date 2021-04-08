@@ -13,9 +13,10 @@ import {
 
 import { getDataSourceHandler } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getAppropriateAuthToken } from '../../App';
-import { layerFromPin, constructSHJSEffects } from './Pin.utils';
+import { layerFromPin } from './Pin.utils';
 import { constructDataFusionLayer } from '../../junk/EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
+import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
 
 const PIN_PREVIEW_DIMENSIONS = {
   WIDTH: 70,
@@ -128,9 +129,9 @@ class PinPreviewImage extends React.Component {
         showlogo: false,
       };
 
-      const effects = constructSHJSEffects(this.props.pin);
-      if (effects) {
-        getMapParams.effects = effects;
+      const getMapParamsEffects = constructGetMapParamsEffects(this.props.pin);
+      if (getMapParamsEffects) {
+        getMapParams.effects = getMapParamsEffects;
       }
 
       if (minQa !== undefined) {

@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+
 import Dropzone from 'react-dropzone';
 import Rodal from 'rodal';
 import toGeoJSON from '@mapbox/togeojson';
@@ -108,7 +110,11 @@ export class EOBUploadGeoFile extends Component {
       .pop();
 
   render() {
-    return (
+    const fileUploadTitle = t`File upload`;
+    const fileUploadText = t`Upload a KML/KMZ, GPX or GEOJSON file to create area of interest. Area will be used for clipping when exporting an image.`;
+    const dropAFileString = t`Drop KML/KMZ, GPX, GEOJSON file or search your computer`;
+
+    return ReactDOM.createPortal(
       <Rodal
         animation="slideUp"
         visible={true}
@@ -118,10 +124,8 @@ export class EOBUploadGeoFile extends Component {
         closeOnEsc={true}
       >
         <div className="fileUploadWindow">
-          <h3>{t`File upload`}</h3>
-          <p>
-            {t`Upload a KML/KMZ, GPX or GEOJSON file to create area of interest. Area will be used for clipping when exporting an image.`}
-          </p>
+          <h3>{fileUploadTitle}</h3>
+          <p>{fileUploadText}</p>
           <Dropzone
             acceptClassName="ok"
             rejectClassName="false"
@@ -131,11 +135,12 @@ export class EOBUploadGeoFile extends Component {
             // accept={['application/vnd.google-earth.kml+xml', 'application/vnd.google-earth.kmz']}
             // accept={['application/vnd.google-earth.kml+xml']}
           >
-            {t`Drop KML/KMZ, GPX, GEOJSON file or search your computer`}
+            {dropAFileString}
           </Dropzone>
           {this.state.error && <p className="error">{this.state.error}</p>}
         </div>
-      </Rodal>
+      </Rodal>,
+      document.querySelector('#app'),
     );
   }
 }

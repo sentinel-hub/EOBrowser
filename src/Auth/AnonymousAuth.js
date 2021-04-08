@@ -23,13 +23,12 @@ export default class AnonymousAuth extends React.Component {
   }
 
   onCaptchaExecuted = token => {
-    const redirectUri = window.location.origin + window.location.pathname;
     this.iFrame.src =
-      'https://services.sentinel-hub.com/oauth/token/assisted?client_id=' +
+      process.env.REACT_APP_AUTH_BASEURL +
+      'oauth/token/assisted?client_id=' +
       this.CLIENT_ID +
-      '&redirect_uri= ' +
-      redirectUri +
-      'test.html&response_type=token&grant_type=' +
+      '&redirect_uri=not_used' +
+      '&response_type=token&grant_type=' +
       this.GRANT_TYPE +
       '&recaptcha=' +
       token;

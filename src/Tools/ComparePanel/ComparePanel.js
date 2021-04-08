@@ -12,7 +12,7 @@ import './ComparePanel.scss';
 
 export const COMPARE_SPLIT = t`split`;
 export const COMPARE_OPACITY = t`opacity`;
-const NO_COMPARE_LAYERS_MESSAGE = t`No layers to compare.`;
+const NO_COMPARE_LAYERS_MESSAGE = () => t`No layers to compare.`;
 
 class ComparePanel extends Component {
   state = {
@@ -103,7 +103,7 @@ class ComparePanel extends Component {
           ))}
         </div>
 
-        {!comparedLayers.length && <NotificationPanel type="info" msg={NO_COMPARE_LAYERS_MESSAGE} />}
+        {!comparedLayers.length && <NotificationPanel type="info" msg={NO_COMPARE_LAYERS_MESSAGE()} />}
       </div>
     );
   }
@@ -114,6 +114,7 @@ const mapStoreToProps = store => ({
   comparedOpacity: store.compare.comparedOpacity,
   comparedClipping: store.compare.comparedClipping,
   pins: store.pins.items,
+  selectedLanguage: store.language.selectedLanguage,
 });
 
 export default connect(mapStoreToProps, null)(ComparePanel);

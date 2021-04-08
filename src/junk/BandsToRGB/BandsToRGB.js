@@ -9,14 +9,14 @@ import './BandsToRGB.scss';
 import { SelectedBand } from './SelectedBand';
 
 // value = { r:'B01', g:'B02', b: 'B03' }
-export const BandsToRGB = ({ bands, value, onChange }) => {
+export const BandsToRGB = ({ bands, value, onChange, areBandsClasses }) => {
   if (!bands) {
     return null;
   }
 
   return (
     <React.Fragment>
-      <p>{t`Drag bands onto RGB fields.`}</p>
+      <p>{areBandsClasses ? t`Drag classes onto RGB fields.` : t`Drag bands onto RGB fields.`}</p>
       <div className="colors-container">
         {bands.map((band, i) => (
           <DraggableBand key={i} band={band} value={value} onChange={onChange} />

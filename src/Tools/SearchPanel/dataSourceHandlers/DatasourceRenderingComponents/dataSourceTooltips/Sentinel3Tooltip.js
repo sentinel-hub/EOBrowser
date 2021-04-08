@@ -29,7 +29,7 @@ const S3OLCIMarkdown = () => t`
 The **Ocean and Land Colour Instrument (OLCI)** on board Sentinel-3 is a spectrometer that 
 measures the solar radiation reflected by Earth, and it monitors the ocean, the environment, 
 and climate. It provides more frequent visible imagery than Sentinel-2 but at a lower resolution
-and with more wavelengths covered.
+and with more wavelengths covered. The Sentinel-3 OLCI instrument continues the measurements previously performed by the MERIS instrument on board Envisat, whose mission concluded.
 
 **Spatial resolution:** 300m (that is, only details bigger than 300m can be seen).
 
@@ -37,9 +37,7 @@ and with more wavelengths covered.
 
 **Data availability:** Since May 2016 onwards.
 
-**Common usage:** Surface topography, ocean and land surface colour observations and monitoring. 
-The Sentinel-3 OLCI instrument continues the measurements previously performed by the MERIS instrument 
-on board Envisat, whose mission concluded (Select the theme *Change detection through Time* in order to access Envisat data).
+**Common usage:** Surface topography, ocean and land surface colour observations and monitoring.
 `;
 
 const Sentinel3Tooltip = () => {

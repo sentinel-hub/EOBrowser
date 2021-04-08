@@ -13,8 +13,13 @@ class Notification extends Component {
         onClose={() => store.dispatch(notificationSlice.actions.removeNotification())}
         animation="slideUp"
         visible={!!this.props.msg}
-        width={500}
-        height={100}
+        customStyles={{
+          width: '500px',
+          height: 'auto',
+          bottom: 'auto',
+          top: '30%',
+          transform: 'translateY(-50%)',
+        }}
         closeOnEsc={true}
         className="notification-modal"
       >

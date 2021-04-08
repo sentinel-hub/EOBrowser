@@ -7,11 +7,24 @@
   flex-flow: column;
 
   .compare-panel-header {
-    border-bottom: 2px solid $primaryCol;
-    padding: 8px;
+    border-bottom: 1px solid $primaryCol;
+    padding: 10px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
+
+    > div {
+      cursor: pointer;
+      color: #b6bf00;
+      text-decoration: none;
+      text-align: center;
+      margin: 0 5px;
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      font-size: 14px;
+    }
 
     .compare-panel-toggle {
       width: 100px;

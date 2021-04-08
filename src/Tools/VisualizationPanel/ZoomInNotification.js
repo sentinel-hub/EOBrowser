@@ -32,6 +32,7 @@ const ZoomInNotification = ({ datasetId, zoom }) => {
 const mapStoreToProps = store => ({
   datasetId: store.visualization.datasetId,
   zoom: store.mainMap.zoom,
+  selectedLanguage: store.language.selectedLanguage,
 });
 
 export default connect(mapStoreToProps, null)(ZoomInNotification);

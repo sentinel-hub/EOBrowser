@@ -14,13 +14,27 @@ export function findMatchingLayerMetadata(datasourceId, layerId, themeId) {
   return layerMetadata;
 }
 
-export function getDescription(datasetId, layerId, themeId) {
-  const metadata = findMatchingLayerMetadata(datasetId, layerId, themeId);
+export function getDescriptionFromMetadata(metadata) {
   return metadata && metadata.description ? metadata.description() : null;
 }
 
-export function getLegendDefinition(datasetId, layerId, themeId) {
-  const metadata = findMatchingLayerMetadata(datasetId, layerId, themeId);
+export function getTitleFromMetadata(metadata, selectedModeId) {
+  if (!metadata || !metadata.titles) {
+    return null;
+  }
+  const titles = metadata.titles();
+  return titles[selectedModeId] ? titles[selectedModeId] : null;
+}
+
+export function getShortDescriptionFromMetadata(metadata, selectedModeId) {
+  if (!metadata || !metadata.shortDescriptions) {
+    return null;
+  }
+  const shortDescriptions = metadata.shortDescriptions();
+  return shortDescriptions[selectedModeId] ? shortDescriptions[selectedModeId] : null;
+}
+
+export function getLegendDefinitionFromMetadata(metadata) {
   return metadata ? metadata.legend : null;
 }
 

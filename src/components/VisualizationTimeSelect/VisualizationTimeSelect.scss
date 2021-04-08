@@ -26,9 +26,11 @@
     font-size: 13px;
     height: 15px;
     align-items: flex-end;
-    margin: 0 15px;
-    padding: 0 5px 3px 5px;
+    margin: 0 5px;
+    padding: 1px 2px;
     line-height: 10px;
+    min-width: 220px;
+    justify-content: center;
 
     &:hover {
       cursor: pointer;

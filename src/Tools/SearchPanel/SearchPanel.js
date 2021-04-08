@@ -13,9 +13,15 @@ import { renderDataSourcesInputs } from './dataSourceHandlers/dataSourceHandlers
 import { Query } from './search';
 import store, { themesSlice, visualizationSlice, notificationSlice } from '../../store';
 import { EDUCATION_MODE } from '../../const';
-import { MODE_THEMES_LIST, USER_INSTANCES_THEMES_LIST, URL_THEMES_LIST } from '../../const';
+import {
+  MODE_THEMES_LIST,
+  USER_INSTANCES_THEMES_LIST,
+  URL_THEMES_LIST,
+  EXPIRED_ACCOUNT_DUMMY_INSTANCE_ID,
+} from '../../const';
 import Results from '../Results/Results';
 import Highlights from './Highlights/Highlights';
+import { getThemeName } from '../../utils';
 
 const NO_THEME = 'no-theme-selected';
 const HIGHLIGHTS_TAB = 'highlights';
@@ -37,18 +43,6 @@ class SearchPanel extends Component {
   };
 
   async componentDidUpdate(prevProps) {
-    if (
-      this.props.failedThemeParts.length > 0 &&
-      prevProps.failedThemeParts !== this.props.failedThemeParts
-    ) {
-      this.setState({
-        searchError: {
-          msg: t`Error retrieving additional data!`,
-          failedThemeParts: this.props.failedThemeParts,
-        },
-      });
-    }
-
     if (prevProps.selectedModeId !== this.props.selectedModeId) {
       this.setState({
         selectedTab: SEARCH_TAB,
@@ -151,6 +145,13 @@ class SearchPanel extends Component {
 
   handleSelectTheme = async (e, themes) => {
     const { id: selectedThemeId, list: selectedThemesListId } = themes[e.target.value];
+    if (selectedThemeId === EXPIRED_ACCOUNT_DUMMY_INSTANCE_ID) {
+      const errorMessage = t`Your user instances could not be loaded as your Sentinel Hub account was not set up/expired. You can still use EO Browser but you will not be able to use personal user instances. To be able to set up personal user instances you can apply for a 30-days free trial or consider subscribing to one of the plans: `;
+      const errorLink = 'https://apps.sentinel-hub.com/dashboard/#/account/billing';
+      store.dispatch(notificationSlice.actions.displayPanelError({ message: errorMessage, link: errorLink }));
+    } else {
+      store.dispatch(notificationSlice.actions.displayPanelError(null));
+    }
     this.setState({
       searchError: null,
     });
@@ -212,7 +213,7 @@ class SearchPanel extends Component {
             {selectedThemeId === null && <option value={NO_THEME}>...</option>}
             {themes.map((theme, i) => (
               <option key={i} value={i}>
-                {theme.name}
+                {getThemeName(theme)}
               </option>
             ))}
           </select>
@@ -251,7 +252,6 @@ class SearchPanel extends Component {
     const highlightsAvailable = selectedTheme && selectedTheme.pins && selectedTheme.pins.length > 0;
     const isSearchSelected = selectedTab === SEARCH_TAB;
     const areHighlightsSelected = selectedTab === HIGHLIGHTS_TAB;
-
     return (
       <>
         {displayingResults && (
@@ -344,7 +344,7 @@ class SearchPanel extends Component {
                   <span>{error.message}</span>
                   {error.link ? (
                     <ExternalLink href={error.link}>
-                      <i class="fas fa-external-link-alt" />
+                      <i className="fas fa-external-link-alt" />
                     </ExternalLink>
                   ) : null}
                 </div>
@@ -354,27 +354,26 @@ class SearchPanel extends Component {
           ) : null}
 
           {this.state.searchError ? (
+            <NotificationPanel msg={<div>{this.state.searchError.msg}</div>} type="error" />
+          ) : null}
+          {this.props.failedThemeParts.length > 0 && (
             <NotificationPanel
+              type="error"
               msg={
                 <div>
-                  {this.state.searchError.msg}{' '}
-                  {this.state.searchError.failedThemeParts ? (
-                    <div>
-                      <span>These are theme parts which contain unavailable data sources:</span>
-                      <ul style={{ textAlign: 'left' }}>
-                        {this.state.searchError.failedThemeParts.map(f => (
-                          <li key={f}>{f}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    ''
-                  )}
+                  {t`Error retrieving additional data!`}
+                  <div>
+                    <span>{t`These are theme parts which contain unavailable data sources:`}</span>
+                    <ul style={{ textAlign: 'left' }}>
+                      {this.props.failedThemeParts.map(f => (
+                        <li key={f}>{f}</li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               }
-              type="error"
             />
-          ) : null}
+          )}
         </div>
       </>
     );

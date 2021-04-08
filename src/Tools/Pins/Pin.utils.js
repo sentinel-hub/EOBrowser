@@ -14,6 +14,13 @@ import { getDataSourceHandler } from '../SearchPanel/dataSourceHandlers/dataSour
 
 import { datasourceToDatasetId, dataSourceToThemeId, datasourceToUrl } from '../../utils/handleOldUrls';
 import { ensureCorrectDataFusionFormat } from '../../utils';
+import {
+  defaultGain,
+  defaultGamma,
+  defaultRange,
+  isEffectValueSetAndNotDefault,
+  isEffectRangeSetAndNotDefault,
+} from '../../utils/effectsUtils';
 
 const PINS_LC_NAME = 'eob-pins';
 
@@ -107,21 +114,47 @@ const convertTime = (pin, newPin) => {
 
 const convertEffects = (pin, newPin) => {
   const { gainOverride, gammaOverride, redRangeOverride, greenRangeOverride, blueRangeOverride } = pin;
-  if (gainOverride !== undefined) {
+  const { gain, gamma, redRange, greenRange, blueRange } = pin;
+  const { downsampling, upsampling } = pin;
+  if (
+    isEffectValueSetAndNotDefault(gainOverride, defaultGain) &&
+    !isEffectValueSetAndNotDefault(gain, defaultGain)
+  ) {
     newPin.gain = gainOverride;
   }
-  if (gammaOverride !== undefined) {
+  if (
+    isEffectValueSetAndNotDefault(gammaOverride, defaultGamma) &&
+    !isEffectValueSetAndNotDefault(gamma, defaultGamma)
+  ) {
     newPin.gamma = gammaOverride;
   }
-  if (redRangeOverride && !(redRangeOverride[0] === 0 && redRangeOverride[1] === 1)) {
+  if (
+    isEffectRangeSetAndNotDefault(redRangeOverride, defaultRange) &&
+    isEffectRangeSetAndNotDefault(redRange, defaultRange)
+  ) {
     newPin.redRange = redRangeOverride;
   }
-  if (greenRangeOverride && !(greenRangeOverride[0] === 0 && greenRangeOverride[1] === 1)) {
+  if (
+    isEffectRangeSetAndNotDefault(greenRangeOverride, defaultRange) &&
+    isEffectRangeSetAndNotDefault(greenRange, defaultRange)
+  ) {
     newPin.greenRange = greenRangeOverride;
   }
-  if (blueRangeOverride && !(blueRangeOverride[0] === 0 && blueRangeOverride[1] === 1)) {
+  if (
+    isEffectRangeSetAndNotDefault(blueRangeOverride, defaultRange) &&
+    isEffectRangeSetAndNotDefault(blueRange, defaultRange)
+  ) {
     newPin.blueRange = blueRangeOverride;
   }
+
+  if (!!upsampling) {
+    newPin.upsampling = upsampling;
+  }
+
+  if (!!downsampling) {
+    newPin.downsampling = downsampling;
+  }
+
   return newPin;
 };
 
@@ -143,6 +176,14 @@ export function convertToNewFormat(pin) {
       evalscripturl,
       dataFusion,
       description,
+      gain,
+      gamma,
+      redRange,
+      greenRange,
+      blueRange,
+      redCurve,
+      greenCurve,
+      blueCurve,
     } = pin;
     let newPin = {
       _id: _id,
@@ -160,6 +201,14 @@ export function convertToNewFormat(pin) {
       evalscripturl: evalscripturl,
       dataFusion: dataFusion,
       description: description,
+      gain: gain,
+      gamma: gamma,
+      redRange: redRange,
+      greenRange: greenRange,
+      blueRange: blueRange,
+      redCurve: redCurve,
+      greenCurve: greenCurve,
+      blueCurve: blueCurve,
     };
     // convert pin data
     newPin = convertTitle(pin, newPin);
@@ -457,15 +506,15 @@ export async function layerFromPin(pin, reqConfig) {
   let layer;
   if (layerId) {
     layer = layers.find(l => l.layerId === layerId);
+    if (layer) {
+      await layer.updateLayerFromServiceIfNeeded(reqConfig);
+    }
   } else {
     layer = layers[0];
     if (Object.keys(dataFusion).length === 0) {
       layer.evalscript = evalscript;
       layer.evalscriptUrl = evalscripturl;
     }
-  }
-  if (layer) {
-    await layer.updateLayerFromServiceIfNeeded(reqConfig);
   }
   return layer;
 }
@@ -489,29 +538,6 @@ export const constructTimespanString = ({ fromTime, toTime } = {}) => {
   return `${moment.utc(fromTime).format('YYYY-MM-DD')} - ${moment.utc(toTime).format('YYYY-MM-DD')}`;
 };
 
-export function constructSHJSEffects(pin) {
-  const { gain, gamma, redRange, greenRange, blueRange } = pin;
-
-  const effects = {};
-  if (gain !== undefined && gain !== 1) {
-    effects.gain = gain;
-  }
-  if (gamma !== undefined && gamma !== 1) {
-    effects.gamma = gamma;
-  }
-  if (redRange && !(redRange[0] === 0 && redRange[1] === 1)) {
-    effects.redRange = { from: redRange[0], to: redRange[1] };
-  }
-  if (greenRange && !(greenRange[0] === 0 && greenRange[1] === 1)) {
-    effects.greenRange = { from: greenRange[0], to: greenRange[1] };
-  }
-  if (blueRange && !(blueRange[0] === 0 && blueRange[1] === 1)) {
-    effects.blueRange = { from: blueRange[0], to: blueRange[1] };
-  }
-
-  return Object.keys(effects).length > 0 ? effects : null;
-}
-
 function preparePins(pins) {
   return pins.map(pin => {
     if (pin.dataFusion) {
@@ -520,4 +546,18 @@ function preparePins(pins) {
     }
     return pin;
   });
+}
+
+export function isPinValid(pin) {
+  const { _id, gain, gamma, redRange, greenRange, blueRange } = pin;
+  try {
+    isEffectValueSetAndNotDefault(gain, defaultGain);
+    isEffectValueSetAndNotDefault(gamma, defaultGamma);
+    isEffectRangeSetAndNotDefault(redRange, defaultRange);
+    isEffectRangeSetAndNotDefault(greenRange, defaultRange);
+    isEffectRangeSetAndNotDefault(blueRange, defaultRange);
+  } catch (err) {
+    return { isValid: false, error: `Pin ${_id} is invalid: ` + err.message };
+  }
+  return { isValid: true, error: null };
 }

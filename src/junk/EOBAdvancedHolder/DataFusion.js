@@ -16,6 +16,9 @@ import { connect } from 'react-redux';
 import SupplementalDatasets from './SupplementalDatasets';
 import DataFusionPrimaryDataset from './DataFusionPrimaryDataset';
 import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import DataFusionAdditionalParametersS1 from './DataFusionAdditionalParametersS1';
+
+import './DataFusion.scss';
 
 class DataFusion extends React.Component {
   toggleDataFusionEnabled = () => {
@@ -46,6 +49,7 @@ class DataFusion extends React.Component {
         label: 'S-1 GRD',
         dataset: DATASET_AWSEU_S1GRD,
         additionalMosaickingOrders: [],
+        additionalParametersComponent: DataFusionAdditionalParametersS1,
       },
       [DATASET_S2L1C.id]: {
         label: 'S-2 L1C',
@@ -144,6 +148,10 @@ class DataFusion extends React.Component {
     this.setNewSettings(alias, 'mosaickingOrder', mosaickingOrder);
   };
 
+  updateAdditionalParameters = (alias, additionalParameters) => {
+    this.setNewSettings(alias, 'additionalParameters', additionalParameters);
+  };
+
   updateTimespan = (alias, fromTime, toTime) => {
     this.setNewSettings(alias, 'timespan', [fromTime, toTime]);
   };
@@ -185,8 +193,8 @@ class DataFusion extends React.Component {
     const enabled = settings && settings.length > 0;
 
     return (
-      <div style={{ padding: '5px 0px 5px 0px', fontSize: 12, marginTop: '5px' }}>
-        <span className="checkbox-holder use-url">
+      <div className="data-fusion">
+        <div className="checkbox-holder use-url data-fusion-enabled">
           <input
             type="checkbox"
             id="data-fusion-checkbox"
@@ -194,10 +202,10 @@ class DataFusion extends React.Component {
             checked={enabled}
           />
           <label htmlFor="data-fusion-checkbox">{t`Use additional datasets (advanced)`}</label>
-        </span>
+        </div>
 
         {enabled && (
-          <div className="insert-url-block">
+          <div className="data-fusion-details">
             <DataFusionPrimaryDataset
               alias={primaryDataset.alias}
               label={availableDatasets[dataset.id].label}
@@ -218,6 +226,7 @@ class DataFusion extends React.Component {
               updateAlias={this.updateAlias}
               updateTimespan={this.updateTimespan}
               updateMosaickingOrder={this.updateMosaickingOrder}
+              updateAdditionalParameters={this.updateAdditionalParameters}
               checkAliasValidity={this.checkAliasValidity}
             />
           </div>

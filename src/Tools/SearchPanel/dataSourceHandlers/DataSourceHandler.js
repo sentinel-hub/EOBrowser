@@ -3,6 +3,7 @@ import moment from 'moment';
 import { constructV3Evalscript } from '../../../utils';
 import { datasetLabels } from './dataSourceHandlers';
 import { filterLayers } from './filter';
+import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 // DataSourceHandler subclasses take care of:
 // - recognizing (WMS / WMTS) URLs as "theirs"
 // - fetching additional information from their services as needed
@@ -89,10 +90,6 @@ export default class DataSourceHandler {
     return true;
   }
 
-  hasFISLayer() {
-    return false;
-  }
-
   supportsMinQa() {
     return false;
   }
@@ -116,7 +113,11 @@ export default class DataSourceHandler {
     }
   }
 
-  getFISLayer(url, datasetId, layerId) {
+  getFISLayer(url, datasetId, layerId, isCustom) {
+    if (isCustom) {
+      return true;
+    }
+
     const FISLayerId = `__FIS_${layerId}`;
     if (
       this.FISLayers[url] &&
@@ -159,4 +160,24 @@ export default class DataSourceHandler {
   supportsV3Evalscript() {
     return true;
   }
+
+  getSupportedImageFormats() {
+    return Object.values(IMAGE_FORMATS);
+  }
+
+  saveSearchFilters = searchFilters => {
+    this.searchFilters = searchFilters;
+  };
+
+  saveCheckedState = checkedState => {
+    this.isChecked = checkedState;
+  };
+
+  areBandsClasses = () => {
+    return false;
+  };
+
+  supportsIndex = () => {
+    return true;
+  };
 }

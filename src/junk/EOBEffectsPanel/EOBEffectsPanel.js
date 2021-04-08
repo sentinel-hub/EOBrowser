@@ -622,7 +622,7 @@ export class EOBEffectsPanel extends React.Component {
         {this.renderGammaSlider()}
 
         <div className="rgb-effects-chooser">
-          <label>Advanced RGB effects:</label>
+          <label>{t`Advanced RGB effects`}:</label>
           <Toggle
             checked={this.state.advancedRgbEffectsOpen}
             icons={false}

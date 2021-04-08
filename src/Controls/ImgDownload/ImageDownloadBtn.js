@@ -4,7 +4,6 @@ import { t } from 'ttag';
 
 import store, { modalSlice, notificationSlice } from '../../store';
 import { ModalId } from '../../Modals/Consts';
-import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
 import downloadIcon from './download-icon.svg';
 import './ImgDownloadBtn.scss';
@@ -19,24 +18,16 @@ class ImageDownloadBtn extends Component {
   };
 
   checkIfEnabled = () => {
-    const { layerId, customSelected, datasetId, selectedTabIndex } = this.props;
+    const { layerId, customSelected, selectedTabIndex } = this.props;
 
     const isOnVisualizationPanel = selectedTabIndex === 2;
     const hasVisualization = !!(layerId || customSelected);
-    let isDatasourceSupported = false;
-    if (datasetId) {
-      const dsh = getDataSourceHandler(datasetId);
-      isDatasourceSupported = dsh && dsh.datasource !== 'GIBS';
-    }
 
     if (!hasVisualization) {
       return { enabled: false, errorMessage: t`please select a layer` };
     }
     if (!isOnVisualizationPanel) {
       return { enabled: false, errorMessage: t`you can only download image while visualizing` };
-    }
-    if (!isDatasourceSupported) {
-      return { enabled: false, errorMessage: t`this datasource is not supported` };
     }
     return { enabled: true, errorMessage: null };
   };

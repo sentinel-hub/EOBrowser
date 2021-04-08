@@ -1,20 +1,16 @@
 import React from 'react';
-import { connect } from 'react-redux';
 
-import { getLegendDefinition } from './legendUtils';
 import LegendFromSpec from './LegendFromSpec';
 import LegendFromUrl from './LegendFromUrl';
+
 import './Legend.scss';
 
-class Legend extends React.Component {
+export default class Legend extends React.Component {
   render() {
-    const { datasetId, layerId, selectedThemeId, legendDefinitionFromLayer, legendUrl } = this.props;
-    const legendDefinition = getLegendDefinition(datasetId, layerId, selectedThemeId);
+    const { legendDefinitionFromLayer, legendUrl } = this.props;
     return (
       <div className="layer-legend">
-        {legendDefinition ? (
-          <LegendFromSpec legend={legendDefinition} />
-        ) : legendDefinitionFromLayer ? (
+        {legendDefinitionFromLayer ? (
           <LegendFromSpec legend={legendDefinitionFromLayer} />
         ) : legendUrl ? (
           <LegendFromUrl legendUrl={legendUrl} />
@@ -23,10 +19,3 @@ class Legend extends React.Component {
     );
   }
 }
-
-const mapStoreToProps = store => ({
-  datasetId: store.visualization.datasetId,
-  selectedThemeId: store.themes.selectedThemeId,
-});
-
-export default connect(mapStoreToProps, null)(Legend);

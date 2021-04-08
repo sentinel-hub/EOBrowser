@@ -4,13 +4,14 @@ import moment from 'moment';
 import { CancelToken, isCancel } from 'axios';
 import RCSlider from 'rc-slider';
 import { isAuthTokenSet, setAuthToken } from '@sentinel-hub/sentinelhub-js';
+import AlertContainer from 'react-alert';
+import gifshot from 'gifshot';
+import FileSaver from 'file-saver';
+import { t } from 'ttag';
 
 import { EOBButton } from '../EOBCommon/EOBButton/EOBButton';
 import { EOBCCSlider } from '../EOBCommon/EOBCCSlider/EOBCCSlider';
 import DatePicker from '../../components/DatePicker/DatePicker';
-import AlertContainer from 'react-alert';
-import gifshot from 'gifshot';
-import FileSaver from 'file-saver';
 import {
   getCurrentBboxUrl,
   fetchBlobObj,
@@ -21,7 +22,6 @@ import {
 import { calcBboxFromXY } from '../EOBCommon/utils/coords';
 import EOBFilterSearchByMonths from '../EOBCommon/EOBFilterSearchByMonths/EOBFilterSearchByMonths';
 import { getInstantsFromTimeInterval } from '../EOBCommon/utils/timespanHelpers';
-import { t } from 'ttag';
 
 import './EOB3TimelapsePanel.scss';
 
@@ -288,6 +288,9 @@ export class EOB3TimelapsePanel extends Component {
       apiType,
       effects,
       dataFusion,
+      supportsTimeRange,
+      showSHLogo,
+      showCopernicusLogo,
     } = this.props;
 
     const { showOverlayLayers, selectedPeriodForBestImg, allFlyovers } = this.state;
@@ -371,6 +374,9 @@ export class EOB3TimelapsePanel extends Component {
         apiType,
         effects,
         dataFusion,
+        supportsTimeRange,
+        showSHLogo,
+        showCopernicusLogo,
       )
         .then(response => {
           const dateToBeAdded = response.date;

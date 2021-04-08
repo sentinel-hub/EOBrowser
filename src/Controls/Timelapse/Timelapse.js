@@ -11,6 +11,7 @@ import { getAppropriateAuthToken } from '../../App';
 import {
   getDataSourceHandler,
   getEvalsource,
+  checkIfCustom,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { b64EncodeUnicode } from '../../utils/base64MDN';
 
@@ -125,6 +126,7 @@ class Timelapse extends Component {
       lat,
       lng,
       zoom,
+      datasetId,
       authToken,
       mapBounds,
       gainEffect,
@@ -132,6 +134,9 @@ class Timelapse extends Component {
       redRangeEffect,
       greenRangeEffect,
       blueRangeEffect,
+      redCurveEffect,
+      greenCurveEffect,
+      blueCurveEffect,
       upsampling,
       downsampling,
       minQa,
@@ -150,11 +155,18 @@ class Timelapse extends Component {
       redRangeEffect,
       greenRangeEffect,
       blueRangeEffect,
+      redCurveEffect,
+      greenCurveEffect,
+      blueCurveEffect,
       upsampling,
       downsampling,
       minQa,
     };
     const timelapseOverlayLayers = [{ name: t`Borders`, layer: timelapseBorders }];
+    const dsh = getDataSourceHandler(datasetId);
+    const supportsTimeRange = dsh && dsh.supportsTimeRange();
+    const isGIBS = dsh && dsh.datasource === 'GIBS';
+    const isBYOC = checkIfCustom(datasetId);
 
     return (
       <div className="timelapse-wrapper">
@@ -179,6 +191,9 @@ class Timelapse extends Component {
           canWeFilterByClouds={this.state.canWeFilterByClouds}
           isEvalUrl={!!evalscripturl}
           effects={effects}
+          supportsTimeRange={supportsTimeRange}
+          showSHLogo={!isGIBS}
+          showCopernicusLogo={!isGIBS && !isBYOC}
           // TO DO
           evalscriptoverrides={''}
           aoiBounds={undefined}
@@ -207,6 +222,9 @@ const mapStoreToProps = store => ({
   redRangeEffect: store.visualization.redRangeEffect,
   greenRangeEffect: store.visualization.greenRangeEffect,
   blueRangeEffect: store.visualization.blueRangeEffect,
+  redCurveEffect: store.visualization.redCurveEffect,
+  greenCurveEffect: store.visualization.greenCurveEffect,
+  blueCurveEffect: store.visualization.blueCurveEffect,
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
   minQa: store.visualization.minQa,

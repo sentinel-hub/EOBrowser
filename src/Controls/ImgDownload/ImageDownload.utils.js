@@ -7,6 +7,7 @@ import {
   drawBlobOnCanvas,
   ApiType,
   ProcessingDataFusionLayer,
+  DEMLayer,
 } from '@sentinel-hub/sentinelhub-js';
 import moment from 'moment';
 import { t } from 'ttag';
@@ -17,6 +18,7 @@ import {
   datasetLabels,
   checkIfCustom,
   CUSTOM,
+  COPERNICUS_CORINE_LAND_COVER,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { isDataFusionEnabled } from '../../utils';
 import { overlayTileLayers } from '../../Map/Layers';
@@ -28,11 +30,16 @@ import { IMAGE_FORMATS, IMAGE_FORMATS_INFO } from './consts';
 import { constructDataFusionLayer } from '../../junk/EOBCommon/utils/dataFusion';
 import { wgs84ToMercator } from '../../junk/EOBCommon/utils/coords';
 import { getMapOverlayXYZ, getGlOverlay } from '../../junk/EOBCommon/utils/getMapOverlayXYZ';
-import { getBaseUrlsForImageFormat } from './baseUrls';
+import {
+  getEvalscriptSetup,
+  setEvalscriptSampleType,
+  setEvalscriptOutputScale,
+  setEvalscriptOutputBandNumber,
+} from '../../utils/parseEvalscript';
+import { WARNINGS } from './ImageDownloadWarningPanel';
 
 import copernicus from '../../junk/EOBCommon/assets/copernicus.png';
 import SHlogo from '../../junk/EOBCommon/assets/shLogo.png';
-import SHlogoLarge from '../../junk/EOBCommon/assets/shLogoLarge.png';
 
 const PARTITION_PADDING = 5;
 const SCALEBAR_LEFT_PADDING = 10;
@@ -49,6 +56,9 @@ const IMAGE_SIZE_LIMIT = 2500;
 export const SENTINEL_COPYRIGHT_TEXT = `Credit: European Union, contains modified Copernicus Sentinel data ${moment
   .utc()
   .format('YYYY')}, processed with EO Browser`;
+
+export const GIBS_COPYRIGHT_TEXT =
+  "We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Observing System Data and Information System (EOSDIS).";
 
 export function getMapDimensions(pixelBounds, resolutionDivisor = 1) {
   const width = pixelBounds.max.x - pixelBounds.min.x;
@@ -123,7 +133,7 @@ export async function fetchImage(layer, options) {
   }
 }
 
-export async function fetchImageFromParams(params) {
+export async function fetchImageFromParams(params, raiseWarning) {
   const {
     fromTime,
     toTime,
@@ -146,9 +156,11 @@ export async function fetchImageFromParams(params) {
     userDescription,
     enabledOverlaysId,
     cancelToken,
+    shouldClipExtraBands,
   } = params;
 
   const layer = await getLayerFromParams(params, cancelToken);
+
   if (!layer) {
     throw Error('No applicable layer found');
   }
@@ -158,6 +170,16 @@ export async function fetchImageFromParams(params) {
     apiType === ApiType.PROCESSING
       ? IMAGE_FORMATS_INFO[imageFormat].mimeTypeProcessing
       : IMAGE_FORMATS_INFO[imageFormat].mimeType;
+
+  await overrideEvalscriptIfNeeded(
+    apiType,
+    imageFormat,
+    layer,
+    customSelected,
+    cancelToken,
+    raiseWarning,
+    shouldClipExtraBands,
+  );
 
   if (
     !(imageFormat === IMAGE_FORMATS.JPG || imageFormat === IMAGE_FORMATS.PNG) &&
@@ -188,12 +210,21 @@ export async function fetchImageFromParams(params) {
         : layer.legend;
   }
 
+  const isGIBS = datasourceForDatasetId(datasetId) === 'GIBS';
+  const isBYOC = checkIfCustom(datasetId);
+
   if (showCaptions) {
-    const isBYOC = checkIfCustom(datasetId);
-    copyrightText =
-      isBYOC || datasourceForDatasetId(datasetId).includes('Sentinel') ? SENTINEL_COPYRIGHT_TEXT : '';
+    copyrightText = '';
+    if (isGIBS) {
+      copyrightText = GIBS_COPYRIGHT_TEXT;
+    } else if (!isBYOC && datasourceForDatasetId(datasetId).includes('Sentinel')) {
+      copyrightText = SENTINEL_COPYRIGHT_TEXT;
+    }
     title = getTitle(fromTime, toTime, datasetId, layer.title, customSelected);
   }
+
+  const addLogos = !isGIBS;
+  const drawCopernicusLogo = !isBYOC;
 
   const imageWithOverlays = await addImageOverlays(
     blob,
@@ -213,10 +244,54 @@ export async function fetchImageFromParams(params) {
     legendUrl,
     copyrightText,
     title,
+    true,
+    addLogos,
+    drawCopernicusLogo,
   );
 
   const nicename = getNicename(fromTime, toTime, datasetId, layer.title, customSelected, isRawBand, bandName);
   return { blob: imageWithOverlays, nicename: nicename };
+}
+
+async function overrideEvalscriptIfNeeded(
+  apiType,
+  imageFormat,
+  layer,
+  customSelected,
+  cancelToken,
+  raiseWarning,
+  shouldClipExtraBands,
+) {
+  if (apiType !== ApiType.PROCESSING) {
+    return;
+  }
+  if (!isTiff(imageFormat)) {
+    return;
+  }
+  const { sampleType, scaleFactor } = IMAGE_FORMATS_INFO[imageFormat];
+  const layerName = customSelected ? 'Custom' : layer.title;
+  if (!layer.evalscript && !layer.evalscriptUrl) {
+    await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken });
+    if (!layer.evalscript) {
+      raiseWarning(WARNINGS.NO_EVALSCRIPT, layerName);
+      return;
+    }
+  }
+
+  const setupInfo = getEvalscriptSetup(layer.evalscript);
+  if (!setupInfo) {
+    raiseWarning(WARNINGS.PARSING_UNSUCCESSFUL, layerName);
+    return;
+  }
+  if (setupInfo.sampleType !== sampleType) {
+    layer.evalscript = setEvalscriptSampleType(layer.evalscript, sampleType);
+    if (scaleFactor && !(layer instanceof DEMLayer)) {
+      layer.evalscript = setEvalscriptOutputScale(layer.evalscript, scaleFactor);
+    }
+  }
+  if (shouldClipExtraBands && setupInfo.nBands > 3) {
+    layer.evalscript = setEvalscriptOutputBandNumber(layer.evalscript, 3);
+  }
 }
 
 async function getAppropriateApiType(layer, imageFormat, isRawBand, cancelToken) {
@@ -224,15 +299,14 @@ async function getAppropriateApiType(layer, imageFormat, isRawBand, cancelToken)
     return ApiType.PROCESSING;
   }
   if (layer.supportsApiType(ApiType.PROCESSING)) {
+    const isKMZ = imageFormat === IMAGE_FORMATS.KMZ_JPG || imageFormat === IMAGE_FORMATS.KMZ_PNG;
     if (isRawBand) {
-      const isKMZ = imageFormat === IMAGE_FORMATS.KMZ_JPG || imageFormat === IMAGE_FORMATS.KMZ_PNG;
       if (isKMZ) {
         return ApiType.WMS;
       }
       return ApiType.PROCESSING;
     }
-    const isJPGorPNG = imageFormat === IMAGE_FORMATS.JPG || imageFormat === IMAGE_FORMATS.PNG;
-    if (isJPGorPNG) {
+    if (!isKMZ) {
       if (!layer.evalscript && !layer.evalscriptUrl) {
         await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken });
       }
@@ -245,10 +319,14 @@ async function getAppropriateApiType(layer, imageFormat, isRawBand, cancelToken)
 export function getTitle(fromTime, toTime, datasetId, layerTitle, customSelected) {
   const format = 'YYYY-MM-DD HH:mm';
   const datasetLabel = checkIfCustom(datasetId) ? datasetLabels[CUSTOM] : datasetLabels[datasetId];
-  return `${fromTime
-    .clone()
-    .utc()
-    .format(format)} - ${toTime
+  return `${
+    fromTime
+      ? fromTime
+          .clone()
+          .utc()
+          .format(format) + ' - '
+      : ''
+  }${toTime
     .clone()
     .utc()
     .format(format)}, ${datasetLabel}, ${customSelected ? 'Custom script' : layerTitle}`;
@@ -268,10 +346,14 @@ export function getNicename(fromTime, toTime, datasetId, layerTitle, customSelec
 
   const datasetLabel = checkIfCustom(datasetId) ? datasetLabels[CUSTOM] : datasetLabels[datasetId];
 
-  return `${fromTime
-    .clone()
-    .utc()
-    .format(format)}_${toTime
+  return `${
+    fromTime
+      ? fromTime
+          .clone()
+          .utc()
+          .format(format) + '_'
+      : ''
+  }${toTime
     .clone()
     .utc()
     .format(format)}_${datasetLabel.replace(/ /gi, '_')}_${layerName}`;
@@ -292,7 +374,6 @@ export async function getLayerFromParams(params, cancelToken) {
     minQa,
     upsampling,
     downsampling,
-    imageFormat,
   } = params;
   let layer;
 
@@ -301,24 +382,27 @@ export async function getLayerFromParams(params, cancelToken) {
   };
 
   if (layerId) {
-    // Use baseUrl with V1 evalscripts if TIFF
-    const url = getBaseUrlsForImageFormat(visualizationUrl, imageFormat);
-    layer = await LayersFactory.makeLayer(url, layerId, null, reqConfig);
+    layer = await LayersFactory.makeLayer(visualizationUrl, layerId, null, reqConfig);
   } else if (isDataFusionEnabled(dataFusion)) {
-    layer = constructDataFusionLayer(dataFusion, evalscript, evalscripturl, fromTime, toTime);
+    layer = await constructDataFusionLayer(dataFusion, evalscript, evalscripturl, fromTime, toTime);
   } else if (customSelected) {
     const dsh = getDataSourceHandler(datasetId);
     const shJsDataset = dsh ? dsh.getSentinelHubDataset(datasetId) : null;
-    const layers = await LayersFactory.makeLayers(
+    let layers = await LayersFactory.makeLayers(
       visualizationUrl,
       (_, dataset) => (!shJsDataset ? true : dataset.id === shJsDataset.id),
       null,
       reqConfig,
     );
+    const isBYOC = checkIfCustom(datasetId);
+    if (isBYOC) {
+      await Promise.all(layers.map(l => l.updateLayerFromServiceIfNeeded(reqConfig)));
+      layers = layers.filter(l => l.collectionId === datasetId);
+    }
     if (layers.length > 0) {
       layer = layers[0];
       layer.evalscript = evalscript;
-      layer.evalscripturl = evalscripturl;
+      layer.evalscriptUrl = evalscripturl;
     }
   }
   if (layer) {
@@ -368,6 +452,8 @@ export async function addImageOverlays(
   copyrightText,
   title,
   showScaleBar = true,
+  logos = true,
+  drawCopernicusLogo = true,
 ) {
   if (!(showLegend || showCaptions || addMapOverlays || showLogo)) {
     return blob;
@@ -386,7 +472,7 @@ export async function addImageOverlays(
     if (showScaleBar) {
       scalebar = getScaleBarInfo();
     }
-    await drawCaptions(ctx, width, userDescription, title, copyrightText, scalebar, true);
+    await drawCaptions(ctx, userDescription, title, copyrightText, scalebar, logos, drawCopernicusLogo);
   }
   if (showLegend) {
     const legendImageUrl = legendDefinition
@@ -400,7 +486,8 @@ export async function addImageOverlays(
     }
   }
   if (showLogo) {
-    await applyLogo(ctx);
+    const logosPartitionWidth = ctx.canvas.width * 0.4 - PARTITION_PADDING;
+    await drawLogos(ctx, logosPartitionWidth, getLowerYAxis(ctx), drawCopernicusLogo);
   }
 
   return await canvasToBlob(canvas, imageFormat);
@@ -426,15 +513,8 @@ export async function getAllLayers(url, datasetId, selectedTheme) {
   return dsh.getLayers(allLayers, datasetId, url, layersExclude, layersInclude);
 }
 
-export function getSupportedImageFormats(url) {
-  // This method should either be implemented properly in sentinelhub-js or datasource handlers
-  // Currently just using the same as before, as it is not crucial
-  if (url.includes('eocloud')) {
-    return Object.values(IMAGE_FORMATS).filter(
-      f => f !== IMAGE_FORMATS.KMZ_JPG && f !== IMAGE_FORMATS.KMZ_PNG,
-    );
-  }
-  return Object.values(IMAGE_FORMATS);
+export function getSupportedImageFormats(datasetId) {
+  return getDataSourceHandler(datasetId).getSupportedImageFormats(datasetId);
 }
 
 export function constructV3Evalscript(layer, datasetId, imageFormat, bands, addDataMask = false) {
@@ -448,20 +528,35 @@ export function constructV3Evalscript(layer, datasetId, imageFormat, bands, addD
       factor = 65535;
     }
   }
-  if (datasetId.startsWith('CUSTOM')) {
+  const isBYOC = checkIfCustom(datasetId);
+  if (isBYOC) {
     // This is a hack to make raw bands for BYOC layers display anything
     // Service stretches values from 0-1 to 0-255, but if our BYOC bands can be UINT8 or UINT16
     // https://docs.sentinel-hub.com/api/latest/#/Evalscript/V3/README?id=sampletype
-    const sampleType = bands[datasetId][0].sampleType;
+    const sampleType = bands[0].sampleType;
+    const orig = factor ? factor : 1.0;
     if (sampleType === 'UINT8') {
-      factor = 1.0 / 2 ** 8;
+      factor = orig / 255;
     }
     if (sampleType === 'UINT16') {
-      factor = 1.0 / 2 ** 16;
+      factor = orig / 65535;
     }
   }
 
   factor = factor ? `${factor} *` : '';
+
+  if (datasetId === COPERNICUS_CORINE_LAND_COVER) {
+    return `//VERSION=3
+function setup() {
+  return {
+    input: ["CLC"${addDataMask ? ', "dataMask"' : ''}],
+    output: { bands: ${addDataMask ? 2 : 1}, sampleType: "${sampleType}" }
+  };
+}
+
+function evaluatePixel(sample) {
+  return [${`${factor} (sample.CLC === ${layer})`}${addDataMask ? ', sample.dataMask' : ''} ];}`;
+  }
 
   return `//VERSION=3
 function setup() {
@@ -479,37 +574,19 @@ export function constructBasicEvalscript(band) {
   return `return [${band}]`;
 }
 
+export function isTiff(imageFormat) {
+  return (
+    imageFormat === IMAGE_FORMATS.TIFF_UINT8 ||
+    imageFormat === IMAGE_FORMATS.TIFF_UINT16 ||
+    imageFormat === IMAGE_FORMATS.TIFF_FLOAT32
+  );
+}
+
 /*
 
   METHODS BELOW ARE VIRTUALLY UNCHANGED FROM EOB3IMAGEDOWNLOADPANEL
 
 */
-
-async function applyLogo(ctx) {
-  const sentinelHubLogo = await loadImage(SHlogoLarge);
-
-  const bottomYAxis = getLowerYAxis(ctx);
-  const proposedWidth = Math.max(ctx.canvas.width * 0.1, sentinelHubLogo.width);
-  const ratio = proposedWidth / sentinelHubLogo.width;
-  const imagePadding = 0;
-
-  const sentinelHubLogoWidth = sentinelHubLogo.width * ratio;
-  const sentinelHubLogoHeight = sentinelHubLogo.height * ratio;
-
-  let sentinelHubLogoX;
-  let sentinelHubLogoY;
-
-  sentinelHubLogoX = imagePadding;
-  sentinelHubLogoY = bottomYAxis - sentinelHubLogoHeight - imagePadding;
-
-  ctx.drawImage(
-    sentinelHubLogo,
-    sentinelHubLogoX,
-    sentinelHubLogoY,
-    sentinelHubLogoWidth,
-    sentinelHubLogoHeight,
-  );
-}
 
 export const drawMapOverlaysOnCanvas = async (ctx, lat, lng, zoom, width, enabledOverlaysId) => {
   const enabledOverlays = overlayTileLayers().filter(overlayTileLayer =>
@@ -555,13 +632,14 @@ export const getScaleBarInfo = () => {
 
 export const drawCaptions = async (
   ctx,
-  width,
   userDescription,
   title,
   copyrightText,
   scaleBar,
   logos = true,
+  drawCopernicusLogo = true,
 ) => {
+  const width = ctx.canvas.width;
   const scalebarPartitionWidth = scaleBar
     ? Math.max(getScalebarWidth(ctx, scaleBar, width), ctx.canvas.width * 0.33)
     : ctx.canvas.width * 0.33;
@@ -579,7 +657,7 @@ export const drawCaptions = async (
     drawScalebar(ctx, scaleBar, width);
   }
   if (logos) {
-    await drawLogos(ctx, logosPartitionWidth, bottomYAxis);
+    await drawLogos(ctx, logosPartitionWidth, bottomYAxis, drawCopernicusLogo);
   }
   if (copyrightText) {
     drawCopyrightText(ctx, copyrightText, copyrightPartitionXCoords, copyrightPartitionWidth, bottomYAxis);
@@ -674,17 +752,20 @@ function drawCopyrightText(ctx, text, copyrightPartitionX, copyrightPartitionWid
   });
 }
 
-async function drawLogos(ctx, logosPartitionWidth, bottomY) {
+async function drawLogos(ctx, logosPartitionWidth, bottomY, drawCopernicusLogo) {
   const sentinelHubLogo = await loadImage(SHlogo);
-  const copernicusLogo = await loadImage(copernicus);
+  let copernicusLogo;
+
+  if (drawCopernicusLogo) {
+    copernicusLogo = await loadImage(copernicus);
+  }
 
   const proposedWidth = Math.max(ctx.canvas.width * 0.05, 50);
-  const ratio = proposedWidth / copernicusLogo.width;
   const imagePadding = 10;
+  const ratio = proposedWidth / sentinelHubLogo.width;
 
-  const copernicusLogoWidth = copernicusLogo.width * ratio;
-  const copernicusLogoHeight = copernicusLogo.height * ratio;
-
+  const copernicusLogoWidth = drawCopernicusLogo ? copernicusLogo.width * ratio : 0;
+  const copernicusLogoHeight = drawCopernicusLogo ? copernicusLogo.height * ratio : 0;
   const sentinelHubLogoWidth = sentinelHubLogo.width * ratio;
   const sentinelHubLogoHeight = sentinelHubLogo.height * ratio;
 
@@ -711,7 +792,17 @@ async function drawLogos(ctx, logosPartitionWidth, bottomY) {
   ctx.shadowBlur = 2;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 0;
-  ctx.drawImage(copernicusLogo, copernicusLogoX, copernicusLogoY, copernicusLogoWidth, copernicusLogoHeight);
+
+  if (drawCopernicusLogo) {
+    ctx.drawImage(
+      copernicusLogo,
+      copernicusLogoX,
+      copernicusLogoY,
+      copernicusLogoWidth,
+      copernicusLogoHeight,
+    );
+  }
+
   ctx.drawImage(
     sentinelHubLogo,
     sentinelHubLogoX,

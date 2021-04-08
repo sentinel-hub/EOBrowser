@@ -7,9 +7,15 @@ import {
   getCompareModeErrorMsg,
   getDatasourceNotSupportedMsg,
 } from '../ConstMessages';
+import store, { timelapseSlice } from '../../store';
+
 import '../EOBPanel.scss';
 
 export class EOBTimelapsePanelButton extends React.Component {
+  toggleAreaPreview = () => {
+    store.dispatch(timelapseSlice.actions.toggleTimelapseAreaPreview());
+  };
+
   render() {
     const isLayerSelected = !!this.props.selectedResult;
     const isTimelapseSupported =
@@ -36,7 +42,7 @@ export class EOBTimelapsePanelButton extends React.Component {
             this.props.onErrorMessage(title);
             return;
           }
-          this.props.openTimelapsePanel();
+          this.toggleAreaPreview();
         }}
       >
         {

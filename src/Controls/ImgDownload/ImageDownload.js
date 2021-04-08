@@ -20,14 +20,19 @@ import {
   getSupportedImageFormats,
   getImageDimensionFromBounds,
   constructBasicEvalscript,
+  isTiff,
 } from './ImageDownload.utils';
 import { findMatchingLayerMetadata } from '../../Tools/VisualizationPanel/legendUtils';
-import { constructSHJSEffects } from '../../Tools/Pins/Pin.utils';
 import { IMAGE_FORMATS_INFO } from './consts';
 import ImageDownloadErrorPanel from './ImageDownloadErrorPanel';
-import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { ImageDownloadWarningPanel } from './ImageDownloadWarningPanel';
+import {
+  getDataSourceHandler,
+  datasourceForDatasetId,
+} from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getLoggedInErrorMsg } from '../../junk/ConstMessages';
 import { isDataFusionEnabled } from '../../utils';
+import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
 
 import './ImageDownload.scss';
 
@@ -38,12 +43,13 @@ function ImageDownload(props) {
   const [allLayers, setAllLayers] = useState([]);
   const [supportedImageFormats, setSupportedImageFormats] = useState([]);
   const [error, setError] = useState(null);
+  const [warnings, setWarnings] = useState(null);
 
   const { width: defaultWidth, height: defaultHeight } = getImageDimensionFromBounds(
     props.bounds,
     props.datasetId,
   );
-  const effects = constructSHJSEffects(props);
+  const effects = constructGetMapParamsEffects(props);
 
   let cancelToken;
   useEffect(cancelToken => {
@@ -62,7 +68,7 @@ function ImageDownload(props) {
     getAllLayers(props.visualizationUrl, props.datasetId, selectedTheme).then(allLayers =>
       setAllLayers(allLayers),
     );
-    setSupportedImageFormats(getSupportedImageFormats(props.visualizationUrl));
+    setSupportedImageFormats(getSupportedImageFormats(props.datasetId));
   }, [
     props.visualizationUrl,
     props.datasetId,
@@ -73,10 +79,12 @@ function ImageDownload(props) {
 
   useEffect(() => {
     setError(null);
+    setWarnings(null);
   }, [selectedTab]);
 
   async function downloadBasic(formData) {
     setError(null);
+    setWarnings(null);
     const { pixelBounds, aoiGeometry } = props;
     const { imageFormat } = formData;
 
@@ -103,11 +111,14 @@ function ImageDownload(props) {
       width: width,
       height: height,
       geometry: aoiGeometry,
-      effects: effects,
     };
+    if (effects) {
+      baseParams.effects = effects;
+    }
+
     let image;
     try {
-      image = await fetchImageFromParams({ ...props, ...formData, ...baseParams });
+      image = await fetchImageFromParams({ ...props, ...formData, ...baseParams }, setWarnings);
     } catch (err) {
       setError(err);
       setLoadingImages(false);
@@ -120,6 +131,7 @@ function ImageDownload(props) {
 
   async function downloadAnalytical(formData) {
     setError(null);
+    setWarnings(null);
     setLoadingImages(true);
     const {
       evalscript,
@@ -144,9 +156,12 @@ function ImageDownload(props) {
       selectedCrs,
       showLogo,
       addDataMask,
+      clipExtraBandsTiff,
     } = formData;
     const width = Math.floor(defaultWidth / resolutionDivisor);
     const height = Math.floor(defaultHeight / resolutionDivisor);
+
+    const shouldClipExtraBands = clipExtraBandsTiff && isTiff(imageFormat);
 
     cancelToken = new CancelToken();
 
@@ -167,6 +182,7 @@ function ImageDownload(props) {
       downsampling: downsampling,
       cancelToken: cancelToken,
       showLogo: showLogo,
+      shouldClipExtraBands: shouldClipExtraBands,
     };
 
     if (customSelected) {
@@ -205,7 +221,7 @@ function ImageDownload(props) {
 
     const images = await Promise.all(
       requestsParams.map(params =>
-        fetchImageFromParams(params).catch(err => {
+        fetchImageFromParams(params, addWarning).catch(err => {
           setError(err);
           return null;
         }),
@@ -243,6 +259,7 @@ function ImageDownload(props) {
     } = formData;
 
     setError(null);
+    setWarnings(null);
     setLoadingImages(true);
     cancelToken = new CancelToken();
 
@@ -263,7 +280,7 @@ function ImageDownload(props) {
 
     let image;
     try {
-      image = await fetchImageFromParams({ ...props, ...params });
+      image = await fetchImageFromParams({ ...props, ...params }, setWarnings);
     } catch (err) {
       setError(err);
       setLoadingImages(false);
@@ -295,8 +312,29 @@ function ImageDownload(props) {
     store.dispatch(notificationSlice.actions.displayError(getLoggedInErrorMsg()));
   }
 
+  function addWarning(warningType, layerName) {
+    setWarnings(prevWarnings => {
+      if (!prevWarnings) {
+        return { [warningType]: [layerName] };
+      }
+      if (!prevWarnings[warningType]) {
+        return {
+          [warningType]: [layerName],
+          ...prevWarnings,
+        };
+      } else {
+        const newWarningLayers = [...prevWarnings[warningType], layerName];
+        return {
+          ...prevWarnings,
+          [warningType]: newWarningLayers,
+        };
+      }
+    });
+  }
+
   const hasLegendData = checkIfCurrentLayerHasLegend();
   const isUserLoggedIn = props.user && props.user.userdata;
+  const isGIBS = datasourceForDatasetId(props.datasetId) === 'GIBS';
 
   return (
     <Rodal
@@ -338,6 +376,7 @@ function ImageDownload(props) {
             onDisabledClick={displayLogInToAccessMessage}
           />
         </div>
+        <ImageDownloadWarningPanel warnings={warnings} />
         <ImageDownloadForms
           selectedTab={selectedTab}
           hasLegendData={hasLegendData}
@@ -356,6 +395,9 @@ function ImageDownload(props) {
           bounds={props.bounds}
           datasetId={props.datasetId}
           isDataFusionEnabled={isDataFusionEnabled(props.dataFusion)}
+          allowShowLogoAnalytical={!isGIBS}
+          areEffectsSet={!!effects}
+          hasAOI={!!props.aoiGeometry}
         />
         <ImageDownloadErrorPanel error={error} />
       </div>
@@ -385,11 +427,14 @@ const mapStoreToProps = store => ({
   toTime: store.visualization.toTime,
   datasetId: store.visualization.datasetId,
   customSelected: store.visualization.customSelected,
-  gain: store.visualization.gainEffect,
-  gamma: store.visualization.gammaEffect,
-  redRange: store.visualization.redRangeEffect,
-  greenRange: store.visualization.greenRangeEffect,
-  blueRange: store.visualization.blueRangeEffect,
+  gainEffect: store.visualization.gainEffect,
+  gammaEffect: store.visualization.gammaEffect,
+  redRangeEffect: store.visualization.redRangeEffect,
+  greenRangeEffect: store.visualization.greenRangeEffect,
+  blueRangeEffect: store.visualization.blueRangeEffect,
+  redCurveEffect: store.visualization.redCurveEffect,
+  greenCurveEffect: store.visualization.greenCurveEffect,
+  blueCurveEffect: store.visualization.blueCurveEffect,
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
   minQa: store.visualization.minQa,
