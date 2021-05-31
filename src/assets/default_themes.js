@@ -2802,9 +2802,37 @@ export const DEFAULT_THEMES = [
       },
 
       {
+        name: 'Landsat 4-5 TM L1',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/8da429-YOUR-INSTANCEID-HERE',
+        preselected: false,
+      },
+
+      {
+        name: 'Landsat 4-5 TM L2',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/0cd456-YOUR-INSTANCEID-HERE',
+        preselected: false,
+      },
+
+      {
         name: 'Landsat 8 USGS',
         service: 'WMS',
         url: 'https://services.sentinel-hub.com/ogc/wms/950dce-YOUR-INSTANCEID-HERE',
+        preselected: false,
+      },
+
+      {
+        name: 'Landsat 8 L1',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/e35192-YOUR-INSTANCEID-HERE',
+        preselected: false,
+      },
+
+      {
+        name: 'Landsat 8 L2',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/fa0736-YOUR-INSTANCEID-HERE',
         preselected: true,
       },
 
@@ -2932,6 +2960,10 @@ export const DEFAULT_THEMES = [
       {
         name: 'Water Bodies',
         url: 'https://creodias.sentinel-hub.com/ogc/wms/6630ab-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'Global Surface Water',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/0a6c72-YOUR-INSTANCEID-HERE',
       },
     ],
   },

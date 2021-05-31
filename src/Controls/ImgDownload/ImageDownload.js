@@ -31,8 +31,9 @@ import {
   datasourceForDatasetId,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getLoggedInErrorMsg } from '../../junk/ConstMessages';
-import { isDataFusionEnabled } from '../../utils';
+import { isDataFusionEnabled, fetchEvalscriptFromEvalscripturl } from '../../utils';
 import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
+import { getGetMapAuthToken } from '../../App';
 
 import './ImageDownload.scss';
 
@@ -50,6 +51,7 @@ function ImageDownload(props) {
     props.datasetId,
   );
   const effects = constructGetMapParamsEffects(props);
+  const getMapAuthToken = getGetMapAuthToken(props.auth);
 
   let cancelToken;
   useEffect(cancelToken => {
@@ -111,6 +113,7 @@ function ImageDownload(props) {
       width: width,
       height: height,
       geometry: aoiGeometry,
+      getMapAuthToken: getMapAuthToken,
     };
     if (effects) {
       baseParams.effects = effects;
@@ -183,13 +186,25 @@ function ImageDownload(props) {
       cancelToken: cancelToken,
       showLogo: showLogo,
       shouldClipExtraBands: shouldClipExtraBands,
+      getMapAuthToken: getMapAuthToken,
     };
 
     if (customSelected) {
+      let response;
+      if (evalscripturl) {
+        try {
+          response = await fetchEvalscriptFromEvalscripturl(evalscripturl);
+        } catch (error) {
+          setError('Could not get custom evalscript.');
+          setLoadingImages(false);
+          return;
+        }
+      }
+
       requestsParams.push({
         ...baseParams,
         customSelected: true,
-        evalscript: evalscript,
+        evalscript: evalscripturl ? response.data : evalscript,
         evalscripturl: evalscripturl,
         dataFusion: dataFusion,
         effects: effects,
@@ -276,6 +291,7 @@ function ImageDownload(props) {
       height: height,
       geometry: aoiGeometry,
       effects: effects,
+      getMapAuthToken: getMapAuthToken,
     };
 
     let image;
@@ -441,6 +457,7 @@ const mapStoreToProps = store => ({
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,
   selectedThemeId: store.themes.selectedThemeId,
+  auth: store.auth,
 });
 
 export default connect(mapStoreToProps, null)(ImageDownload);

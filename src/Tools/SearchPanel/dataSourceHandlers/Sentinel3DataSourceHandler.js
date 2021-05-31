@@ -397,14 +397,18 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
       'TOTAL_COLUMN_WATER_VAPOR',
     It was decided this group will be omitted, as it is not of particular importance and the channel names are too long
     */
-  groupChannels = channels => {
-    const groupedBands = {
-      [t`Reflectance`]: this.SLSTR_BANDS.filter(c => ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'].includes(c.name)),
-      [t`Brightness temperature`]: this.SLSTR_BANDS.filter(c =>
-        ['S7', 'S8', 'S9', 'F1', 'F2'].includes(c.name),
-      ),
-    };
-    return groupedBands;
+  groupChannels = datasetId => {
+    if (datasetId === S3SLSTR) {
+      const groupedBands = {
+        [t`Reflectance`]: this.SLSTR_BANDS.filter(c => ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'].includes(c.name)),
+        [t`Brightness temperature`]: this.SLSTR_BANDS.filter(c =>
+          ['S7', 'S8', 'S9', 'F1', 'F2'].includes(c.name),
+        ),
+      };
+      return groupedBands;
+    } else {
+      return null;
+    }
   };
 
   tilesHaveCloudCoverage(datasetId) {

@@ -1,5 +1,6 @@
 import round from 'lodash.round';
 import moment from 'moment';
+import request from 'axios';
 import {
   DATASET_AWS_L8L1C,
   DATASET_MODIS,
@@ -62,8 +63,12 @@ export function userCanAccessLockedFunctionality(user, selectedTheme) {
   - upsampling: upsampling (SH datasets only)
   - downsampling: downsampling (SH datasets only)
   - dataFusion: dataFusion settings
+  - handlePositions: positions of pins in index feature.
+  - gradient: gradient used to calculate color in index feature. 
+ 
 */
-export function updatePath(props) {
+
+export function updatePath(props, shouldPushToHistoryStack = true) {
   let {
     currentZoom,
     currentLat,
@@ -91,6 +96,9 @@ export function updatePath(props) {
     upsampling,
     downsampling,
     dataFusion,
+    handlePositions,
+    gradient,
+    terrainViewerSettings,
   } = props;
   currentLat = Math.round(100000 * currentLat) / 100000;
   currentLng = Math.round(100000 * currentLng) / 100000;
@@ -108,29 +116,39 @@ export function updatePath(props) {
     params.themesUrl = themesUrl;
   }
 
+  if (visualizationUrl) {
+    params.visualizationUrl = visualizationUrl;
+  }
+  if (customSelected && evalscript && !evalscripturl) {
+    params.evalscript = b64EncodeUnicode(evalscript);
+  }
+  if (customSelected && evalscripturl) {
+    params.evalscripturl = evalscripturl;
+  }
+  if (datasetId) {
+    params.datasetId = datasetId;
+  }
+  if (fromTime) {
+    params.fromTime = fromTime.toISOString();
+  }
+  if (toTime) {
+    params.toTime = toTime.toISOString();
+  }
+  if (layerId) {
+    params.layerId = layerId;
+  }
+
   if (selectedTabIndex === 2) {
     // Visualize tab is selected
-    if (datasetId) {
-      params.datasetId = datasetId;
+
+    if (handlePositions && customSelected && evalscript) {
+      params.handlePositions = handlePositions;
     }
-    if (fromTime) {
-      params.fromTime = fromTime.toISOString();
+
+    if (gradient && customSelected && evalscript) {
+      params.gradient = gradient;
     }
-    if (toTime) {
-      params.toTime = toTime.toISOString();
-    }
-    if (layerId) {
-      params.layerId = layerId;
-    }
-    if (visualizationUrl) {
-      params.visualizationUrl = visualizationUrl;
-    }
-    if (customSelected && evalscript && !evalscripturl) {
-      params.evalscript = b64EncodeUnicode(evalscript);
-    }
-    if (customSelected && evalscripturl) {
-      params.evalscripturl = evalscripturl;
-    }
+
     if (gainEffect !== undefined && gainEffect !== 1) {
       params.gain = gainEffect;
     }
@@ -171,12 +189,20 @@ export function updatePath(props) {
     }
   }
 
+  if (terrainViewerSettings !== null) {
+    params.terrainViewerSettings = JSON.stringify(terrainViewerSettings);
+  }
+
   const escapedParams = Object.keys(params)
     .map(k => `${k}=${encodeURIComponent(params[k])}`)
     .join('&');
+
   const newUrl =
     window.location.origin + window.location.pathname + '?' + escapedParams + window.location.hash;
-  window.history.pushState({}, '', newUrl);
+
+  shouldPushToHistoryStack
+    ? window.history.pushState({}, '', newUrl)
+    : window.history.replaceState({}, '', newUrl);
 }
 // eslint-disable-next-line
 function hexToRgb(hex) {
@@ -204,20 +230,31 @@ let viz = new ColorRampVisualizer(colorRamp);
 function setup() {
   return {
     input: ["${[...new Set(Object.values(bands))].join('","')}", "dataMask"],
-    output: { bands: 4 }
+    output: [
+      { id:"default", bands: 4 }, 
+      { id: "index", bands: 1, sampleType: 'FLOAT32' }
+    ]
   };
 }
 
 function evaluatePixel(samples) {
-  let index = ${indexEquation}
-  const minIndex = ${values[0]}
-  const maxIndex = ${values[values.length - 1]}
+  let index = ${indexEquation};
+  const minIndex = ${values[0]};
+  const maxIndex = ${values[values.length - 1]};
+  let visVal = null;
   
   if(index > maxIndex || index < minIndex) {
-    return [0, 0, 0, 0]
+    visVal = [0, 0, 0, 0];
   }
+  else {
+    visVal = [...viz.process(index),samples.dataMask];
+  };
+
+  // The library for tiffs works well only if there is only one channel returned.
+  // So we encode the "no data" as NaN here and ignore NaNs on frontend.
+  const indexVal = samples.dataMask === 1 ? index : NaN;
   
-  return [...viz.process(index),samples.dataMask]; 
+  return { default: visVal, index: [indexVal] };
 }`;
   }
 
@@ -480,4 +517,8 @@ export function getThemeName(theme) {
     return null;
   }
   return isFunction(theme.name) ? theme.name() : theme.name;
+}
+
+export async function fetchEvalscriptFromEvalscripturl(evalscripturl) {
+  return request.get(evalscripturl);
 }

@@ -20,27 +20,7 @@
   }
 }
 
-.GPFUKGKCPO.position-top-right {
-  background: $mainDark;
-  border-radius: 0 !important;
-  padding: 0 !important;
-
-  .GPFUKGKCAP {
-    border: none;
-    color: $mainDark;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 16px;
-    font-weight: 600;
-    padding: 8px 12px;
-    text-decoration: none;
-
-    .gwt-Image {
-      width: 20px;
-      height: 20px;
-    }
-  }
-}
+.sgDialogBox { z-index: 1000; }
 /* stylelint-enable */
 
 .terrain-viewer-button {
@@ -107,34 +87,78 @@
         margin-left: 5px;
       }
     }
-  }
-}
 
-.terrain-viewer-help {
-  height: 95%;
-  overflow: auto;
-  margin-top: 5%;
-  color: $textCol;
-  background: $mainDark;
+    .actions {
+      width: 80px;
+      height: 40px;
+      margin-left: 30px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
 
-  .help-controls {
-    h2 {
-      margin-bottom: 10px;
-    }
+      .action-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
 
-    div {
-      margin-bottom: 14px;
-      font-size: 12px;
-      padding-right: 5px;
+        i {
+          color: $primaryCol;
+          margin-right: 5px;
+          font-size: 20px;
+        }
 
-      .text {
-        margin-left: 60px;
-        min-height: 50px;
-      }
+        &.pin-saved {
+          i {
+            opacity: 0.5;
+            pointer-events: none;
+          }
+        }
 
-      .right-img {
-        margin-top: 10px;
-        float: left;
+        .social-networks {
+          z-index: 5;
+          padding: 5px;
+          background-color: #eee;
+          box-shadow: 0 2px 5px #000;
+          position: fixed;
+          color: #fff;
+          display: flex;
+          margin-top: -80px;
+          margin-right: 180px;
+
+          .copy-to-clipboard {
+            margin-left: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            align-content: center;
+            color: $primaryCol;
+            padding: 3px 8px 3px 3px;
+          }
+
+          .holders {
+            .facebook-share-button,
+            .twitter-share-button,
+            .linkedin-share-button {
+              i {
+                font-size: 30px;
+              }
+            }
+          }
+
+          input {
+            color: $mainDark;
+          }
+
+          input:disabled {
+            background: #ccc;
+          }
+
+          .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+          }
+        }
       }
     }
   }

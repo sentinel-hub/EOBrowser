@@ -4,123 +4,45 @@ import {
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
   DATASET_AWS_L8L1C,
+  DATASET_AWS_LOTL1,
+  DATASET_AWS_LOTL2,
+  DATASET_AWS_LTML1,
+  DATASET_AWS_LTML2,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
 import DataSourceHandler from './DataSourceHandler';
 import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/GenericSearchGroup';
-import LandsatTooltip from './DatasourceRenderingComponents/dataSourceTooltips/LandsatTooltip';
+import LandsatTooltip, {
+  renderLandsatOptionsHelpTooltips,
+} from './DatasourceRenderingComponents/dataSourceTooltips/LandsatTooltip';
 import { FetchingFunction } from '../search';
 import { constructBasicEvalscript, constructV3Evalscript } from '../../../utils';
-import { ESA_L5, ESA_L7, ESA_L8, AWS_L8L1C } from './dataSourceHandlers';
+import {
+  ESA_L5,
+  ESA_L7,
+  ESA_L8,
+  AWS_L8L1C,
+  AWS_LOTL1,
+  AWS_LOTL2,
+  AWS_LTML1,
+  AWS_LTML2,
+} from './dataSourceHandlers';
+import { getLandsatBandForDataset, getGroupedBands } from './datasourceAssets/landsatBands';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 
+export const LANDSAT_COPYRIGHT_TEXT = number =>
+  `Landsat ${number} image courtesy of the U.S. Geological Survey`;
+
 export default class LandsatDataSourceHandler extends DataSourceHandler {
-  L5_BANDS = [
-    {
-      name: 'B01',
-      description: t`Band 1 - Blue - 450-515 nm`,
-      color: '#699aff',
-    },
-    {
-      name: 'B02',
-      description: t`Band 2 - Green - 525-605 nm`,
-      color: '#a4d26f',
-    },
-    {
-      name: 'B03',
-      description: t`Band 3 - Red - 630-690 nm`,
-      color: '#e47121',
-    },
-    {
-      name: 'B04',
-      description: t`Band 4 - NIR - 750-900 nm`,
-      color: '#c31e20',
-    },
-    {
-      name: 'B05',
-      description: t`Band 5 - SWIR-1 - 1550-1750 nm`,
-      color: '#990134',
-    },
-    {
-      name: 'B07',
-      description: t`Band 7 - SWIR-2 - 2090-2350 nm`,
-      color: '#800000',
-    },
-  ];
-
-  L7_BANDS = [
-    ...this.L5_BANDS,
-    {
-      name: 'B08',
-      description: t`Band 8 - Panchromatic - 520-900 nm`,
-      color: '#800000',
-    },
-  ];
-
-  L8_BANDS = [
-    {
-      name: 'B01',
-      description: t`Band 1 - Coastal/Aerosol - 433-453 nm`,
-      color: '#699aff',
-    },
-    {
-      name: 'B02',
-      description: t`Band 2 - Blue - 450-515 nm`,
-      color: '#699aff',
-    },
-    {
-      name: 'B03',
-      description: t`Band 3 - Green - 525-600 nm`,
-      color: '#a4d26f',
-    },
-    {
-      name: 'B04',
-      description: t`Band 4 - Red - 630-680 nm`,
-      color: '#e47121',
-    },
-    {
-      name: 'B05',
-      description: t`Band 5 - NIR - 845-885 nm`,
-      color: '#c31e20',
-    },
-    {
-      name: 'B06',
-      description: t`Band 6 - SWIR-1 - 1560-1660 nm`,
-      color: '#990134',
-    },
-    {
-      name: 'B07',
-      description: t`Band 7 - SWIR-2 - 2100-2300 nm`,
-      color: '#800000',
-    },
-    {
-      name: 'B08',
-      description: t`Band 8 - Panchromatic - 500-680 nm`,
-      color: '#699aff',
-    },
-    {
-      name: 'B09',
-      description: t`Band 9 - Cirrus - 1360-1390 nm`,
-      color: '#d71234',
-    },
-    {
-      name: 'B10',
-      description: t`Band 10 - Thermal Infrared (TIRS) - 10895 nm`,
-      color: '#d51234',
-    },
-    {
-      name: 'B11',
-      description: t`Band 11 - Thermal Infrared (TIRS) - 12005 nm`,
-      color: '#f76244',
-    },
-  ];
-  urls = { ESA5: [], ESA7: [], ESA8: [], USGS8: [] };
+  urls = { ESA5: [], ESA7: [], ESA8: [], USGS8: [], LOTL1: [], LOTL2: [] };
   datasetSearchLabels = {
     [ESA_L5]: t`Landsat 5 (ESA archive)`,
     [ESA_L7]: t`Landsat 7 (ESA archive)`,
     [ESA_L8]: t`Landsat 8 (ESA archive)`,
     [AWS_L8L1C]: t`Landsat 8 (USGS archive)`,
+    [AWS_LOTL1]: t`Landsat 8 L1`,
+    [AWS_LOTL2]: t`Landsat 8 L2`,
   };
   allLayers = [];
   datasets = [];
@@ -128,6 +50,8 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
   searchFilters = {};
   isChecked = false;
   datasource = 'Landsat';
+  searchGroupLabel = 'Landsat';
+  searchGroupKey = 'landsat';
 
   leafletZoomConfig = {
     [ESA_L5]: {
@@ -146,34 +70,41 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
       min: 9,
       max: 18,
     },
+    [AWS_LOTL1]: {
+      min: 9,
+      max: 18,
+    },
+    [AWS_LOTL2]: {
+      min: 9,
+      max: 18,
+    },
   };
 
+  knownDatasets = [
+    { shDataset: DATASET_AWS_L8L1C, datasetId: AWS_L8L1C, urlId: 'USGS8' },
+    { shDataset: DATASET_AWS_LOTL1, datasetId: AWS_LOTL1, urlId: 'LOTL1' },
+    { shDataset: DATASET_AWS_LOTL2, datasetId: AWS_LOTL2, urlId: 'LOTL2' },
+    { shDataset: DATASET_EOCLOUD_LANDSAT5, datasetId: ESA_L5, urlId: 'ESA5' },
+    { shDataset: DATASET_EOCLOUD_LANDSAT7, datasetId: ESA_L7, urlId: 'ESA7' },
+    { shDataset: DATASET_EOCLOUD_LANDSAT8, datasetId: ESA_L8, urlId: 'ESA8' },
+  ];
+
+  initializeDatasets(layers, url, preselected) {
+    this.knownDatasets.forEach(ds => {
+      if (layers.find(l => l.dataset === ds.shDataset)) {
+        this.datasets.push(ds.datasetId);
+        this.urls[ds.urlId].push(url);
+        if (preselected) {
+          this.preselectedDatasets.add(ds.datasetId);
+        }
+      }
+    });
+  }
+
   willHandle(service, url, name, layers, preselected) {
-    if (layers.find(l => l.dataset === DATASET_AWS_L8L1C)) {
-      this.datasets.push(AWS_L8L1C);
-      this.urls.USGS8.push(url);
-      if (preselected) {
-        this.preselectedDatasets.add(AWS_L8L1C);
-      }
-    } else if (layers.find(l => l.dataset === DATASET_EOCLOUD_LANDSAT5)) {
-      this.datasets.push(ESA_L5);
-      this.urls.ESA5.push(url);
-      if (preselected) {
-        this.preselectedDatasets.add(ESA_L5);
-      }
-    } else if (layers.find(l => l.dataset === DATASET_EOCLOUD_LANDSAT7)) {
-      this.datasets.push(ESA_L7);
-      this.urls.ESA7.push(url);
-      if (preselected) {
-        this.preselectedDatasets.add(ESA_L7);
-      }
-    } else if (layers.find(l => l.dataset === DATASET_EOCLOUD_LANDSAT8)) {
-      this.datasets.push(ESA_L8);
-      this.urls.ESA8.push(url);
-      if (preselected) {
-        this.preselectedDatasets.add(ESA_L8);
-      }
-    } else {
+    this.initializeDatasets(layers, url, preselected);
+
+    if (this.datasets.length === 0) {
       return false;
     }
 
@@ -182,6 +113,10 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
       ...layers.filter(l =>
         [
           DATASET_AWS_L8L1C,
+          DATASET_AWS_LOTL1,
+          DATASET_AWS_LOTL2,
+          DATASET_AWS_LTML1,
+          DATASET_AWS_LTML2,
           DATASET_EOCLOUD_LANDSAT5,
           DATASET_EOCLOUD_LANDSAT7,
           DATASET_EOCLOUD_LANDSAT8,
@@ -196,6 +131,10 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
     return Object.values(this.urls).flat().length > 0;
   }
 
+  getDataSourceTooltip() {
+    return <LandsatTooltip />;
+  }
+
   getSearchFormComponents() {
     if (!this.isHandlingAnyUrl()) {
       return null;
@@ -203,16 +142,17 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
     const preselected = false;
     return (
       <GenericSearchGroup
-        key={`landsat`}
-        label="Landsat"
+        key={this.searchGroupKey}
+        label={this.searchGroupLabel}
         preselected={preselected}
         saveCheckedState={this.saveCheckedState}
-        dataSourceTooltip={<LandsatTooltip />}
+        dataSourceTooltip={this.getDataSourceTooltip()}
         saveFiltersValues={this.saveSearchFilters}
         options={this.datasets}
         optionsLabels={this.datasetSearchLabels}
         preselectedOptions={Array.from(this.preselectedDatasets)}
         hasMaxCCFilter={true}
+        renderOptionsHelpTooltips={renderLandsatOptionsHelpTooltips}
       />
     );
   }
@@ -272,24 +212,20 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
         return this.urls.ESA8;
       case AWS_L8L1C:
         return this.urls.USGS8;
+      case AWS_LOTL1:
+        return this.urls.LOTL1;
+      case AWS_LOTL2:
+        return this.urls.LOTL2;
+      case AWS_LTML1:
+        return this.urls.LTML1;
+      case AWS_LTML2:
+        return this.urls.LTML2;
       default:
         return [];
     }
   };
 
-  getBands = datasetId => {
-    switch (datasetId) {
-      case ESA_L5:
-        return this.L5_BANDS;
-      case ESA_L7:
-        return this.L7_BANDS;
-      case ESA_L8:
-      case AWS_L8L1C:
-        return this.L8_BANDS;
-      default:
-        return [];
-    }
-  };
+  getBands = datasetId => getLandsatBandForDataset(datasetId);
 
   getSentinelHubDataset = datasetId => {
     switch (datasetId) {
@@ -301,6 +237,14 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
         return DATASET_EOCLOUD_LANDSAT8;
       case AWS_L8L1C:
         return DATASET_AWS_L8L1C;
+      case AWS_LOTL1:
+        return DATASET_AWS_LOTL1;
+      case AWS_LOTL2:
+        return DATASET_AWS_LOTL2;
+      case AWS_LTML1:
+        return DATASET_AWS_LTML1;
+      case AWS_LTML2:
+        return DATASET_AWS_LTML2;
       default:
         return null;
     }
@@ -313,6 +257,10 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
       case ESA_L8:
         return constructBasicEvalscript(bands, config);
       case AWS_L8L1C:
+      case AWS_LOTL1:
+      case AWS_LOTL2:
+      case AWS_LTML1:
+      case AWS_LTML2:
         return constructV3Evalscript(bands, config);
       default:
         return '';
@@ -330,7 +278,10 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
       case ESA_L8:
         return { resolution: 1 };
       case AWS_L8L1C:
+      case AWS_LOTL2:
         return { resolution: 30, fisResolutionCeiling: 1490 };
+      case AWS_LOTL1:
+        return { resolution: 15, fisResolutionCeiling: 1490 };
       default:
         return {};
     }
@@ -341,7 +292,7 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
   }
 
   supportsV3Evalscript(datasetId) {
-    if (datasetId === AWS_L8L1C) {
+    if (datasetId === AWS_L8L1C || datasetId === AWS_LOTL1 || datasetId === AWS_LOTL2) {
       return true;
     }
     return false;
@@ -360,11 +311,39 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
     }
   }
 
-  groupChannels = channels => {
-    const groupedBands = {
-      [t`Reflectance`]: this.L8_BANDS.filter(c => !['B10', 'B11'].includes(c.name)),
-      [t`Brightness temperature`]: this.L8_BANDS.filter(c => ['B10', 'B11'].includes(c.name)),
-    };
-    return groupedBands;
+  groupChannels = datasetId => getGroupedBands(datasetId);
+
+  getSibling = datasetId => {
+    switch (datasetId) {
+      case AWS_LOTL1:
+        return { siblingId: AWS_LOTL2, siblingShortName: 'L2' };
+      case AWS_LOTL2:
+        return { siblingId: AWS_LOTL1, siblingShortName: 'L1' };
+      default:
+        return {};
+    }
   };
+
+  getCopyrightText = datasetId => {
+    switch (datasetId) {
+      case ESA_L5:
+        return LANDSAT_COPYRIGHT_TEXT('5');
+      case ESA_L7:
+        return LANDSAT_COPYRIGHT_TEXT('7');
+      case ESA_L8:
+      case AWS_L8L1C:
+      case AWS_LOTL1:
+      case AWS_LOTL2:
+        return LANDSAT_COPYRIGHT_TEXT('8');
+      case AWS_LTML1:
+      case AWS_LTML2:
+        return LANDSAT_COPYRIGHT_TEXT('4-5');
+      default:
+        return '';
+    }
+  };
+
+  isCopernicus = () => false;
+
+  isSentinelHub = () => true;
 }

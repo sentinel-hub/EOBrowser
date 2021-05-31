@@ -1,9 +1,11 @@
 import { parseScript } from 'esprima';
 import escodegen from 'escodegen';
 
+const DEFAULT_OUTPUT_ID = 'default';
+
 export function getEvalscriptSetup(evalscript) {
   const setup = {
-    id: 'default',
+    id: DEFAULT_OUTPUT_ID,
     sampleType: 'AUTO',
   };
   try {
@@ -21,7 +23,20 @@ export function getEvalscriptSetup(evalscript) {
       }
     }
 
-    const outputObj = output.value.elements ? output.value.elements[0].properties : output.value.properties;
+    // setup in evalscript can have multiple outputs
+    // the 'default' output is not guaranteed to be the first one, so we try to find it
+    // if we don't find it, the first output object is used
+    const outputArr = output.value.elements
+      ? output.value.elements.map(e => e.properties)
+      : [output.value.properties];
+    let outputObj = outputArr[0];
+    for (let o of outputArr) {
+      const idObj = o.find(p => p.key.name === 'id');
+      if (idObj && idObj.value.value === DEFAULT_OUTPUT_ID) {
+        outputObj = o;
+        break;
+      }
+    }
 
     const id = outputObj.find(p => p.key.name === 'id');
     if (id) {
@@ -51,14 +66,28 @@ export function setEvalscriptSampleType(evalscript, sampleType) {
     const { output } = getSetupObjects(parsed);
 
     if (output.value.elements) {
-      const _sampleType = output.value.elements[0].properties.find(p => p.key.name === 'sampleType');
+      // find the index of the default output object
+      // use the first index if default output object is not found
+      const outputArr = output.value.elements.map(e => e.properties);
+      let defaultOutputIndex = 0;
+      for (let index in outputArr) {
+        const idObj = outputArr[index].find(p => p.key.name === 'id');
+        if (idObj && idObj.value.value === DEFAULT_OUTPUT_ID) {
+          defaultOutputIndex = index;
+          break;
+        }
+      }
+
+      const _sampleType = output.value.elements[defaultOutputIndex].properties.find(
+        p => p.key.name === 'sampleType',
+      );
       if (_sampleType) {
         _sampleType.value.value = sampleType;
         _sampleType.value.raw = `""${sampleType}""`;
       } else {
         const a = parseScript(`b = {sampleType: "${sampleType}"}`);
         const newProperty = a.body[0].expression.right.properties[0];
-        output.value.elements[0].properties.push(newProperty);
+        output.value.elements[defaultOutputIndex].properties.push(newProperty);
       }
     } else {
       const _sampleType = output.value.properties.find(p => p.key.name === 'sampleType');
@@ -91,7 +120,16 @@ export function setEvalscriptOutputScale(evalscript, scaleFactor) {
     evaluatePixelFunction.id.name = '__noScaleFactor__evaluatePixel';
     const newEvaluatePixel = `
     function evaluatePixel(sample, scene, inputMetadata, customData, outputMetadata) {
-      return __noScaleFactor__evaluatePixel(sample, scene, inputMetadata, customData, outputMetadata).map(v => v * ${scaleFactor})
+      let output = __noScaleFactor__evaluatePixel(sample, scene, inputMetadata, customData, outputMetadata);
+
+      if(!Array.isArray(output)){
+        for(let key in output){
+          output[key] = output[key].map(v => v * ${scaleFactor});
+        }
+        return output;
+      }
+
+      return output.map(v => v * ${scaleFactor});
     }
     `;
     const newEvaluatePixelParsed = parseScript(newEvaluatePixel, { jsx: true, tolerant: true });
@@ -122,7 +160,21 @@ export function setEvalscriptOutputBandNumber(evalscript, nBands) {
     escodegen.attachComments(parsed, parsed.comments, parsed.tokens);
     const { output } = getSetupObjects(parsed);
     if (output.value.elements) {
-      const originalNBands = output.value.elements[0].properties.find(p => p.key.name === 'bands');
+      // find the index of the default output object
+      // use the first index if default output object is not found
+      const outputArr = output.value.elements.map(e => e.properties);
+      let defaultOutputIndex = 0;
+      for (let index in outputArr) {
+        const idObj = outputArr[index].find(p => p.key.name === 'id');
+        if (idObj && idObj.value.value === DEFAULT_OUTPUT_ID) {
+          defaultOutputIndex = index;
+          break;
+        }
+      }
+
+      const originalNBands = output.value.elements[defaultOutputIndex].properties.find(
+        p => p.key.name === 'bands',
+      );
       originalNBands.value.raw = nBands.toString();
       originalNBands.value.value = nBands;
     } else {
@@ -134,4 +186,40 @@ export function setEvalscriptOutputBandNumber(evalscript, nBands) {
   } catch (e) {
     return evalscript;
   }
+}
+
+export function checkIfIndexOutputInEvalscript(evalscript) {
+  const OUTPUT_ID = 'index';
+  const N_BANDS = 1;
+  const SAMPLE_TYPE = 'FLOAT32';
+
+  let isIndexOutputPresent = false;
+  try {
+    const parsed = parseScript(evalscript, { jsx: true, tolerant: true });
+    const setupFunction = parsed.body.find(d => d.id && d.id.name === 'setup');
+    const output = setupFunction.body.body[0].argument.properties.find(p => p.key.name === 'output');
+    const outputArr = output.value.elements
+      ? output.value.elements.map(e => e.properties)
+      : [output.value.properties];
+
+    for (let o of outputArr) {
+      const idObj = o.find(p => p.key.name === 'id');
+      const isIdIndex = idObj ? idObj.value.value === OUTPUT_ID : false;
+
+      const sampleTypeObj = o.find(p => p.key.name === 'sampleType');
+      const isSampleTypeFloat32 = sampleTypeObj ? sampleTypeObj.value.value === SAMPLE_TYPE : false;
+
+      const nBandsObj = o.find(p => p.key.name === 'bands');
+      const isOneChannelOutput = nBandsObj ? nBandsObj.value.value === N_BANDS : false;
+
+      isIndexOutputPresent = isIdIndex && isSampleTypeFloat32 && isOneChannelOutput;
+      if (isIndexOutputPresent) {
+        break;
+      }
+    }
+  } catch (err) {
+    console.warn('Unable to parse evalscript', err);
+  }
+
+  return isIndexOutputPresent;
 }

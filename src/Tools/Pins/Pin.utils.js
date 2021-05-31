@@ -10,10 +10,10 @@ import { DEFAULT_THEMES } from '../../assets/default_themes.js';
 import { VERSION_INFO } from '../../VERSION';
 import { b64DecodeUnicode } from '../../utils/base64MDN';
 import { getTokenFromLocalStorage } from '../../Auth/authHelpers';
-import { getDataSourceHandler } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { getDataSourceHandler, getDatasetLabel } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
 import { datasourceToDatasetId, dataSourceToThemeId, datasourceToUrl } from '../../utils/handleOldUrls';
-import { ensureCorrectDataFusionFormat } from '../../utils';
+import { ensureCorrectDataFusionFormat, getThemeName } from '../../utils';
 import {
   defaultGain,
   defaultGamma,
@@ -560,4 +560,66 @@ export function isPinValid(pin) {
     return { isValid: false, error: `Pin ${_id} is invalid: ` + err.message };
   }
   return { isValid: true, error: null };
+}
+
+export function constructPinFromProps(props) {
+  const {
+    lat,
+    lng,
+    zoom,
+    datasetId,
+    layerId,
+    visualizationUrl,
+    fromTime,
+    toTime,
+    evalscript,
+    evalscripturl,
+    customSelected,
+    dataFusion,
+    gainEffect,
+    gammaEffect,
+    redRangeEffect,
+    greenRangeEffect,
+    blueRangeEffect,
+    redCurveEffect,
+    greenCurveEffect,
+    blueCurveEffect,
+    minQa,
+    upsampling,
+    downsampling,
+    selectedThemeId,
+    selectedThemesListId,
+    themesLists,
+    terrainViewerSettings,
+  } = props;
+  const isGIBS = !fromTime; //GIBS only has toTime
+  const themeName = getThemeName(themesLists[selectedThemesListId].find(t => t.id === selectedThemeId));
+  return {
+    title: `${getDatasetLabel(datasetId)}: ${customSelected ? 'Custom' : layerId} (${themeName})`,
+    lat: lat,
+    lng: lng,
+    zoom: zoom,
+    datasetId: datasetId,
+    layerId: layerId,
+    visualizationUrl: visualizationUrl,
+    fromTime: isGIBS ? null : fromTime.toISOString(),
+    toTime: toTime.toISOString(),
+    evalscript: evalscript && !evalscripturl && customSelected ? evalscript : '',
+    evalscripturl: evalscripturl && customSelected ? evalscripturl : '',
+    themeId: selectedThemeId,
+    dataFusion: dataFusion,
+    tag: VERSION_INFO.tag,
+    gain: gainEffect,
+    gamma: gammaEffect,
+    redRange: redRangeEffect,
+    greenRange: greenRangeEffect,
+    blueRange: blueRangeEffect,
+    redCurve: redCurveEffect ? redCurveEffect.points : undefined,
+    greenCurve: greenCurveEffect ? greenCurveEffect.points : undefined,
+    blueCurve: blueCurveEffect ? blueCurveEffect.points : undefined,
+    minQa: minQa,
+    upsampling: upsampling,
+    downsampling: downsampling,
+    terrainViewerSettings: terrainViewerSettings,
+  };
 }

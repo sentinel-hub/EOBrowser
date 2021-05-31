@@ -67,7 +67,7 @@ class ResultItem extends React.Component {
             {metadata.sunElevation !== undefined && (
               <div className="detail" title={t`Sun elevation`}>
                 <i className="fa fa-sun-o" />
-                {metadata.sunElevation.toFixed(1)} %
+                {metadata.sunElevation.toFixed(1)}°
               </div>
             )}
             {metadata.MGRSLocation && (

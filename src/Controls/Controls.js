@@ -6,6 +6,7 @@ import LeafletPMLanguage from './LeafletPMLanguage';
 import ImageDownloadBtn from './ImgDownload/ImageDownloadBtn';
 import TimelapseButton from './Timelapse/TimelapseButton';
 import TerrainViewerButton from '../TerrainViewer/TerrainViewerButton';
+import HistogramWrapper from './Histogram/HistogramWrapper';
 import { withLeaflet } from 'react-leaflet';
 
 class Controls extends Component {
@@ -19,6 +20,10 @@ class Controls extends Component {
         <ImageDownloadBtn locale={this.props.selectedLanguage} />
         <TimelapseButton locale={this.props.selectedLanguage} />
         <TerrainViewerButton locale={this.props.selectedLanguage} />
+        <HistogramWrapper
+          locale={this.props.selectedLanguage}
+          histogramContainer={this.props.histogramContainer}
+        />
       </div>
     );
   }

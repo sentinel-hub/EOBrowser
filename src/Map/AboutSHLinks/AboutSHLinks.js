@@ -8,9 +8,9 @@ export default class AboutSHLinks extends React.Component {
   render() {
     return (
       <div id="about-sh-links">
-        <ExternalLink href="https://www.sentinel-hub.com/apps/eo_browser">{t`About EO Browser`}</ExternalLink>
+        <ExternalLink href="https://www.sentinel-hub.com/explore/eobrowser/">{t`About EO Browser`}</ExternalLink>
         <ExternalLink href="https://forum.sentinel-hub.com/">{t`Contact us`}</ExternalLink>
-        <ExternalLink href="https://www.sentinel-hub.com/apps/wms">{t`Get data`}</ExternalLink>
+        <ExternalLink href="https://www.sentinel-hub.com/develop/api/">{t`Get data`}</ExternalLink>
       </div>
     );
   }

@@ -12,10 +12,8 @@ import ComparePanel from './ComparePanel/ComparePanel';
 import { Tabs, Tab } from '../junk/Tabs/Tabs';
 import ToolsFooter from './ToolsFooter/ToolsFooter';
 import store, { notificationSlice, visualizationSlice, tabsSlice, compareLayersSlice } from '../store';
-import { savePinsToServer, savePinsToSessionStorage } from './Pins/Pin.utils';
-import { getDatasetLabel, checkIfCustom } from './SearchPanel/dataSourceHandlers/dataSourceHandlers';
-import { VERSION_INFO } from '../VERSION';
-import { getThemeName } from '../utils';
+import { savePinsToServer, savePinsToSessionStorage, constructPinFromProps } from './Pins/Pin.utils';
+import { checkIfCustom } from './SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
 import './Tools.scss';
 
@@ -119,32 +117,13 @@ class Tools extends Component {
 
   savePin = async () => {
     const {
-      lat,
-      lng,
-      zoom,
       datasetId,
       layerId,
       visualizationUrl,
-      fromTime,
-      toTime,
       evalscript,
       evalscripturl,
       customSelected,
-      dataFusion,
-      gainEffect,
-      gammaEffect,
-      redRangeEffect,
-      greenRangeEffect,
-      blueRangeEffect,
-      redCurveEffect,
-      greenCurveEffect,
-      blueCurveEffect,
-      minQa,
-      upsampling,
-      downsampling,
       selectedThemeId,
-      selectedThemesListId,
-      themesLists,
     } = this.props;
     if (
       !(
@@ -156,35 +135,7 @@ class Tools extends Component {
     ) {
       return null;
     }
-    const isGIBS = !fromTime; //GIBS only has toTime
-    const themeName = getThemeName(themesLists[selectedThemesListId].find(t => t.id === selectedThemeId));
-    let pin = {
-      title: `${getDatasetLabel(datasetId)}: ${customSelected ? 'Custom' : layerId} (${themeName})`,
-      lat: lat,
-      lng: lng,
-      zoom: zoom,
-      datasetId: datasetId,
-      layerId: layerId,
-      visualizationUrl: visualizationUrl,
-      fromTime: isGIBS ? null : fromTime.toISOString(),
-      toTime: toTime.toISOString(),
-      evalscript: evalscript && !evalscripturl && customSelected ? evalscript : '',
-      evalscripturl: evalscripturl && customSelected ? evalscripturl : '',
-      themeId: selectedThemeId,
-      dataFusion: dataFusion,
-      tag: VERSION_INFO.tag,
-      gain: gainEffect,
-      gamma: gammaEffect,
-      redRange: redRangeEffect,
-      greenRange: greenRangeEffect,
-      blueRange: blueRangeEffect,
-      redCurve: redCurveEffect ? redCurveEffect.points : undefined,
-      greenCurve: greenCurveEffect ? greenCurveEffect.points : undefined,
-      blueCurve: blueCurveEffect ? blueCurveEffect.points : undefined,
-      minQa: minQa,
-      upsampling: upsampling,
-      downsampling: downsampling,
-    };
+    let pin = constructPinFromProps(this.props);
     if (this.props.user) {
       const { uniqueId } = await savePinsToServer([pin]);
       this.setLastAddedPin(uniqueId);

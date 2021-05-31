@@ -7,21 +7,22 @@ import { BBox, CRS_EPSG3857, MimeTypes, CancelToken } from '@sentinel-hub/sentin
 import uuid from 'uuid';
 import Toggle from 'react-toggle';
 
-import store, { modalSlice } from '../store';
+import store, { modalSlice, terrainViewerSlice } from '../store';
 import Loader from '../Loader/Loader';
 import { getMapDimensions } from '../Controls/ImgDownload/ImageDownload.utils';
-import {
-  addImageOverlays,
-  getNicename,
-  getTitle,
-  SENTINEL_COPYRIGHT_TEXT,
-} from '../Controls/ImgDownload/ImageDownload.utils';
+import { addImageOverlays, getNicename, getTitle } from '../Controls/ImgDownload/ImageDownload.utils';
 import { EOBButton } from '../junk/EOBCommon/EOBButton/EOBButton';
 import { getLayerFromParams } from '../Controls/ImgDownload/ImageDownload.utils';
 import { wgs84ToMercator } from '../junk/EOBCommon/utils/coords';
 import { getHeightFromZoom, getMapTile } from './TerrainViewer.utils';
-import TerrainViewerHelp from './TerrainViewerHelp';
-import { datasourceForDatasetId } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import {
+  datasourceForDatasetId,
+  getDataSourceHandler,
+} from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { getGetMapAuthToken } from '../App';
+import { savePinsToServer, savePinsToSessionStorage, constructPinFromProps } from '../Tools/Pins/Pin.utils';
+import SocialShare from '../components/SocialShare/SocialShare';
+import { constructGetMapParamsEffects } from '../utils/effectsUtils';
 
 import 'rodal/lib/rodal.css';
 
@@ -39,19 +40,21 @@ function TerrainViewer(props) {
   const [downloadingImage, setDownloadingImage] = useState(false);
   const [layer, setLayer] = useState();
   const [terrainViewerId, setTerrainViewerId] = useState();
-  const [showHelp, setShowHelp] = useState(false);
   const [activeTerrainViewerComponentId] = useState(uuid());
   const [originalChildren] = useState([...document.head.children]);
   const [showLogoAndCaptions, setShowLogoAndCaptions] = useState(true);
+  const [socialSharePanelOpen, setSocialSharePanelOpen] = useState(false);
+  const [hasPinBeenSaved, setHasPinBeenSaved] = useState(false);
 
-  const { toTime, lat, lng, pixelBounds, datasetId, locale } = props;
+  const { toTime, lat, lng, zoom, pixelBounds, datasetId, locale, auth, terrainViewerSettings } = props;
   const isGIBS = datasourceForDatasetId(datasetId) === 'GIBS';
   const fromTime = isGIBS ? null : props.fromTime;
-  const { x, y } = wgs84ToMercator({ lat: lat, lng: lng });
   const { width, height } = getMapDimensions(pixelBounds);
   const rendererWidth = Math.floor((width - 80) * 0.85);
   const rendererHeight = Math.floor((height / width) * rendererWidth);
-  const startAngle = 10;
+  const { x: defaultX, y: defaultY } = wgs84ToMercator({ lat: lat, lng: lng });
+  const { x = defaultX, y = defaultY, z = getHeightFromZoom(zoom), rotV = 10, rotH = 0 } =
+    terrainViewerSettings || {};
   const cancelToken = new CancelToken();
 
   useEffect(() => {
@@ -83,13 +86,14 @@ function TerrainViewer(props) {
       fromTime: fromTime && fromTime.toDate(),
       toTime: toTime.toDate(),
       preview: 2,
+      effects: constructGetMapParamsEffects(props),
     };
-    const reqConfig = { cancelToken: cancelToken };
+    const reqConfig = { cancelToken: cancelToken, authToken: getGetMapAuthToken(auth), retries: 0 };
+
     getMapTile(layer, getMapParams, minX, minY, maxX, maxY, width, height, callback, reqConfig);
   }
 
   async function on3DInitialized() {
-    const { zoom } = props;
     const layer = await getLayerFromParams(props);
 
     window.set3DLocale(locale);
@@ -99,14 +103,13 @@ function TerrainViewer(props) {
       window.activeTerrainViewers[activeTerrainViewerComponentId] === null
     ) {
       setLayer(layer);
-      const height = getHeightFromZoom(zoom);
+
       window.set3DServiceUrl(BACKEND_SERVICE_3D);
-      const terrainViewerId = window.create3DViewer('terrain-map-container', x, y, height, 0, startAngle);
+      const terrainViewerId = window.create3DViewer('terrain-map-container', x, y, z, rotH, rotV);
       window.activeTerrainViewers[activeTerrainViewerComponentId] = terrainViewerId;
       setTerrainViewerId(terrainViewerId);
       setLoadingViewer(false);
     }
-    removeUnnecessaryScripts();
   }
 
   function removeUnnecessaryScripts() {
@@ -116,16 +119,40 @@ function TerrainViewer(props) {
     for (let elem of elementsToRemove) {
       document.head.removeChild(elem);
     }
+    return;
   }
 
   function on3DButtonClicked(viewerId, buttonId) {
     if (buttonId === 'center3Dto2D') {
       window.set3DPosition(viewerId, x, y, 8000);
     }
+  }
 
-    if (buttonId === 'help') {
-      setShowHelp(true);
+  function on3DPositionChanged(viewerId, x, y, z, rotH, rotV) {
+    setHasPinBeenSaved(false);
+    store.dispatch(
+      terrainViewerSlice.actions.setTerrainViewerSettings({
+        x: x,
+        y: y,
+        z: z,
+        rotH: rotH,
+        rotV: rotV,
+      }),
+    );
+  }
+
+  async function savePin() {
+    const { user, setLastAddedPin } = props;
+    const pin = constructPinFromProps(props);
+
+    if (user.userdata) {
+      const { uniqueId } = await savePinsToServer([pin]);
+      setLastAddedPin(uniqueId);
+    } else {
+      const uniqueId = savePinsToSessionStorage([pin]);
+      setLastAddedPin(uniqueId);
     }
+    setHasPinBeenSaved(true);
   }
 
   async function downloadImage() {
@@ -143,6 +170,11 @@ function TerrainViewer(props) {
     const imageUrl = await window.print3D(terrainViewerId, width, height);
     const blob = await fetch(imageUrl).then(res => res.blob());
     const title = showLogoAndCaptions ? getTitle(fromTime, toTime, datasetId, layerId, customSelected) : null;
+
+    const dsh = getDataSourceHandler(datasetId);
+    const drawCopernicusLogo = dsh.isCopernicus();
+    const addLogos = dsh.isSentinelHub();
+
     const imageWithOverlays = await addImageOverlays(
       blob,
       width,
@@ -159,9 +191,11 @@ function TerrainViewer(props) {
       null,
       null,
       null,
-      showLogoAndCaptions ? SENTINEL_COPYRIGHT_TEXT : null,
+      showLogoAndCaptions ? dsh.getCopyrightText(datasetId) : null,
       title,
       false,
+      addLogos,
+      drawCopernicusLogo,
     );
     const nicename = getNicename(fromTime, toTime, datasetId, layerId, customSelected, false);
     FileSaver.saveAs(imageWithOverlays, `${nicename}.png`);
@@ -169,16 +203,19 @@ function TerrainViewer(props) {
   }
 
   function onClose() {
+    removeUnnecessaryScripts();
     if (terrainViewerId) {
       window.close3DViewer(terrainViewerId);
     }
     cancelToken.cancel();
+    store.dispatch(terrainViewerSlice.actions.resetTerrainViewerSettings());
     store.dispatch(modalSlice.actions.removeModal());
   }
 
   window.get3DMapTileUrl = get3DMapTileUrl;
   window.on3DButtonClicked = on3DButtonClicked;
   window.on3DInitialized = on3DInitialized;
+  window.on3DPositionChanged = on3DPositionChanged;
 
   const isUserLoggedIn = props.user && props.user.userdata;
 
@@ -222,10 +259,30 @@ function TerrainViewer(props) {
                 <label>{t`Show captions`}</label>
               </div>
             )}
+            <div className="actions">
+              <div
+                className={`action-wrapper ${hasPinBeenSaved ? ' pin-saved' : ''}`}
+                onClick={savePin}
+                title={t`Add to Pins`}
+              >
+                <i className="fa fa-thumb-tack" />
+              </div>
+              <div
+                className="action-wrapper"
+                onClick={() => setSocialSharePanelOpen(!socialSharePanelOpen)}
+                title={t`Share`}
+              >
+                <i className="fas fa-share-alt" />
+                <SocialShare
+                  displaySocialShareOptions={socialSharePanelOpen}
+                  toggleSocialSharePanel={() => setSocialSharePanelOpen(false)}
+                  datasetId={datasetId}
+                />
+              </div>
+            </div>
           </div>
         )}
       </div>
-      {showHelp && <TerrainViewerHelp setShowHelp={setShowHelp} />}
     </Rodal>
   );
 }
@@ -245,11 +302,14 @@ const mapStoreToProps = store => ({
   toTime: store.visualization.toTime,
   datasetId: store.visualization.datasetId,
   customSelected: store.visualization.customSelected,
-  gain: store.visualization.gainEffect,
-  gamma: store.visualization.gammaEffect,
-  redRange: store.visualization.redRangeEffect,
-  greenRange: store.visualization.greenRangeEffect,
-  blueRange: store.visualization.blueRangeEffect,
+  gainEffect: store.visualization.gainEffect,
+  gammaEffect: store.visualization.gammaEffect,
+  redRangeEffect: store.visualization.redRangeEffect,
+  greenRangeEffect: store.visualization.greenRangeEffect,
+  blueRangeEffect: store.visualization.blueRangeEffect,
+  redCurveEffect: store.visualization.redCurveEffect,
+  greenCurveEffect: store.visualization.greenCurveEffect,
+  blueCurveEffect: store.visualization.blueCurveEffect,
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
   minQa: store.visualization.minQa,
@@ -258,6 +318,8 @@ const mapStoreToProps = store => ({
   selectedThemeId: store.themes.selectedThemeId,
   locale: store.language.selectedLanguage,
   user: store.auth.user,
+  auth: store.auth,
+  terrainViewerSettings: store.terrainViewer.settings,
 });
 
 export default connect(mapStoreToProps, null)(TerrainViewer);

@@ -21,15 +21,7 @@ import Visualizations from './Visualizations';
 import Loader from '../../Loader/Loader';
 import './VisualizationPanel.scss';
 import { sortLayers } from './VisualizationPanel.utils';
-import {
-  getDataSourceHandler,
-  S3SLSTR,
-  getDatasetLabel,
-  S2L1C,
-  S2L2A,
-  AWS_L8L1C,
-  ESA_L8,
-} from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { getDataSourceHandler, getDatasetLabel } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { VisualizationPanelHeaderActions } from './VisualizationPanelHeaderActions';
 import { parseEvalscriptBands, parseIndexEvalscript } from '../../utils';
 import ZoomInNotification from './ZoomInNotification';
@@ -84,11 +76,7 @@ class VisualizationPanel extends Component {
     }
 
     if (this.props.selectedVisualizationId && this.props.customSelected) {
-      store.dispatch(
-        visualizationSlice.actions.setVisualizationParams({
-          customSelected: false,
-        }),
-      );
+      store.dispatch(visualizationSlice.actions.setVisualizationParams({ customSelected: false }));
     }
   }
 
@@ -150,19 +138,23 @@ class VisualizationPanel extends Component {
         layerId: layer.layerId,
         customSelected: false,
         visibleOnMap: true,
+        dataFusion: [],
       }),
     );
   };
 
-  setCustomVisualization = () => {
-    store.dispatch(
-      visualizationSlice.actions.setVisualizationParams({
-        layerId: null,
-        customSelected: true,
-        visibleOnMap: true,
-        visualizationUrl: this.state.visualizations[0].url,
-      }),
-    );
+  setCustomVisualization = (evalscript = null) => {
+    const params = {
+      layerId: null,
+      customSelected: true,
+      visibleOnMap: true,
+      visualizationUrl: this.state.visualizations[0].url,
+    };
+
+    if (evalscript) {
+      params.evalscript = evalscript;
+    }
+    store.dispatch(visualizationSlice.actions.setVisualizationParams(params));
   };
 
   goToCustom = () => {
@@ -171,8 +163,11 @@ class VisualizationPanel extends Component {
         ? this.props.evalscript
         : this.generateEvalscript(this.state.selectedBands, this.props.datasetId);
 
-    store.dispatch(visualizationSlice.actions.setEvalscript(evalscript));
-    this.setCustomVisualization();
+    this.setState({
+      evalscript: evalscript,
+    });
+
+    this.setCustomVisualization(evalscript);
   };
 
   onDataFusionChange = value => {
@@ -552,17 +547,6 @@ class VisualizationPanel extends Component {
     );
   };
 
-  getSibling = datasetId => {
-    switch (datasetId) {
-      case S2L2A:
-        return { siblingId: S2L1C, siblingShortName: 'L1C' };
-      case S2L1C:
-        return { siblingId: S2L2A, siblingShortName: 'L2A' };
-      default:
-        return {};
-    }
-  };
-
   setSibling = async datasetId => {
     const isSiblingDataAvailable = await this.searchForSiblingData(datasetId);
     if (!isSiblingDataAvailable) {
@@ -626,7 +610,8 @@ class VisualizationPanel extends Component {
 
   manageSiblings = async () => {
     const { datasetId } = this.props;
-    const { siblingShortName, siblingId } = this.getSibling(datasetId);
+    const dsh = getDataSourceHandler(datasetId);
+    const { siblingShortName, siblingId } = dsh ? dsh.getSibling(datasetId) : {};
     if (!siblingId) {
       return;
     }
@@ -841,12 +826,13 @@ class VisualizationPanel extends Component {
   };
 
   _getLegacyActiveLayer = datasetId => {
-    if (datasetId !== S3SLSTR && datasetId !== AWS_L8L1C && datasetId !== ESA_L8) {
-      return {};
+    const dsh = getDataSourceHandler(datasetId);
+    if (dsh && dsh.groupChannels) {
+      return {
+        groupChannels: datasetId => dsh.groupChannels(datasetId),
+      };
     }
-    return {
-      groupChannels: channels => getDataSourceHandler(datasetId).groupChannels(channels),
-    };
+    return {};
   };
 
   render() {
@@ -870,6 +856,7 @@ class VisualizationPanel extends Component {
 
     const legacyActiveLayer = {
       ...this._getLegacyActiveLayer(this.props.datasetId),
+      datasetId: datasetId,
       baseUrls: {
         WMS: this.props.visualizationUrl,
       },

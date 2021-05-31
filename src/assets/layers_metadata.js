@@ -301,7 +301,11 @@ export const PREDEFINED_LAYERS_METADATA = [
   },
 
   {
-    match: [{ datasourceId: 'AWS_L8L1C', layerId: 'THERMAL' }],
+    match: [
+      { datasourceId: 'AWS_L8L1C', layerId: 'THERMAL' },
+      { datasourceId: 'AWS_LOTL1', layerId: 'THERMAL' },
+      { datasourceId: 'AWS_LOTL2', layerId: 'THERMAL' },
+    ],
     legend: {
       type: 'continuous',
       minPosition: 223,
@@ -327,12 +331,52 @@ export const PREDEFINED_LAYERS_METADATA = [
 
   {
     match: [
+      { datasourceId: 'AWS_LTML1', layerId: '1_TRUE_COLOR' },
+      { datasourceId: 'AWS_LTML2', layerId: '1_TRUE_COLOR' },
+    ],
+    description: () =>
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 4-5 TM has 7 bands. The true color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here]( https://www.usgs.gov/centers/eros/science/usgs-eros-archive-landsat-archives-landsat-4-5-thematic-mapper-tm-level-1-data?qt-science_center_objects=0#qt-science_center_objects).`,
+  },
+  {
+    match: [
+      { datasourceId: 'AWS_LTML1', layerId: 'THERMAL' },
+      { datasourceId: 'AWS_LTML2', layerId: 'THERMAL' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: 223,
+      maxPosition: 348,
+      gradients: [
+        { position: 223, color: '#003d99', label: '<= -50' },
+        { position: 253, color: '#2e82ff', label: '-20' },
+        { position: 263, color: '#80b3ff', label: '-10' },
+        { position: 272, color: '#e0edff' },
+        { position: 273, color: '#ffffff', label: '0' },
+        { position: 274, color: '#fefce7' },
+        { position: 283, color: '#FDE191', label: '10' },
+        { position: 293, color: '#f69855', label: '20' },
+        { position: 303, color: '#f66927', label: '30' },
+        { position: 323, color: '#aa2d1d', label: '50' },
+        { position: 342, color: '#650401', label: '90' },
+        { position: 348, color: '#3d0200', label: '>= 100 [°C]' },
+      ],
+    },
+    description: () =>
+      t`# Thermal band 6\n\nThis thermal visualization is based on band 6 (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). At the central wavelength of 11040 nm it measures in the thermal infrared, or TIR. Instead of measuring the temperature of the air, like weather stations do, band 6 reports on the ground itself, which is often much hotter. Thermal band 6 is useful in providing surface temperatures and is collected with a 120-meter resolution, resampled to 30-meter.\n\n\n\nMore info [here](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-landsat-archives-landsat-4-5-thematic-mapper-tm-level-1-data?qt-science_center_objects=0#qt-science_center_objects).`,
+  },
+
+  {
+    match: [
       { datasourceId: 'S2L1C', layerId: '3_NDVI' },
       { datasourceId: 'S2L2A', layerId: '3_NDVI' },
       { datasourceId: 'ENVISAT_MERIS', layerId: 'NDVI' },
       { datasourceId: 'S2L1C', layerId: 'NORMALIZED-DIFFERENCE-VEGETATION-INDEX-NDVI' },
       { datasourceId: 'S2L2A', layerId: 'NORMALIZED-DIFFERENCE-VEGETATION-INDEX-NDVI' },
       { datasourceId: 'AWS_L8L1C', layerId: '4-NDVI' },
+      { datasourceId: 'AWS_LOTL1', layerId: '4-NDVI' },
+      { datasourceId: 'AWS_LOTL2', layerId: '4-NDVI' },
+      { datasourceId: 'AWS_LTML1', layerId: '4_NDVI' },
+      { datasourceId: 'AWS_LTML2', layerId: '4_NDVI' },
       { datasourceId: 'ESA_L8', layerId: '3_NDVI' },
       { datasourceId: 'ESA_L7', layerId: '3_NDVI' },
       { datasourceId: 'ESA_L5', layerId: '3_NDVI' },
@@ -543,6 +587,8 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L1C', layerId: '3_NDWI' },
       { datasourceId: 'S2L2A', layerId: '3_NDWI' },
       { datasourceId: 'MODIS', layerId: 'NDWI' },
+      { datasourceId: 'AWS_LTML1', layerId: '5_NDWI' },
+      { datasourceId: 'AWS_LTML2', layerId: '5_NDWI' },
     ],
     legend: {
       type: 'continuous',
@@ -601,12 +647,25 @@ export const PREDEFINED_LAYERS_METADATA = [
   },
 
   {
-    match: [{ datasourceId: 'AWS_L8L1C', layerId: '3_FALSE_COLOR' }],
+    match: [
+      { datasourceId: 'AWS_L8L1C', layerId: '3_FALSE_COLOR' },
+      { datasourceId: 'AWS_LOTL1', layerId: '3_FALSE_COLOR' },
+      { datasourceId: 'AWS_LOTL2', layerId: '3_FALSE_COLOR' },
+    ],
 
     description: () =>
       t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://gisgeography.com/landsat-8-bands-combinations/)`,
   },
 
+  {
+    match: [
+      { datasourceId: 'AWS_LTML1', layerId: '3_FALSE_COLOR' },
+      { datasourceId: 'AWS_LTML2', layerId: '3_FALSE_COLOR' },
+    ],
+
+    description: () =>
+      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://earthobservatory.nasa.gov/features/FalseColor/page6.php)`,
+  },
   {
     match: [
       { datasourceId: 'ESA_L5', layerId: '2_FALSE_COLOR' },
@@ -657,6 +716,12 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'AWS_L8L1C', layerId: '1_TRUE_COLOR' },
       { datasourceId: 'AWS_L8L1C', layerId: '1_TRUE-COLOR' },
       { datasourceId: 'AWS_L8L1C', layerId: 'TRUE-COLOR' },
+      { datasourceId: 'AWS_LOTL1', layerId: '1_TRUE_COLOR' },
+      { datasourceId: 'AWS_LOTL1', layerId: '1_TRUE-COLOR' },
+      { datasourceId: 'AWS_LOTL1', layerId: 'TRUE-COLOR' },
+      { datasourceId: 'AWS_LOTL2', layerId: '1_TRUE_COLOR' },
+      { datasourceId: 'AWS_LOTL2', layerId: '1_TRUE-COLOR' },
+      { datasourceId: 'AWS_LOTL2', layerId: 'TRUE-COLOR' },
     ],
 
     description: () =>
@@ -685,10 +750,13 @@ export const PREDEFINED_LAYERS_METADATA = [
   },
 
   {
-    match: [{ datasourceId: 'AWS_L8L1C', layerId: '2_TRUE_COLOR_PANSHARPENED' }],
+    match: [
+      { datasourceId: 'AWS_L8L1C', layerId: '2_TRUE_COLOR_PANSHARPENED' },
+      { datasourceId: 'AWS_LOTL1', layerId: '2_TRUE_COLOR_PANSHARPENED' },
+    ],
 
     description: () =>
-      t`# Pansharpened True Color\n\nThe pansharpened true color composite is done by using the usual true color data (red, green and blue (RGB)) and enhancing them by using the panchromatic band 8, or pan band (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). An image from the pan band is similar to black-and-white film: it combines light from the red, green, and blue parts of the spectrum into a single measure of overall visible reflectance. Pansharpened images have 2x the resolution of the usual true color composite, greatly enhancing the usefulness of Landsat imagery.\n\n\n\nMore info [here](https://blog.mapbox.com/pansharpening-for-higher-resolution-in-landsat-live-e4717cd7c356) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
+      t`# Pansharpened True Color\n\nThe pansharpened true color composite is done by using the usual true color data (red, green and blue (RGB)) and enhancing them by using the panchromatic band 8, or pan band (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). An image from the pan band is similar to black-and-white film: it combines light from the red, green, and blue parts of the spectrum into a single measure of overall visible reflectance. Pansharpened images have 4x the resolution of the usual true color composite, greatly enhancing the usefulness of Landsat imagery.\n\n\n\nMore info [here](https://blog.mapbox.com/pansharpening-for-higher-resolution-in-landsat-live-e4717cd7c356) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
   },
   {
     match: [
@@ -705,7 +773,11 @@ export const PREDEFINED_LAYERS_METADATA = [
   },
 
   {
-    match: [{ datasourceId: 'AWS_L8L1C', layerId: 'FALSE-COLOR-LAVA-FLOW' }],
+    match: [
+      { datasourceId: 'AWS_L8L1C', layerId: 'FALSE-COLOR-LAVA-FLOW' },
+      { datasourceId: 'AWS_LOTL1', layerId: 'FALSE-COLOR-LAVA-FLOW' },
+      { datasourceId: 'AWS_LOTL2', layerId: 'FALSE-COLOR-LAVA-FLOW' },
+    ],
 
     description: () =>
       t`# False Color Urban composite\n\nThis composite uses a combination of bands in visible and in short wave infrared (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). It displays vegetation in shades of green. While darker shades of green indicate denser vegetation, sparse vegetation have lighter shades. Urban areas are blue and soils have various shades of brown.\n\n\n\nMore info [here.](https://gisgeography.com/landsat-8-bands-combinations/)`,
@@ -760,7 +832,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       [EDUCATION_MODE.id]: `Short Wave Infrared Composite`,
     }),
     description: () =>
-      t`# Short wave infrared composite (SWIR)\n\nShort wave infrared (SWIR) measurements can help scientists estimate how much water is present in plants and soil, as water reflects SWIR wavelengths. Short wave infrared bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. In this composite vegetation appears in shades of green, soils and built-up areas are in various shades of brown, and water appears black. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/)`,
+      t`# Short wave infrared composite (SWIR)\n\nShort wave infrared (SWIR) measurements can help scientists estimate how much water is present in plants and soil, as water absorbs SWIR wavelengths. Short wave infrared bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. In this composite vegetation appears in shades of green, soils and built-up areas are in various shades of brown, and water appears black. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/)`,
   },
 
   {
@@ -1685,6 +1757,207 @@ export const PREDEFINED_LAYERS_METADATA = [
       t`# Water Bodies - Occurrence\n\n\n\nThis layer displays the 6 occurrence levels of the Quality layer (QUAL), providing information on the seasonal dynamics of the detected water bodies. QUAL is generated from water body occurrence statistics computed from previous monthly Water Bodies products. The occurrence statistics is ranked from low occurrence to permanent occurrence. More information [here](https://collections.sentinel-hub.com/water-bodies/readme.html), and [here](https://custom-scripts.sentinel-hub.com/copernicus_services/water-bodies-occurence/#).`,
   },
 
+  {
+    match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '1_OCCURRENCE' }],
+    legend: [
+      {
+        type: 'continuous',
+        minPosition: 1,
+        maxPosition: 100,
+        gradients: [
+          { position: '1', color: 'rgb(255,204,204)', label: '1 % Occurence' },
+          { position: '100', color: 'rgb(0,0,255)', label: '100 % Occurence' },
+        ],
+      },
+      {
+        type: 'discrete',
+        items: [
+          {
+            color: '#ffffff',
+            label: 'Not Water',
+          },
+          {
+            color: '#cccccc',
+            label: 'No Data',
+          },
+        ],
+      },
+    ],
+    description: () =>
+      t`# Global Surface Water - Occurrence\n\n\n\nThe layer shows the (intra- and inter-annual) variations of surface water presence in the time range between March 1984 and December 2019. Permanent water areas with 100% occurrence over the 36 years are shown in blue, while lighter shades of pink and purple indicate lower degrees of water presence. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_occurrence/).`,
+  },
+  {
+    match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '2_CHANGE-INTENSITY' }],
+    legend: [
+      {
+        type: 'continuous',
+        minPosition: 0,
+        maxPosition: 200,
+        gradients: [
+          { position: '0', color: 'rgb(255,0,0)', label: '100 % Loss of Occurence' },
+          { position: '100', color: 'rgb(0,0,0)', label: '0 % Change in Occurence' },
+          { position: '200', color: 'rgb(0,255,0)', label: '100 % Increase in Occurence' },
+        ],
+      },
+      {
+        type: 'discrete',
+        items: [
+          {
+            color: '#ffffff',
+            label: 'Not Water',
+          },
+          {
+            color: '#888888',
+            label: 'Unable to calculate',
+          },
+          {
+            color: '#cccccc',
+            label: 'No Data',
+          },
+        ],
+      },
+    ],
+    description: () =>
+      t`# Global Surface Water - Occurrence Change Intensity\n\n\n\nThe layer visualises changes in water occurrence between two different epochs, the first ranging from March 1984 to December 1999, and the other covering the period from January 2000 to December 2019. Areas with increase in water occurrence are visualized in different shades of green, areas with no change are colored black and areas with decrease are shown in shades of red. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_change/).`,
+  },
+  {
+    match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '3_SEASONALITY' }],
+    legend: [
+      {
+        type: 'continuous',
+        minPosition: 1,
+        maxPosition: 12,
+        gradients: [
+          { position: '1', color: 'rgb(153, 217, 234)', label: '1 month of water' },
+          { position: '12', color: 'rgb(0,0,170)', label: '12 months of water (permanent)' },
+        ],
+      },
+      {
+        type: 'discrete',
+        items: [
+          {
+            color: '#ffffff',
+            label: 'Not Water',
+          },
+          {
+            color: '#cccccc',
+            label: 'No Data',
+          },
+        ],
+      },
+    ],
+    description: () =>
+      t`# Global Surface Water - Seasonality\n\n\n\nThe Seasonality layer provides information on the distribution of surface water in 2019. Permanent water bodies (water was present for 12 months) are colored in dark blue and seasonal water (water was present for less than 12 months) in gradually lighter shades of blue, with the lightest blue showing areas where water was present for only 1 month. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_seasonality/#).`,
+  },
+  {
+    match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '4_RECURRENCE' }],
+    legend: [
+      {
+        type: 'continuous',
+        minPosition: 1,
+        maxPosition: 100,
+        gradients: [
+          { position: '1', color: 'rgb(255, 127, 39)', label: '1 % recurrence' },
+          { position: '100', color: 'rgb(153, 217, 234 )', label: '100 % recurrence' },
+        ],
+      },
+      {
+        type: 'discrete',
+        items: [
+          {
+            color: '#ffffff',
+            label: 'Not Water',
+          },
+          {
+            color: '#cccccc',
+            label: 'No Data',
+          },
+        ],
+      },
+    ],
+    description: () =>
+      t`# Global Surface Water - Recurrence\n\n\n\nThe Recurrence layer shows how frequently water returned to a particular location in a defined water period between 1984 and 2019. Orange color indicates low recurrence (water returned to the area infrequently), and light blue color indicates high recurrence (water returned to the area frequently). Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_recurrence/).`,
+  },
+  {
+    match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '5_TRANSITIONS' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#ffffff',
+          label: 'Not water',
+        },
+        {
+          color: '#0000ff',
+          label: 'Permanent',
+        },
+        {
+          color: '#22b14c',
+          label: 'New permanent',
+        },
+        {
+          color: '#d1102d',
+          label: 'Lost permanent',
+        },
+        {
+          color: '#99d9ea',
+          label: 'Seasonal',
+        },
+        {
+          color: '#b5e61d',
+          label: 'New seasonal',
+        },
+        {
+          color: '#e6a1aa',
+          label: 'Lost seasonal',
+        },
+        {
+          color: '#ff7f27',
+          label: 'Seasonal to permanent',
+        },
+        {
+          color: '#ffc90e',
+          label: 'Permanent to seasonal',
+        },
+        {
+          color: '#7f7f7f',
+          label: 'Ephemeral permanent',
+        },
+        {
+          color: '#c3c3c3',
+          label: 'Ephemeral seasonal',
+        },
+        {
+          color: '#cccccc',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Global Surface Water - Transitions\n\n\n\nThe Transitions layer is derived from a comparison between the first and last year in the 36-year time period. It visualises conversions between seasonal and permanent water. For example, "lost seasonal" means, that previously seasonal water was converted to land, "new seasonal" means that land has been converted to seasonal waters and so on. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_transitions/) and learn what each class means [here](https://global-surface-water.appspot.com/faq).`,
+  },
+  {
+    match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '6_EXTENT' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#6666ff',
+          label: 'Water Detected',
+        },
+        {
+          color: '#ffffff',
+          label: 'Not Water',
+        },
+        {
+          color: '#cccccc',
+          label: 'No Data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Global Surface Water - Extent\n\n\n\nThis layer visualizes water in blue. It combines all the other layers and visualizes all the locations for which water presence has ever been detected over the 36-year period. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_extent/).`,
+  },
   {
     match: [{ datasourceId: 'COPERNICUS_WATER_BODIES', layerId: 'WATER-BODIES' }],
 

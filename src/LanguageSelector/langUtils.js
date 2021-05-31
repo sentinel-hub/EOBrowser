@@ -9,6 +9,7 @@ export const SUPPORTED_LANGUAGES = [
   { langCode: 'es', text: 'español', flagCode: 'ES' },
   { langCode: 'el', text: 'ελληνικά', flagCode: 'GR' },
   { langCode: 'pl', text: 'polski', flagCode: 'PL' },
+  { langCode: 'sl', text: 'slovenščina', flagCode: 'SI' },
 ];
 
 export const changeLanguage = locale => {

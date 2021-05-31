@@ -7,6 +7,7 @@ import {
   CorineLandCoverTooltip,
   GlobalLandCoverTooltip,
   WaterBodiesTooltip,
+  GlobalSurfaceWaterTooltip,
 } from './DatasourceRenderingComponents/dataSourceTooltips/CopernicusServicesTooltips';
 import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 
@@ -15,10 +16,12 @@ import {
   COPERNICUS_CORINE_LAND_COVER,
   COPERNICUS_GLOBAL_LAND_COVER,
   COPERNICUS_WATER_BODIES,
+  COPERNICUS_GLOBAL_SURFACE_WATER,
 } from './dataSourceHandlers';
 import { CORINE_LAND_COVER_BANDS } from './datasourceAssets/copernicusCorineLandCoverBands';
 import { GLOBAL_LAND_COVER_BANDS } from './datasourceAssets/copernicusGlobalLandCoverBands';
 import { WATER_BODIES_BANDS } from './datasourceAssets/copernicusWaterBodiesBands';
+import { GLOBAL_SURFACE_WATER_BANDS } from './datasourceAssets/copernicusGlobalSurfaceWaterBands';
 import { convertGeoJSONToEPSG4326 } from '../../../utils/coords';
 
 export default class CopernicusServicesDataSourceHandler extends DataSourceHandler {
@@ -26,12 +29,14 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
     [COPERNICUS_CORINE_LAND_COVER]: 'CORINE Land Cover',
     [COPERNICUS_GLOBAL_LAND_COVER]: 'Global Land Cover',
     [COPERNICUS_WATER_BODIES]: 'Water Bodies',
+    [COPERNICUS_GLOBAL_SURFACE_WATER]: 'Global Surface Water',
   });
 
   urls = {
     [COPERNICUS_CORINE_LAND_COVER]: [],
     [COPERNICUS_GLOBAL_LAND_COVER]: [],
     [COPERNICUS_WATER_BODIES]: [],
+    [COPERNICUS_GLOBAL_SURFACE_WATER]: [],
   };
   datasets = [];
   allLayers = [];
@@ -50,44 +55,34 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
       min: 3,
       max: 16,
     },
+    [COPERNICUS_GLOBAL_SURFACE_WATER]: {
+      min: 3,
+      max: 16,
+    },
   };
 
   KNOWN_COLLECTIONS = {
     [COPERNICUS_CORINE_LAND_COVER]: ['cbdba8-YOUR-INSTANCEID-HERE'],
     [COPERNICUS_GLOBAL_LAND_COVER]: ['f0a976-YOUR-INSTANCEID-HERE'],
     [COPERNICUS_WATER_BODIES]: ['62bf6f-YOUR-INSTANCEID-HERE'],
+    [COPERNICUS_GLOBAL_SURFACE_WATER]: ['9a525f-YOUR-INSTANCEID-HERE'],
   };
 
   willHandle(service, url, name, layers, preselected) {
-    const layersWithCorineCollection = layers.filter(l =>
-      this.KNOWN_COLLECTIONS[COPERNICUS_CORINE_LAND_COVER].includes(l.collectionId),
-    );
-    const layersWithGlobalCollection = layers.filter(l =>
-      this.KNOWN_COLLECTIONS[COPERNICUS_GLOBAL_LAND_COVER].includes(l.collectionId),
-    );
-    const layersWithWaterBodiesCollection = layers.filter(l =>
-      this.KNOWN_COLLECTIONS[COPERNICUS_WATER_BODIES].includes(l.collectionId),
-    );
+    let handlesAny = false;
 
-    if (layersWithCorineCollection.length > 0) {
-      this.urls.COPERNICUS_CORINE_LAND_COVER.push(url);
-      this.datasets.push(COPERNICUS_CORINE_LAND_COVER);
-    } else if (layersWithGlobalCollection.length > 0) {
-      this.urls.COPERNICUS_GLOBAL_LAND_COVER.push(url);
-      this.datasets.push(COPERNICUS_GLOBAL_LAND_COVER);
-    } else if (layersWithWaterBodiesCollection.length > 0) {
-      this.urls.COPERNICUS_WATER_BODIES.push(url);
-      this.datasets.push(COPERNICUS_WATER_BODIES);
-    } else {
-      return false;
+    for (let datasetId of Object.keys(this.KNOWN_COLLECTIONS)) {
+      const layersWithDataset = layers.filter(l =>
+        this.KNOWN_COLLECTIONS[datasetId].includes(l.collectionId),
+      );
+      if (layersWithDataset.length > 0) {
+        this.urls[datasetId].push(url);
+        this.datasets.push(datasetId);
+        handlesAny = true;
+        this.allLayers.push(...layersWithDataset);
+      }
     }
-
-    this.allLayers.push(
-      ...layersWithCorineCollection,
-      ...layersWithGlobalCollection,
-      ...layersWithWaterBodiesCollection,
-    );
-    return true;
+    return handlesAny;
   }
 
   isHandlingAnyUrl() {
@@ -139,6 +134,13 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
             <WaterBodiesTooltip />
           </HelpTooltip>
         );
+      case COPERNICUS_GLOBAL_SURFACE_WATER:
+        return (
+          <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+            <GlobalSurfaceWaterTooltip />
+          </HelpTooltip>
+        );
+
       default:
         return null;
     }
@@ -193,6 +195,8 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
         return this.urls.COPERNICUS_GLOBAL_LAND_COVER;
       case COPERNICUS_WATER_BODIES:
         return this.urls.COPERNICUS_WATER_BODIES;
+      case COPERNICUS_GLOBAL_SURFACE_WATER:
+        return this.urls.COPERNICUS_GLOBAL_SURFACE_WATER;
       default:
         return [];
     }
@@ -208,6 +212,8 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
         return GLOBAL_LAND_COVER_BANDS;
       case COPERNICUS_WATER_BODIES:
         return WATER_BODIES_BANDS;
+      case COPERNICUS_GLOBAL_SURFACE_WATER:
+        return GLOBAL_SURFACE_WATER_BANDS;
       default:
         return [];
     }

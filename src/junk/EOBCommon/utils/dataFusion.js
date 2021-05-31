@@ -8,6 +8,10 @@ import {
   DATASET_S3SLSTR,
   DATASET_S5PL2,
   DATASET_AWS_L8L1C,
+  DATASET_AWS_LOTL1,
+  DATASET_AWS_LOTL2,
+  DATASET_AWS_LTML1,
+  DATASET_AWS_LTML2,
   DATASET_MODIS,
   DATASET_AWS_DEM,
   S1GRDAWSEULayer,
@@ -17,10 +21,16 @@ import {
   S3OLCILayer,
   S5PL2Layer,
   Landsat8AWSLayer,
+  Landsat8AWSLOTL1Layer,
+  Landsat8AWSLOTL2Layer,
+  Landsat45AWSLTML1Layer,
+  Landsat45AWSLTML2Layer,
   MODISLayer,
   DEMLayer,
   ProcessingDataFusionLayer,
 } from '@sentinel-hub/sentinelhub-js';
+
+import { S1_DEFAULT_PARAMS } from '../../../const';
 
 export async function getMapDataFusion(wmsParams, dataFusionSettings, effects = null) {
   const { evalscript, evalscriptUrl, getMapParams } = parseLegacyWmsGetMapParams(wmsParams);
@@ -71,13 +81,21 @@ export function constructLayerFromDatasetId(datasetId, mosaickingOrder, addition
     case DATASET_AWSEU_S1GRD.id:
       // we are setting evalscript to avoid exception when the layer is initialized without any parameters
       // (this should be fixed in sentinelhub-js)
-      const { orthorectification = '' } = additionalParameters;
+      const {
+        orthorectification = S1_DEFAULT_PARAMS.orthorectification,
+        polarization = S1_DEFAULT_PARAMS.polarization,
+        acquisitionMode = S1_DEFAULT_PARAMS.acquisitionMode,
+        resolution = S1_DEFAULT_PARAMS.resolution,
+      } = additionalParameters;
       const orthorectify = orthorectification === '' ? false : true;
       const demInstanceType = orthorectification === '' ? null : orthorectification;
       return new S1GRDAWSEULayer({
         evalscript: '//VERSION=3 ---',
         mosaickingOrder: mosaickingOrder,
         orthorectify: orthorectify,
+        polarization: polarization,
+        acquisitionMode: acquisitionMode,
+        resolution: resolution,
         demInstanceType: demInstanceType,
       });
     case DATASET_S2L1C.id:
@@ -90,8 +108,16 @@ export function constructLayerFromDatasetId(datasetId, mosaickingOrder, addition
       return new S3SLSTRLayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_S5PL2.id:
       return new S5PL2Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
+    case DATASET_AWS_LTML1.id:
+      return new Landsat45AWSLTML1Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
+    case DATASET_AWS_LTML2.id:
+      return new Landsat45AWSLTML2Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_AWS_L8L1C.id:
       return new Landsat8AWSLayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
+    case DATASET_AWS_LOTL1.id:
+      return new Landsat8AWSLOTL1Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
+    case DATASET_AWS_LOTL2.id:
+      return new Landsat8AWSLOTL2Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_MODIS.id:
       return new MODISLayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_AWS_DEM.id:

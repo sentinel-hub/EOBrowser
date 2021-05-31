@@ -14,6 +14,10 @@ import {
   S3OLCILayer,
   S5PL2Layer,
   Landsat8AWSLayer,
+  Landsat8AWSLOTL1Layer,
+  Landsat8AWSLOTL2Layer,
+  Landsat45AWSLTML1Layer,
+  Landsat45AWSLTML2Layer,
   MODISLayer,
   DEMLayer,
   ProcessingDataFusionLayer,
@@ -57,11 +61,16 @@ import {
   COPERNICUS_GLOBAL_LAND_COVER,
   COPERNICUS_WATER_BODIES,
   getDataSourceHandler,
+  AWS_LOTL1,
+  AWS_LOTL2,
+  AWS_LTML1,
+  AWS_LTML2,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import DEMDataSourceHandler from '../../Tools/SearchPanel/dataSourceHandlers/DEMDataSourceHandler';
 import { constructLayerFromDatasetId } from '../../junk/EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
 import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
+import { refetchWithDefaultToken } from '../../utils/fetching.utils';
 
 class SentinelHubLayer extends L.TileLayer {
   constructor(options) {
@@ -177,28 +186,34 @@ class SentinelHubLayer extends L.TileLayer {
         }
       }
       const apiType = layer.supportsApiType(ApiType.PROCESSING) ? ApiType.PROCESSING : ApiType.WMS;
-      layer
-        .getMap(individualTileParams, apiType, reqConfig)
-        .then(blob => {
-          tile.onload = function() {
-            URL.revokeObjectURL(tile.src);
-            if (onTileImageLoad) {
-              onTileImageLoad();
-            }
-            done(null, tile);
-          };
-          const objectURL = URL.createObjectURL(blob);
-          tile.src = objectURL;
-        })
-        .catch(function(error) {
-          if (!isCancelled(error)) {
-            if (onTileImageError) {
-              onTileImageError(error);
-            }
-            console.error('There has been a problem with your fetch operation: ', error.message);
+
+      if (this.options.getMapAuthToken) {
+        reqConfig.authToken = this.options.getMapAuthToken;
+      }
+
+      refetchWithDefaultToken(
+        reqConfig =>
+          layer.getMap(individualTileParams, apiType, reqConfig).then(blob => {
+            tile.onload = function() {
+              URL.revokeObjectURL(tile.src);
+              if (onTileImageLoad) {
+                onTileImageLoad();
+              }
+              done(null, tile);
+            };
+            const objectURL = URL.createObjectURL(blob);
+            tile.src = objectURL;
+          }),
+        reqConfig,
+      ).catch(function(error) {
+        if (!isCancelled(error)) {
+          if (onTileImageError) {
+            onTileImageError(error);
           }
-          done(error, null);
-        });
+          console.error('There has been a problem with your fetch operation: ', error.message);
+        }
+        done(error, null);
+      });
     });
     return tile;
   };
@@ -365,6 +380,34 @@ class SentinelHubLayer extends L.TileLayer {
         return await this.createSH12Layer(url, evalscript, evalscripturl, upsampling, downsampling);
       case AWS_L8L1C:
         return await new Landsat8AWSLayer({
+          evalscript: evalscript,
+          evalscriptUrl: evalscripturl,
+          upsampling: upsampling,
+          downsampling: downsampling,
+        });
+      case AWS_LOTL1:
+        return await new Landsat8AWSLOTL1Layer({
+          evalscript: evalscript,
+          evalscriptUrl: evalscripturl,
+          upsampling: upsampling,
+          downsampling: downsampling,
+        });
+      case AWS_LOTL2:
+        return await new Landsat8AWSLOTL2Layer({
+          evalscript: evalscript,
+          evalscriptUrl: evalscripturl,
+          upsampling: upsampling,
+          downsampling: downsampling,
+        });
+      case AWS_LTML1:
+        return await new Landsat45AWSLTML1Layer({
+          evalscript: evalscript,
+          evalscriptUrl: evalscripturl,
+          upsampling: upsampling,
+          downsampling: downsampling,
+        });
+      case AWS_LTML2:
+        return await new Landsat45AWSLTML2Layer({
           evalscript: evalscript,
           evalscriptUrl: evalscripturl,
           upsampling: upsampling,
@@ -567,6 +610,10 @@ class SentinelHubLayerComponent extends GridLayer {
 
     if (params.accessToken) {
       options.accessToken = params.accessToken;
+    }
+
+    if (params.getMapAuthToken) {
+      options.getMapAuthToken = params.getMapAuthToken;
     }
 
     if (params.onTileImageError) {

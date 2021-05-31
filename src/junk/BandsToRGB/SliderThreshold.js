@@ -29,16 +29,19 @@ export class SliderThreshold extends Component {
     return values.map(item => item * SLIDER_BUG_OFFSET);
   };
 
-  calculateGradient = (sliderOffset, gradient, values) => {
+  calculateGradient = (handlePositions, gradient, values) => {
     const firstValue = values[0];
     const lastValue = values[values.length - 1];
+
+    const firstHandlePosition = handlePositions[0];
+    const lastHandlePosition = handlePositions[handlePositions.length - 1];
     const range = lastValue - firstValue;
 
-    const offsetLeftInPercent = `${((sliderOffset.left - firstValue) * 100) / range}%`;
-    const offsetRightInPercent = `${100 - ((lastValue - sliderOffset.right) * 100) / range}%`;
+    const offsetLeftInPercent = `${((firstHandlePosition - firstValue) * 100) / range}%`;
+    const offsetRightInPercent = `${100 - ((lastValue - lastHandlePosition) * 100) / range}%`;
 
-    const leftGradientColor = pickColor(gradient[0], gradient[1], sliderOffset.left, firstValue, lastValue);
-    const rightGradientColor = pickColor(gradient[0], gradient[1], sliderOffset.right, firstValue, lastValue);
+    const leftGradientColor = pickColor(gradient[0], gradient[1], firstHandlePosition, firstValue, lastValue);
+    const rightGradientColor = pickColor(gradient[0], gradient[1], lastHandlePosition, firstValue, lastValue);
 
     const transparentLeft = `rgba(0,0,0,0) ${offsetLeftInPercent},`;
     const fullGradient = `${leftGradientColor} ${offsetLeftInPercent}, ${rightGradientColor} ${offsetRightInPercent},`;
@@ -48,17 +51,16 @@ export class SliderThreshold extends Component {
   };
 
   render() {
-    const { sliderOffset, values, colors, domain, gradient, invalidMinMax } = this.props;
+    const { values, colors, domain, gradient, invalidMinMax, handlePositions } = this.props;
     // because of lib bug read above
-    const fixedValues = this.multiplyWithOffset(values);
+    const fixedValues = this.multiplyWithOffset(this.props.handlePositions);
     let fixedDomain = domain;
 
     if (!isNaN(domain[0]) && !isNaN(domain[1])) {
       fixedDomain = [domain[0] * SLIDER_BUG_OFFSET, domain[1] * SLIDER_BUG_OFFSET];
     }
 
-    const gradientStyle = this.calculateGradient(sliderOffset, gradient, values);
-
+    const gradientStyle = this.calculateGradient(handlePositions, gradient, values);
     return (
       <div className="slider-transparent-background">
         <div className="slider">

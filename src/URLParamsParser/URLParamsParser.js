@@ -7,11 +7,19 @@ import {
   dataSourceToThemeId,
   getDatasetIdFromInstanceId,
 } from '../utils/handleOldUrls';
-import store, { mainMapSlice, visualizationSlice, themesSlice } from '../store';
+import store, {
+  mainMapSlice,
+  visualizationSlice,
+  themesSlice,
+  indexSlice,
+  modalSlice,
+  terrainViewerSlice,
+} from '../store';
 import { b64DecodeUnicode } from '../utils/base64MDN';
 
 import { computeNewValuesFromPoints } from '../junk/EOBEffectsPanel/AdvancedRgbEffects/CurveEditor/CurveEditor.utils';
 import { DEFAULT_LAT_LNG } from '../const';
+import { ModalId } from '../Modals/Consts';
 
 class URLParamsParser extends React.Component {
   state = {
@@ -20,7 +28,6 @@ class URLParamsParser extends React.Component {
 
   async componentDidMount() {
     let params = getUrlParams();
-
     // Check if the url contains EOB2 params and update them accordingly.
     if (this.containsEOB2Params(params)) {
       const translatedEOB2Params = await this.translateEOB2(params);
@@ -154,6 +161,9 @@ class URLParamsParser extends React.Component {
       upsampling,
       downsampling,
       dataFusion,
+      handlePositions,
+      gradient,
+      terrainViewerSettings,
     } = params;
 
     let { lat: parsedLat, lng: parsedLng, zoom: parsedZoom } = parsePosition(lat, lng, zoom);
@@ -196,8 +206,21 @@ class URLParamsParser extends React.Component {
     };
     store.dispatch(visualizationSlice.actions.setVisualizationParams(newVisualizationParams));
 
+    if (handlePositions && gradient) {
+      const parsedGradient = gradient.split(',');
+      const parsedHandlePositions = handlePositions.split(',').map(position => parseFloat(position));
+
+      store.dispatch(indexSlice.actions.setHandlePositions(parsedHandlePositions));
+      store.dispatch(indexSlice.actions.setGradient(parsedGradient));
+    }
+
     if (themesUrl) {
       store.dispatch(themesSlice.actions.setThemesUrl(themesUrl));
+    }
+
+    if (terrainViewerSettings) {
+      store.dispatch(terrainViewerSlice.actions.setTerrainViewerSettings(JSON.parse(terrainViewerSettings)));
+      store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TERRAIN_VIEWER }));
     }
   };
 

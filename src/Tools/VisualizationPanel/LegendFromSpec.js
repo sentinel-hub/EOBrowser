@@ -10,10 +10,10 @@ export default class LegendFromSpec extends React.Component {
     spec: null,
   };
 
-  renderDiscreteLegend() {
-    const { items } = this.props.legend;
+  renderDiscreteLegend(legend, multipleLegends = false) {
+    const { items } = legend;
     return items.map((legendItem, index) => (
-      <div key={index} className="legend-item discrete">
+      <div key={index} className={`legend-item discrete ${multipleLegends ? 'multiple-legends' : ''}`}>
         <div
           className="color"
           style={{
@@ -25,8 +25,7 @@ export default class LegendFromSpec extends React.Component {
     ));
   }
 
-  renderContinuousLegend() {
-    const { legend } = this.props;
+  renderContinuousLegend(legend) {
     const { minPosition, maxPosition, gradients } = createGradients(legend);
     const gradientsWithLabels = legend.gradients.filter(g => g.label !== undefined && g.label !== null);
 
@@ -75,13 +74,23 @@ export default class LegendFromSpec extends React.Component {
   }
 
   render() {
+    const { legend } = this.props;
     try {
-      const { items, gradients } = this.props.legend;
-      if (gradients) {
-        return this.renderContinuousLegend();
+      if (Array.isArray(legend)) {
+        return (
+          <>
+            {legend.map(l =>
+              l.type === 'continuous' ? this.renderContinuousLegend(l) : this.renderDiscreteLegend(l, true),
+            )}
+          </>
+        );
       }
-      if (items) {
-        return this.renderDiscreteLegend();
+      const { type } = legend;
+      if (type === 'continuous') {
+        return this.renderContinuousLegend(legend);
+      }
+      if (type === 'discrete') {
+        return this.renderDiscreteLegend(legend);
       }
       return null;
     } catch (err) {

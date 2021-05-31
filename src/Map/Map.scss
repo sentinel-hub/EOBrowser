@@ -11,20 +11,20 @@
     bottom: 25px;
     left: 10px;
     z-index: 999;
-    width: 10%;
-    width: 100px;
+    width: 75px;
+    opacity: 0.75;
     filter: drop-shadow($boxShadow);
   }
 
   @media (max-width: 1200px) {
     .maptiler-logo {
-      bottom: 30px;
+      bottom: 35px;
     }
   }
 
   @media (max-width: 768px) {
     .maptiler-logo {
-      bottom: 15px;
+      bottom: 60px;
     }
   }
 
@@ -92,7 +92,7 @@
 .poi-wrapper > .poiPanel,
 .aoi-wrapper > .aoiPanel,
 .measure-wrapper > .measurePanel,
-.timelapse-wrapper > .timelapsePanelButton, {
+.timelapse-wrapper > .timelapsePanelButton {
   z-index: 400;
   cursor: pointer;
 }

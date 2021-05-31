@@ -12,7 +12,6 @@ import { withRouter } from 'react-router-dom';
 import './EOBAdvancedHolder.scss';
 
 export const CUSTOM_VISUALIZATION_URL_ROUTES = ['#custom-composite', '#custom-index', '#custom-script'];
-
 class EOBAdvancedHolder extends React.Component {
   state = {
     openAccordion: 0, // composite accordion displayed by default
@@ -69,7 +68,9 @@ class EOBAdvancedHolder extends React.Component {
     } = this.props;
 
     const groupedChannels =
-      activeDatasource && activeDatasource.groupChannels ? activeDatasource.groupChannels(channels) : null;
+      activeDatasource && activeDatasource.datasetId && activeDatasource.groupChannels
+        ? activeDatasource.groupChannels(activeDatasource.datasetId)
+        : null;
 
     return layers && channels ? (
       <div className="advancedPanel" style={style}>

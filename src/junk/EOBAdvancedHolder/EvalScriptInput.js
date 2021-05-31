@@ -1,12 +1,11 @@
 import React from 'react';
-import request from 'axios';
 import Codemirror from 'react-codemirror';
+import { fetchEvalscriptFromEvalscripturl } from '../../utils';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/dracula.css';
 import './EvalScriptInput.scss';
 import { t } from 'ttag';
-
 export class EvalScriptInput extends React.Component {
   constructor(props) {
     super(props);
@@ -49,8 +48,7 @@ export class EvalScriptInput extends React.Component {
     if (evalscripturl.includes('http://')) {
       return;
     }
-    request
-      .get(evalscripturl)
+    fetchEvalscriptFromEvalscripturl(evalscripturl)
       .then(res => {
         const { data: text } = res;
         this.updateCode(text);
@@ -78,6 +76,7 @@ export class EvalScriptInput extends React.Component {
     if (this.refreshEvalscriptDisabled()) {
       return;
     }
+
     this.props.onRefresh();
   };
 

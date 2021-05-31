@@ -13,7 +13,7 @@ import store, { themesSlice, visualizationSlice } from './store';
 import Map from './Map/Map';
 import Notification from './Notification/Notification';
 import Tools from './Tools/Tools';
-import { Modals } from './Modals/Consts';
+import { Modals, propsSufficientToRender } from './Modals/Consts';
 import { updatePath } from './utils/';
 import { importSharedPins } from './Tools/Pins/Pin.utils';
 import { EDUCATION_MODE, MODES } from './const';
@@ -69,7 +69,11 @@ class App extends Component {
   }
 
   async componentDidUpdate(prevProps) {
-    updatePath(this.props);
+    if (this.props.handlePositions === prevProps.handlePositions) {
+      updatePath(this.props);
+    } else {
+      updatePath(this.props, false);
+    }
 
     if (this.props.authToken && this.props.authToken !== prevProps.authToken) {
       setAuthToken(this.props.authToken);
@@ -118,6 +122,7 @@ class App extends Component {
           highlightedTile={this.state.highlightedTile}
           authenticated={authenticated}
           displayingTileGeometries={this.state.displayingTileGeometries}
+          histogramContainer={this.histogramHolder}
         />
         <Tools
           selectedTiles={this.state.selectedTiles}
@@ -137,8 +142,11 @@ class App extends Component {
             selectedModeId={this.props.selectedModeId}
           />
         )}
-        {Modals[modalId]}
+        {modalId &&
+          propsSufficientToRender(this.props) &&
+          Modals[modalId]({ setLastAddedPin: this.setLastAddedPin })}
         <Notification />
+        <div className="histogram-holder" ref={e => (this.histogramHolder = e)} />
       </div>
     );
   }
@@ -155,7 +163,21 @@ export const getAppropriateAuthToken = (auth, selectedThemeId) => {
   }
 };
 
+export const getGetMapAuthToken = auth => {
+  if (auth.user) {
+    const now = new Date().valueOf();
+    const isTokenExpired = auth.user.token_expiration < now;
+
+    if (!isTokenExpired) {
+      return auth.user.access_token;
+    }
+  }
+  return auth.anonToken;
+};
+
 const mapStoreToProps = store => ({
+  handlePositions: store.index.handlePositions,
+  gradient: store.index.gradient,
   modalId: store.modal.id,
   currentZoom: store.mainMap.zoom,
   currentLat: store.mainMap.lat,
@@ -189,6 +211,8 @@ const mapStoreToProps = store => ({
   dataFusion: store.visualization.dataFusion,
   selectedThemeId: store.themes.selectedThemeId,
   selectedModeId: store.themes.selectedModeId,
+  pixelBounds: store.mainMap.pixelBounds,
+  terrainViewerSettings: store.terrainViewer.settings,
 });
 
 export default connect(mapStoreToProps, null)(App);

@@ -3,6 +3,7 @@ import { ApiType, isCancelled } from '@sentinel-hub/sentinelhub-js';
 let mapTileRequestDelay = 1;
 const mapTileRequestList = [];
 let mapTileRequestTimerId = null;
+const maxDelayBeforeSwitch = 500;
 
 function mapTileRequestExecutor() {
   mapTileRequestTimerId = null;
@@ -15,9 +16,9 @@ function mapTileRequestExecutor() {
   }
 }
 
-function getMapTileUrl(minX, minY, maxX, maxY, width, height, callback) {
+function getMapTileUrl(layer, params, minX, minY, maxX, maxY, width, height, callback, reqConfig) {
   mapTileRequestList.push(() => {
-    getMapTileUrlInternal(minX, minY, maxX, maxY, width, height, callback);
+    getMapTileUrlInternal(layer, params, minX, minY, maxX, maxY, width, height, callback, reqConfig);
   });
 
   if (mapTileRequestTimerId == null) {
@@ -49,7 +50,10 @@ function getMapTileUrlInternal(layer, params, minX, minY, maxX, maxY, width, hei
       if (httpStatus === 429) {
         // too many requests, must wait a little and retry
         mapTileRequestDelay = Math.min(5000, mapTileRequestDelay / 0.8);
-        getMapTileUrl(minX, minY, maxX, maxY, width, height, callback);
+        if (mapTileRequestDelay > maxDelayBeforeSwitch) {
+          reqConfig.authToken = null;
+        }
+        getMapTileUrl(layer, params, minX, minY, maxX, maxY, width, height, callback, reqConfig);
       } else {
         if (httpStatus !== 400 && !isCancelled(error)) {
           console.log(error.message);

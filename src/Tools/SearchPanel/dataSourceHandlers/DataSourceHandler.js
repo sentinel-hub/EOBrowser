@@ -16,6 +16,10 @@ export const DEFAULT_ZOOM_CONFIGURATION = {
   max: undefined,
 };
 
+export const SENTINEL_COPYRIGHT_TEXT = `Credit: European Union, contains modified Copernicus Sentinel data ${moment
+  .utc()
+  .format('YYYY')}, processed with EO Browser`;
+
 export default class DataSourceHandler {
   fetchingFunctions = [];
   FISLayers = {};
@@ -180,4 +184,14 @@ export default class DataSourceHandler {
   supportsIndex = () => {
     return true;
   };
+
+  getSibling = () => {
+    return {};
+  };
+
+  getCopyrightText = () => SENTINEL_COPYRIGHT_TEXT;
+
+  isCopernicus = () => true;
+
+  isSentinelHub = () => true;
 }

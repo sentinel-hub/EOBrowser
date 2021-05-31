@@ -19,6 +19,7 @@ import store, {
   pinsSlice,
   themesSlice,
   visualizationSlice,
+  terrainViewerSlice,
 } from '../../store';
 
 import { getDataSourceHandler } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
@@ -325,6 +326,7 @@ class PinPanel extends Component {
       minQa,
       upsampling,
       downsampling,
+      terrainViewerSettings,
     } = pin;
 
     if (arePinsSelectable) {
@@ -426,6 +428,11 @@ class PinPanel extends Component {
     store.dispatch(visualizationSlice.actions.setVisualizationParams(visualizationParams));
     this.props.setSelectedPin(this.props.item);
     this.props.setActiveTabIndex(2);
+
+    if (terrainViewerSettings && Object.keys(terrainViewerSettings).length > 0) {
+      store.dispatch(terrainViewerSlice.actions.setTerrainViewerSettings(terrainViewerSettings));
+      store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TERRAIN_VIEWER }));
+    }
   };
 
   onTogglePinForSelection = pinForSharing => {

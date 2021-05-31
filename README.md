@@ -23,3 +23,15 @@ Note that because the code relies on a specific SentinelHub clientId which is no
 * Run `npm run prettier` to prettify `js`, `json`, `css` and `scss` files
 * Run `npm run lint` to lint `js`, `json`, `css` and `scss` files
 * Run `npm run build` to build the application sources
+
+## Multilanguage support
+
+Thanks to the effort of various people and institutions you can enjoy EO Browser in your native language.
+
+Your language is missing and you want to help to translate it? Contact us at info@sentinel-hub.com for more details.
+
+- German: ESERO Austria/ESERO Germany
+- Greek: [GET](https://www.getmap.eu/?lang=en)
+- Polish: ESERO Poland
+- Slovenian: Krištof Oštir ([Faculty of Civil and Geodetic Engineering](https://www.en.fgg.uni-lj.si/), University of Ljubljana) with financial support from the Slovenian Research Agency research core funding No. P2-0406 Earth observation and geoinformatics
+- Spanish: ESERO Spain

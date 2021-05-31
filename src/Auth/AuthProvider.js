@@ -21,6 +21,7 @@ class AuthProvider extends React.Component {
         store.dispatch(
           authSlice.actions.setUser({
             userdata: decodeToken(token),
+            token_expiration: token.expires_in,
             access_token: token.access_token,
           }),
         );

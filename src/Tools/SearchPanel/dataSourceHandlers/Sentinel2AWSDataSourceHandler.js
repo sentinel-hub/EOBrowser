@@ -228,4 +228,15 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
   supportsInterpolation() {
     return true;
   }
+
+  getSibling = datasetId => {
+    switch (datasetId) {
+      case S2L2A:
+        return { siblingId: S2L1C, siblingShortName: 'L1C' };
+      case S2L1C:
+        return { siblingId: S2L2A, siblingShortName: 'L2A' };
+      default:
+        return {};
+    }
+  };
 }

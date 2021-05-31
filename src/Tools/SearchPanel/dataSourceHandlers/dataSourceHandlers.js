@@ -14,7 +14,10 @@ import Sentinel1DataSourceHandler from './Sentinel1DataSourceHandler';
 import Sentinel2AWSDataSourceHandler from './Sentinel2AWSDataSourceHandler';
 import Sentinel3DataSourceHandler from './Sentinel3DataSourceHandler';
 import Sentinel5PDataSourceHandler from './Sentinel5PDataSourceHandler';
-import LandsatDataSourceHandler from './LandsatDataSourceHandler';
+import Landsat45AWSDataSourceHandler from './Landsat45AWSDataSourceHandler';
+import Landsat8AWSDataSourceHandler from './Landsat8AWSDataSourceHandler';
+import LandsatEOCloudDataSourceHandler from './LandsatEOCloudDataSourceHandler';
+
 import EnvisatMerisDataSourceHandler from './EnvisatMerisDataSourceHandler';
 import ModisDataSourceHandler from './ModisDataSourceHandler';
 import ProbaVDataSourceHandler from './ProbaVDataSourceHandler';
@@ -52,6 +55,10 @@ export const S1_AWS_IW_VVVH = 'S1_AWS_IW_VVVH',
   ESA_L7 = 'ESA_L7',
   ESA_L8 = 'ESA_L8',
   AWS_L8L1C = 'AWS_L8L1C',
+  AWS_LOTL1 = 'AWS_LOTL1',
+  AWS_LOTL2 = 'AWS_LOTL2',
+  AWS_LTML1 = 'AWS_LTML1',
+  AWS_LTML2 = 'AWS_LTML2',
   ENVISAT_MERIS = 'ENVISAT_MERIS',
   GIBS_MODIS_TERRA = 'GIBS_MODIS_TERRA',
   GIBS_MODIS_AQUA = 'GIBS_MODIS_AQUA',
@@ -70,6 +77,7 @@ export const S1_AWS_IW_VVVH = 'S1_AWS_IW_VVVH',
   COPERNICUS_CORINE_LAND_COVER = 'COPERNICUS_CORINE_LAND_COVER',
   COPERNICUS_GLOBAL_LAND_COVER = 'COPERNICUS_GLOBAL_LAND_COVER',
   COPERNICUS_WATER_BODIES = 'COPERNICUS_WATER_BODIES',
+  COPERNICUS_GLOBAL_SURFACE_WATER = 'COPERNICUS_GLOBAL_SURFACE_WATER',
   CUSTOM = 'CUSTOM';
 
 export let dataSourceHandlers;
@@ -81,7 +89,9 @@ export function initializeDataSourceHandlers() {
     new Sentinel2AWSDataSourceHandler(),
     new Sentinel3DataSourceHandler(),
     new Sentinel5PDataSourceHandler(),
-    new LandsatDataSourceHandler(),
+    new Landsat45AWSDataSourceHandler(),
+    new Landsat8AWSDataSourceHandler(),
+    new LandsatEOCloudDataSourceHandler(),
     new EnvisatMerisDataSourceHandler(),
     new ModisDataSourceHandler(),
     new DEMDataSourceHandler(),
@@ -148,6 +158,7 @@ async function updateLayersFromServiceIfNeeded(layers) {
         }
       } catch (e) {
         console.error(`Error retrieving additional data for layer ${l.layerId} in instance ${l.instanceId}`);
+        throw e;
       }
     }),
   );
@@ -234,8 +245,14 @@ export function datasourceForDatasetId(datasetId) {
     case ESA_L5:
     case ESA_L7:
     case ESA_L8:
+      return 'LandsatEOCloud';
     case AWS_L8L1C:
-      return 'Landsat';
+    case AWS_LOTL1:
+    case AWS_LOTL2:
+      return 'Landsat8AWS';
+    case AWS_LTML1:
+    case AWS_LTML2:
+      return 'Landsat45AWS';
     case ENVISAT_MERIS:
       return 'Envisat Meris';
     case GIBS_MODIS_TERRA:
@@ -257,6 +274,7 @@ export function datasourceForDatasetId(datasetId) {
     case COPERNICUS_CORINE_LAND_COVER:
     case COPERNICUS_GLOBAL_LAND_COVER:
     case COPERNICUS_WATER_BODIES:
+    case COPERNICUS_GLOBAL_SURFACE_WATER:
       return 'Copernicus Services';
     default:
       return null;
@@ -312,6 +330,10 @@ export const datasetLabels = {
   [ESA_L7]: 'Landsat 7 (ESA archive)',
   [ESA_L8]: 'Landsat 8 (ESA archive)',
   [AWS_L8L1C]: 'Landsat 8 (USGS archive)',
+  [AWS_LOTL1]: 'Landsat 8 L1',
+  [AWS_LOTL2]: 'Landsat 8 L2',
+  [AWS_LTML1]: 'Landsat 4-5 TM L1',
+  [AWS_LTML2]: 'Landsat 4-5 TM L2',
   [ENVISAT_MERIS]: 'Envisat Meris',
   [GIBS_MODIS_TERRA]: 'MODIS Terra',
   [GIBS_MODIS_AQUA]: 'MODIS Aqua',
@@ -330,6 +352,7 @@ export const datasetLabels = {
   [DEM_COPERNICUS_90]: 'DEM COPERNICUS 90',
   [COPERNICUS_CORINE_LAND_COVER]: 'CORINE Land Cover',
   [COPERNICUS_GLOBAL_LAND_COVER]: 'Global Land Cover',
+  [COPERNICUS_GLOBAL_SURFACE_WATER]: 'Global Surface Water',
   [COPERNICUS_WATER_BODIES]: 'Water Bodies',
 };
 
@@ -379,6 +402,8 @@ export function getEvalsource(datasetId) {
       return 'L7';
     case ESA_L8:
     case AWS_L8L1C:
+    case AWS_LOTL1:
+    case AWS_LOTL2:
       return 'L8';
     case MODIS:
       return 'Modis';
@@ -439,6 +464,8 @@ export function getDataSourceHashtags(datasetId) {
     case ESA_L7:
     case ESA_L8:
     case AWS_L8L1C:
+    case AWS_LOTL1:
+    case AWS_LOTL2:
       return 'Landsat,NASA';
     case ENVISAT_MERIS:
       return 'Envisat Meris,ESA';

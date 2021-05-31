@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { t } from 'ttag';
+import store, { indexSlice } from '../../store';
 
 import { SelectedBand } from './SelectedBand';
 import { DraggableBand } from './DraggableBand';
@@ -10,15 +12,13 @@ import { parseIndexEvalscript } from '../../utils';
 
 import './BandsToRGB.scss';
 
-const GRADIENTS = [
+export const GRADIENTS = [
   ['0x000000', '0xffffff'],
   ['0xd73027', '0x1a9850'],
   ['0xffffff', '0x005824'],
   ['0xffffff', '0xFF0000'],
   ['0x2079B5', '0x2079B5'],
 ];
-
-const DEFAULT_GRADIENT = GRADIENTS[0];
 
 const FLOAT_REGEX = /^[-]?\d{0,2}\.?\d{0,2}$/; // limited on two decimals
 const ALLOWED_CHARS_REGEX = /^$|^\.$|^-$/; // if empty string or first char is dot or minus
@@ -28,42 +28,44 @@ const DEFAULT_VALUES = spreadHandlersEvenly(2, DEFAULT_DOMAIN.min, DEFAULT_DOMAI
 
 export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   const [equation, setEquation] = React.useState(EQUATIONS[0]);
-  const [gradient, setGradient] = React.useState(DEFAULT_GRADIENT);
   const [values, setValues] = React.useState(DEFAULT_VALUES); //
   const [min, setMin] = React.useState(DEFAULT_DOMAIN.min);
   const [max, setMax] = React.useState(DEFAULT_DOMAIN.max);
+  const [open, setOpen] = React.useState(false);
   const [colorRamp, setColorRamp] = React.useState([
     GRADIENTS[0][0].replace('0x', '#'),
     GRADIENTS[0][1].replace('0x', '#'),
-  ]); // [ "#000000", "#ffffff"]
-  const [open, setOpen] = React.useState(false);
-  const [sliderOffset, setSliderOffset] = React.useState({
-    left: DEFAULT_DOMAIN.min,
-    right: DEFAULT_DOMAIN.max,
-  });
+  ]);
+
+  const [loading, setLoading] = useState(true);
+
+  const { gradient, handlePositions } = useSelector(state => state.index);
+
   const equationArray = [...equation]; // split string into array
 
   React.useEffect(() => {
     if (evalscript) {
       const parsed = parseIndexEvalscript(evalscript);
-
       if (parsed !== null) {
         initEvalFromUrl(parsed);
+      } else {
+        initValues();
       }
+    } else {
+      initValues();
     }
+
+    setLoading(false);
     // eslint-disable-next-line
   }, []);
 
-  React.useEffect(() => {
-    setSliderOffset({ left: values[0], right: values[values.length - 1] });
-  }, [values]);
+  function initValues() {
+    store.dispatch(indexSlice.actions.setGradient(GRADIENTS[0]));
+    store.dispatch(indexSlice.actions.setHandlePositions([0, 1]));
+  }
 
   const initEvalFromUrl = parsed => {
     setValues(parsed.positions);
-    setGradient([
-      parsed.colors[0].replace('#', '0x'),
-      parsed.colors[parsed.colors.length - 1].replace('#', '0x'),
-    ]);
     setEquation(parsed.equation);
     setColorRamp(parsed.colors);
     setMin(parsed.positions[0]); // because we don't save slider min/max use first/last values from evalscript
@@ -85,24 +87,35 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   };
 
   const onGradientChange = selectedGradient => {
-    const { left, right } = sliderOffset;
-    const sliderOffsetArr = [left, right];
-    const newColors = initColors(sliderOffsetArr, selectedGradient, min, max);
+    const newColors = initColors(handlePositions, selectedGradient, min, max);
     onChange(layers, { equation, colorRamp: newColors, values });
-    setGradient(selectedGradient);
+    store.dispatch(indexSlice.actions.setGradient(selectedGradient));
     setColorRamp(newColors);
     setOpen(false);
   };
 
   const onSliderChange = newValues => {
+    if (newValues.includes(NaN)) {
+      return;
+    }
+
+    if (invalidMinMax()) {
+      return;
+    }
     const newColors = initColors(newValues, gradient, min, max);
     onChange(layers, { equation, colorRamp: newColors, values });
   };
 
   const onSliderUpdate = newValues => {
-    const firstSlider = newValues[0];
-    const lastSlider = newValues[newValues.length - 1];
-    setSliderOffset({ left: firstSlider, right: lastSlider });
+    if (newValues.includes(NaN)) {
+      return;
+    }
+
+    if (invalidMinMax()) {
+      return;
+    }
+    store.dispatch(indexSlice.actions.setHandlePositions(newValues));
+
     const newColors = initColors(newValues, gradient, min, max);
     setColorRamp(newColors);
   };
@@ -119,6 +132,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
     // save values & colors in state
     setValues(newValues);
     setColorRamp(newColors);
+    store.dispatch(indexSlice.actions.setHandlePositions(newValues));
   };
 
   const addHandle = () => {
@@ -126,12 +140,14 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
     newValues = spreadHandlersEvenly(newValues.length, min, max);
     const newColors = initColors(newValues, gradient, min, max);
     onChange(layers, { equation, colorRamp: newColors, values: newValues });
+    store.dispatch(indexSlice.actions.setHandlePositions(newValues));
     setValues(newValues);
     setColorRamp(newColors);
   };
 
   const onMinChange = newMin => {
     const parsedMin = parseFloat(newMin);
+
     if (!isNaN(parsedMin) && FLOAT_REGEX.test(newMin) && parsedMin >= -10 && parsedMin <= 10) {
       setMin(newMin);
       const newValues = spreadHandlersEvenly(values.length, parsedMin, max);
@@ -139,6 +155,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
       onChange(layers, { equation, colorRamp: newColors, values: newValues });
       setValues(newValues);
       setColorRamp(newColors);
+      store.dispatch(indexSlice.actions.setHandlePositions(newValues));
     } else if (ALLOWED_CHARS_REGEX.test(newMin)) {
       setMin(newMin);
     }
@@ -146,12 +163,14 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
 
   const onMaxChange = newMax => {
     const parsedMax = parseFloat(newMax);
+
     if (!isNaN(parsedMax) && FLOAT_REGEX.test(newMax) && parsedMax >= -10 && parsedMax <= 10) {
       setMax(newMax);
       const newValues = spreadHandlersEvenly(values.length, min, parsedMax);
       const newColors = initColors(newValues, gradient, min, parsedMax);
       onChange(layers, { equation, colorRamp: newColors, values: newValues });
       setValues(newValues);
+      store.dispatch(indexSlice.actions.setHandlePositions(newValues));
       setColorRamp(newColors);
     } else if (ALLOWED_CHARS_REGEX.test(newMax)) {
       setMax(newMax);
@@ -161,6 +180,10 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   const invalidMinMax = () => {
     return Boolean(isNaN(parseFloat(min)) || isNaN(parseFloat(max)));
   };
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <React.Fragment>
@@ -250,7 +273,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
             onSliderChange={onSliderChange}
             values={values}
             invalidMinMax={invalidMinMax}
-            sliderOffset={sliderOffset}
+            handlePositions={handlePositions}
           />
         </div>
         <div className="scale-wrap">

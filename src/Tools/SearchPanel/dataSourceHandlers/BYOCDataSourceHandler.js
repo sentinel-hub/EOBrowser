@@ -211,4 +211,10 @@ function evaluatePixel(sample) {
   supportsInterpolation() {
     return true;
   }
+
+  getCopyrightText = () => '';
+
+  isCopernicus = () => false;
+
+  isSentinelHub = () => true;
 }

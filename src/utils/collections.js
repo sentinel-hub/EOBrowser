@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { SHV3_LOCATIONS_ROOT_URL } from '@sentinel-hub/sentinelhub-js';
 
 import store from '../store';
 
@@ -12,10 +13,6 @@ export function getCollectionInformation(collectionId, locationId) {
   const requestConfig = {
     headers: headers,
   };
-  return axios.get(
-    `https://${
-      locationId === 'creo' ? 'creodias' : 'services'
-    }.sentinel-hub.com/api/v1/catalog/collections/${collectionId}`,
-    requestConfig,
-  );
+  const baseUrl = SHV3_LOCATIONS_ROOT_URL[locationId];
+  return axios.get(`${baseUrl}api/v1/catalog/collections/${collectionId}`, requestConfig);
 }

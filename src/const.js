@@ -1,3 +1,4 @@
+import { Polarization, AcquisitionMode, Resolution } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
 import { DEFAULT_THEMES } from './assets/default_themes.js';
@@ -27,3 +28,10 @@ export const DEFAULT_LAT_LNG = {
 export const MODES = [EDUCATION_MODE, DEFAULT_MODE];
 
 export const EXPIRED_ACCOUNT_DUMMY_INSTANCE_ID = 'expired_account_dummy_instance_id';
+
+export const S1_DEFAULT_PARAMS = {
+  polarization: Polarization.DV,
+  acquisitionMode: AcquisitionMode.IW,
+  resolution: Resolution.HIGH,
+  orthorectification: '',
+};

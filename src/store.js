@@ -124,6 +124,7 @@ export const authSlice = createSlice({
   initialState: {
     user: {
       userdata: null,
+      token_expiration: null,
       access_token: null,
     },
     anonToken: null,
@@ -132,10 +133,12 @@ export const authSlice = createSlice({
     setUser: (state, action) => {
       state.user.userdata = action.payload.userdata;
       state.user.access_token = action.payload.access_token;
+      state.user.token_expiration = action.payload.token_expiration;
     },
     resetUser: (state, action) => {
       state.user.userdata = null;
       state.user.access_token = null;
+      state.user.token_expiration = null;
     },
     setAnonToken: (state, action) => {
       state.anonToken = action.payload;
@@ -312,6 +315,7 @@ export const visualizationSlice = createSlice({
     setEvalscript: (state, action) => {
       state.evalscript = action.payload;
     },
+
     setEvalscripturl: (state, action) => {
       state.evalscripturl = action.payload;
     },
@@ -685,6 +689,37 @@ export const timelapseSlice = createSlice({
   },
 });
 
+export const indexSlice = createSlice({
+  name: 'index',
+  initialState: {
+    handlePositions: null,
+    gradient: null,
+  },
+  reducers: {
+    setHandlePositions: (state, action) => {
+      state.handlePositions = action.payload;
+    },
+    setGradient: (state, action) => {
+      state.gradient = action.payload;
+    },
+  },
+});
+
+export const terrainViewerSlice = createSlice({
+  name: 'terrainViewer',
+  initialState: {
+    settings: null,
+  },
+  reducers: {
+    setTerrainViewerSettings: (state, action) => {
+      state.settings = action.payload;
+    },
+    resetTerrainViewerSettings: (state, action) => {
+      state.settings = null;
+    },
+  },
+});
+
 const reducers = combineReducers({
   aoi: aoiSlice.reducer,
   poi: poiSlice.reducer,
@@ -700,6 +735,8 @@ const reducers = combineReducers({
   modes: modeSlice.reducer,
   pins: pinsSlice.reducer,
   timelapse: timelapseSlice.reducer,
+  index: indexSlice.reducer,
+  terrainViewer: terrainViewerSlice.reducer,
 });
 
 const store = configureStore({

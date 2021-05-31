@@ -1,10 +1,10 @@
 .data-fusion-additional-parameters-s1 {
   width: 100%;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding-top: 3px;
 
   select {
-    margin-left: auto;
+    margin-right: auto;
   }
 }

@@ -37,7 +37,7 @@ class Highlights extends Component {
     }
 
     const { lat: parsedLat, lng: parsedLng, zoom: parsedZoom } = parsePosition(lat, lng, zoom);
-
+    store.dispatch(visualizationSlice.actions.reset());
     store.dispatch(
       mainMapSlice.actions.setPosition({
         lat: parsedLat,

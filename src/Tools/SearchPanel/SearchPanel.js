@@ -234,7 +234,7 @@ class SearchPanel extends Component {
       selectedThemesListId,
       error,
     } = this.props;
-    const minDateRange = minDate ? minDate : moment.utc('1984-01-01');
+    const minDateRange = minDate ? minDate : moment.utc('1982-01-01');
     const maxDateRange = maxDate ? maxDate : moment.utc();
     const { fromMoment, toMoment, searchInProgress, resultsPanelSelected, selectedTab } = this.state;
     const isEducationModeSelected = selectedModeId === EDUCATION_MODE.id;

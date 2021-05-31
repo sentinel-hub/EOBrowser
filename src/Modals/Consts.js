@@ -16,10 +16,20 @@ export const ModalId = {
 };
 
 export const Modals = {
-  [ModalId.IMG_DOWNLOAD]: <ImageDownload />,
-  [ModalId.TIMELAPSE]: <Timelapse />,
-  [ModalId.FIS]: <FIS />,
-  [ModalId.SHAREPINSLINK]: <SharePinsLink />,
-  [ModalId.PINS_STORY_BUILDER]: <PinsStoryBuilder />,
-  [ModalId.TERRAIN_VIEWER]: <TerrainViewer />,
+  [ModalId.IMG_DOWNLOAD]: () => <ImageDownload />,
+  [ModalId.TIMELAPSE]: () => <Timelapse />,
+  [ModalId.FIS]: () => <FIS />,
+  [ModalId.SHAREPINSLINK]: () => <SharePinsLink />,
+  [ModalId.PINS_STORY_BUILDER]: () => <PinsStoryBuilder />,
+  [ModalId.TERRAIN_VIEWER]: ({ setLastAddedPin }) => <TerrainViewer setLastAddedPin={setLastAddedPin} />,
 };
+
+export function propsSufficientToRender(props) {
+  const { visualizationUrl, datasetId, layerId, customSelected, pixelBounds, modalId } = props;
+
+  if (modalId === ModalId.TERRAIN_VIEWER) {
+    const isDisabled = (!visualizationUrl && !datasetId && !layerId && !customSelected) || !pixelBounds;
+    return !isDisabled;
+  }
+  return true;
+}

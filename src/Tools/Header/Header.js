@@ -11,7 +11,13 @@ import './Header.scss';
 
 class HeaderWithLogin extends Component {
   onLogIn = (token, decodedToken) => {
-    store.dispatch(authSlice.actions.setUser({ userdata: decodedToken, access_token: token.access_token }));
+    store.dispatch(
+      authSlice.actions.setUser({
+        userdata: decodedToken,
+        access_token: token.access_token,
+        token_expiration: token.expires_in,
+      }),
+    );
   };
 
   onLogOut = () => {

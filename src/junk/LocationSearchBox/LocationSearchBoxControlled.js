@@ -45,7 +45,7 @@ class LocationSearchBoxControlled extends React.PureComponent {
   input = undefined;
 
   componentDidMount() {
-    this.debouncedOnInputChange = debounce(this.onInputChangeDelayed, 300);
+    this.debouncedOnInputChange = debounce(this.onInputChangeDelayed, 700);
 
     if (this.props.googleAccessToken) {
       this.loadGoogleMapsScript();
@@ -169,7 +169,6 @@ class LocationSearchBoxControlled extends React.PureComponent {
   loadGoogleMapsScript = () => {
     if (window.google) {
       this.googleAutocompleteService = new window.google.maps.places.AutocompleteService();
-      this.googleMapsSessionToken = new window.google.maps.places.AutocompleteSessionToken();
       this.googleGeocoder = new window.google.maps.Geocoder();
     } else {
       const script = document.createElement('script');
@@ -177,7 +176,6 @@ class LocationSearchBoxControlled extends React.PureComponent {
       script.async = false;
       script.onload = () => {
         this.googleAutocompleteService = new window.google.maps.places.AutocompleteService();
-        this.googleMapsSessionToken = new window.google.maps.places.AutocompleteSessionToken();
         this.googleGeocoder = new window.google.maps.Geocoder();
       };
       document.body.appendChild(script);
@@ -187,7 +185,6 @@ class LocationSearchBoxControlled extends React.PureComponent {
   fetchLocationsGoogle = async keywords => {
     const options = {
       input: keywords,
-      sessionToken: this.googleMapsSessionToken,
     };
 
     this.googleAutocompleteService.getPlacePredictions(options, suggestions => {
@@ -212,7 +209,6 @@ class LocationSearchBoxControlled extends React.PureComponent {
 
   onSelectHandle = (inputValue, item) => {
     this.setState({ locationResults: [item] });
-    this.props.onChange(inputValue);
 
     if (this.isCoordinate(inputValue) || this.props.mapboxAccessToken) {
       this.props.onSelect(item);

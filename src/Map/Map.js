@@ -24,7 +24,7 @@ import {
   getDatasetLabel,
   getDataSourceHandler,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
-import { getAppropriateAuthToken } from '../App';
+import { getAppropriateAuthToken, getGetMapAuthToken } from '../App';
 import { constructErrorMessage } from '../utils';
 import TimelapseAreaPreview from '../Controls/Timelapse/TimelapseAreaPreview';
 
@@ -234,6 +234,7 @@ class Map extends React.Component {
                   minQa={minQa}
                   upsampling={upsampling}
                   downsampling={downsampling}
+                  getMapAuthToken={getGetMapAuthToken(auth)}
                   onTileImageError={this.onTileError}
                   onTileImageLoad={this.onTileLoad}
                 />
@@ -330,6 +331,7 @@ class Map extends React.Component {
                     pane={SENTINELHUB_LAYER_PANE_ID}
                     progress={this.progress}
                     accessToken={getAppropriateAuthToken(auth, themeId)}
+                    getMapAuthToken={getGetMapAuthToken(auth)}
                     onTileImageError={this.onTileError}
                     onTileImageLoad={this.onTileLoad}
                   />
@@ -381,7 +383,10 @@ class Map extends React.Component {
         <LeafletControls key={selectedLanguage} />
         <SearchBox />
         <Tutorial selectedLanguage={this.props.selectedLanguage} />
-        <Controls selectedLanguage={this.props.selectedLanguage} />
+        <Controls
+          selectedLanguage={this.props.selectedLanguage}
+          histogramContainer={this.props.histogramContainer}
+        />
 
         <AboutSHLinks />
         <a href="https://www.maptiler.com/" target="_blank" rel="noopener noreferrer">

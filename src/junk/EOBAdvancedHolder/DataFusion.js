@@ -9,6 +9,10 @@ import {
   DATASET_AWS_L8L1C,
   DATASET_MODIS,
   DATASET_AWS_DEM,
+  DATASET_AWS_LOTL1,
+  DATASET_AWS_LOTL2,
+  DATASET_AWS_LTML1,
+  DATASET_AWS_LTML2,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 import { connect } from 'react-redux';
@@ -35,12 +39,19 @@ class DataFusion extends React.Component {
 
   getPrimaryDataset = () => {
     const { datasetId } = this.props;
-    const dataset = getDataSourceHandler(datasetId).getSentinelHubDataset(datasetId);
+    const dsh = getDataSourceHandler(datasetId);
+    const dataset = dsh.getSentinelHubDataset(datasetId);
     const alias = this.constructAlias(dataset, []);
-    return {
+
+    const primaryDataset = {
       id: dataset.id,
       alias: alias,
     };
+    if (dataset === DATASET_AWSEU_S1GRD) {
+      const datasetParams = dsh.constructor.getDatasetParams(datasetId);
+      primaryDataset['additionalParameters'] = datasetParams;
+    }
+    return primaryDataset;
   };
 
   getAvailableDatasets(dataset) {
@@ -86,9 +97,24 @@ class DataFusion extends React.Component {
         dataset: DATASET_AWS_L8L1C,
         additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
       },
-      [DATASET_AWS_L8L1C.id]: {
-        label: 'Landsat 8 L1C',
-        dataset: DATASET_AWS_L8L1C,
+      [DATASET_AWS_LOTL1.id]: {
+        label: 'Landsat 8 L1',
+        dataset: DATASET_AWS_LOTL1,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_AWS_LOTL2.id]: {
+        label: 'Landsat 8 L2',
+        dataset: DATASET_AWS_LOTL2,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_AWS_LTML1.id]: {
+        label: 'Landsat 4-5 TM L1',
+        dataset: DATASET_AWS_LTML1,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_AWS_LTML2.id]: {
+        label: 'Landsat 4-5 TM L2',
+        dataset: DATASET_AWS_LTML2,
         additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
       },
       [DATASET_MODIS.id]: {

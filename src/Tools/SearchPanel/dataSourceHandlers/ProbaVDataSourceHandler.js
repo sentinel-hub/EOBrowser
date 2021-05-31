@@ -228,4 +228,10 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
   supportsIndex = () => {
     return false;
   };
+
+  getCopyrightText = () => '';
+
+  isCopernicus = () => false;
+
+  isSentinelHub = () => false;
 }

@@ -1,0 +1,137 @@
+@import "./../../variables.scss";
+
+.histogram-modal {
+  z-index: 1002;
+  position: absolute;
+  top: 360px;
+  right: 60px;
+  padding: 10px;
+  width: 500px;
+  min-height: 300px;
+  background-color: $mainDark;
+  color: #fff;
+
+  @media screen and (max-height: 720px) {
+    & {
+      bottom: 10px;
+      top: auto;
+    }
+  }
+
+  @media screen and (max-height: 400px) {
+    & {
+      bottom: 10px;
+      top: 10px;
+      overflow-y: auto;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    & {
+      left: 10px;
+      right: auto;
+      width: calc(100vw - 90px);
+      overflow-x: auto;
+    }
+  }
+
+  .title-bar {
+    display: flex;
+
+    h3.title {
+      margin: 14px 0 0 20px;
+      flex-grow: 1;
+    }
+
+    @media screen and (max-width: 600px) {
+      & {
+        flex-direction: column;
+
+        .recalculate-button {
+          margin-left: 14px;
+        }
+      }
+    }
+  }
+
+  .close-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 1rem;
+  }
+
+  .loading-holder {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    height: 300px;
+
+    .loading {
+      text-align: center;
+
+      i {
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .error-holder {
+    height: 300px;
+    margin: 10px 20px 0;
+  }
+
+  .histogram {
+    cursor: crosshair;
+  }
+
+  svg.visualization-layer {
+    text {
+      fill: #fff;
+    }
+
+    path.tick-line {
+      shape-rendering: crispEdges;
+      stroke: #666;
+      stroke-dasharray: 5, 5;
+    }
+
+    line.axis-baseline {
+      shape-rendering: crispEdges;
+      stroke: #eee;
+    }
+  }
+
+  svg.background-graphics {
+    text {
+      fill: #fff;
+    }
+
+    path.tick-line {
+      shape-rendering: crispEdges;
+      stroke: #666;
+      stroke-dasharray: 5, 5;
+    }
+
+    line.axis-baseline {
+      shape-rendering: crispEdges;
+      stroke: #eee;
+    }
+  }
+
+  div.annotation {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid black;
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+
+  .recalculate-button {
+    color: $mainDark;
+    float: right;
+  }
+}

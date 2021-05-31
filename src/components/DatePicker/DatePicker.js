@@ -123,6 +123,7 @@ class DatePicker extends Component {
             handleClickOutside={this.handleClickOutside}
             outsideClickIgnoreClass={id}
             highlightedDays={availableDays}
+            eventTypes="click"
           />
         )}
       </div>

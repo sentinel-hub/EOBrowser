@@ -9,12 +9,10 @@ import {
   ProcessingDataFusionLayer,
   DEMLayer,
 } from '@sentinel-hub/sentinelhub-js';
-import moment from 'moment';
 import { t } from 'ttag';
 
 import {
   getDataSourceHandler,
-  datasourceForDatasetId,
   datasetLabels,
   checkIfCustom,
   CUSTOM,
@@ -37,6 +35,7 @@ import {
   setEvalscriptOutputBandNumber,
 } from '../../utils/parseEvalscript';
 import { WARNINGS } from './ImageDownloadWarningPanel';
+import { refetchWithDefaultToken } from '../../utils/fetching.utils';
 
 import copernicus from '../../junk/EOBCommon/assets/copernicus.png';
 import SHlogo from '../../junk/EOBCommon/assets/shLogo.png';
@@ -52,13 +51,6 @@ const FONT_SIZES = {
 };
 
 const IMAGE_SIZE_LIMIT = 2500;
-
-export const SENTINEL_COPYRIGHT_TEXT = `Credit: European Union, contains modified Copernicus Sentinel data ${moment
-  .utc()
-  .format('YYYY')}, processed with EO Browser`;
-
-export const GIBS_COPYRIGHT_TEXT =
-  "We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Observing System Data and Information System (EOSDIS).";
 
 export function getMapDimensions(pixelBounds, resolutionDivisor = 1) {
   const width = pixelBounds.max.x - pixelBounds.min.x;
@@ -104,6 +96,7 @@ export async function fetchImage(layer, options) {
     selectedCrs,
     geometry,
     effects,
+    getMapAuthToken,
   } = options;
 
   const dsh = getDataSourceHandler(datasetId);
@@ -126,10 +119,18 @@ export async function fetchImage(layer, options) {
   const reqConfig = {
     cancelToken: cancelToken,
   };
+
+  if (getMapAuthToken) {
+    reqConfig.authToken = getMapAuthToken;
+  }
+
   if (width > IMAGE_SIZE_LIMIT || height > IMAGE_SIZE_LIMIT) {
-    return layer.getHugeMap(getMapParams, apiType, reqConfig);
+    return refetchWithDefaultToken(
+      reqConfig => layer.getHugeMap(getMapParams, apiType, reqConfig),
+      reqConfig,
+    );
   } else {
-    return layer.getMap(getMapParams, apiType, reqConfig);
+    return refetchWithDefaultToken(reqConfig => layer.getMap(getMapParams, apiType, reqConfig), reqConfig);
   }
 }
 
@@ -157,6 +158,7 @@ export async function fetchImageFromParams(params, raiseWarning) {
     enabledOverlaysId,
     cancelToken,
     shouldClipExtraBands,
+    getMapAuthToken,
   } = params;
 
   const layer = await getLayerFromParams(params, cancelToken);
@@ -194,7 +196,9 @@ export async function fetchImageFromParams(params, raiseWarning) {
     ...params,
     apiType: apiType,
     imageFormat: mimeType,
+    getMapAuthToken: getMapAuthToken,
   };
+
   const blob = await fetchImage(layer, options).catch(err => {
     throw err;
   });
@@ -210,21 +214,15 @@ export async function fetchImageFromParams(params, raiseWarning) {
         : layer.legend;
   }
 
-  const isGIBS = datasourceForDatasetId(datasetId) === 'GIBS';
-  const isBYOC = checkIfCustom(datasetId);
+  const dsh = getDataSourceHandler(datasetId);
 
   if (showCaptions) {
-    copyrightText = '';
-    if (isGIBS) {
-      copyrightText = GIBS_COPYRIGHT_TEXT;
-    } else if (!isBYOC && datasourceForDatasetId(datasetId).includes('Sentinel')) {
-      copyrightText = SENTINEL_COPYRIGHT_TEXT;
-    }
+    copyrightText = dsh.getCopyrightText(datasetId);
     title = getTitle(fromTime, toTime, datasetId, layer.title, customSelected);
   }
 
-  const addLogos = !isGIBS;
-  const drawCopernicusLogo = !isBYOC;
+  const drawCopernicusLogo = dsh.isCopernicus();
+  const addLogos = dsh.isSentinelHub();
 
   const imageWithOverlays = await addImageOverlays(
     blob,
@@ -422,7 +420,7 @@ export async function getLayerFromParams(params, cancelToken) {
   return layer;
 }
 
-function constructBBoxFromBounds(bounds, crs = CRS_EPSG4326.authId) {
+export function constructBBoxFromBounds(bounds, crs = CRS_EPSG4326.authId) {
   if (crs === CRS_EPSG4326.authId) {
     return new BBox(CRS_EPSG4326, bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth());
   }
@@ -967,7 +965,7 @@ function createSVGLegendDiscrete(legend) {
   );
   svg.setAttribute('width', `${maxLabelWidth + 2 * MARGIN_LEFT + LEGEND_ITEM_HEIGHT}px`);
 
-  return new XMLSerializer().serializeToString(svg);
+  return svg;
 }
 
 function getLabelWidth(txt, fontSize, fontFamily) {
@@ -1125,11 +1123,41 @@ function createSVGLegendContinous(legend) {
   setSVGElementAttributes(svg, {
     width: `${maxLabelWidth + 2 * MARGIN_LEFT + LEGEND_WIDTH}px`,
   });
-  return new XMLSerializer().serializeToString(svg);
+  return svg;
 }
 
-export const createSVGLegend = legendSpec =>
-  legendSpec.type === 'discrete' ? createSVGLegendDiscrete(legendSpec) : createSVGLegendContinous(legendSpec);
+export const createSVGLegend = legendSpec => {
+  let legendImage;
+  if (Array.isArray(legendSpec)) {
+    for (let legend of legendSpec) {
+      let l;
+      if (legend.type === 'continuous') {
+        l = createSVGLegendContinous(legend);
+      } else {
+        l = createSVGLegendDiscrete(legend);
+      }
+      if (legendImage) {
+        const currentHeight = legendImage.height.baseVal.value;
+        const newPartHeight = l.height.baseVal.value;
+        setSVGElementAttributes(legendImage, {
+          height: `${currentHeight + newPartHeight}px`,
+        });
+        setSVGElementAttributes(l, {
+          y: currentHeight,
+        });
+        legendImage.append(l);
+      } else {
+        legendImage = l;
+      }
+    }
+  } else {
+    legendImage =
+      legendSpec.type === 'discrete'
+        ? createSVGLegendDiscrete(legendSpec)
+        : createSVGLegendContinous(legendSpec);
+  }
+  return new XMLSerializer().serializeToString(legendImage);
+};
 
 function getLegendTextWidth(txt, fontSize, fontFamily) {
   if (!txt) {
