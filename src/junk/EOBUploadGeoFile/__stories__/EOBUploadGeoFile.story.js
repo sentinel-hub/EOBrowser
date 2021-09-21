@@ -10,7 +10,7 @@ const stories = storiesOf('EOB - Panel - UploadGeoFile', module);
 stories.add('Default', ({ state, setState }) => {
   return (
     <EOBUploadGeoFile
-      onUpload={area => {
+      onUpload={(area) => {
         console.log('Uploaded - area: ', area);
       }}
       onClose={() => {

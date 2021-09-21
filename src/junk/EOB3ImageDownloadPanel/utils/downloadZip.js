@@ -239,7 +239,7 @@ export async function loadImage(url) {
     const img = document.createElement('img');
     img.crossOrigin = 'Anonymous';
     img.onload = () => resolve(img);
-    img.onerror = e => {
+    img.onerror = (e) => {
       reject(t`Error fetching image:` + ` ${url} ${e}`);
     };
     img.src = url;
@@ -248,7 +248,7 @@ export async function loadImage(url) {
 
 function getJsonFromUrl(urlParams) {
   var result = {};
-  urlParams.split('&').forEach(function(part) {
+  urlParams.split('&').forEach(function (part) {
     var item = part.split('=');
     result[item[0].toLowerCase()] = decodeURIComponent(item[1]);
   });
@@ -271,9 +271,9 @@ async function drawHugeMapOnCanvas(ctx, apiType, baseUrl, params, dataFusion, ef
   const ySplitBy = Math.ceil(params.height / LIMIT_DIM);
   const chunkHeight = Math.ceil(params.height / ySplitBy);
 
-  const [lng0, lat0, lng1, lat1] = params.bbox.split(',').map(l => Number(l));
-  const xToLng = x => Math.round(Math.min(lng0, lng1) + (x / params.width) * Math.abs(lng1 - lng0));
-  const yToLat = y => Math.round(Math.max(lat0, lat1) - (y / params.height) * Math.abs(lat1 - lat0));
+  const [lng0, lat0, lng1, lat1] = params.bbox.split(',').map((l) => Number(l));
+  const xToLng = (x) => Math.round(Math.min(lng0, lng1) + (x / params.width) * Math.abs(lng1 - lng0));
+  const yToLat = (y) => Math.round(Math.max(lat0, lat1) - (y / params.height) * Math.abs(lat1 - lat0));
 
   for (let x = 0; x < params.width; x += chunkWidth) {
     const xTo = Math.min(x + chunkWidth, params.width);
@@ -506,11 +506,11 @@ async function getImgObject(
   mapBounds,
 ) {
   const preset = customObject.preset || presetArg;
-  const imageExt = IMAGE_FORMATS.find(f => f.value === imageFormat).ext;
+  const imageExt = IMAGE_FORMATS.find((f) => f.value === imageFormat).ext;
   const { name: cName, preset: cPreset, time: cTime, url: cUrl, legendData } = customObject;
-  const presetName = presets[datasource].find(p => p.id === (cPreset || preset));
+  const presetName = presets[datasource].find((p) => p.id === (cPreset || preset));
 
-  const interestedDatasource = instances.find(instance => instance.name === datasource);
+  const interestedDatasource = instances.find((instance) => instance.name === datasource);
   const copyrightText = datasource.includes('Sentinel') ? SENTINEL_COPYRIGHT_TEXT : '';
 
   if (interestedDatasource.constructSpacecraftInfo) {
@@ -586,7 +586,7 @@ async function downloadCanvas(
       presets,
       instances,
       mapBounds,
-    ).then(obj => {
+    ).then((obj) => {
       createCanvasBlob(
         obj,
         imageFormat,
@@ -600,11 +600,11 @@ async function downloadCanvas(
         dataFusion,
         effects,
       )
-        .then(blob => {
+        .then((blob) => {
           FileSaver.saveAs(blob, `${obj.title}.${obj.imageExt}`);
           resolve();
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
           reject(err);
         });
@@ -680,10 +680,10 @@ export function downloadOne(
         dataFusion,
         effects,
       )
-        .then(blob => {
+        .then((blob) => {
           resolve();
         })
-        .catch(err => {
+        .catch((err) => {
           console.error('Could not download files', err);
           reject(t`Could not download files:` + ` ${err.message}`);
         });
@@ -713,7 +713,7 @@ export function downloadZipIt(
 ) {
   const zip = new JSZip();
   let count = 0;
-  const imageExt = IMAGE_FORMATS.find(f => f.value === imageFormat).ext;
+  const imageExt = IMAGE_FORMATS.find((f) => f.value === imageFormat).ext;
   const zipFilename = 'EO_Browser_images.zip';
 
   const sentinelHubLogo = document.createElement('img');
@@ -721,7 +721,7 @@ export function downloadZipIt(
   sentinelHubLogo.src = SHlogoLarge;
 
   return new Promise((resolve, reject) => {
-    layerUrls.forEach(async layer => {
+    layerUrls.forEach(async (layer) => {
       //new
       let { preset, src, apiType } = layer;
 
@@ -794,9 +794,7 @@ export function downloadZipIt(
       }
 
       if (params.geometry) {
-        paramsChunk.geometry = decodeURIComponent(params.geometry)
-          .split('+')
-          .join(' ');
+        paramsChunk.geometry = decodeURIComponent(params.geometry).split('+').join(' ');
       }
 
       if (apiType === ApiType.PROCESSING) {

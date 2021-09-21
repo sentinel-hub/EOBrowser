@@ -20,7 +20,7 @@ stories
         openUploadGeoFileDialog={() => setState({ openUploadGeoFileDialog: true })}
         centerOnFeature={() => setState({ centerOnFeature: true })}
         disabled={true}
-        onErrorMessage={msg => setState({ errorMsg: msg })}
+        onErrorMessage={(msg) => setState({ errorMsg: msg })}
       />
     );
   })
@@ -56,7 +56,7 @@ class EOBPOIPanelButtonWithMockedData extends React.Component {
         disabled={false}
         presetLayerName={'True color'}
         fisShadowLayer={fisShadowLayer}
-        onErrorMessage={msg => console.log('onErrorMessage: ', msg)}
+        onErrorMessage={(msg) => console.log('onErrorMessage: ', msg)}
       />
     );
   }

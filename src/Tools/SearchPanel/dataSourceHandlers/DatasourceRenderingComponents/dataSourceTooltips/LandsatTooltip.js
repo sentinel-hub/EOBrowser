@@ -4,7 +4,7 @@ import { t } from 'ttag';
 import ExternalLink from '../../../../../ExternalLink/ExternalLink';
 import HelpTooltip from '../../DatasourceRenderingComponents/HelpTooltip';
 
-import { AWS_LOTL1, AWS_LOTL2, AWS_LTML1, AWS_LTML2 } from '../../dataSourceHandlers';
+import { AWS_LETML1, AWS_LETML2, AWS_LOTL1, AWS_LOTL2, AWS_LTML1, AWS_LTML2 } from '../../dataSourceHandlers';
 
 const getLandsat_Markdown = () => t`
 The series of **Landsat** satellites of NASA/ U.S. Geological Survey are similar to Sentinel-2 (they capture visible and infrared wavelengths)
@@ -28,6 +28,36 @@ The **Landsat 4-5 TM** collection includes imagery produced with the Thematic Ma
 **Revisit time** 16 days
 
 **Data availability**: global, Level-1 from August 1982 to May 2012, Level-2 from July 1984 to May 2012. 
+
+**Common Usage**: Monitoring of vegetation, ice and water resources, change detection and the creation of land use - land cover maps.
+`;
+
+const getLandsat15AWS_Markdown = () =>
+  t`
+  **Landsat 1-5 MSS** collection includes imagery produced with the Multispectral Scanner System (MSS), which was carried onboard Landsat 1 through Landsat 5 satellites. There are 4 optical bands available in 60 m resolution. Data is archived and includes global imagery since 1972. 
+
+  **Spatial resolution**: 68 m x 83 m (commonly resampled to 57 m, or 60 m)
+  
+  **Revisit time**: 18 days for Landsats 1-3 and 16 days for Landsats 4-5
+  
+  **Data availability**: Global, since:
+  - Landsat 1 from July 1972 to January 1978
+  - Landsat 2 from January 1975 to February 1982
+  - Landsat 3 from March 1978 to March 1983
+  - Landsat 4 from July 1982 to December 1993
+  - Landsat 5 from 1984 to October 1992, and from June 2012 to January 2013
+  
+  **Common Usage**: Monitoring of vegetation, ice and water resources, change detection and the creation of land use - land cover maps.
+  `;
+
+const getLandsat7ETMAWS_Markdown = () => t`  
+**Landsat 7 ETM+** includes imagery produced with the Enhanced Thematic Mapper (ETM+) sensor, which was carried onboard Landsat 7 satellite. There are 8 optical and 1 thermal infrared bands available. Global data is available since 1999, with a revisit time of 16 days. Top of the atmosphere level-1, and surface reflectance level-2 products are provided. Note that there are data gaps for all images acquired since 2003-05-30 due to sensor failure.
+
+**Spatial resolution**: 30 meter, 15 meter for a panchromatic band
+
+**Revisit time**: 16 days
+
+**Data availability**: global, since April 1999
 
 **Common Usage**: Monitoring of vegetation, ice and water resources, change detection and the creation of land use - land cover maps.
 `;
@@ -61,10 +91,20 @@ The data products are generated from Collection 2 Level-1 inputs that meet the <
 Learn more about Level-2 data [here](https://www.usgs.gov/core-science-systems/nli/landsat/landsat-collection-2-level-2-science-products) and [here](https://docs.sentinel-hub.com/api/latest/data/landsat-8-l2/).`;
 
 const AWS_LTML1_Markdown = () =>
-  t`**Landsat 4-5 TM Level-1** product provides top of the atmosphere (TOA) reflectance imagery. Level-1 data is produced by processing Landsat TM data with standard processing parameters, such as cubic convolution and terrain correction. Learn more [here](https://collections.sentinel-hub.com/landsat-4-5-tm-l1/).`;
+  t`**Landsat 4-5 TM Level-1** product provides top of the atmosphere (TOA) reflectance imagery. Level-1 data is produced by processing Landsat TM data with standard processing parameters, such as cubic convolution and terrain correction. Learn more [here](https://collections.sentinel-hub.com/landsat-4-5-tm-l1/) and [here](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-landsat-archives-landsat-4-5-thematic-mapper-collection-2?qt-science_center_objects=0#qt-science_center_objects).`;
 
 const AWS_LTML2_Markdown = () =>
-  t`**Landsat 4-5 TM Level-2** product is produced by processing Level-1 data to surface reflectance - an estimate of the surface spectral reflectance at ground level in the absence of atmospheric scattering and absorption. Learn more [here](https://collections.sentinel-hub.com/landsat-4-5-tm-l2/).`;
+  t`**Landsat 4-5 TM Level-2** product is produced by processing Level-1 data to surface reflectance - an estimate of the surface spectral reflectance at ground level in the absence of atmospheric scattering and absorption. Learn more [here](https://collections.sentinel-hub.com/landsat-4-5-tm-l2/) and [here](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-landsat-archives-landsat-4-5-tm-collection-2-level-2-science?qt-science_center_objects=0#qt-science_center_objects).`;
+
+const AWS_LETML1_Markdown = () => t`**Landsat 7 ETM+ Level-1** 
+
+Learn more [here](https://docs.sentinel-hub.com/api/latest/data/landsat-etm/)
+`;
+
+const AWS_LETML2_Markdown = () => t`**Landsat 7 ETM+ Level-2** 
+
+Learn more [here](https://docs.sentinel-hub.com/api/latest/data/landsat-etm-l2/).
+`;
 
 const renderTooltip = ({ credits, creditsLink, source }) => {
   return (
@@ -82,13 +122,13 @@ const renderTooltip = ({ credits, creditsLink, source }) => {
   );
 };
 
-const renderHelpTooltip = tooltip => (
+const renderHelpTooltip = (tooltip) => (
   <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
     <ReactMarkdown source={tooltip} />
   </HelpTooltip>
 );
 
-export const renderLandsatOptionsHelpTooltips = option => {
+export const renderLandsatOptionsHelpTooltips = (option) => {
   switch (option) {
     case AWS_LOTL1:
       return renderHelpTooltip(AWS_LOTL1_Markdown());
@@ -98,6 +138,10 @@ export const renderLandsatOptionsHelpTooltips = option => {
       return renderHelpTooltip(AWS_LTML1_Markdown());
     case AWS_LTML2:
       return renderHelpTooltip(AWS_LTML2_Markdown());
+    case AWS_LETML1:
+      return renderHelpTooltip(AWS_LETML1_Markdown());
+    case AWS_LETML2:
+      return renderHelpTooltip(AWS_LETML2_Markdown());
     default:
       return null;
   }
@@ -116,6 +160,24 @@ export const Landsat45AWSTooltip = () => {
     source: getLandsat45AWS_Markdown(),
     credits: 'USGS',
     creditsLink: 'https://landsat.gsfc.nasa.gov/landsat-4-5/tm',
+  });
+};
+
+export const Landsat15AWSTooltip = () => {
+  return renderTooltip({
+    source: getLandsat15AWS_Markdown(),
+    credits: 'USGS',
+    creditsLink:
+      'https://www.usgs.gov/centers/eros/science/usgs-eros-archive-landsat-archives-landsat-1-5-multispectral-scanner-mss-level?qt-science_center_objects=0#qt-science_center_objects',
+  });
+};
+
+export const Landsat7ETMAWSTooltip = () => {
+  return renderTooltip({
+    source: getLandsat7ETMAWS_Markdown(),
+    credits: 'USGS',
+    creditsLink:
+      'https://www.usgs.gov/core-science-systems/nli/landsat/landsat-7?qt-science_support_page_related_con=0#qt-science_support_page_related_con',
   });
 };
 

@@ -2,10 +2,12 @@
 .cc-slider {
   display: flex;
   align-items: center;
+  box-sizing: border-box;
 
   div.rcStyler {
     margin: 0 10px 0 6px;
     display: flex;
+    align-items: center;
   }
 
   div.rc-slider {
@@ -23,11 +25,12 @@
   i.fa-cloud {
     color: #c0fbff;
     font-size: 10px;
+    margin-left: 4px;
+    margin-right: 2px;
   }
 
   span.percentage {
     margin-left: 5px;
-    display: inline-block;
     width: 30px;
   }
 }

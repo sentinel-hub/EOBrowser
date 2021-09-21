@@ -51,7 +51,7 @@ export async function addOverlays(
     //get overlay images
     const overlayImages = [];
     await Promise.all(
-      overlayLayers.map(async overlayLayer => {
+      overlayLayers.map(async (overlayLayer) => {
         const overlayImageBlob = await getOverlayImageBlob(width, height, bbox, overlayLayer);
         overlayImages.push({
           idx: overlayLayer.idx,
@@ -64,12 +64,14 @@ export async function addOverlays(
     await Promise.all(
       overlayImages
         .sort((a, b) => a.sortIndex - b.sortIndex)
-        .map(async image => await applyBlobToCanvas(context, timelapseWidth, timelapseHeight, image.imgBlob)),
+        .map(
+          async (image) => await applyBlobToCanvas(context, timelapseWidth, timelapseHeight, image.imgBlob),
+        ),
     );
 
     //export canvas back to blob
     const blob = await new Promise((resolve, reject) => {
-      canvas.toBlob(blob => {
+      canvas.toBlob((blob) => {
         resolve(blob);
       }, 'image/jpeg');
     });

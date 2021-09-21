@@ -16,7 +16,7 @@ class EditableString extends React.Component {
   }
 
   startEditing() {
-    BLOCKABLE_OUTSIDE_EVENTS.forEach(evType => {
+    BLOCKABLE_OUTSIDE_EVENTS.forEach((evType) => {
       window.addEventListener(evType, this.onOutsideEvent, true);
     });
     this.setState({
@@ -26,7 +26,7 @@ class EditableString extends React.Component {
   }
 
   stopEditing(doSave = false) {
-    BLOCKABLE_OUTSIDE_EVENTS.forEach(evType => {
+    BLOCKABLE_OUTSIDE_EVENTS.forEach((evType) => {
       window.removeEventListener(evType, this.onOutsideEvent, true);
     });
     if (doSave) {
@@ -38,12 +38,12 @@ class EditableString extends React.Component {
     });
   }
 
-  onEditClick = ev => {
+  onEditClick = (ev) => {
     ev.stopPropagation();
     this.startEditing();
   };
 
-  onOutsideEvent = ev => {
+  onOutsideEvent = (ev) => {
     if (this.outerSpanRef.current.contains(ev.target)) {
       return; // this is not an outside event, ignore it
     }
@@ -60,13 +60,13 @@ class EditableString extends React.Component {
     }
   };
 
-  onTextChange = ev => {
+  onTextChange = (ev) => {
     this.setState({
       newText: ev.target.value,
     });
   };
 
-  onKeyUp = ev => {
+  onKeyUp = (ev) => {
     switch (ev.keyCode) {
       case 13: // Enter
         ev.stopPropagation();
@@ -83,23 +83,23 @@ class EditableString extends React.Component {
     }
   };
 
-  onFocus = ev => {
+  onFocus = (ev) => {
     ev.target.select();
   };
 
-  onSaveClick = ev => {
+  onSaveClick = (ev) => {
     ev.stopPropagation();
     ev.preventDefault();
     this.stopEditing(true);
   };
 
-  onCancelClick = ev => {
+  onCancelClick = (ev) => {
     ev.stopPropagation();
     ev.preventDefault();
     this.stopEditing(false);
   };
 
-  stopEventPropagation = ev => {
+  stopEventPropagation = (ev) => {
     ev.stopPropagation();
   };
 

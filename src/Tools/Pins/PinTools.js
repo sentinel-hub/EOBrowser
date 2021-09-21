@@ -7,7 +7,13 @@ import { getLoggedInErrorMsg } from '../../junk/ConstMessages';
 
 import './PinTools.scss';
 
-import { convertToNewFormat, savePinsToSessionStorage, savePinsToServer, isPinValid } from './Pin.utils';
+import {
+  convertToNewFormat,
+  savePinsToSessionStorage,
+  savePinsToServer,
+  isPinValid,
+  formatDeprecatedPins,
+} from './Pin.utils';
 
 class PinTools extends Component {
   state = {
@@ -30,12 +36,12 @@ class PinTools extends Component {
   };
 
   toggleKeepExistingPins = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       keepExisting: !prevState.keepExisting,
     }));
   };
 
-  onDrop = files => {
+  onDrop = (files) => {
     this.setState({ error: null });
     if (files.length > 0) {
       const file = files[0];
@@ -47,7 +53,7 @@ class PinTools extends Component {
         }
 
         const reader = new FileReader();
-        reader.onload = e => this.parseFile(e.target.result, format);
+        reader.onload = (e) => this.parseFile(e.target.result, format);
         reader.readAsText(file);
       } catch (e) {
         this.setState({ error: e.message });
@@ -70,8 +76,7 @@ class PinTools extends Component {
         throw new Error(t`No pins were found.`);
       }
 
-      pins = pins.map(pin => convertToNewFormat(pin));
-
+      pins = pins.map((pin) => convertToNewFormat(pin));
       let allErrors = '';
       for (let pin of pins) {
         const { isValid, error } = isPinValid(pin);
@@ -83,8 +88,9 @@ class PinTools extends Component {
         throw new Error(allErrors);
       }
 
-      const existingIds = this.props.pins.map(pin => pin._id);
-      pins = pins.filter(pin => !existingIds.includes(pin._id));
+      pins = formatDeprecatedPins(pins);
+      const existingIds = this.props.pins.map((pin) => pin._id);
+      pins = pins.filter((pin) => !existingIds.includes(pin._id));
       const replaceExisting = !this.state.keepExisting;
       let uniqueId;
       if (this.props.isUserLoggedIn) {
@@ -100,6 +106,7 @@ class PinTools extends Component {
       if (replaceExisting) {
         this.props.clearThemePins();
       }
+
       this.setState({
         displayOptions: false,
         keepExisting: true,
@@ -109,11 +116,7 @@ class PinTools extends Component {
     }
   };
 
-  getFileExtension = filename =>
-    filename
-      .toLowerCase()
-      .split('.')
-      .pop();
+  getFileExtension = (filename) => filename.toLowerCase().split('.').pop();
 
   renderModal = () => (
     <Rodal
@@ -149,7 +152,7 @@ class PinTools extends Component {
     </Rodal>
   );
 
-  preparePinForExport = pin => {
+  preparePinForExport = (pin) => {
     // Orders pin attributes in the format for export
     // Fields "group" and "highResImageUrl" are added here to simplify Pin Library usage
     // It should be removed when adding functionality for them
@@ -202,8 +205,8 @@ class PinTools extends Component {
     };
   };
 
-  getPinsDataURI = pins => {
-    const pinsForExport = pins.map(pin => this.preparePinForExport(pin));
+  getPinsDataURI = (pins) => {
+    const pinsForExport = pins.map((pin) => this.preparePinForExport(pin));
     const data =
       'data: text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(pinsForExport, null, 4));
     return data;

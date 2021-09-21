@@ -52,7 +52,7 @@ class ImageDownloadBtn extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   layerId: store.visualization.layerId,
   customSelected: store.visualization.customSelected,
   evalscript: store.visualization.evalscript,

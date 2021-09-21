@@ -12,25 +12,26 @@ import {
 import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 import { FetchingFunction } from '../search';
 import { S2L1C, S2L2A } from './dataSourceHandlers';
+import { DATASOURCES } from '../../../const';
 
 export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
   L1C_BANDS = [
-    { name: 'B01', description: t`Band 1 - Coastal aerosol - 443 nm`, color: '#4c17e2' },
-    { name: 'B02', description: t`Band 2 - Blue - 490 nm`, color: '#699aff' },
-    { name: 'B03', description: t`Band 3 - Green - 560 nm`, color: '#a4d26f' },
-    { name: 'B04', description: t`Band 4 - Red - 665 nm`, color: '#e47121' },
-    { name: 'B05', description: t`Band 5 - Vegetation Red Edge - 705 nm`, color: '#ba0a0a' },
-    { name: 'B06', description: t`Band 6 - Vegetation Red Edge - 740 nm`, color: '#cc1412' },
-    { name: 'B07', description: t`Band 7 - Vegetation Red Edge - 783 nm`, color: '#c00607' },
-    { name: 'B08', description: t`Band 8 - NIR - 842 nm`, color: '#c31e20' },
-    { name: 'B09', description: t`Band 9 - Water vapour - 945 nm`, color: '#b31a1b' },
-    { name: 'B10', description: t`Band 10 - SWIR - Cirrus - 1375 nm`, color: '#d71234' },
-    { name: 'B11', description: t`Band 11 - SWIR - 1610 nm`, color: '#990134' },
-    { name: 'B12', description: t`Band 12 - SWIR - 2190 nm`, color: '#800000' },
-    { name: 'B8A', description: t`Band 8A - Vegetation Red Edge - 865 nm`, color: '#bc0e10' },
+    { name: 'B01', getDescription: () => t`Band 1 - Coastal aerosol - 443 nm`, color: '#4c17e2' },
+    { name: 'B02', getDescription: () => t`Band 2 - Blue - 490 nm`, color: '#699aff' },
+    { name: 'B03', getDescription: () => t`Band 3 - Green - 560 nm`, color: '#a4d26f' },
+    { name: 'B04', getDescription: () => t`Band 4 - Red - 665 nm`, color: '#e47121' },
+    { name: 'B05', getDescription: () => t`Band 5 - Vegetation Red Edge - 705 nm`, color: '#ba0a0a' },
+    { name: 'B06', getDescription: () => t`Band 6 - Vegetation Red Edge - 740 nm`, color: '#cc1412' },
+    { name: 'B07', getDescription: () => t`Band 7 - Vegetation Red Edge - 783 nm`, color: '#c00607' },
+    { name: 'B08', getDescription: () => t`Band 8 - NIR - 842 nm`, color: '#c31e20' },
+    { name: 'B09', getDescription: () => t`Band 9 - Water vapour - 945 nm`, color: '#b31a1b' },
+    { name: 'B10', getDescription: () => t`Band 10 - SWIR - Cirrus - 1375 nm`, color: '#d71234' },
+    { name: 'B11', getDescription: () => t`Band 11 - SWIR - 1610 nm`, color: '#990134' },
+    { name: 'B12', getDescription: () => t`Band 12 - SWIR - 2190 nm`, color: '#800000' },
+    { name: 'B8A', getDescription: () => t`Band 8A - Vegetation Red Edge - 865 nm`, color: '#bc0e10' },
   ];
 
-  L2A_BANDS = [...this.L1C_BANDS].filter(b => b.name !== 'B10');
+  L2A_BANDS = [...this.L1C_BANDS].filter((b) => b.name !== 'B10');
 
   getDatasetSearchLabels = () => ({ [S2L1C]: 'L1C', [S2L2A]: t`L2A (atmospherically corrected)` });
   datasetSearchIds = { [S2L1C]: 'L1C', [S2L2A]: 'L2A' };
@@ -44,7 +45,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
   preselectedDatasets = new Set();
   searchFilters = {};
   isChecked = false;
-  datasource = 'Sentinel-2';
+  datasource = DATASOURCES.S2;
 
   leafletZoomConfig = {
     [S2L1C]: {
@@ -58,8 +59,8 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
   };
 
   willHandle(service, url, name, layers, preselected) {
-    const usesS2L2ADataset = !!layers.find(l => l.dataset && l.dataset.id === DATASET_S2L2A.id);
-    const usesS2L1CDataset = !!layers.find(l => l.dataset && l.dataset.id === DATASET_S2L1C.id);
+    const usesS2L2ADataset = !!layers.find((l) => l.dataset && l.dataset.id === DATASET_S2L2A.id);
+    const usesS2L1CDataset = !!layers.find((l) => l.dataset && l.dataset.id === DATASET_S2L1C.id);
     if (!usesS2L2ADataset && !usesS2L1CDataset) {
       return false;
     }
@@ -81,7 +82,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
     }
 
     this.allLayers.push(
-      ...layers.filter(l => l.dataset && (l.dataset === DATASET_S2L2A || l.dataset === DATASET_S2L1C)),
+      ...layers.filter((l) => l.dataset && (l.dataset === DATASET_S2L2A || l.dataset === DATASET_S2L1C)),
     );
     this.saveFISLayers(url, layers);
     return true;
@@ -91,7 +92,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
     return Object.values(this.urls).flat().length > 0;
   }
 
-  renderOptionsHelpTooltips = option => {
+  renderOptionsHelpTooltips = (option) => {
     switch (option) {
       case S2L1C:
         return (
@@ -140,8 +141,8 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
     let fetchingFunctions = [];
 
     const { selectedOptions, maxCC } = this.searchFilters;
-    selectedOptions.forEach(datasetId => {
-      const searchLayer = this.allLayers.find(l => l.dataset === this.getSentinelHubDataset(datasetId));
+    selectedOptions.forEach((datasetId) => {
+      const searchLayer = this.allLayers.find((l) => l.dataset === this.getSentinelHubDataset(datasetId));
       if (searchLayer.maxCloudCoverPercent !== undefined) {
         searchLayer.maxCloudCoverPercent = maxCC;
       }
@@ -159,7 +160,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map(t => ({
+    const tiles = data.map((t) => ({
       sensingTime: t.sensingTime,
       geometry: t.geometry,
       datasource: this.datasource,
@@ -177,7 +178,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
     return tiles;
   };
 
-  getBands = datasetId => {
+  getBands = (datasetId) => {
     switch (datasetId) {
       case S2L1C:
         return this.L1C_BANDS;
@@ -188,7 +189,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
     }
   };
 
-  getUrlsForDataset = datasetId => {
+  getUrlsForDataset = (datasetId) => {
     switch (datasetId) {
       case S2L1C:
         return this.urls.L1C;
@@ -199,7 +200,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
     }
   };
 
-  getSentinelHubDataset = datasetId => {
+  getSentinelHubDataset = (datasetId) => {
     switch (datasetId) {
       case S2L1C:
         return DATASET_S2L1C;
@@ -229,7 +230,7 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
     return true;
   }
 
-  getSibling = datasetId => {
+  getSibling = (datasetId) => {
     switch (datasetId) {
       case S2L2A:
         return { siblingId: S2L1C, siblingShortName: 'L1C' };

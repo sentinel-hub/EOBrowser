@@ -17,7 +17,7 @@ stories
         area={2708318.79}
         removeMeasurement={() => setState({ removeMeasurement: true })}
         isLoggedIn={false}
-        onErrorMessage={msg => setState({ errorMsg: msg })}
+        onErrorMessage={(msg) => setState({ errorMsg: msg })}
       />
     );
   })
@@ -25,7 +25,7 @@ stories
     return (
       <EOBMeasurePanelButton
         toggleMeasure={() =>
-          setState(prevState => ({
+          setState((prevState) => ({
             hasMeasurement: !prevState.hasMeasurement,
           }))
         }
@@ -34,7 +34,7 @@ stories
         area={2708318.79}
         removeMeasurement={() => setState({ removeMeasurement: true })}
         isLoggedIn={true}
-        onErrorMessage={msg => setState({ errorMsg: msg })}
+        onErrorMessage={(msg) => setState({ errorMsg: msg })}
       />
     );
   });

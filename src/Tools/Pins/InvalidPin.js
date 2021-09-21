@@ -17,7 +17,7 @@ export default class InvalidPin extends Component {
           <div className="pin-left-controls-container">
             <div
               className="remove-pin"
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation();
                 this.props.onRemovePin(index);
               }}

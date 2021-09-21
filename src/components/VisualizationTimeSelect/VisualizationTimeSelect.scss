@@ -3,7 +3,8 @@
 
 .visualization-time-select {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  justify-content: flex-start;
   text-transform: none;
   color: white;
   text-align: center;
@@ -14,6 +15,8 @@
     font-weight: normal;
     color: $textColor;
     margin-left: 0;
+    width: auto;
+    margin-right: 6px;
   }
 
   div:last-child {
@@ -42,5 +45,9 @@
     color: $primaryCol;
     font-size: 13px;
     cursor: pointer;
+  }
+
+  .timespan-title-wrap {
+    display: flex;
   }
 }

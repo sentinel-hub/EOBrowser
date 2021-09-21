@@ -3,9 +3,10 @@ import LandsatDataSourceHandler from './LandsatDataSourceHandler';
 import { Landsat8AWSTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/LandsatTooltip';
 import { DATASET_AWS_L8L1C, DATASET_AWS_LOTL1, DATASET_AWS_LOTL2 } from '@sentinel-hub/sentinelhub-js';
 import { AWS_L8L1C, AWS_LOTL1, AWS_LOTL2 } from './dataSourceHandlers';
+import { DATASOURCES } from '../../../const';
 
 export default class Landsat8AWSDataSourceHandler extends LandsatDataSourceHandler {
-  datasource = 'Landsat8AWS';
+  datasource = DATASOURCES.AWS_LANDSAT8;
   searchGroupLabel = 'Landsat 8';
   searchGroupKey = 'landsat8-aws';
   knownDatasets = [

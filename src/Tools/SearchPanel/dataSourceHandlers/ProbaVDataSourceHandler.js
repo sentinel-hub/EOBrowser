@@ -9,6 +9,7 @@ import ProbaVTooltip from './DatasourceRenderingComponents/dataSourceTooltips/Pr
 import { FetchingFunction } from '../search';
 import { PROBAV_S1, PROBAV_S5, PROBAV_S10 } from './dataSourceHandlers';
 import { filterLayers } from './filter';
+import { DATASOURCES } from '../../../const';
 
 export default class ProbaVDataSourceHandler extends DataSourceHandler {
   urls = [];
@@ -24,7 +25,7 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
   isChecked = false;
   KNOWN_URL = 'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows';
   allResults = null;
-  datasource = 'Proba-V';
+  datasource = DATASOURCES.PROBAV;
 
   leafletZoomConfig = {
     [PROBAV_S1]: {
@@ -83,7 +84,7 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
     let fetchingFunctions = [];
     const selectedDatasets = this.searchFilters.selectedOptions;
 
-    selectedDatasets.forEach(selectedDataset => {
+    selectedDatasets.forEach((selectedDataset) => {
       // Performance optimization - instead of WMS GetCapabilities request:
       //   const url = `${this.KNOWN_URL}?SERVICE=WMS&REQUEST=GetCapabilities&time=${new Date().valueOf()}`;
       // we use a cached version:
@@ -125,12 +126,12 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
     if (this.allResults) {
       allLayers = this.allResults;
     } else {
-      const capabilities = await axios.get(url).then(r => {
+      const capabilities = await axios.get(url).then((r) => {
         return r.data;
       });
       const parseString = require('xml2js').parseString;
       const data = await new Promise((resolve, reject) =>
-        parseString(capabilities, function(err, result) {
+        parseString(capabilities, function (err, result) {
           if (err) reject(err);
           else resolve(result);
         }),
@@ -159,12 +160,12 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
       this.allResults = allLayers;
     }
 
-    const applicableLayer = Object.values(allLayers).find(l => l.name.startsWith(`${datasourceId}_`)); //All layers with the same probaDay have the same dates, so we take the first one
-    const allDates = applicableLayer.dimension[0].values.map(d => moment(d));
+    const applicableLayer = Object.values(allLayers).find((l) => l.name.startsWith(`${datasourceId}_`)); //All layers with the same probaDay have the same dates, so we take the first one
+    const allDates = applicableLayer.dimension[0].values.map((d) => moment(d));
 
-    const filteredDates = allDates.filter(d => d.isBetween(fromMoment, toMoment));
+    const filteredDates = allDates.filter((d) => d.isBetween(fromMoment, toMoment));
     filteredDates.sort((a, b) => b.diff(a));
-    const foundDates = filteredDates.map(d => d.toISOString());
+    const foundDates = filteredDates.map((d) => d.toISOString());
     const datesForOffset = foundDates.slice(offset, foundDates.length);
     const tiles = convertToStandardTiles(datesForOffset, datasetId);
     const hasMore = filteredDates.length > offset + datesForOffset.length ? true : false;
@@ -172,7 +173,7 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
   };
 
   convertToStandardTiles = (data, datasetId) => {
-    return data.map(d => ({
+    return data.map((d) => ({
       datasetId,
       datasource: this.datasource,
       sensingTime: d,
@@ -190,11 +191,11 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
 
   getLayers = (data, datasetId, url, layersExclude, layersInclude) => {
     let layers = data.filter(
-      layer =>
+      (layer) =>
         filterLayers(layer.layerId, layersExclude, layersInclude) &&
         this.filterLayersProbaV(layer.layerId, datasetId),
     );
-    layers.forEach(l => {
+    layers.forEach((l) => {
       l.url = url;
     });
     return layers;

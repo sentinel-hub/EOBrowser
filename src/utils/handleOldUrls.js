@@ -38,6 +38,7 @@ import {
   GIBS_MISR,
   GIBS_ASTER_GDEM,
   CUSTOM,
+  AWS_LOTL1,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
 import {
@@ -52,6 +53,8 @@ import {
   DATASET_S5PL2,
   DATASET_AWSEU_S1GRD,
 } from '@sentinel-hub/sentinelhub-js';
+
+import { reqConfigMemoryCache } from '../const';
 
 export const datasourceToDatasetId = {
   'Sentinel-2 L1C': S2L1C,
@@ -256,7 +259,7 @@ export const dataSourceToThemeId = {
   'Atmosphere CLOUD': 'ATMOSPHERE',
 };
 
-const getDatasetIdFromParamsS1 = params => {
+const getDatasetIdFromParamsS1 = (params) => {
   switch (params) {
     case 'AWS IW DV':
       return S1_AWS_IW_VVVH;
@@ -284,7 +287,7 @@ const layerToDatasetId = async (layer, instanceId) => {
       return S3SLSTR;
     case DATASET_AWSEU_S1GRD.id:
       try {
-        await layer.updateLayerFromServiceIfNeeded();
+        await layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
         const params = 'AWS ' + layer.acquisitionMode + ' ' + layer.polarization;
         return getDatasetIdFromParamsS1(params);
       } catch (er) {
@@ -311,8 +314,11 @@ export const getDatasetIdFromInstanceId = async (instanceId, preset) => {
   try {
     const layers = await LayersFactory.makeLayers(
       `https://services.sentinel-hub.com/ogc/wms/${layerInstance}`,
+      null,
+      null,
+      reqConfigMemoryCache,
     );
-    const selectedLayer = layers.find(l => l.layerId === preset);
+    const selectedLayer = layers.find((l) => l.layerId === preset);
     datasetId = await layerToDatasetId(selectedLayer, layerInstance);
   } catch (err) {
     console.log('error creating layers');
@@ -450,4 +456,22 @@ export const datasourceToUrl = {
   'Atmosphere HCHO': 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
   'Atmosphere AER': 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
   'Atmosphere CLOUD': 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+};
+
+const EOB3DatasourceToUrl = {
+  'Landsat 8 L1': 'https://services.sentinel-hub.com/ogc/wms/e35192-YOUR-INSTANCEID-HERE',
+};
+
+export const getNewDatasetPropertiesIfDeprecatedDatasetId = (datasetId, visualizationUrl) => {
+  let newProperties = {};
+
+  if (datasetId === AWS_L8L1C) {
+    newProperties.datasetId = AWS_LOTL1;
+
+    if (visualizationUrl === datasourceToUrl['Landsat 8 USGS']) {
+      newProperties.visualizationUrl = EOB3DatasourceToUrl['Landsat 8 L1'];
+    }
+  }
+
+  return newProperties;
 };

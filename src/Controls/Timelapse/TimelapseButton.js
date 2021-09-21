@@ -30,14 +30,14 @@ class TimelapseButton extends Component {
         <EOBTimelapsePanelButton
           selectedResult={this.generateSelectedResult()}
           isLoggedIn={!!this.props.user.userdata}
-          onErrorMessage={msg => store.dispatch(notificationSlice.actions.displayError(msg))}
+          onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
         />
       </div>
     );
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   user: store.auth.user,
   datasetId: store.visualization.datasetId,
   layerId: store.visualization.layerId,

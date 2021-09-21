@@ -13,9 +13,9 @@ export default class CheckboxesWithChildren extends React.Component {
     };
   }
 
-  toggleChecked = ev => {
+  toggleChecked = (ev) => {
     const v = ev.target.value;
-    this.setState(oldState => {
+    this.setState((oldState) => {
       let newChecked = new Set(oldState.checked);
       if (oldState.checked.has(v)) {
         newChecked.delete(v);
@@ -29,7 +29,7 @@ export default class CheckboxesWithChildren extends React.Component {
   };
 
   setCheckedChildren = (checked, parent) => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       prevState.checkedChildren[parent] = checked;
       return {
         checkedChildren: prevState.checkedChildren,
@@ -40,14 +40,14 @@ export default class CheckboxesWithChildren extends React.Component {
   onChange = () => {
     const { checked, checkedChildren } = this.state;
     const parents = Array.from(checked);
-    const children = parents.map(p => checkedChildren[p]).flat();
+    const children = parents.map((p) => checkedChildren[p]).flat();
     this.props.onChange(parents, children);
   };
 
   render() {
     return (
       <div className="checkboxes with-children">
-        {Object.keys(this.props.choices).map(k => (
+        {Object.keys(this.props.choices).map((k) => (
           <div className="parent" key={k}>
             <label key={k} className="checkboxItem">
               <input
@@ -64,7 +64,7 @@ export default class CheckboxesWithChildren extends React.Component {
                 <NonEmptyCheckboxes
                   choices={this.props.children[k]}
                   initiallyChecked={this.state.checkedChildren[k]}
-                  onChange={checked => this.setCheckedChildren(checked, k)}
+                  onChange={(checked) => this.setCheckedChildren(checked, k)}
                   warningEmpty={this.props.warningEmptyChildren}
                 />
               </div>

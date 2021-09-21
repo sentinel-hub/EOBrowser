@@ -14,15 +14,15 @@ export default class EOBFilterSearchByMonths extends React.Component {
 
   handleFilterCheckboxChange = () => {
     this.setState(
-      prevState => ({
+      (prevState) => ({
         doFiltering: !prevState.doFiltering,
       }),
       this.publishChange,
     );
   };
 
-  toggleMonth = monthIndex => {
-    this.setState(prevState => {
+  toggleMonth = (monthIndex) => {
+    this.setState((prevState) => {
       const newValue = new Set(prevState.selectedMonths);
       if (newValue.has(monthIndex)) {
         newValue.delete(monthIndex);
@@ -57,7 +57,7 @@ export default class EOBFilterSearchByMonths extends React.Component {
         </label>
         <div className="months">
           {doFiltering &&
-            range(12).map(monthIndex => (
+            range(12).map((monthIndex) => (
               <label key={monthIndex} className="align-checkbox">
                 <input
                   type="checkbox"

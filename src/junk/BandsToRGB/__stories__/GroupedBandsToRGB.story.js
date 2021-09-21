@@ -30,8 +30,8 @@ stories.add('S-3 SLSTR grouped', ({ state, setState }) => {
   const groups = Object.keys(groupedBands);
 
   const groupedBandsWithColors = {};
-  groups.forEach(g => {
-    groupedBandsWithColors[g] = groupedBands[g].map(b => ({
+  groups.forEach((g) => {
+    groupedBandsWithColors[g] = groupedBands[g].map((b) => ({
       name: b,
       description: b,
       color: '#000000',
@@ -49,7 +49,7 @@ stories.add('S-3 SLSTR grouped', ({ state, setState }) => {
         <GroupedBandsToRGB
           groupedBands={groupedBandsWithColors}
           value={value}
-          onChange={v => setState({ value: v })}
+          onChange={(v) => setState({ value: v })}
         />
       </div>
     </DndProvider>
@@ -65,8 +65,8 @@ stories.add('S-3 SLSTR grouped, with an empty group', ({ state, setState }) => {
   const groups = Object.keys(groupedBands);
 
   const groupedBandsWithColors = {};
-  groups.forEach(g => {
-    groupedBandsWithColors[g] = groupedBands[g].map(b => ({
+  groups.forEach((g) => {
+    groupedBandsWithColors[g] = groupedBands[g].map((b) => ({
       name: b,
       description: b,
       color: '#000000',
@@ -84,7 +84,7 @@ stories.add('S-3 SLSTR grouped, with an empty group', ({ state, setState }) => {
         <GroupedBandsToRGB
           groupedBands={groupedBandsWithColors}
           value={value}
-          onChange={v => setState({ value: v })}
+          onChange={(v) => setState({ value: v })}
         />
       </div>
     </DndProvider>
@@ -100,8 +100,8 @@ stories.add('S-3 SLSTR grouped, with invalid (cross-group) initial value', ({ st
   const groups = Object.keys(groupedBands);
 
   const groupedBandsWithColors = {};
-  groups.forEach(g => {
-    groupedBandsWithColors[g] = groupedBands[g].map(b => ({
+  groups.forEach((g) => {
+    groupedBandsWithColors[g] = groupedBands[g].map((b) => ({
       name: b,
       description: b,
       color: '#000000',
@@ -119,7 +119,7 @@ stories.add('S-3 SLSTR grouped, with invalid (cross-group) initial value', ({ st
         <GroupedBandsToRGB
           groupedBands={groupedBandsWithColors}
           value={value}
-          onChange={v => setState({ value: v })}
+          onChange={(v) => setState({ value: v })}
         />
       </div>
     </DndProvider>

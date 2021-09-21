@@ -12,7 +12,7 @@ const stories = storiesOf('EOB - AdvancedHolder', module);
 
 stories.add('Default', ({ state, setState }) => {
   const viewValue = state.viewValue || 2;
-  const onDataFusionChange = dataFusion => setState({ dataFusion: dataFusion });
+  const onDataFusionChange = (dataFusion) => setState({ dataFusion: dataFusion });
 
   return (
     <DndProvider options={HTML5toTouch}>

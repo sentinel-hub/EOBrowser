@@ -1,0 +1,57 @@
+@import '../variables.scss';
+
+.login-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 501;
+}
+
+// !important to override styles from npm
+.alert {
+  .alert-inner {
+    top: 30% !important;
+    padding: 25px !important;
+    text-align: center !important;
+    border-radius: 1px !important;
+    background-color: $mainDark !important;
+
+    .alert-title {
+      color: #fff !important;
+      font-size: 18px !important;
+      font-weight: bold !important;
+    }
+
+    .alert-text {
+      color: #fff !important;
+    }
+
+    .alert-buttons {
+      border-radius: 1px !important;
+
+      &_ok {
+        color: #fff !important;
+        cursor: pointer !important;
+        content: 'Terst' !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        border-radius: 1px !important;
+        background: #b6bf00 !important;
+      }
+
+      &_cancel {
+        cursor: pointer !important;
+        font-weight: 600 !important;
+        color: #b6bf00 !important;
+        padding: 8px 12px !important;
+        border-radius: 1px !important;
+        background: transparent !important;
+        border: 1px solid #b6bf00 !important;
+      }
+    }
+  }
+}

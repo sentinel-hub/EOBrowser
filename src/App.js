@@ -20,7 +20,7 @@ import { EDUCATION_MODE, MODES } from './const';
 
 import './App.scss';
 
-const ALL_DEFAULT_THEMES = MODES.map(mode => mode.themes).flat();
+const ALL_DEFAULT_THEMES = MODES.map((mode) => mode.themes).flat();
 
 class App extends Component {
   themesFromThemesUrl = [];
@@ -48,7 +48,7 @@ class App extends Component {
     }
 
     setDefaultRequestsConfig({
-      rewriteUrlFunc: url => {
+      rewriteUrlFunc: (url) => {
         // performance optimization: instead of original GetCapabilities requests, use
         // the proxied ones: (gzipped)
         if (
@@ -80,39 +80,39 @@ class App extends Component {
     }
   }
 
-  setQuery = query => {
+  setQuery = (query) => {
     this.setState({
       query: query,
     });
   };
 
-  setSelectedTiles = selectedTiles => {
+  setSelectedTiles = (selectedTiles) => {
     this.setState({
       selectedTiles: selectedTiles,
     });
   };
 
-  setHighlightedTile = highlightedTile => {
+  setHighlightedTile = (highlightedTile) => {
     this.setState({
       highlightedTile: highlightedTile,
     });
   };
 
-  setLastAddedPin = lastAddedPin => this.setState({ lastAddedPin: lastAddedPin });
+  setLastAddedPin = (lastAddedPin) => this.setState({ lastAddedPin: lastAddedPin });
 
-  onSelectMode = modeId => {
+  onSelectMode = (modeId) => {
     store.dispatch(visualizationSlice.actions.reset());
     store.dispatch(themesSlice.actions.setSelectedModeIdAndDefaultTheme(modeId));
   };
 
-  shouldDisplayTileGeometries = shouldDisplay => {
+  shouldDisplayTileGeometries = (shouldDisplay) => {
     this.setState({
       displayingTileGeometries: shouldDisplay,
     });
   };
 
   render() {
-    const { modalId, authToken, selectedModeId } = this.props;
+    const { modalId, authToken, selectedModeId, googleAPI } = this.props;
     const authenticated = Boolean(authToken);
     return (
       <div id="app">
@@ -123,6 +123,7 @@ class App extends Component {
           authenticated={authenticated}
           displayingTileGeometries={this.state.displayingTileGeometries}
           histogramContainer={this.histogramHolder}
+          googleAPI={googleAPI}
         />
         <Tools
           selectedTiles={this.state.selectedTiles}
@@ -146,7 +147,7 @@ class App extends Component {
           propsSufficientToRender(this.props) &&
           Modals[modalId]({ setLastAddedPin: this.setLastAddedPin })}
         <Notification />
-        <div className="histogram-holder" ref={e => (this.histogramHolder = e)} />
+        <div className="histogram-holder" ref={(e) => (this.histogramHolder = e)} />
       </div>
     );
   }
@@ -156,14 +157,14 @@ export const getAppropriateAuthToken = (auth, selectedThemeId) => {
   if (!selectedThemeId) {
     return null;
   }
-  if (ALL_DEFAULT_THEMES.find(t => t.id === selectedThemeId) || !auth.user.access_token) {
+  if (ALL_DEFAULT_THEMES.find((t) => t.id === selectedThemeId) || !auth.user.access_token) {
     return auth.anonToken;
   } else {
     return auth.user.access_token;
   }
 };
 
-export const getGetMapAuthToken = auth => {
+export const getGetMapAuthToken = (auth) => {
   if (auth.user) {
     const now = new Date().valueOf();
     const isTokenExpired = auth.user.token_expiration < now;
@@ -175,7 +176,7 @@ export const getGetMapAuthToken = auth => {
   return auth.anonToken;
 };
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   handlePositions: store.index.handlePositions,
   gradient: store.index.gradient,
   modalId: store.modal.id,
@@ -208,6 +209,7 @@ const mapStoreToProps = store => ({
   minQa: store.visualization.minQa,
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
+  speckleFilter: store.visualization.speckleFilter,
   dataFusion: store.visualization.dataFusion,
   selectedThemeId: store.themes.selectedThemeId,
   selectedModeId: store.themes.selectedModeId,

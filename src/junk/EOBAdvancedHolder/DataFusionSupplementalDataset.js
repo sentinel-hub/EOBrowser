@@ -73,11 +73,11 @@ function DataFusionSupplementalDataset(props) {
             <select
               className="dropdown-normal-ui"
               value={mosaickingOrder}
-              onChange={e => props.updateMosaickingOrder(alias, e.target.value)}
+              onChange={(e) => props.updateMosaickingOrder(alias, e.target.value)}
             >
               <option value={MosaickingOrder.MOST_RECENT}>{t`Most recent`}</option>
               <option value={MosaickingOrder.LEAST_RECENT}>{t`Least recent`}</option>
-              {additionalMosaickingOrders.map(mo => (
+              {additionalMosaickingOrders.map((mo) => (
                 <option key={mo.id} value={mo.id}>
                   {mo.label}
                 </option>
@@ -87,7 +87,7 @@ function DataFusionSupplementalDataset(props) {
 
           {AdditionalParametersComponent && (
             <AdditionalParametersComponent
-              onChange={v => props.updateAdditionalParameters(alias, v)}
+              onChange={(v) => props.updateAdditionalParameters(alias, v)}
               additionalParameters={additionalParameters}
             />
           )}

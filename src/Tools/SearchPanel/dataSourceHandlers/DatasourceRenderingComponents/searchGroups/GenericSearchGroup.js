@@ -29,13 +29,13 @@ class GenericSearchGroup extends React.Component {
     });
   }
 
-  onOptionsChange = options => {
+  onOptionsChange = (options) => {
     this.setState({
       selectedOptions: options,
     });
   };
 
-  onMaxCCChange = maxCC => {
+  onMaxCCChange = (maxCC) => {
     this.setState({
       maxCC: maxCC,
     });
@@ -51,14 +51,8 @@ class GenericSearchGroup extends React.Component {
   }
 
   render() {
-    const {
-      key,
-      options,
-      hasMaxCCFilter,
-      renderOptionsFilters,
-      renderOptionsHelpTooltips,
-      optionsLabels,
-    } = this.props;
+    const { key, options, hasMaxCCFilter, renderOptionsFilters, renderOptionsHelpTooltips, optionsLabels } =
+      this.props;
     const { selectedOptions, maxCC } = this.state;
     return (
       <div>
@@ -69,7 +63,7 @@ class GenericSearchGroup extends React.Component {
           onChange={this.onOptionsChange}
         >
           <div className="column">
-            {options.map(option => (
+            {options.map((option) => (
               <div key={option}>
                 <div className="title">
                   <label>

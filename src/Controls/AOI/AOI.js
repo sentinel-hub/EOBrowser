@@ -4,8 +4,8 @@ import { EOBUploadGeoFile } from '../../junk/EOBUploadGeoFile/EOBUploadGeoFile';
 import { EOBAOIPanelButton } from '../../junk/EOBAOIPanelButton/EOBAOIPanelButton';
 import { connect } from 'react-redux';
 import L from 'leaflet';
-import 'leaflet.pm';
-import 'leaflet.pm/dist/leaflet.pm.css';
+import '@geoman-io/leaflet-geoman-free';
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 
 import { removeAoiWithEmptyCoords } from '../../utils/coords';
 import store, { aoiSlice, notificationSlice, modalSlice } from '../../store';
@@ -44,33 +44,57 @@ class AOI extends Component {
     L.DomEvent.disableScrollPropagation(this.ref);
     L.DomEvent.disableClickPropagation(this.ref);
     const { map } = this.props;
-    map.on('pm:create', e => {
-      if (e.shape && e.shape === 'Polygon') {
-        store.dispatch(aoiSlice.actions.set({ geometry: e.layer.toGeoJSON(), bounds: e.layer.getBounds() }));
+    map.on('pm:create', (e) => {
+      if (e.shape && e.shape === this.props.aoiShape) {
+        // e.layer.toGeoJSON() is a GeoJSON Feature, we convert it to a GeoJSON geometry type
+        const geometry = e.layer.toGeoJSON().geometry;
+        store.dispatch(aoiSlice.actions.set({ geometry: geometry, bounds: e.layer.getBounds() }));
         this.props.map.removeLayer(e.layer);
         this.enableEdit();
       }
     });
   }
 
-  enableEdit = layer => {
-    this.props.map.eachLayer(l => {
+  componentDidUpdate(prevProps) {
+    if (!!this.props.aoiIsDrawing && !prevProps.aoiIsDrawing) {
+      this.onStartDrawingPolygon();
+    }
+
+    if (!this.props.aoiIsDrawing && prevProps.aoiIsDrawing) {
+      this.setState({
+        drawingInProgress: false,
+      });
+    }
+
+    if (this.props.aoiClearMap && !prevProps.aoiClearMap) {
+      this.onResetAoi();
+      store.dispatch(aoiSlice.actions.clearMap(false));
+    }
+  }
+
+  enableEdit = () => {
+    this.props.map.eachLayer((l) => {
       if (l.options.id && l.options.id === 'aoi-layer') {
         this.AOILayerRef = l;
       }
     });
-    this.AOILayerRef.pm.enable();
-    this.AOILayerRef.on('pm:edit', f => {
+    this.AOILayerRef.pm.enable({
+      allowSelfIntersection: false,
+    });
+    this.AOILayerRef.on('pm:edit', (f) => {
       const layer = f.target;
       const aoiGeojson = removeAoiWithEmptyCoords(layer.toGeoJSON());
       // in edit we can remove a vertex with a right click
-      // when the 2nd last vertex is removed leaflet.pm will return an array with undefined
+      // when the 2nd last vertex is removed geoman will return an array with undefined
       // leaflet complains about this, and so we just simply remove the aoi.
       if (!aoiGeojson) {
         this.onResetAoi();
         return;
       }
-      store.dispatch(aoiSlice.actions.set({ geometry: aoiGeojson, bounds: layer.getBounds() }));
+
+      // aoiGeojson is a GeoJSON Feature or FeatureCollection, we convert it to a GeoJSON geometry type
+      const geometry = aoiGeojson.geometry || aoiGeojson.features[0].geometry;
+      store.dispatch(aoiSlice.actions.set({ geometry: geometry, bounds: layer.getBounds() }));
       this.enableEdit();
     });
   };
@@ -80,14 +104,14 @@ class AOI extends Component {
     this.setState({
       drawingInProgress: true,
     });
-    map.pm.enableDraw('Poly', {
+    map.pm.enableDraw(this.props.aoiShape, {
       finishOn: 'contextmenu',
-      allowSelfIntersection: true,
+      allowSelfIntersection: false,
     });
   };
 
   onResetAoi = () => {
-    this.props.map.pm.disableDraw('Poly');
+    this.props.map.pm.disableDraw(this.props.aoiShape);
     if (this.AOILayerRef) {
       this.props.map.removeLayer(this.AOILayerRef);
       this.AOILayerRef = null;
@@ -100,7 +124,7 @@ class AOI extends Component {
 
   centerMapOnFeature = () => {
     if (!this.AOILayerRef) {
-      if (this.props.aoiGeometry && this.props.aoiGeometry.features) {
+      if (this.props.aoiGeometry) {
         const layer = L.geoJSON(this.props.aoiGeometry);
         this.props.map.fitBounds(layer.getBounds());
       }
@@ -110,7 +134,7 @@ class AOI extends Component {
     this.props.map.fitBounds(featureBounds);
   };
 
-  onFileUpload = geometry => {
+  onFileUpload = (geometry) => {
     this.setState({
       drawingInProgress: true,
       uploadDialog: false,
@@ -146,14 +170,12 @@ class AOI extends Component {
     const selectedBounds =
       this.props.mapBounds && this.state.drawingInProgress
         ? this.props.aoiGeometry
-          ? this.props.aoiGeometry.features
-            ? this.props.aoiGeometry.features[0]
-            : this.props.aoiGeometry
+          ? this.props.aoiGeometry
           : boundsToGeoJSON(this.props.mapBounds)
         : null;
     return (
       <div
-        ref={r => {
+        ref={(r) => {
           this.ref = r;
         }}
         className="aoi-wrapper"
@@ -162,10 +184,12 @@ class AOI extends Component {
           disabled={false}
           aoiBounds={selectedBounds}
           isAoiClip={this.state.drawingInProgress}
-          onDrawPolygon={this.onStartDrawingPolygon}
+          onDrawShape={(shape) =>
+            store.dispatch(aoiSlice.actions.startDrawing({ isDrawing: true, shape: shape }))
+          }
           resetAoi={this.onResetAoi}
           centerOnFeature={this.centerMapOnFeature}
-          onErrorMessage={msg => store.dispatch(notificationSlice.actions.displayError(msg))}
+          onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
           openUploadGeoFileDialog={() => this.setState({ uploadDialog: true })}
           openFisPopup={this.openFISPanel}
           selectedResult={this.generateSelectedResult()}
@@ -183,8 +207,11 @@ class AOI extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   aoiGeometry: store.aoi.geometry,
+  aoiIsDrawing: store.aoi.isDrawing,
+  aoiShape: store.aoi.shape,
+  aoiClearMap: store.aoi.clearMap,
   mapBounds: store.mainMap.bounds,
   layerId: store.visualization.layerId,
   datasetId: store.visualization.datasetId,

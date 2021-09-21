@@ -1,28 +1,13 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import ClientOAuth2 from 'client-oauth2';
 import { t } from 'ttag';
 
-import { decodeToken, saveTokenToLocalStorage, removeTokenFromLocalStorage } from './authHelpers';
+import { decodeToken, removeTokenFromLocalStorage, openLoginWindow } from './authHelpers';
 
 class UserAuth extends Component {
-  LOCAL_STORAGE_AUTH_KEY = 'eobrowser_oauth';
-  oauth = new ClientOAuth2({
-    clientId: process.env.REACT_APP_CLIENTID,
-    accessTokenUri: process.env.REACT_APP_AUTH_BASEURL + 'oauth/token',
-    authorizationUri: process.env.REACT_APP_AUTH_BASEURL + 'oauth/auth',
-    redirectUri: `${process.env.REACT_APP_ROOT_URL}oauthCallback.html`,
-    scopes: ['EOBrowser', 'SH'],
-  });
-
-  doLogin = () => {
-    new Promise((resolve, reject) => {
-      window.authorizationCallback = { resolve, reject };
-      window.open(this.oauth.token.getUri(), 'popupWindow', 'width=800,height=600');
-    }).then(token => {
-      saveTokenToLocalStorage(token);
-      this.props.onLogIn(token, decodeToken(token));
-    });
+  doLogin = async () => {
+    const token = await openLoginWindow();
+    this.props.onLogIn(token, decodeToken(token));
   };
 
   doLogout = () => {
@@ -33,7 +18,7 @@ class UserAuth extends Component {
           client_id: process.env.REACT_APP_CLIENTID,
         },
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
       })
       .finally(() => {

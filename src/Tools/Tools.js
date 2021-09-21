@@ -27,13 +27,13 @@ class Tools extends Component {
     showEffects: false,
   };
 
-  setTimeSpanExpanded = isExpanded => {
+  setTimeSpanExpanded = (isExpanded) => {
     this.setState({
       timespanExpanded: isExpanded,
     });
   };
 
-  setShowEffects = showEffects => {
+  setShowEffects = (showEffects) => {
     this.setState({ showEffects: showEffects });
   };
 
@@ -58,7 +58,7 @@ class Tools extends Component {
     });
   };
 
-  onSearchFinished = query => {
+  onSearchFinished = (query) => {
     this.setState({
       resultsAvailable: true,
       showEffects: false,
@@ -74,7 +74,7 @@ class Tools extends Component {
     this.props.setQuery(null);
   };
 
-  onResultSelected = tile => {
+  onResultSelected = (tile) => {
     this.setSelectedDate(tile.sensingTime);
     store.dispatch(
       visualizationSlice.actions.setVisualizationParams({
@@ -90,13 +90,9 @@ class Tools extends Component {
     this.props.setHighlightedTile(null);
   };
 
-  setSelectedDate = date => {
-    const fromTime = moment(date)
-      .utc()
-      .startOf('day');
-    const toTime = moment(date)
-      .utc()
-      .endOf('day');
+  setSelectedDate = (date) => {
+    const fromTime = moment(date).utc().startOf('day');
+    const toTime = moment(date).utc().endOf('day');
 
     store.dispatch(
       visualizationSlice.actions.setVisualizationTime({
@@ -106,7 +102,7 @@ class Tools extends Component {
     );
   };
 
-  setActiveTabIndex = index => {
+  setActiveTabIndex = (index) => {
     store.dispatch(tabsSlice.actions.setTabIndex(index));
 
     if (index === 4) {
@@ -146,15 +142,15 @@ class Tools extends Component {
     this.setActiveTabIndex(3);
   };
 
-  saveLocalPinsOnLogin = async pins => {
+  saveLocalPinsOnLogin = async (pins) => {
     return await savePinsToServer(pins);
   };
 
-  setLastAddedPin = id => {
+  setLastAddedPin = (id) => {
     this.props.setLastAddedPin(id);
   };
 
-  setSelectedPin = pin => {
+  setSelectedPin = (pin) => {
     this.setState({
       selectedPin: pin,
       selectedResult: null,
@@ -206,7 +202,7 @@ class Tools extends Component {
           <HeaderWithLogin toggleTools={this.toggleTools} />
           <Tabs
             activeIndex={this.props.selectedTabIndex}
-            onErrorMessage={msg => store.dispatch(notificationSlice.actions.displayError(msg))}
+            onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
             onSelect={this.setActiveTabIndex}
           >
             <Tab id="SearchTab" title={t`Discover`} icon="search" renderKey={0}>
@@ -269,7 +265,7 @@ class Tools extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   user: store.auth.user.userdata,
   access_token: store.auth.user.access_token,
   zoom: store.mainMap.zoom,
@@ -298,6 +294,8 @@ const mapStoreToProps = store => ({
   minQa: store.visualization.minQa,
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
+  speckleFilter: store.visualization.speckleFilter,
+  orthorectification: store.visualization.orthorectification,
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,
   selectedThemeId: store.themes.selectedThemeId,

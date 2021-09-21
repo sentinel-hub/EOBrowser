@@ -7,13 +7,13 @@ export const SelectedBand = ({ bands, bandName, value, showName }) => {
     drop: () => ({
       id: bandName,
     }),
-    collect: monitor => ({
+    collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
   });
 
-  const band = value && bands.find(b => b.name === value[bandName]);
+  const band = value && bands.find((b) => b.name === value[bandName]);
 
   return (
     <React.Fragment key={bandName}>

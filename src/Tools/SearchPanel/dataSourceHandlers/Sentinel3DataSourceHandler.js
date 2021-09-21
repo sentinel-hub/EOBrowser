@@ -13,6 +13,8 @@ import Sentinel3SLSTRFilters from './DatasourceRenderingComponents/searchGroups/
 import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 import { FetchingFunction } from '../search';
 import { S3SLSTR, S3OLCI } from './dataSourceHandlers';
+import { BAND_UNIT } from './dataSourceConstants';
+import { DATASOURCES } from '../../../const';
 
 export default class Sentinel3DataSourceHandler extends DataSourceHandler {
   VIEWS = {
@@ -35,112 +37,116 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
   searchFilters = {};
   searchFiltersSLSTR = {}; // SLSTR specific parameters
   isChecked = false;
-  datasource = 'Sentinel-3';
+  datasource = DATASOURCES.S3;
 
   OLCI_BANDS = [
     {
       name: 'B01',
-      description: t`Band 1 - Aerosol correction, improved water constituent retrieval - 400 nm`,
+      getDescription: () => t`Band 1 - Aerosol correction, improved water constituent retrieval - 400 nm`,
       color: '#4900A5',
     },
     {
       name: 'B02',
-      description: t`Band 2 - Yellow substance and detrital pigments (turbidity)-412 nm`,
+      getDescription: () => t`Band 2 - Yellow substance and detrital pigments (turbidity)-412 nm`,
       color: '#4400DB',
     },
     {
       name: 'B03',
-      description: t`Band 3 - Chl absorption max., biogeochemistry, vegetation - 442.5 nm`,
+      getDescription: () => t`Band 3 - Chl absorption max., biogeochemistry, vegetation - 442.5 nm`,
       color: '#000AFF',
     },
     {
       name: 'B04',
-      description: t`Band 4 - High Chl, other pigments - 490 nm`,
+      getDescription: () => t`Band 4 - High Chl, other pigments - 490 nm`,
       color: '#00FFFF',
     },
     {
       name: 'B05',
-      description: t`Band 5 - Chl, sediment, turbidity, red tide - 510 nm`,
+      getDescription: () => t`Band 5 - Chl, sediment, turbidity, red tide - 510 nm`,
       color: '#00FF00',
     },
     {
       name: 'B06',
-      description: t`Band 6 - Chlorophyll reference (Chl minimum) - 560 nm`,
+      getDescription: () => t`Band 6 - Chlorophyll reference (Chl minimum) - 560 nm`,
       color: '#B6FF00',
     },
     {
       name: 'B07',
-      description: t`Band 7 - Sediment loading - 620 nm`,
+      getDescription: () => t`Band 7 - Sediment loading - 620 nm`,
       color: '#FF6200',
     },
     {
       name: 'B08',
-      description: t`Band 8 - Chl (2nd Chl abs. max.), sediment, yellow substance/vegetation - 665 nm`,
+      getDescription: () =>
+        t`Band 8 - Chl (2nd Chl abs. max.), sediment, yellow substance/vegetation - 665 nm`,
       color: '#FF0000',
     },
     {
       name: 'B09',
-      description: t`Band 9 - For improved fluorescence retrieval and to better account for smile together with the bands 665 and 680 nm - 673.75 nm `,
+      getDescription: () =>
+        t`Band 9 - For improved fluorescence retrieval and to better account for spectral smile together with the band 8 (665 nm) and band 10 (681.25 nm) - 673.75 nm`,
       color: '#FF0000',
     },
     {
       name: 'B10',
-      description: t`Band 10 - Chl fluorescence peak, red edge - 681.25 nm`,
+      getDescription: () => t`Band 10 - Chl fluorescence peak, red edge - 681.25 nm`,
       color: '#FF0000',
     },
     {
       name: 'B11',
-      description: t`Band 11 - Chl fluorescence baseline, red edge transition - 708.75 nm`,
+      getDescription: () => t`Band 11 - Chl fluorescence baseline, red edge transition - 708.75 nm`,
       color: '#ED0000',
     },
     {
       name: 'B12',
-      description: t`Band 12 - O2 absorption/clouds, vegetation - 753.75 nm`,
+      getDescription: () => t`Band 12 - O2 absorption/clouds, vegetation - 753.75 nm`,
       color: '#880000',
     },
     {
       name: 'B13',
-      description: t`Band 13 - O2 absorption band/aerosol corr. - 761.25 nm`,
+      getDescription: () => t`Band 13 - O2 absorption band/aerosol corr. - 761.25 nm`,
       color: '#760000',
     },
     {
       name: 'B14',
-      description: t`Band 14 - Atmospheric correction - 764.375 nm`,
+      getDescription: () => t`Band 14 - Atmospheric correction - 764.375 nm`,
       color: '#700000',
     },
     {
       name: 'B15',
-      description: t`Band 15 - O2A used for cloud top pressure, fluorescence over land - 767.5 nm`,
+      getDescription: () => t`Band 15 - O2A used for cloud top pressure, fluorescence over land - 767.5 nm`,
       color: '#670000',
     },
     {
       name: 'B16',
-      description: t`Band 16 - Atmos. corr./aerosol corr. - 778.75 nm`,
+      getDescription: () => t`Band 16 - Atmos. corr./aerosol corr. - 778.75 nm`,
       color: '#500000',
     },
     {
       name: 'B17',
-      description: t`Band 17 - Atmos. corr./aerosol corr., clouds, pixel co-registration - 865 nm`,
+      getDescription: () => t`Band 17 - Atmos. corr./aerosol corr., clouds, pixel co-registration - 865 nm`,
       color: '#000000',
     },
     {
       name: 'B18',
-      description: t`Band 18 - Water vapour absorption reference band. Common reference band with SLSTR instrument. Vegetation monitoring - 885 nm`,
+      getDescription: () =>
+        t`Band 18 - Water vapour absorption reference band. Common reference band with SLSTR instrument. Vegetation monitoring - 885 nm`,
       color: '#000000',
     },
     {
       name: 'B19',
-      description: t`Band 19 - Water vapour absorption/vegetation monitoring (max. reflectance) - 900 nm`,
+      getDescription: () =>
+        t`Band 19 - Water vapour absorption/vegetation monitoring (max. reflectance) - 900 nm`,
       color: '#000000',
     },
     {
       name: 'B20',
-      description: t`Band 20 - Water vapour absorption, atmos./aerosol corr. - 940 nm`,
+      getDescription: () => t`Band 20 - Water vapour absorption, atmos./aerosol corr. - 940 nm`,
       color: '#000000',
     },
     {
       name: 'B21',
-      description: t`Band 21 - Atmos./aerosol corr. - 1020 nm`,
+      getDescription: () => t`Band 21 - Atmos./aerosol corr. - 1020 nm`,
       color: '#000000',
     },
   ];
@@ -148,47 +154,58 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
   SLSTR_BANDS = [
     {
       name: 'F1',
-      description: t`Band F1 - Thermal IR fire emission - Active fire - 3742.00 nm`,
+      getDescription: () => t`Band F1 - Thermal IR fire emission - Active fire - 3742.00 nm`,
+      unit: BAND_UNIT.KELVIN,
     },
     {
       name: 'F2',
-      description: t`Band F2 - Thermal IR fire emission - Active fire - 10854.00 nm`,
+      getDescription: () => t`Band F2 - Thermal IR fire emission - Active fire - 10854.00 nm`,
+      unit: BAND_UNIT.KELVIN,
     },
     {
       name: 'S1',
-      description: t`Band S1 - VNIR - Cloud screening, vegetation monitoring, aerosol - 554.27 nm`,
+      getDescription: () => t`Band S1 - VNIR - Cloud screening, vegetation monitoring, aerosol - 554.27 nm`,
+      unit: BAND_UNIT.REFLECTANCE,
     },
     {
       name: 'S2',
-      description: t`Band S2 - VNIR - NDVI, vegetation monitoring, aerosol - 659.47 nm`,
+      getDescription: () => t`Band S2 - VNIR - NDVI, vegetation monitoring, aerosol - 659.47 nm`,
+      unit: BAND_UNIT.REFLECTANCE,
     },
     {
       name: 'S3',
-      description: t`Band S3 - VNIR - NDVI, cloud flagging, pixel co-registration - 868.00 nm`,
+      getDescription: () => t`Band S3 - VNIR - NDVI, cloud flagging, pixel co-registration - 868.00 nm`,
+      unit: BAND_UNIT.REFLECTANCE,
     },
     {
       name: 'S4',
-      description: t`Band S4 - SWIR - Cirrus detection over land - 1374.80 nm`,
+      getDescription: () => t`Band S4 - SWIR - Cirrus detection over land - 1374.80 nm`,
+      unit: BAND_UNIT.REFLECTANCE,
     },
     {
       name: 'S5',
-      description: t`Band S5 - SWIR - Cloud clearing, ice, snow, vegetation monitoring - 1613.40 nm`,
+      getDescription: () => t`Band S5 - SWIR - Cloud clearing, ice, snow, vegetation monitoring - 1613.40 nm`,
+      unit: BAND_UNIT.REFLECTANCE,
     },
     {
       name: 'S6',
-      description: t`Band S6 - SWIR - Vegetation state and cloud clearing - 2255.70 nm`,
+      getDescription: () => t`Band S6 - SWIR - Vegetation state and cloud clearing - 2255.70 nm`,
+      unit: BAND_UNIT.REFLECTANCE,
     },
     {
       name: 'S7',
-      description: t`Band S7 - Thermal IR Ambient - SST, LST, active fire - 3742.00 nm`,
+      getDescription: () => t`Band S7 - Thermal IR Ambient - SST, LST, active fire - 3742.00 nm`,
+      unit: BAND_UNIT.KELVIN,
     },
     {
       name: 'S8',
-      description: t`Band S8 - Thermal IR Ambient - SST, LST, active fire - 10854.00 nm`,
+      getDescription: () => t`Band S8 - Thermal IR Ambient - SST, LST, active fire - 10854.00 nm`,
+      unit: BAND_UNIT.KELVIN,
     },
     {
       name: 'S9',
-      description: t`Band S9 - Thermal IR Ambient - SST, LST - 12022.50 nm`,
+      getDescription: () => t`Band S9 - Thermal IR Ambient - SST, LST - 12022.50 nm`,
+      unit: BAND_UNIT.KELVIN,
     },
   ];
 
@@ -204,8 +221,8 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
   };
 
   willHandle(service, url, name, layers, preselected) {
-    const usesS3SLSTRDataset = !!layers.find(l => l.dataset && l.dataset.id === DATASET_S3SLSTR.id);
-    const usesS3OLCIDataset = !!layers.find(l => l.dataset && l.dataset.id === DATASET_S3OLCI.id);
+    const usesS3SLSTRDataset = !!layers.find((l) => l.dataset && l.dataset.id === DATASET_S3SLSTR.id);
+    const usesS3OLCIDataset = !!layers.find((l) => l.dataset && l.dataset.id === DATASET_S3OLCI.id);
 
     if (!usesS3SLSTRDataset && !usesS3OLCIDataset) {
       return false;
@@ -238,11 +255,11 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
     return Object.values(this.urls).flat().length > 0;
   }
 
-  saveSLSTRSearchFilters = searchFilters => {
+  saveSLSTRSearchFilters = (searchFilters) => {
     this.searchFiltersSLSTR = searchFilters;
   };
 
-  renderOptionsHelpTooltips = option => {
+  renderOptionsHelpTooltips = (option) => {
     switch (option) {
       case S3SLSTR:
         return (
@@ -277,7 +294,7 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
         optionsLabels={this.datasetSearchLabels}
         preselectedOptions={Array.from(this.preselectedDatasets)}
         hasMaxCCFilter={false}
-        renderOptionsFilters={option => {
+        renderOptionsFilters={(option) => {
           // SLSTR allows additional filters:
           if (option === S3SLSTR) {
             return (
@@ -303,7 +320,7 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
     let fetchingFunctions = [];
 
     const datasets = this.searchFilters.selectedOptions;
-    datasets.forEach(dataset => {
+    datasets.forEach((dataset) => {
       const { maxCC, views, orbitDirections } = this.searchFiltersSLSTR;
 
       let searchLayer;
@@ -336,7 +353,7 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map(t => ({
+    const tiles = data.map((t) => ({
       sensingTime: t.sensingTime,
       geometry: t.geometry,
       datasource: this.datasource,
@@ -350,7 +367,7 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
     return tiles;
   };
 
-  getUrlsForDataset = datasetId => {
+  getUrlsForDataset = (datasetId) => {
     switch (datasetId) {
       case S3SLSTR:
         return this.urls.SLSTR;
@@ -361,7 +378,7 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
     }
   };
 
-  getBands = datasetId => {
+  getBands = (datasetId) => {
     switch (datasetId) {
       case S3OLCI:
         return this.OLCI_BANDS;
@@ -372,7 +389,7 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
     }
   };
 
-  getSentinelHubDataset = datasetId => {
+  getSentinelHubDataset = (datasetId) => {
     switch (datasetId) {
       case S3OLCI:
         return DATASET_S3OLCI;
@@ -397,13 +414,11 @@ export default class Sentinel3DataSourceHandler extends DataSourceHandler {
       'TOTAL_COLUMN_WATER_VAPOR',
     It was decided this group will be omitted, as it is not of particular importance and the channel names are too long
     */
-  groupChannels = datasetId => {
+  groupChannels = (datasetId) => {
     if (datasetId === S3SLSTR) {
       const groupedBands = {
-        [t`Reflectance`]: this.SLSTR_BANDS.filter(c => ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'].includes(c.name)),
-        [t`Brightness temperature`]: this.SLSTR_BANDS.filter(c =>
-          ['S7', 'S8', 'S9', 'F1', 'F2'].includes(c.name),
-        ),
+        [t`Reflectance`]: this.SLSTR_BANDS.filter((band) => band.unit === BAND_UNIT.REFLECTANCE),
+        [t`Brightness temperature`]: this.SLSTR_BANDS.filter((band) => band.unit === BAND_UNIT.KELVIN),
       };
       return groupedBands;
     } else {

@@ -20,7 +20,7 @@ class MouseCoordsControl extends MapControl {
     map.removeControl(this.leafletElement);
   }
 
-  handleMouseMoveAndZoomChange = e => {
+  handleMouseMoveAndZoomChange = (e) => {
     let mouseCoords;
     if (e.type === 'mousemove') {
       mouseCoords = e.latlng.wrap();
@@ -48,7 +48,7 @@ class MouseCoordsControl extends MapControl {
 
   createLeafletElement(props) {
     const MouseCoordsControl = L.Control.extend({
-      onAdd: map => {
+      onAdd: (map) => {
         this.panelDiv = L.DomUtil.create('div', 'leaflet-control-map-coordinates no-coordinates');
         return this.panelDiv;
       },

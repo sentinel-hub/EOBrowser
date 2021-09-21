@@ -26,8 +26,9 @@ import { VisualizationPanelHeaderActions } from './VisualizationPanelHeaderActio
 import { parseEvalscriptBands, parseIndexEvalscript } from '../../utils';
 import ZoomInNotification from './ZoomInNotification';
 import { getAppropriateAuthToken } from '../../App';
-import { EDUCATION_MODE } from '../../const';
+import { EDUCATION_MODE, reqConfigMemoryCache } from '../../const';
 import { VisualizationTimeSelect } from '../../components/VisualizationTimeSelect/VisualizationTimeSelect';
+
 import VisualizationErrorPanel from './VisualizationErrorPanel';
 
 class VisualizationPanel extends Component {
@@ -82,7 +83,7 @@ class VisualizationPanel extends Component {
 
   async getLayersAndBands() {
     const { datasetId, selectedThemeId, selectedThemesListId, themesLists } = this.props;
-    const selectedTheme = themesLists[selectedThemesListId].find(t => t.id === selectedThemeId);
+    const selectedTheme = themesLists[selectedThemesListId].find((t) => t.id === selectedThemeId);
 
     const datasourceHandler = getDataSourceHandler(datasetId);
     const urls = datasourceHandler.getUrlsForDataset(datasetId);
@@ -94,23 +95,27 @@ class VisualizationPanel extends Component {
     const supportsTimeRange = datasourceHandler.supportsTimeRange();
 
     let allLayers = [];
-    for (let url of urls) {
-      const { layersExclude, layersInclude, name } = selectedTheme.content.find(t => t.url === url);
 
-      let shjsLayers = await LayersFactory.makeLayers(url, (_, dataset) =>
-        !shJsDatasetId ? true : dataset.id === shJsDatasetId,
+    for (let url of urls) {
+      const { layersExclude, layersInclude, name } = selectedTheme.content.find((t) => t.url === url);
+
+      let shjsLayers = await LayersFactory.makeLayers(
+        url,
+        (_, dataset) => (!shJsDatasetId ? true : dataset.id === shJsDatasetId),
+        null,
+        reqConfigMemoryCache,
       );
       if (datasourceHandler.updateLayersOnVisualization()) {
         // We have to update layers to get thier legend info and additionally acquisitionMode, polarization for S1. WMS layers don't need updating
         await Promise.all(
-          shjsLayers.map(async l => {
-            await l.updateLayerFromServiceIfNeeded();
+          shjsLayers.map(async (l) => {
+            await l.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
           }),
         );
       }
       let layers = datasourceHandler.getLayers(shjsLayers, datasetId, url, layersExclude, layersInclude);
       for (let layer of layers) {
-        if (allLayers.find(l => l.layerId === layer.layerId)) {
+        if (allLayers.find((l) => l.layerId === layer.layerId)) {
           layer.description += ` (${name})`;
           layer.duplicateLayerId = layer.layerId + ` (${name})`;
         }
@@ -127,7 +132,7 @@ class VisualizationPanel extends Component {
     return datasourceHandler.generateEvalscript(bands, datasetId, config);
   }
 
-  setSelectedVisualization = layer => {
+  setSelectedVisualization = (layer) => {
     const layerId = layer.duplicateLayerId ? layer.duplicateLayerId : layer.layerId;
     this.setState({
       selectedLayer: layerId,
@@ -170,7 +175,7 @@ class VisualizationPanel extends Component {
     this.setCustomVisualization(evalscript);
   };
 
-  onDataFusionChange = value => {
+  onDataFusionChange = (value) => {
     this.setState({
       dataFusion: value,
     });
@@ -186,13 +191,13 @@ class VisualizationPanel extends Component {
     window.location.hash = '';
   };
 
-  toggleValue = key => {
+  toggleValue = (key) => {
     if (key === 'showEffects') {
       this.props.setShowEffects(!this.props.showEffects);
       return;
     }
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       [key]: !prevState[key],
     }));
   };
@@ -248,7 +253,7 @@ class VisualizationPanel extends Component {
       if (this.props.evalscript) {
         // Composite evalscript
         bands = parseEvalscriptBands(this.props.evalscript).filter(
-          band => !!allBands.find(b => b.name === band),
+          (band) => !!allBands.find((b) => b.name === band),
         );
 
         // Index evalscript
@@ -265,7 +270,7 @@ class VisualizationPanel extends Component {
 
       if (!bands || bands.length !== 3) {
         // Some datasets might have only 1 or 2 available bands. This assures `bands` always contains exactly 3.
-        bands = [...allBands, ...allBands, ...allBands].slice(0, 3).map(b => b.name);
+        bands = [...allBands, ...allBands, ...allBands].slice(0, 3).map((b) => b.name);
       }
 
       const selectedBands = {
@@ -277,7 +282,7 @@ class VisualizationPanel extends Component {
       if (evalscripturl) {
         axios
           .get(evalscripturl, { timeout: 10000 })
-          .then(r => {
+          .then((r) => {
             this.setState({
               evalscript: r.data,
             });
@@ -309,7 +314,7 @@ class VisualizationPanel extends Component {
       this.setCustomVisualization();
     } else {
       const selectedLayer = selectedVisualizationId
-        ? allLayers.find(l => l.layerId === selectedVisualizationId)
+        ? allLayers.find((l) => l.layerId === selectedVisualizationId)
         : allLayers[0];
       this.setSelectedVisualization(selectedLayer || allLayers[0]);
     }
@@ -319,7 +324,7 @@ class VisualizationPanel extends Component {
    * Custom visualization rendering, composite mode, on drag n drop change
    * @param {*} bands { r: ... , g: ... , b: ...} bands
    */
-  onCompositeChange = bands => {
+  onCompositeChange = (bands) => {
     const evalscript = this.generateEvalscript(bands, this.props.datasetId);
 
     this.setState({
@@ -337,7 +342,7 @@ class VisualizationPanel extends Component {
    * @param {*} config an object representing the eval script configuration, can containt equation formula, ramp/gradient values
    */
   onIndexScriptChange = (bands, config) => {
-    if (Object.values(bands).filter(item => item === null).length > 0) {
+    if (Object.values(bands).filter((item) => item === null).length > 0) {
       this.setState({
         selectedIndexBands: bands,
       });
@@ -375,7 +380,7 @@ class VisualizationPanel extends Component {
       );
 
       const bands = parseEvalscriptBands(this.state.evalscript).filter(
-        band => !!this.state.bands.find(b => b.name === band),
+        (band) => !!this.state.bands.find((b) => b.name === band),
       );
       if (bands && bands.length === 3) {
         this.setState({
@@ -390,7 +395,7 @@ class VisualizationPanel extends Component {
   };
 
   // this should be probably moved to utils
-  getMinMaxDates = asMoment => {
+  getMinMaxDates = (asMoment) => {
     let minDate;
     let maxDate;
     const dsh = getDataSourceHandler(this.props.datasetId);
@@ -409,7 +414,7 @@ class VisualizationPanel extends Component {
     return { minDate, maxDate };
   };
 
-  onFetchAvailableDates = async (fromMoment, toMoment) => {
+  getLayerAndBBoxSetup = () => {
     const { mapBounds, selectedVisualizationId } = this.props;
     const { visualizations } = this.state;
     const bbox = new BBox(
@@ -421,10 +426,19 @@ class VisualizationPanel extends Component {
     );
 
     // Get layer for selected visualization. If layer is not found (custom layer), just use first layer from list.
-    let layer = visualizations.find(l => l.layerId === selectedVisualizationId);
+    let layer = visualizations.find((l) => l.layerId === selectedVisualizationId);
     if (!layer && visualizations && visualizations.length > 0) {
       layer = visualizations[0];
     }
+
+    return {
+      bbox,
+      layer,
+    };
+  };
+
+  onFetchAvailableDates = async (fromMoment, toMoment) => {
+    const { bbox, layer } = this.getLayerAndBBoxSetup();
     let dates = [];
     if (layer) {
       dates = await layer.findDatesUTC(bbox, fromMoment.toDate(), toMoment.toDate());
@@ -432,107 +446,27 @@ class VisualizationPanel extends Component {
     return dates;
   };
 
-  onQueryDatesForActiveMonth = async day => {
+  fetchAvailableFlyovers = async (day) => {
+    const monthStart = moment(day).clone().startOf('month');
+    const monthEnd = moment(day).clone().endOf('month');
+    const { bbox, layer } = this.getLayerAndBBoxSetup();
+
+    return await layer.findFlyovers(bbox, monthStart, monthEnd);
+  };
+
+  onQueryDatesForActiveMonth = async (day) => {
     const monthStart = day.clone().startOf('month');
     const monthEnd = day.clone().endOf('month');
     const dates = await this.onFetchAvailableDates(monthStart, monthEnd);
     return dates;
   };
 
-  onUpdateScript = state => {
+  onUpdateScript = (state) => {
     this.setState({
       evalscript: state.evalscript,
       evalscripturl: state.evalscripturl,
       useEvalscriptUrl: state.isEvalUrl,
     });
-  };
-
-  onGetAndSetNextPrev = async (direction, currentDay) => {
-    const { minDate, maxDate } = this.getMinMaxDates(true);
-    let newSelectedDay;
-    const NO_DATES_FOUND = 'No dates found';
-
-    if (direction === 'prev') {
-      const start = minDate.utc().startOf('day');
-      const startDates = [
-        moment
-          .utc(currentDay)
-          .subtract(3, 'months')
-          .startOf('day'),
-        moment
-          .utc(currentDay)
-          .subtract(1, 'year')
-          .startOf('day'),
-        start,
-      ].filter(date => date.isSameOrAfter(start));
-      const end = currentDay
-        .clone()
-        .subtract(1, 'day')
-        .endOf('day');
-      let dates = [];
-      try {
-        for (const startDate of startDates) {
-          dates = await this.onFetchAvailableDates(startDate, end);
-          if (dates.length > 0) {
-            break;
-          }
-        }
-      } catch (e) {
-        console.error(e);
-        throw NO_DATES_FOUND;
-      }
-
-      if (dates.length < 1) {
-        throw NO_DATES_FOUND;
-      }
-
-      newSelectedDay = dates[0];
-    }
-
-    if (direction === 'next') {
-      const start = currentDay
-        .clone()
-        .utc()
-        .add(1, 'day')
-        .startOf('day');
-      const end = maxDate.utc();
-      const endDates = [
-        moment
-          .utc(currentDay)
-          .add(3, 'months')
-          .endOf('day'),
-        moment
-          .utc(currentDay)
-          .add(1, 'year')
-          .endOf('day'),
-        end,
-      ].filter(date => date.isSameOrBefore(end));
-
-      let dates = [];
-      try {
-        for (const endDate of endDates) {
-          dates = await this.onFetchAvailableDates(start, endDate);
-          if (dates.length > 0) {
-            break;
-          }
-        }
-      } catch (e) {
-        console.error(e);
-        throw NO_DATES_FOUND;
-      }
-
-      // if no future date is found throw no dates found
-      if (dates.length < 1) {
-        throw NO_DATES_FOUND;
-      }
-
-      newSelectedDay = dates[dates.length - 1];
-    }
-
-    this.updateSelectedTime(
-      moment.utc(newSelectedDay).startOf('day'),
-      moment.utc(newSelectedDay).endOf('day'),
-    );
   };
 
   updateSelectedTime = (fromTime, toTime) => {
@@ -547,7 +481,7 @@ class VisualizationPanel extends Component {
     );
   };
 
-  setSibling = async datasetId => {
+  setSibling = async (datasetId) => {
     const isSiblingDataAvailable = await this.searchForSiblingData(datasetId);
     if (!isSiblingDataAvailable) {
       this.setState({
@@ -587,8 +521,8 @@ class VisualizationPanel extends Component {
       return false;
     }
 
-    const layers = await LayersFactory.makeLayers(url);
-    const layer = layers.find(l => l.dataset === shJsDataset);
+    const layers = await LayersFactory.makeLayers(url, null, null, reqConfigMemoryCache);
+    const layer = layers.find((l) => l.dataset === shJsDataset);
 
     const bbox = new BBox(
       CRS_EPSG4326,
@@ -621,7 +555,7 @@ class VisualizationPanel extends Component {
     });
   };
 
-  renderNoSibling = datasetId => {
+  renderNoSibling = (datasetId) => {
     const { fromTime, toTime } = this.props;
     return (
       <Rodal
@@ -644,42 +578,50 @@ class VisualizationPanel extends Component {
     );
   };
 
-  updateGainEffect = x => {
+  updateGainEffect = (x) => {
     store.dispatch(visualizationSlice.actions.setGainEffect(parseFloat(x)));
   };
-  updateGammaEffect = x => {
+  updateGammaEffect = (x) => {
     store.dispatch(visualizationSlice.actions.setGammaEffect(parseFloat(x)));
   };
-  updateRedRangeEffect = range => {
+  updateRedRangeEffect = (range) => {
     store.dispatch(visualizationSlice.actions.setRedRangeEffect(range));
   };
-  updateGreenRangeEffect = range => {
+  updateGreenRangeEffect = (range) => {
     store.dispatch(visualizationSlice.actions.setGreenRangeEffect(range));
   };
-  updateBlueRangeEffect = range => {
+  updateBlueRangeEffect = (range) => {
     store.dispatch(visualizationSlice.actions.setBlueRangeEffect(range));
   };
 
-  updateRedCurveEffect = curve => {
+  updateRedCurveEffect = (curve) => {
     store.dispatch(visualizationSlice.actions.setRedCurveEffect(curve));
   };
-  updateGreenCurveEffect = curve => {
+  updateGreenCurveEffect = (curve) => {
     store.dispatch(visualizationSlice.actions.setGreenCurveEffect(curve));
   };
-  updateBlueCurveEffect = curve => {
+  updateBlueCurveEffect = (curve) => {
     store.dispatch(visualizationSlice.actions.setBlueCurveEffect(curve));
   };
 
-  updateMinQa = x => {
+  updateMinQa = (x) => {
     store.dispatch(visualizationSlice.actions.setMinQa(parseInt(x)));
   };
 
-  updateUpsampling = x => {
+  updateUpsampling = (x) => {
     store.dispatch(visualizationSlice.actions.setUpsampling(x ? x : undefined));
   };
 
-  updateDownsampling = x => {
+  updateDownsampling = (x) => {
     store.dispatch(visualizationSlice.actions.setDownsampling(x ? x : undefined));
+  };
+
+  updateSpeckleFilter = (x) => {
+    store.dispatch(visualizationSlice.actions.setSpeckleFilter(x ? x : undefined));
+  };
+
+  updateOrthorectification = (x) => {
+    store.dispatch(visualizationSlice.actions.setOrthorectification(x ? x : undefined));
   };
 
   resetEffects = () => {
@@ -690,7 +632,7 @@ class VisualizationPanel extends Component {
     store.dispatch(visualizationSlice.actions.resetRgbEffects());
   };
 
-  doesDatasetSupportMinQa = datasetId => {
+  doesDatasetSupportMinQa = (datasetId) => {
     const dsh = getDataSourceHandler(datasetId);
     if (dsh) {
       return dsh.supportsMinQa();
@@ -698,7 +640,7 @@ class VisualizationPanel extends Component {
     return false;
   };
 
-  getDefaultMinQa = datasetId => {
+  getDefaultMinQa = (datasetId) => {
     const dsh = getDataSourceHandler(datasetId);
     if (dsh && dsh.supportsMinQa()) {
       return dsh.getDefaultMinQa(datasetId);
@@ -706,7 +648,7 @@ class VisualizationPanel extends Component {
     return null;
   };
 
-  doesDatasetSupportInterpolation = datasetId => {
+  doesDatasetSupportInterpolation = (datasetId) => {
     const dsh = getDataSourceHandler(datasetId);
     if (dsh) {
       return dsh.supportsInterpolation();
@@ -714,10 +656,36 @@ class VisualizationPanel extends Component {
     return false;
   };
 
+  doesDatasetSupportSpeckleFilter = (datasetId) => {
+    const dsh = getDataSourceHandler(datasetId);
+    if (dsh) {
+      return dsh.supportsSpeckleFilter(datasetId);
+    }
+    return false;
+  };
+
+  doesDatasetSupportOrthorectification = (datasetId) => {
+    const dsh = getDataSourceHandler(datasetId);
+    if (dsh) {
+      return dsh.supportsOrthorectification(datasetId);
+    }
+    return false;
+  };
+
   toggleSocialSharePanel = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       displaySocialShareOptions: !prevState.displaySocialShareOptions,
     }));
+  };
+
+  setEvalScriptAndCustomVisualization = async (layerId) => {
+    const { allLayers } = await this.getLayersAndBands();
+    const layer = allLayers.find((l) => l.layerId === layerId);
+
+    if (layer) {
+      store.dispatch(visualizationSlice.actions.setVisualizationParams({ evalscript: layer.evalscript }));
+      this.goToCustom();
+    }
   };
 
   addVisualizationToCompare = () => {
@@ -744,6 +712,8 @@ class VisualizationPanel extends Component {
       minQa,
       upsampling,
       downsampling,
+      speckleFilter,
+      orthorectification,
       customSelected,
       selectedThemeId,
     } = this.props;
@@ -774,6 +744,8 @@ class VisualizationPanel extends Component {
       minQa,
       upsampling,
       downsampling,
+      speckleFilter,
+      orthorectification,
       themeId: selectedThemeId,
     };
 
@@ -785,8 +757,11 @@ class VisualizationPanel extends Component {
     const { siblingShortName, siblingId, isSiblingDataAvailable } = this.state.sibling;
     const { minDate, maxDate } = this.getMinMaxDates(true);
     let timespanSupported = false;
+    let hasCloudCoverage = false;
+
     const dsh = getDataSourceHandler(datasetId);
     if (dsh) {
+      hasCloudCoverage = dsh.tilesHaveCloudCoverage();
       timespanSupported = dsh.supportsTimeRange() && selectedModeId !== EDUCATION_MODE.id;
     }
     return (
@@ -809,27 +784,30 @@ class VisualizationPanel extends Component {
           {this.state.noSiblingDataModal && this.renderNoSibling(siblingId)}
         </div>
         <div className="date-selection">
-          <VisualizationTimeSelect
-            maxDate={maxDate}
-            minDate={minDate}
-            showNextPrev={true}
-            getAndSetNextPrevDate={this.onGetAndSetNextPrev}
-            onQueryDatesForActiveMonth={this.onQueryDatesForActiveMonth}
-            fromTime={fromTime}
-            toTime={toTime}
-            updateSelectedTime={this.updateSelectedTime}
-            timespanSupported={timespanSupported}
-          />
+          {this.props.mapBounds && this.state.visualizations && (
+            <VisualizationTimeSelect
+              maxDate={maxDate}
+              minDate={minDate}
+              showNextPrev={true}
+              onQueryDatesForActiveMonth={this.onQueryDatesForActiveMonth}
+              fromTime={fromTime}
+              toTime={toTime}
+              hasCloudCoverage={hasCloudCoverage}
+              updateSelectedTime={this.updateSelectedTime}
+              timespanSupported={timespanSupported}
+              onQueryFlyoversForActiveMonth={this.fetchAvailableFlyovers}
+            />
+          )}
         </div>
       </div>
     );
   };
 
-  _getLegacyActiveLayer = datasetId => {
+  _getLegacyActiveLayer = (datasetId) => {
     const dsh = getDataSourceHandler(datasetId);
     if (dsh && dsh.groupChannels) {
       return {
-        groupChannels: datasetId => dsh.groupChannels(datasetId),
+        groupChannels: (datasetId) => dsh.groupChannels(datasetId),
       };
     }
     return {};
@@ -850,10 +828,11 @@ class VisualizationPanel extends Component {
       minQa,
       upsampling,
       downsampling,
+      speckleFilter,
+      orthorectification,
       datasetId,
       zoomToTileConfig,
     } = this.props;
-
     const legacyActiveLayer = {
       ...this._getLegacyActiveLayer(this.props.datasetId),
       datasetId: datasetId,
@@ -866,6 +845,8 @@ class VisualizationPanel extends Component {
     const dsh = datasetId && getDataSourceHandler(datasetId);
     const areBandsClasses = dsh && dsh.areBandsClasses(datasetId);
     const supportsIndex = dsh && dsh.supportsIndex(datasetId);
+    const supportedSpeckleFilters = dsh && dsh.getSupportedSpeckleFilters(datasetId);
+    const canApplySpeckleFilter = dsh && dsh.canApplySpeckleFilter(datasetId, this.props.zoom);
 
     return (
       <div key={this.props.datasetId} className="visualization-panel">
@@ -897,12 +878,18 @@ class VisualizationPanel extends Component {
               minQa: minQa !== undefined ? minQa : this.getDefaultMinQa(datasetId),
               upsampling: upsampling,
               downsampling: downsampling,
+              speckleFilter: speckleFilter,
+              orthorectification: orthorectification,
             }}
             isFISLayer={false}
             defaultMinQaValue={this.getDefaultMinQa(datasetId)}
             doesDatasetSupportMinQa={this.doesDatasetSupportMinQa(datasetId)}
             doesDatasetSupportInterpolation={this.doesDatasetSupportInterpolation(datasetId)}
+            doesDatasetSupportSpeckleFilter={this.doesDatasetSupportSpeckleFilter(datasetId)}
+            doesDatasetSupportOrthorectification={this.doesDatasetSupportOrthorectification(datasetId)}
             interpolations={supportedInterpolations}
+            supportedSpeckleFilters={supportedSpeckleFilters}
+            canApplySpeckleFilter={canApplySpeckleFilter}
             onUpdateGainEffect={this.updateGainEffect}
             onUpdateGammaEffect={this.updateGammaEffect}
             onUpdateRedRangeEffect={this.updateRedRangeEffect}
@@ -914,6 +901,8 @@ class VisualizationPanel extends Component {
             onUpdateMinQa={this.updateMinQa}
             onUpdateUpsampling={this.updateUpsampling}
             onUpdateDownsampling={this.updateDownsampling}
+            onUpdateSpeckleFilter={this.updateSpeckleFilter}
+            onUpdateOrthorectification={this.updateOrthorectification}
             onResetEffects={this.resetEffects}
             onResetRgbEffects={this.resetRgbEffects}
           />
@@ -932,6 +921,7 @@ class VisualizationPanel extends Component {
                     setSelectedVisualization={this.setSelectedVisualization}
                     setCustomVisualization={this.goToCustom}
                     supportsCustom={this.state.supportsCustom}
+                    setEvalScriptAndCustomVisualization={this.setEvalScriptAndCustomVisualization}
                   />
                 )}
               </div>
@@ -965,7 +955,7 @@ class VisualizationPanel extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   datasetId: store.visualization.datasetId,
   selectedVisualizationId: store.visualization.layerId,
   customSelected: store.visualization.customSelected,
@@ -991,6 +981,8 @@ const mapStoreToProps = store => ({
   minQa: store.visualization.minQa,
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
+  speckleFilter: store.visualization.speckleFilter,
+  orthorectification: store.visualization.orthorectification,
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,
   selectedThemeId: store.themes.selectedThemeId,

@@ -1,0 +1,12 @@
+@import '../../variables';
+
+.commercial-data-panel {
+  color: $textCol;
+  display: flex;
+  flex-flow: column;
+
+  .accordion-title {
+    font-weight: 500;
+    font-size: 16px;
+  }
+}

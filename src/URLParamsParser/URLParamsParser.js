@@ -6,6 +6,7 @@ import {
   datasourceToDatasetId,
   dataSourceToThemeId,
   getDatasetIdFromInstanceId,
+  getNewDatasetPropertiesIfDeprecatedDatasetId,
 } from '../utils/handleOldUrls';
 import store, {
   mainMapSlice,
@@ -43,7 +44,7 @@ class URLParamsParser extends React.Component {
     });
   }
 
-  containsEOB2Params = params => {
+  containsEOB2Params = (params) => {
     return !!(
       params.instanceId ||
       params.time ||
@@ -57,7 +58,7 @@ class URLParamsParser extends React.Component {
     );
   };
 
-  translateEOB2 = async params => {
+  translateEOB2 = async (params) => {
     let {
       time,
       preset,
@@ -69,7 +70,6 @@ class URLParamsParser extends React.Component {
       greenRangeOverride,
       blueRangeOverride,
     } = params;
-
     const EOB3Params = {};
 
     if (instanceId) {
@@ -136,7 +136,7 @@ class URLParamsParser extends React.Component {
     return EOB3Params;
   };
 
-  setStore = params => {
+  setStore = (params) => {
     const {
       zoom,
       lat,
@@ -160,6 +160,8 @@ class URLParamsParser extends React.Component {
       minQa,
       upsampling,
       downsampling,
+      speckleFilter,
+      orthorectification,
       dataFusion,
       handlePositions,
       gradient,
@@ -173,12 +175,11 @@ class URLParamsParser extends React.Component {
       parsedLat = DEFAULT_LAT_LNG.lat;
     }
     store.dispatch(mainMapSlice.actions.setPosition({ zoom: parsedZoom, lat: parsedLat, lng: parsedLng }));
-
     const newVisualizationParams = {
-      datasetId,
+      datasetId: datasetId,
       fromTime: fromTime ? moment.utc(fromTime) : null,
       toTime: moment.utc(toTime),
-      visualizationUrl,
+      visualizationUrl: visualizationUrl,
       layerId,
       evalscript: evalscript && !evalscripturl ? b64DecodeUnicode(evalscript) : undefined,
       customSelected: evalscript || evalscripturl ? true : undefined,
@@ -202,13 +203,16 @@ class URLParamsParser extends React.Component {
       minQa: minQa ? parseInt(minQa) : undefined,
       upsampling: upsampling,
       downsampling: downsampling,
+      speckleFilter: speckleFilter ? JSON.parse(speckleFilter) : undefined,
+      orthorectification: orthorectification ? JSON.parse(orthorectification) : undefined,
       dataFusion: dataFusion ? parseDataFusion(dataFusion, datasetId) : undefined,
+      ...getNewDatasetPropertiesIfDeprecatedDatasetId(datasetId, visualizationUrl),
     };
     store.dispatch(visualizationSlice.actions.setVisualizationParams(newVisualizationParams));
 
     if (handlePositions && gradient) {
       const parsedGradient = gradient.split(',');
-      const parsedHandlePositions = handlePositions.split(',').map(position => parseFloat(position));
+      const parsedHandlePositions = handlePositions.split(',').map((position) => parseFloat(position));
 
       store.dispatch(indexSlice.actions.setHandlePositions(parsedHandlePositions));
       store.dispatch(indexSlice.actions.setGradient(parsedGradient));

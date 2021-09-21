@@ -2,12 +2,12 @@ import L from 'leaflet';
 import { GridLayer, withLeaflet } from 'react-leaflet';
 
 L.TileLayer.MakeLabelsReadable = L.TileLayer.extend({
-  initialize: function(url, options) {
+  initialize: function (url, options) {
     options = options || {};
     L.TileLayer.prototype.initialize.call(this, url, options);
   },
 
-  createTile: function(coords, done) {
+  createTile: function (coords, done) {
     const tile = L.DomUtil.create('canvas', 'leaflet-tile');
     tile.width = tile.height = this.options.tileSize;
     const imageObj = new Image();
@@ -21,13 +21,13 @@ L.TileLayer.MakeLabelsReadable = L.TileLayer.extend({
       done(null, tile); // Syntax is 'done(error, tile)'
     };
 
-    imageObj.onerror = error => {
+    imageObj.onerror = (error) => {
       done(error, null);
     };
     imageObj.src = this.getTileUrl(coords);
     return tile;
   },
-  createGrayscale: function(tile) {
+  createGrayscale: function (tile) {
     if (!tile.originalImage) {
       return;
     }
@@ -45,7 +45,7 @@ L.TileLayer.MakeLabelsReadable = L.TileLayer.extend({
   },
 });
 
-L.tileLayer.makeLabelsReadable = function(url, options) {
+L.tileLayer.makeLabelsReadable = function (url, options) {
   return new L.TileLayer.MakeLabelsReadable(url, options);
 };
 

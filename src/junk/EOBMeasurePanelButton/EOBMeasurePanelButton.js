@@ -41,7 +41,7 @@ export class EOBMeasurePanelButton extends React.Component {
       // eslint-disable-next-line
       <a
         className={`drawGeometry ${this.props.isLoggedIn ? '' : 'disabled'}`}
-        onClick={ev => {
+        onClick={(ev) => {
           if (!isEnabled) {
             this.props.onErrorMessage(title);
             return;

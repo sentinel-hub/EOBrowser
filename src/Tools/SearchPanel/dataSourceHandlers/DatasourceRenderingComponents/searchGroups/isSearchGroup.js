@@ -3,7 +3,7 @@ import HelpTooltip from '../HelpTooltip';
 
 import './isSearchGroup.scss';
 
-export const isSearchGroup = WrappedComponent => {
+export const isSearchGroup = (WrappedComponent) => {
   return class extends React.Component {
     constructor(props) {
       super(props);
@@ -18,7 +18,7 @@ export const isSearchGroup = WrappedComponent => {
     }
 
     toggleChecked = () => {
-      this.setState(oldState => ({
+      this.setState((oldState) => ({
         checked: !oldState.checked,
       }));
     };

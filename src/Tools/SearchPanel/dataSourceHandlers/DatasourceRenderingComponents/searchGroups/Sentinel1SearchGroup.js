@@ -73,13 +73,13 @@ class Sentinel1SearchGroup extends React.Component {
   }
 
   toggleAdvancedOpened = () => {
-    this.setState(oldState => ({
+    this.setState((oldState) => ({
       advancedOpened: !oldState.advancedOpened,
     }));
   };
 
-  getInitiallyCheckedPolarization = polarizations => {
-    Object.keys(polarizations).forEach(p => {
+  getInitiallyCheckedPolarization = (polarizations) => {
+    Object.keys(polarizations).forEach((p) => {
       polarizations[p] = Object.keys(polarizations[p]);
     });
     return polarizations;
@@ -113,7 +113,7 @@ class Sentinel1SearchGroup extends React.Component {
               <NonEmptyCheckboxes
                 choices={this.props.dataLocations}
                 initiallyChecked={this.state.dataLocations}
-                onChange={checked => this.setState({ dataLocations: checked })}
+                onChange={(checked) => this.setState({ dataLocations: checked })}
                 warningEmpty={t`Please select at least one location!`}
               />
             </div>
@@ -139,7 +139,7 @@ class Sentinel1SearchGroup extends React.Component {
               <NonEmptyCheckboxes
                 choices={this.props.orbitDirections}
                 initiallyChecked={this.state.orbitDirections}
-                onChange={checked => this.setState({ orbitDirections: checked })}
+                onChange={(checked) => this.setState({ orbitDirections: checked })}
                 warningEmpty={t`Please select at least one orbit direction!`}
               />
             </div>

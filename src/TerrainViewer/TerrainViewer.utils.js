@@ -40,12 +40,12 @@ function getMapTileUrlInternal(layer, params, minX, minY, maxX, maxY, width, hei
   const apiType = layer.supportsApiType(ApiType.PROCESSING) ? ApiType.PROCESSING : ApiType.WMS;
   layer
     .getMap(params, apiType, reqConfig)
-    .then(blob => {
+    .then((blob) => {
       mapTileRequestDelay = Math.max(1, 0.5 * mapTileRequestDelay); // reduce the delay
       let url = URL.createObjectURL(blob);
       callback(url);
     })
-    .catch(error => {
+    .catch((error) => {
       const httpStatus = error.response && error.response.status ? error.response.status : 0;
       if (httpStatus === 429) {
         // too many requests, must wait a little and retry

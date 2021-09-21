@@ -31,7 +31,7 @@ stories
         isCompareMode={false}
         isLoggedIn={true}
         openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-        onErrorMessage={msg => setState({ errorMsg: msg })}
+        onErrorMessage={(msg) => setState({ errorMsg: msg })}
       />
     );
   })
@@ -43,7 +43,7 @@ stories
           isCompareMode={false}
           isLoggedIn={true}
           openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-          onErrorMessage={msg => setState({ errorMsg: msg })}
+          onErrorMessage={(msg) => setState({ errorMsg: msg })}
         />
         {state.openTimelapsePanel && (
           <EOBTimelapsePanel
@@ -83,7 +83,7 @@ stories
           isCompareMode={false}
           isLoggedIn={true}
           openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-          onErrorMessage={msg => setState({ errorMsg: msg })}
+          onErrorMessage={(msg) => setState({ errorMsg: msg })}
         />
         {state.openTimelapsePanel && (
           <EOBTimelapsePanel
@@ -126,7 +126,7 @@ stories
           isCompareMode={false}
           isLoggedIn={true}
           openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-          onErrorMessage={msg => setState({ errorMsg: msg })}
+          onErrorMessage={(msg) => setState({ errorMsg: msg })}
         />
         {state.openTimelapsePanel && (
           <EOBTimelapsePanel
@@ -164,7 +164,7 @@ stories
           isCompareMode={false}
           isLoggedIn={true}
           openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-          onErrorMessage={msg => setState({ errorMsg: msg })}
+          onErrorMessage={(msg) => setState({ errorMsg: msg })}
         />
         {state.openTimelapsePanel && (
           <EOBTimelapsePanel
@@ -202,7 +202,7 @@ stories
           isCompareMode={false}
           isLoggedIn={true}
           openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-          onErrorMessage={msg => setState({ errorMsg: msg })}
+          onErrorMessage={(msg) => setState({ errorMsg: msg })}
         />
         {state.openTimelapsePanel && (
           <EOBTimelapsePanel
@@ -242,7 +242,7 @@ stories
             isCompareMode={false}
             isLoggedIn={true}
             openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-            onErrorMessage={msg => setState({ errorMsg: msg })}
+            onErrorMessage={(msg) => setState({ errorMsg: msg })}
           />
           {state.openTimelapsePanel && (
             <EOBTimelapsePanel
@@ -281,7 +281,7 @@ stories
           isCompareMode={false}
           isLoggedIn={true}
           openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-          onErrorMessage={msg => setState({ errorMsg: msg })}
+          onErrorMessage={(msg) => setState({ errorMsg: msg })}
         />
         {state.openTimelapsePanel && (
           <EOBTimelapsePanel
@@ -319,7 +319,7 @@ stories
           isCompareMode={false}
           isLoggedIn={true}
           openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-          onErrorMessage={msg => setState({ errorMsg: msg })}
+          onErrorMessage={(msg) => setState({ errorMsg: msg })}
         />
         {state.openTimelapsePanel && (
           <EOBTimelapsePanel
@@ -357,7 +357,7 @@ stories
           isCompareMode={false}
           isLoggedIn={true}
           openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-          onErrorMessage={msg => setState({ errorMsg: msg })}
+          onErrorMessage={(msg) => setState({ errorMsg: msg })}
         />
         {state.openTimelapsePanel && (
           <EOBTimelapsePanel
@@ -396,7 +396,7 @@ stories.add('Timelapse with 400 dates', ({ state, setState }) => {
         isCompareMode={false}
         isLoggedIn={true}
         openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-        onErrorMessage={msg => setState({ errorMsg: msg })}
+        onErrorMessage={(msg) => setState({ errorMsg: msg })}
       />
       {state.openTimelapsePanel && (
         <EOBTimelapsePanel
@@ -465,7 +465,7 @@ stories.add('Timelapse - time interval', ({ state, setState }) => {
         isCompareMode={false}
         isLoggedIn={true}
         openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-        onErrorMessage={msg => setState({ errorMsg: msg })}
+        onErrorMessage={(msg) => setState({ errorMsg: msg })}
       />
       {state.openTimelapsePanel && (
         <EOBTimelapsePanel
@@ -504,7 +504,7 @@ stories.add('Timelapse january 2018-2020', ({ state, setState }) => {
         isCompareMode={false}
         isLoggedIn={true}
         openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-        onErrorMessage={msg => setState({ errorMsg: msg })}
+        onErrorMessage={(msg) => setState({ errorMsg: msg })}
       />
       {state.openTimelapsePanel && (
         <EOBTimelapsePanel
@@ -556,8 +556,8 @@ function onFetchAvailableDates(fromDate, toDate, boundsGeojson) {
     '2019-11-15',
     '2019-11-17',
   ];
-  return new Promise(resolve => {
-    const dates = KNOWN_DATES.filter(d => moment(d).isBetween(fromDate, toDate, null, '[]'));
+  return new Promise((resolve) => {
+    const dates = KNOWN_DATES.filter((d) => moment(d).isBetween(fromDate, toDate, null, '[]'));
     resolve(dates);
   });
 }
@@ -569,7 +569,7 @@ function mockLotsOfFetchAvailableDates(fromDate, toDate, boundsGeojson) {
     dates.push(d.format('YYYY-MM-DD'));
     d = d.add(-1, 'day');
   }
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     resolve(dates);
   });
 }
@@ -585,7 +585,7 @@ function mockOneDatePerMonth(fromDate, toDate, boundsGeojson) {
     d = d.add(1, 'month');
   }
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     resolve(dates);
   });
 }
@@ -601,7 +601,7 @@ function mockEveryDay(fromDate, toDate, boundsGeojson) {
     d = d.add(1, 'day');
   }
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     resolve(dates);
   });
 }
@@ -646,8 +646,8 @@ function mockHalfYear2019(fromDate, toDate, boundsGeojson) {
     '2019-06-25',
     '2019-06-30',
   ];
-  return new Promise(resolve => {
-    const dates = KNOWN_DATES.filter(d => moment(d).isBetween(fromDate, toDate, null, '[]'));
+  return new Promise((resolve) => {
+    const dates = KNOWN_DATES.filter((d) => moment(d).isBetween(fromDate, toDate, null, '[]'));
     resolve(dates);
   });
 }
@@ -658,12 +658,8 @@ function onGetAndSetNextPrev(direction) {
 
 function onQueryDatesForActiveMonth(date) {
   console.log('Log: onQueryDatesForActiveMonth -> date', date);
-  return new Promise(resolve => {
-    resolve([
-      moment(date)
-        .startOf('month')
-        .format('YYYY-MM-DD'),
-    ]);
+  return new Promise((resolve) => {
+    resolve([moment(date).startOf('month').format('YYYY-MM-DD')]);
   });
 }
 

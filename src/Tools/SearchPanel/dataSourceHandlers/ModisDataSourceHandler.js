@@ -7,36 +7,37 @@ import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/Gen
 import ModisTooltip from './DatasourceRenderingComponents/dataSourceTooltips/ModisTooltip';
 import { FetchingFunction } from '../search';
 import { MODIS } from './dataSourceHandlers';
+import { DATASOURCES } from '../../../const';
 
 export default class ModisDataSourceHandler extends DataSourceHandler {
   KNOWN_BANDS = [
     {
       name: 'B01',
-      description: t`Red band`,
+      getDescription: () => t`Red band`,
     },
     {
       name: 'B02',
-      description: t`841 - 876 nm (NIR)`,
+      getDescription: () => t`841 - 876 nm (NIR)`,
     },
     {
       name: 'B03',
-      description: t`Blue band`,
+      getDescription: () => t`Blue band`,
     },
     {
       name: 'B04',
-      description: t`Green band`,
+      getDescription: () => t`Green band`,
     },
     {
       name: 'B05',
-      description: t`1230 - 1250 nm`,
+      getDescription: () => t`1230 - 1250 nm`,
     },
     {
       name: 'B06',
-      description: t`1628 - 1652 nm`,
+      getDescription: () => t`1628 - 1652 nm`,
     },
     {
       name: 'B07',
-      description: t`2105 - 2155 nm`,
+      getDescription: () => t`2105 - 2155 nm`,
     },
   ];
   urls = [];
@@ -46,7 +47,7 @@ export default class ModisDataSourceHandler extends DataSourceHandler {
   searchFilters = {};
   preselected = false;
   isChecked = false;
-  datasource = 'MODIS';
+  datasource = DATASOURCES.MODIS;
 
   leafletZoomConfig = {
     [MODIS]: {
@@ -56,7 +57,7 @@ export default class ModisDataSourceHandler extends DataSourceHandler {
   };
 
   willHandle(service, url, name, layers, preselected) {
-    const usesDataset = !!layers.find(l => l.dataset && l.dataset.id === DATASET_MODIS.id);
+    const usesDataset = !!layers.find((l) => l.dataset && l.dataset.id === DATASET_MODIS.id);
     if (!usesDataset) {
       return false;
     }
@@ -112,7 +113,7 @@ export default class ModisDataSourceHandler extends DataSourceHandler {
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map(t => ({
+    const tiles = data.map((t) => ({
       sensingTime: t.sensingTime,
       geometry: t.geometry,
       datasource: this.datasource,

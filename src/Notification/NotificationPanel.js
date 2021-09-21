@@ -2,7 +2,7 @@ import React from 'react';
 
 import './NotificationPanel.scss';
 
-export const NotificationPanel = ({ type, msg, className }) => {
+export const NotificationPanel = ({ type, msg, className, children }) => {
   let icon = null;
   switch (type) {
     case 'error':
@@ -24,6 +24,7 @@ export const NotificationPanel = ({ type, msg, className }) => {
     <div className={`notification-panel ${className || ''}`}>
       {icon && <i className={`fas fa-${icon}`} />}
       {paragraphs && paragraphs.map((item, i) => <p key={i}>{item}</p>)}
+      {children && <p>{children}</p>}
     </div>
   );
 };

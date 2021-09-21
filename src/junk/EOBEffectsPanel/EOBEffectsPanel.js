@@ -7,6 +7,19 @@ import 'react-toggle/style.css';
 import AdvancedRgbEffects from './AdvancedRgbEffects/AdvancedRgbEffects';
 
 import './EOBEffectsPanel.scss';
+import HelpTooltip from '../../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/HelpTooltip';
+import ExternalLink from '../../ExternalLink/ExternalLink';
+
+import { ORTHORECTIFICATION_OPTIONS } from '../../const';
+
+export const findSpeckleFilterIndex = (speckleFilters, speckleFilter) =>
+  speckleFilter
+    ? speckleFilters.findIndex((element) =>
+        Object.keys(element.params).every((key) => element.params[key] === speckleFilter[key]),
+      )
+    : null;
+
+const capitalize = (text) => text.toLowerCase().charAt(0).toUpperCase() + text.toLowerCase().slice(1);
 
 export class EOBEffectsPanel extends React.Component {
   static defaultProps = {
@@ -40,24 +53,28 @@ export class EOBEffectsPanel extends React.Component {
       minQa: 50,
       upsampling: '',
       downsampling: '',
+      speckleFilter: '',
+      orthorectification: '',
     },
     isFISLayer: undefined,
     doesDatasetSupportMinQa: undefined,
     doesDatasetSupportInterpolation: undefined,
 
-    onUpdateGainEffect: value => {},
-    onUpdateGammaEffect: value => {},
+    onUpdateGainEffect: (value) => {},
+    onUpdateGammaEffect: (value) => {},
 
-    onUpdateRedRangeEffect: value => {},
-    onUpdateGreenRangeEffect: value => {},
-    onUpdateBlueRangeEffect: value => {},
+    onUpdateRedRangeEffect: (value) => {},
+    onUpdateGreenRangeEffect: (value) => {},
+    onUpdateBlueRangeEffect: (value) => {},
 
-    onUpdateRedCurveEffect: value => {},
-    onUpdateGreenCurveEffect: value => {},
-    onUpdateBlueCurveEffect: value => {},
+    onUpdateRedCurveEffect: (value) => {},
+    onUpdateGreenCurveEffect: (value) => {},
+    onUpdateBlueCurveEffect: (value) => {},
 
-    onUpdateMinQa: value => {},
+    onUpdateMinQa: (value) => {},
     onResetEffects: () => {},
+
+    updateOrthorectification: (value) => {},
   };
 
   constructor(props) {
@@ -96,6 +113,8 @@ export class EOBEffectsPanel extends React.Component {
       minQa = 50,
       upsampling = '',
       downsampling = '',
+      speckleFilter = '',
+      orthorectification = '',
     } = this.props.effects;
 
     this.state = {
@@ -120,6 +139,10 @@ export class EOBEffectsPanel extends React.Component {
 
       upsampling: upsampling,
       downsampling: downsampling,
+
+      speckleFilter: speckleFilter,
+
+      orthorectification: orthorectification,
 
       advancedRgbEffectsOpen: advancedRgbEffectsOpen,
     };
@@ -162,6 +185,9 @@ export class EOBEffectsPanel extends React.Component {
 
     upsampling: '',
     downsampling: '',
+
+    speckleFilter: '',
+    orthorectification: '',
   });
 
   logToLinear = (e, min, max) => {
@@ -174,7 +200,7 @@ export class EOBEffectsPanel extends React.Component {
     return value.toFixed(1);
   };
 
-  updateGainEffectFromInput = e => {
+  updateGainEffectFromInput = (e) => {
     const cappedValue = Math.max(Math.min(e.target.value, 100), 0.01);
     this.setState(
       {
@@ -185,7 +211,7 @@ export class EOBEffectsPanel extends React.Component {
     );
   };
 
-  updateGammaEffectFromInput = e => {
+  updateGammaEffectFromInput = (e) => {
     const cappedValue = Math.max(Math.min(e.target.value, 10), 0.1);
     this.setState(
       {
@@ -238,7 +264,7 @@ export class EOBEffectsPanel extends React.Component {
     );
   };
 
-  updateMinQaFromInput = e => {
+  updateMinQaFromInput = (e) => {
     const cappedValue = Math.max(Math.min(e.target.value, 100), 0);
     this.setState(
       {
@@ -272,13 +298,13 @@ export class EOBEffectsPanel extends React.Component {
       : this.props.onUpdateBlueRangeEffect(this.state.blueRangeEffectLabels);
   };
 
-  updateRedCurveEffect = e => {
+  updateRedCurveEffect = (e) => {
     this.setState({ redCurveEffect: e }, this.props.onUpdateRedCurveEffect(e));
   };
-  updateGreenCurveEffect = e => {
+  updateGreenCurveEffect = (e) => {
     this.setState({ greenCurveEffect: e }, this.props.onUpdateGreenCurveEffect(e));
   };
-  updateBlueCurveEffect = e => {
+  updateBlueCurveEffect = (e) => {
     this.setState({ blueCurveEffect: e }, this.props.onUpdateBlueCurveEffect(e));
   };
 
@@ -286,46 +312,64 @@ export class EOBEffectsPanel extends React.Component {
     this.props.onUpdateMinQa(this.state.minQa);
   };
 
-  updateUpsampling = e => {
+  updateUpsampling = (e) => {
     this.setState({ upsampling: e.target.value }, this.props.onUpdateUpsampling(e.target.value));
   };
-  updateDownsampling = e => {
+  updateDownsampling = (e) => {
     this.setState({ downsampling: e.target.value }, this.props.onUpdateDownsampling(e.target.value));
   };
 
-  changeGainEffect = e => {
+  updateSpeckleFilter = (e) => {
+    const speckleFilter = this.props.supportedSpeckleFilters[e.target.value];
+
+    this.setState(
+      { speckleFilter: speckleFilter ? speckleFilter.params : undefined },
+      this.props.onUpdateSpeckleFilter(speckleFilter ? speckleFilter.params : undefined),
+    );
+  };
+
+  updateOrthorectification = (e) => {
+    this.setState(
+      {
+        orthorectification: e.target.value,
+      },
+      this.props.onUpdateOrthorectification(e.target.value),
+    );
+  };
+
+  changeGainEffect = (e) => {
     this.setState({
       gainEffect: e,
       gainEffectLabels: this.calcLog(e, 0.01, 100),
     });
   };
-  changeGammaEffect = e => {
+  changeGammaEffect = (e) => {
     this.setState({
       gammaEffect: e,
       gammaEffectLabels: this.calcLog(e, 0.1, 10),
     });
   };
 
-  changeRedRangeEffect = e => {
+  changeRedRangeEffect = (e) => {
     this.setState({
       redRangeEffect: e,
       redRangeEffectLabels: e,
     });
   };
-  changeGreenRangeEffect = e => {
+  changeGreenRangeEffect = (e) => {
     this.setState({
       greenRangeEffect: e,
       greenRangeEffectLabels: e,
     });
   };
-  changeBlueRangeEffect = e => {
+  changeBlueRangeEffect = (e) => {
     this.setState({
       blueRangeEffect: e,
       blueRangeEffectLabels: e,
     });
   };
 
-  changeMinQa = e => {
+  changeMinQa = (e) => {
     this.setState({
       minQa: e,
       minQaLabels: e,
@@ -351,7 +395,7 @@ export class EOBEffectsPanel extends React.Component {
       blueCurveEffect,
     } = this.getDefaultState();
     this.setState(
-      oldState => ({
+      (oldState) => ({
         redRangeEffect,
         redRangeEffectLabels,
         greenRangeEffect,
@@ -438,7 +482,7 @@ export class EOBEffectsPanel extends React.Component {
               max={1}
               step={0.01}
               value={this.state.redRangeEffectLabels[0]}
-              onChange={e => this.updateRedRangeEffectFromInput('min', e)}
+              onChange={(e) => this.updateRedRangeEffectFromInput('min', e)}
             />
 
             <RCSlider.Range
@@ -458,7 +502,7 @@ export class EOBEffectsPanel extends React.Component {
               max={1}
               step={0.01}
               value={this.state.redRangeEffectLabels[1]}
-              onChange={e => this.updateRedRangeEffectFromInput('max', e)}
+              onChange={(e) => this.updateRedRangeEffectFromInput('max', e)}
             />
           </div>
         </div>
@@ -473,7 +517,7 @@ export class EOBEffectsPanel extends React.Component {
               max={1}
               step={0.01}
               value={this.state.greenRangeEffectLabels[0]}
-              onChange={e => this.updateGreenRangeEffectFromInput('min', e)}
+              onChange={(e) => this.updateGreenRangeEffectFromInput('min', e)}
             />
 
             <RCSlider.Range
@@ -493,7 +537,7 @@ export class EOBEffectsPanel extends React.Component {
               max={1}
               step={0.01}
               value={this.state.greenRangeEffectLabels[1]}
-              onChange={e => this.updateGreenRangeEffectFromInput('max', e)}
+              onChange={(e) => this.updateGreenRangeEffectFromInput('max', e)}
             />
           </div>
         </div>
@@ -508,7 +552,7 @@ export class EOBEffectsPanel extends React.Component {
               max={1}
               step={0.01}
               value={this.state.blueRangeEffectLabels[0]}
-              onChange={e => this.updateBlueRangeEffectFromInput('min', e)}
+              onChange={(e) => this.updateBlueRangeEffectFromInput('min', e)}
             />
 
             <RCSlider.Range
@@ -528,7 +572,7 @@ export class EOBEffectsPanel extends React.Component {
               max={1}
               step={0.01}
               value={this.state.blueRangeEffectLabels[1]}
-              onChange={e => this.updateBlueRangeEffectFromInput('max', e)}
+              onChange={(e) => this.updateBlueRangeEffectFromInput('max', e)}
             />
           </div>
         </div>
@@ -575,11 +619,11 @@ export class EOBEffectsPanel extends React.Component {
           <div className="effect-dropdown">
             <select className="dropdown" value={upsampling} onChange={this.updateUpsampling}>
               <option className="interpolation-option" key="upsampling-default" value="">
-                Default
+                {t`Layer default`}
               </option>
-              {this.props.interpolations.map(i => (
+              {this.props.interpolations.map((i) => (
                 <option className="interpolation-option" key={`upsampling-${i}`} value={i}>
-                  {i.toLowerCase()}
+                  {capitalize(i)}
                 </option>
               ))}
             </select>
@@ -591,17 +635,86 @@ export class EOBEffectsPanel extends React.Component {
           <div className="effect-dropdown">
             <select className="dropdown" value={downsampling} onChange={this.updateDownsampling}>
               <option className="interpolation-option" key="downsampling-default" value="">
-                Default
+                {t`Layer default`}
               </option>
-              {this.props.interpolations.map(i => (
+              {this.props.interpolations.map((i) => (
                 <option className="interpolation-option" key={`downsampling-${i}`} value={i}>
-                  {i.toLowerCase()}
+                  {capitalize(i)}
                 </option>
               ))}
             </select>
           </div>
         </div>
       </>
+    );
+  }
+
+  renderSpeckleFilterSelection() {
+    const { speckleFilter } = this.state;
+    const speckleFilterIndex = findSpeckleFilterIndex(this.props.supportedSpeckleFilters, speckleFilter);
+
+    return (
+      <>
+        <div className="effect-container effect-with-dropdown">
+          <span className="effect-name">
+            {t`Speckle Filter`}
+            <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+              {t`Speckle filtering is only applied at zoom levels 12 and above for IW and zoom levels 8 and above for EW acquisition. Zoom levels outside this range will render without speckle filtering, even if it is set.`}
+              <br />
+              <br />
+              <ExternalLink href="https://docs.sentinel-hub.com/api/latest/data/sentinel-1-grd/#speckle-filtering">
+                {t`More information`}
+              </ExternalLink>
+            </HelpTooltip>
+          </span>
+          <div className="effect-dropdown">
+            {!this.props.canApplySpeckleFilter && speckleFilterIndex > 0 && (
+              <span
+                className="alert"
+                title={t`Speckle filtering not applied. Zoom in to apply speckle filtering.`}
+              >
+                !
+              </span>
+            )}
+            <select
+              className="dropdown"
+              value={speckleFilterIndex !== null ? speckleFilterIndex : ''}
+              onChange={this.updateSpeckleFilter}
+            >
+              <option className="speckle-filter-option" key="speckle-filter-default" value="">
+                {t`Layer default`}
+              </option>
+              {this.props.supportedSpeckleFilters.map((speckleFilter, index) => (
+                <option className="speckle-filter-option" key={`speckle-filter-${index}`} value={index}>
+                  {capitalize(speckleFilter.label)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  renderOrthorectificationSelection() {
+    const { orthorectification } = this.state;
+
+    return (
+      <div className="effect-container effect-with-dropdown">
+        <span className="effect-name">{t`Orthorectification`}</span>
+        <div className="effect-dropdown">
+          <select className="dropdown" onChange={this.updateOrthorectification} value={orthorectification}>
+            <option key="default" value="">
+              Layer default
+            </option>
+            {Object.keys(ORTHORECTIFICATION_OPTIONS).map((opt) => (
+              <option key={opt} value={opt}>
+                {ORTHORECTIFICATION_OPTIONS[opt]}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
     );
   }
 
@@ -617,6 +730,15 @@ export class EOBEffectsPanel extends React.Component {
             </a>
           }
         </div>
+
+        {(this.props.doesDatasetSupportSpeckleFilter || this.props.doesDatasetSupportOrthorectification) && (
+          <>
+            <div className="title">{t`Processing parameters`}</div>
+            {this.props.doesDatasetSupportSpeckleFilter && this.renderSpeckleFilterSelection()}
+            {this.props.doesDatasetSupportOrthorectification && this.renderOrthorectificationSelection()}
+            <hr />
+          </>
+        )}
 
         {this.renderGainSlider()}
         {this.renderGammaSlider()}

@@ -6,13 +6,15 @@ import {
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
   DATASET_S5PL2,
-  DATASET_AWS_L8L1C,
   DATASET_MODIS,
   DATASET_AWS_DEM,
   DATASET_AWS_LOTL1,
   DATASET_AWS_LOTL2,
   DATASET_AWS_LTML1,
   DATASET_AWS_LTML2,
+  DATASET_AWS_LETML1,
+  DATASET_AWS_LETML2,
+  DATASET_AWS_LMSSL1,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 import { connect } from 'react-redux';
@@ -87,24 +89,9 @@ class DataFusion extends React.Component {
         dataset: DATASET_S5PL2,
         additionalMosaickingOrders: [],
       },
-      [DATASET_AWS_DEM.id]: {
-        label: 'DEM',
-        dataset: DATASET_AWS_DEM,
-        additionalMosaickingOrders: [],
-      },
-      [DATASET_AWS_L8L1C.id]: {
-        label: 'Landsat 8 L1C',
-        dataset: DATASET_AWS_L8L1C,
-        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
-      },
-      [DATASET_AWS_LOTL1.id]: {
-        label: 'Landsat 8 L1',
-        dataset: DATASET_AWS_LOTL1,
-        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
-      },
-      [DATASET_AWS_LOTL2.id]: {
-        label: 'Landsat 8 L2',
-        dataset: DATASET_AWS_LOTL2,
+      [DATASET_AWS_LMSSL1.id]: {
+        label: 'Landsat 1-5 MSS L1',
+        dataset: DATASET_AWS_LMSSL1,
         additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
       },
       [DATASET_AWS_LTML1.id]: {
@@ -117,6 +104,27 @@ class DataFusion extends React.Component {
         dataset: DATASET_AWS_LTML2,
         additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
       },
+      [DATASET_AWS_LETML1.id]: {
+        label: 'Landsat 7 ETM+ L1',
+        dataset: DATASET_AWS_LETML1,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_AWS_LETML2.id]: {
+        label: 'Landsat 7 ETM+ L2',
+        dataset: DATASET_AWS_LETML2,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_AWS_LOTL1.id]: {
+        label: 'Landsat 8 L1',
+        dataset: DATASET_AWS_LOTL1,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+      [DATASET_AWS_LOTL2.id]: {
+        label: 'Landsat 8 L2',
+        dataset: DATASET_AWS_LOTL2,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+      },
+
       [DATASET_MODIS.id]: {
         label: 'MODIS',
         dataset: DATASET_MODIS,
@@ -131,7 +139,7 @@ class DataFusion extends React.Component {
   }
 
   constructAlias = (dataset, settings) => {
-    const existingAliases = settings.filter(d => d.id === dataset.id).map(d => d.alias);
+    const existingAliases = settings.filter((d) => d.id === dataset.id).map((d) => d.alias);
     const newAliasBase = `${dataset.shProcessingApiDatasourceAbbreviation.toUpperCase()}`;
     let serialNumber = existingAliases.length;
     let newAlias = serialNumber ? `${newAliasBase}-${serialNumber}` : newAliasBase;
@@ -142,7 +150,7 @@ class DataFusion extends React.Component {
     return newAlias;
   };
 
-  onAddSupplementalDataset = newDatasetId => {
+  onAddSupplementalDataset = (newDatasetId) => {
     const {
       settings: [...settings],
     } = this.props;
@@ -158,11 +166,11 @@ class DataFusion extends React.Component {
     this.props.onChange(settings);
   };
 
-  onRemoveSupplementalDataset = alias => {
+  onRemoveSupplementalDataset = (alias) => {
     const {
       settings: [...settings],
     } = this.props;
-    const newSettings = settings.filter(d => d.alias !== alias);
+    const newSettings = settings.filter((d) => d.alias !== alias);
     this.props.onChange(newSettings);
   };
 
@@ -186,16 +194,16 @@ class DataFusion extends React.Component {
     let {
       settings: [...newSettings],
     } = this.props;
-    const datasetIndex = newSettings.findIndex(d => d.alias === alias);
+    const datasetIndex = newSettings.findIndex((d) => d.alias === alias);
     const datasetSettings = { ...newSettings[datasetIndex] };
     datasetSettings[key] = newValue;
     newSettings[datasetIndex] = datasetSettings;
     this.props.onChange(newSettings);
   };
 
-  checkAliasValidity = alias => {
+  checkAliasValidity = (alias) => {
     const { settings } = this.props;
-    return !!alias && !settings.some(d => d.alias === alias);
+    return !!alias && !settings.some((d) => d.alias === alias);
   };
 
   render() {
@@ -209,7 +217,7 @@ class DataFusion extends React.Component {
       return null;
     }
 
-    const primaryDatasetIndex = settings.findIndex(d => d.id === dataset.id);
+    const primaryDatasetIndex = settings.findIndex((d) => d.id === dataset.id);
     const primaryDataset = settings[primaryDatasetIndex];
     const supplementalDatasets = [
       ...settings.slice(0, primaryDatasetIndex),
@@ -262,7 +270,7 @@ class DataFusion extends React.Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   datasetId: store.visualization.datasetId,
 });
 

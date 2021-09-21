@@ -4,6 +4,28 @@
   .menu-flags {
     color: white;
     background-color: #2a2c38;
+    padding: 0;
+
+    button {
+      padding: 0 6px;
+      color: white;
+      text-transform: uppercase;
+
+      span {
+        font-size: 10px;
+      }
+    }
+
+    ul {
+      width: 140px;
+      min-height: 200px;
+      background-color: #525e73;
+      text-transform: uppercase;
+    }
+
+    li {
+      font-size: 12px;
+    }
   }
 
   .flag-select {
@@ -12,6 +34,7 @@
   /* stylelint-disable selector-class-pattern  */
   .flag-select__options {
     background: #525e73;
+    max-height: none;
   }
 
   .flag-select__option--placeholder {

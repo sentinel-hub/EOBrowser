@@ -15,6 +15,8 @@ import Sentinel2AWSDataSourceHandler from './Sentinel2AWSDataSourceHandler';
 import Sentinel3DataSourceHandler from './Sentinel3DataSourceHandler';
 import Sentinel5PDataSourceHandler from './Sentinel5PDataSourceHandler';
 import Landsat45AWSDataSourceHandler from './Landsat45AWSDataSourceHandler';
+import Landsat15AWSDataSourceHandler from './Landsat15AWSDataSourceHandler';
+import Landsat7AWSDataSourceHandler from './Landsat7AWSDataSourceHandler';
 import Landsat8AWSDataSourceHandler from './Landsat8AWSDataSourceHandler';
 import LandsatEOCloudDataSourceHandler from './LandsatEOCloudDataSourceHandler';
 
@@ -26,6 +28,8 @@ import BYOCDataSourceHandler from './BYOCDataSourceHandler';
 import DEMDataSourceHandler from './DEMDataSourceHandler';
 
 import { getCollectionInformation } from '../../../utils/collections';
+
+import { DATASOURCES } from '../../../const';
 
 export const S1_AWS_IW_VVVH = 'S1_AWS_IW_VVVH',
   S1_AWS_IW_VV = 'S1_AWS_IW_VV',
@@ -59,6 +63,9 @@ export const S1_AWS_IW_VVVH = 'S1_AWS_IW_VVVH',
   AWS_LOTL2 = 'AWS_LOTL2',
   AWS_LTML1 = 'AWS_LTML1',
   AWS_LTML2 = 'AWS_LTML2',
+  AWS_LMSSL1 = 'AWS_LMSSL1',
+  AWS_LETML1 = 'AWS_LETML1',
+  AWS_LETML2 = 'AWS_LETML2',
   ENVISAT_MERIS = 'ENVISAT_MERIS',
   GIBS_MODIS_TERRA = 'GIBS_MODIS_TERRA',
   GIBS_MODIS_AQUA = 'GIBS_MODIS_AQUA',
@@ -89,7 +96,9 @@ export function initializeDataSourceHandlers() {
     new Sentinel2AWSDataSourceHandler(),
     new Sentinel3DataSourceHandler(),
     new Sentinel5PDataSourceHandler(),
+    new Landsat15AWSDataSourceHandler(),
     new Landsat45AWSDataSourceHandler(),
+    new Landsat7AWSDataSourceHandler(),
     new Landsat8AWSDataSourceHandler(),
     new LandsatEOCloudDataSourceHandler(),
     new EnvisatMerisDataSourceHandler(),
@@ -103,7 +112,7 @@ export function initializeDataSourceHandlers() {
 }
 
 export function registerHandlers(service, url, name, configs, preselected) {
-  const handledBy = dataSourceHandlers.filter(dsHandler =>
+  const handledBy = dataSourceHandlers.filter((dsHandler) =>
     dsHandler.willHandle(service, url, name, configs, preselected),
   );
   return handledBy.length !== 0;
@@ -111,7 +120,7 @@ export function registerHandlers(service, url, name, configs, preselected) {
 
 export function renderDataSourcesInputs() {
   return dataSourceHandlers
-    .filter(dsh => dsh.isHandlingAnyUrl())
+    .filter((dsh) => dsh.isHandlingAnyUrl())
     .map((dsh, dshIndex) => <div key={dshIndex}>{dsh.getSearchFormComponents()}</div>);
 }
 
@@ -122,12 +131,12 @@ collectionId and only way to get it is to query service.
 */
 async function updateLayersFromServiceIfNeeded(layers) {
   const updateLayersFromService = layers.filter(
-    l => l instanceof BYOCLayer || l instanceof S1GRDAWSEULayer || l instanceof DEMLayer,
+    (l) => l instanceof BYOCLayer || l instanceof S1GRDAWSEULayer || l instanceof DEMLayer,
   );
   const collectionTitles = {};
 
   await Promise.all(
-    updateLayersFromService.map(async l => {
+    updateLayersFromService.map(async (l) => {
       try {
         await l.updateLayerFromServiceIfNeeded({
           timeout: 30000,
@@ -140,9 +149,11 @@ async function updateLayersFromServiceIfNeeded(layers) {
           if (collectionTitles[l.collectionId]) {
             l.collectionTitle = collectionTitles[l.collectionId];
           } else {
-            const collectionInfo = await getCollectionInformation(l.collectionId, l.locationId).then(
-              r => r.data,
-            );
+            const collectionInfo = await getCollectionInformation(
+              l.collectionId,
+              l.locationId,
+              l.subType,
+            ).then((r) => r.data);
             collectionTitles[l.collectionId] = collectionInfo.title;
             l.collectionTitle = collectionInfo.title;
           }
@@ -168,7 +179,7 @@ export async function prepareDataSourceHandlers(theme) {
   initializeDataSourceHandlers();
 
   const allLayers = await Promise.all(
-    theme.content.map(async dataSource => {
+    theme.content.map(async (dataSource) => {
       let dataSourceUrl = dataSource.url.replace(
         'https://services-uswest2.sentinel-hub.com/',
         'https://services.sentinel-hub.com/',
@@ -219,13 +230,13 @@ export function datasourceForDatasetId(datasetId) {
     case S1_EW_SH:
     case S1_EW:
     case S1:
-      return 'Sentinel-1';
+      return DATASOURCES.S1;
     case S2L1C:
     case S2L2A:
-      return 'Sentinel-2';
+      return DATASOURCES.S2;
     case S3SLSTR:
     case S3OLCI:
-      return 'Sentinel-3';
+      return DATASOURCES.S3;
     case S5_O3:
     case S5_NO2:
     case S5_SO2:
@@ -235,26 +246,31 @@ export function datasourceForDatasetId(datasetId) {
     case S5_AER_AI:
     case S5_CLOUD:
     case S5_OTHER:
-      return 'Sentinel-5';
+      return DATASOURCES.S5;
     case MODIS:
-      return 'MODIS';
+      return DATASOURCES.MODIS;
     case PROBAV_S1:
     case PROBAV_S5:
     case PROBAV_S10:
-      return 'Proba-V';
+      return DATASOURCES.PROBAV;
     case ESA_L5:
     case ESA_L7:
     case ESA_L8:
-      return 'LandsatEOCloud';
+      return DATASOURCES.ESA_LANDSAT;
     case AWS_L8L1C:
     case AWS_LOTL1:
     case AWS_LOTL2:
-      return 'Landsat8AWS';
+      return DATASOURCES.AWS_LANDSAT8;
     case AWS_LTML1:
     case AWS_LTML2:
-      return 'Landsat45AWS';
+      return DATASOURCES.AWS_LANDSAT45;
+    case AWS_LMSSL1:
+      return DATASOURCES.AWS_LANDSAT15;
     case ENVISAT_MERIS:
-      return 'Envisat Meris';
+      return DATASOURCES.ENVISAT_MERIS;
+    case AWS_LETML1:
+    case AWS_LETML2:
+      return DATASOURCES.AWS_LANDSAT7_ETM;
     case GIBS_MODIS_TERRA:
     case GIBS_MODIS_AQUA:
     case GIBS_VIIRS_SNPP_CORRECTED_REFLECTANCE:
@@ -266,16 +282,16 @@ export function datasourceForDatasetId(datasetId) {
     case GIBS_MISR:
     case GIBS_ASTER_GDEM:
     case GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE:
-      return 'GIBS';
+      return DATASOURCES.GIBS;
     case DEM_MAPZEN:
     case DEM_COPERNICUS_30:
     case DEM_COPERNICUS_90:
-      return 'DEM';
+      return DATASOURCES.DEM;
     case COPERNICUS_CORINE_LAND_COVER:
     case COPERNICUS_GLOBAL_LAND_COVER:
     case COPERNICUS_WATER_BODIES:
     case COPERNICUS_GLOBAL_SURFACE_WATER:
-      return 'Copernicus Services';
+      return DATASOURCES.COPERNICUS;
     default:
       return null;
   }
@@ -284,14 +300,14 @@ export function datasourceForDatasetId(datasetId) {
 export function getDataSourceHandler(datasetId) {
   const datasource = datasourceForDatasetId(datasetId);
   if (datasource) {
-    return dataSourceHandlers.find(d => d.datasource === datasource);
+    return dataSourceHandlers.find((d) => d.datasource === datasource);
   } else {
     return checkIfCustom(datasetId);
   }
 }
 
 export function checkIfCustom(datasetId) {
-  const dsh = dataSourceHandlers.find(d => d.datasource === 'CUSTOM');
+  const dsh = dataSourceHandlers.find((d) => d.datasource === 'CUSTOM');
   if (dsh && dsh.datasets) {
     const isCustomDataset = dsh.datasets.includes(datasetId);
     if (isCustomDataset) {
@@ -334,6 +350,9 @@ export const datasetLabels = {
   [AWS_LOTL2]: 'Landsat 8 L2',
   [AWS_LTML1]: 'Landsat 4-5 TM L1',
   [AWS_LTML2]: 'Landsat 4-5 TM L2',
+  [AWS_LMSSL1]: 'Landsat 1-5 MSS L1',
+  [AWS_LETML1]: 'Landsat 7 ETM+ L1',
+  [AWS_LETML2]: 'Landsat 7 ETM+ L2',
   [ENVISAT_MERIS]: 'Envisat Meris',
   [GIBS_MODIS_TERRA]: 'MODIS Terra',
   [GIBS_MODIS_AQUA]: 'MODIS Aqua',
@@ -466,6 +485,9 @@ export function getDataSourceHashtags(datasetId) {
     case AWS_L8L1C:
     case AWS_LOTL1:
     case AWS_LOTL2:
+    case AWS_LMSSL1:
+    case AWS_LETML1:
+    case AWS_LETML2:
       return 'Landsat,NASA';
     case ENVISAT_MERIS:
       return 'Envisat Meris,ESA';

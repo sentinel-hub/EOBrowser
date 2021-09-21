@@ -63,8 +63,8 @@ export default class DataSourceHandler {
   }
 
   getLayers = (data, datasetId, url, layersExclude, layersInclude) => {
-    let layers = data.filter(layer => filterLayers(layer.layerId, layersExclude, layersInclude));
-    layers.forEach(l => {
+    let layers = data.filter((layer) => filterLayers(layer.layerId, layersExclude, layersInclude));
+    layers.forEach((l) => {
       l.url = url;
     });
     return layers;
@@ -106,13 +106,29 @@ export default class DataSourceHandler {
     return false;
   }
 
+  supportsSpeckleFilter() {
+    return false;
+  }
+
+  getSupportedSpeckleFilters() {
+    return [];
+  }
+
+  canApplySpeckleFilter() {
+    return false;
+  }
+
+  supportsOrthorectification = () => {
+    return false;
+  };
+
   saveFISLayers(url, layers) {
     this.FISLayers[url] = {};
     for (let datasetId of this.datasets) {
       const shJsDataset = this.getSentinelHubDataset(datasetId);
       const datasetFISLayers = layers
-        .filter(l => (l.layerId.startsWith('__FIS_') && l.dataset ? l.dataset === shJsDataset : true))
-        .map(l => l.layerId);
+        .filter((l) => (l.layerId.startsWith('__FIS_') && l.dataset ? l.dataset === shJsDataset : true))
+        .map((l) => l.layerId);
       this.FISLayers[url][datasetId] = datasetFISLayers;
     }
   }
@@ -148,18 +164,18 @@ export default class DataSourceHandler {
   }
 
   generateEvalscript = (bands, dataSetId, config) => {
-    return constructV3Evalscript(bands, config);
+    return constructV3Evalscript(bands, config, this.getBands(dataSetId));
   };
 
   getUrl = (links, type) => {
-    const link = links.find(l => l.type === type);
+    const link = links.find((l) => l.type === type);
     if (link) {
       return link.target;
     }
     return null;
   };
 
-  getDatasetLabel = datasetId => datasetLabels[datasetId];
+  getDatasetLabel = (datasetId) => datasetLabels[datasetId];
 
   supportsV3Evalscript() {
     return true;
@@ -169,11 +185,11 @@ export default class DataSourceHandler {
     return Object.values(IMAGE_FORMATS);
   }
 
-  saveSearchFilters = searchFilters => {
+  saveSearchFilters = (searchFilters) => {
     this.searchFilters = searchFilters;
   };
 
-  saveCheckedState = checkedState => {
+  saveCheckedState = (checkedState) => {
     this.isChecked = checkedState;
   };
 

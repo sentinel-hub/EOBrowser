@@ -113,7 +113,28 @@ $searchBorderColour: #6d7300;
 }
 
 .search-panel {
-  background-color: $mainMedium;
+  background: $mainMedium;
+  max-height: 69vh;
+  display: flex;
+  flex-direction: column;
+
+  @media only screen and (max-width: 1024px) and (max-height: 768px) and (orientation: landscape) {
+    & {
+      max-height: 62vh;
+    }
+  }
+
+  @media only screen and (max-width: 415px) and (max-height: 740px) {
+    & {
+      max-height: 63vh;
+    }
+  }
+
+  @media only screen and (max-width: 360px) and (max-height: 641px) {
+    & {
+      max-height: none;
+    }
+  }
 
   .notification {
     a {
@@ -121,7 +142,7 @@ $searchBorderColour: #6d7300;
     }
   }
 
-  .hidden {
+  &.hidden {
     display: none;
   }
 
@@ -176,6 +197,7 @@ $searchBorderColour: #6d7300;
     border-width: 1px;
     padding: 10px;
     font: $textColor;
+    overflow-y: auto;
 
     .hidden {
       display: hidden;
@@ -258,10 +280,16 @@ $searchBorderColour: #6d7300;
     }
   }
 
-  .btn {
-    display: block;
-    text-align: center;
-    margin: 25px 0 10px 0;
+  .search-btn-wrapper {
+    box-shadow: 0 1px 5px $mainMedium;
+    background-color: $mainLight;
+    z-index: 1;
+
+    .btn {
+      margin: 15px 10px;
+      display: block;
+      text-align: center;
+    }
   }
 }
 

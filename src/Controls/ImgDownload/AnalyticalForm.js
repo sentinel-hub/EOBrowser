@@ -56,7 +56,9 @@ export default class AnalyticalForm extends React.PureComponent {
     } = this.props;
 
     const isJPGorPNG = imageFormat === IMAGE_FORMATS.JPG || imageFormat === IMAGE_FORMATS.PNG;
-    const availableCrs = hasAOI ? AVAILABLE_CRS.filter(crs => crs.id === CRS_EPSG4326.authId) : AVAILABLE_CRS;
+    const availableCrs = hasAOI
+      ? AVAILABLE_CRS.filter((crs) => crs.id === CRS_EPSG4326.authId)
+      : AVAILABLE_CRS;
 
     if (allLayers.length === 0) {
       return <Loader />;
@@ -89,9 +91,9 @@ export default class AnalyticalForm extends React.PureComponent {
           <select
             className="dropdown"
             value={imageFormat}
-            onChange={e => updateFormData('imageFormat', e.target.value)}
+            onChange={(e) => updateFormData('imageFormat', e.target.value)}
           >
-            {supportedImageFormats.map(format => (
+            {supportedImageFormats.map((format) => (
               <option key={IMAGE_FORMATS_INFO[format].text} value={format}>
                 {IMAGE_FORMATS_INFO[format].text}
               </option>
@@ -104,9 +106,9 @@ export default class AnalyticalForm extends React.PureComponent {
             <select
               className="dropdown"
               value={resolutionDivisor}
-              onChange={ev => updateFormData('resolutionDivisor', ev.target.value)}
+              onChange={(ev) => updateFormData('resolutionDivisor', ev.target.value)}
             >
-              {RESOLUTION_DIVISORS.map(r => (
+              {RESOLUTION_DIVISORS.map((r) => (
                 <option key={r.text} value={r.value}>
                   {r.text}
                 </option>
@@ -133,9 +135,9 @@ export default class AnalyticalForm extends React.PureComponent {
             <select
               className="dropdown"
               value={selectedCrs}
-              onChange={ev => updateFormData('selectedCrs', ev.target.value)}
+              onChange={(ev) => updateFormData('selectedCrs', ev.target.value)}
             >
-              {availableCrs.map(obj => (
+              {availableCrs.map((obj) => (
                 <option key={obj.text} value={obj.id}>
                   {obj.text}
                 </option>
@@ -191,13 +193,13 @@ export default class AnalyticalForm extends React.PureComponent {
                   <input
                     type="checkbox"
                     checked={customSelected}
-                    onChange={e => updateFormData('customSelected', e.target.checked)}
+                    onChange={(e) => updateFormData('customSelected', e.target.checked)}
                   />
                   Custom
                 </label>
               ) : null}
               <CheckboxGroup name="layers" value={selectedLayers} onChange={updateSelectedLayers}>
-                {allLayers.map(l => (
+                {allLayers.map((l) => (
                   <label key={l.layerId}>
                     <Checkbox value={l.layerId} /> {l.title}
                   </label>
@@ -207,7 +209,7 @@ export default class AnalyticalForm extends React.PureComponent {
             <div className="column">
               <span className="layer-title">{t`Raw`}</span>
               <CheckboxGroup value={selectedBands} onChange={updateSelectedBands}>
-                {allBands.map(l => (
+                {allBands.map((l) => (
                   <label key={l.name}>
                     <Checkbox value={l.name} /> {l.name}
                   </label>

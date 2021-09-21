@@ -88,7 +88,7 @@ stories.add('BandsToRGB', () => {
         <BandsToRGB
           bands={bands}
           value={{ r: 'B01', g: 'B02', b: 'B03' }}
-          onChange={value => console.log(value)}
+          onChange={(value) => console.log(value)}
         />
       </div>
     </DndProvider>
@@ -114,7 +114,7 @@ stories.add('S-3 SLSTR', ({ state, setState }) => {
     ],
   };
   const allBands = [].concat(Object.values(groupedBands)).flat();
-  const bandsWithColors = allBands.map(b => ({
+  const bandsWithColors = allBands.map((b) => ({
     name: b,
     description: b,
     color: '#000000',
@@ -128,7 +128,7 @@ stories.add('S-3 SLSTR', ({ state, setState }) => {
           backgroundColor: '#3B3D4D',
         }}
       >
-        <BandsToRGB bands={bandsWithColors} value={value} onChange={v => setState({ value: v })} />
+        <BandsToRGB bands={bandsWithColors} value={value} onChange={(v) => setState({ value: v })} />
       </div>
     </DndProvider>
   );

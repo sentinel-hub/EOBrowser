@@ -14,6 +14,7 @@ import {
   checkIfCustom,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { b64EncodeUnicode } from '../../utils/base64MDN';
+import { DATASOURCES, reqConfigMemoryCache } from '../../const';
 
 export const timelapseBorders = (width, height, bbox) => ({
   sortIndex: 1,
@@ -83,7 +84,7 @@ class Timelapse extends Component {
     return dates;
   };
 
-  onQueryDatesForActiveMonth = async date => {
+  onQueryDatesForActiveMonth = async (date) => {
     const monthStart = moment(date).startOf('month');
     const monthEnd = moment(date).endOf('month');
     const dates = await this.onFetchAvailableDates(monthStart, monthEnd);
@@ -96,16 +97,20 @@ class Timelapse extends Component {
     const shJsDatasetId = datasourceHandler.getSentinelHubDataset(datasetId)
       ? datasourceHandler.getSentinelHubDataset(datasetId).id
       : null;
-    let layer = await LayersFactory.makeLayers(visualizationUrl, (layer, dataset) =>
-      !shJsDatasetId
-        ? dataset === null && layer === layerId
-        : !layerId
-        ? true
-        : dataset.id === shJsDatasetId && layer === layerId,
+    let layer = await LayersFactory.makeLayers(
+      visualizationUrl,
+      (layer, dataset) =>
+        !shJsDatasetId
+          ? dataset === null && layer === layerId
+          : !layerId
+          ? true
+          : dataset.id === shJsDatasetId && layer === layerId,
+      null,
+      reqConfigMemoryCache,
     );
 
     this.layer = layer[0];
-    await this.layer.updateLayerFromServiceIfNeeded();
+    await this.layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
     if (this.layer.dataset === DATASET_S5PL2) {
       this.layer.productType = datasourceHandler.getProductType(datasetId);
     }
@@ -139,6 +144,8 @@ class Timelapse extends Component {
       blueCurveEffect,
       upsampling,
       downsampling,
+      speckleFilter,
+      orthorectification,
       minQa,
       dataFusion,
       evalscripturl,
@@ -160,12 +167,14 @@ class Timelapse extends Component {
       blueCurveEffect,
       upsampling,
       downsampling,
+      speckleFilter,
+      demInstanceType: orthorectification,
       minQa,
     };
     const timelapseOverlayLayers = [{ name: t`Borders`, layer: timelapseBorders }];
     const dsh = getDataSourceHandler(datasetId);
     const supportsTimeRange = dsh && dsh.supportsTimeRange();
-    const isGIBS = dsh && dsh.datasource === 'GIBS';
+    const isGIBS = dsh && dsh.datasource === DATASOURCES.GIBS;
     const isBYOC = checkIfCustom(datasetId);
 
     return (
@@ -204,7 +213,7 @@ class Timelapse extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   lat: store.mainMap.lat,
   lng: store.mainMap.lng,
   zoom: store.mainMap.zoom,
@@ -227,6 +236,8 @@ const mapStoreToProps = store => ({
   blueCurveEffect: store.visualization.blueCurveEffect,
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
+  speckleFilter: store.visualization.speckleFilter,
+  orthorectification: store.visualization.orthorectification,
   minQa: store.visualization.minQa,
   dataFusion: store.visualization.dataFusion,
 });

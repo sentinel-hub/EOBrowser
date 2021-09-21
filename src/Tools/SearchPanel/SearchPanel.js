@@ -11,53 +11,58 @@ import { connect } from 'react-redux';
 import { t } from 'ttag';
 import { renderDataSourcesInputs } from './dataSourceHandlers/dataSourceHandlers';
 import { Query } from './search';
-import store, { themesSlice, visualizationSlice, notificationSlice } from '../../store';
+import store, {
+  commercialDataSlice,
+  themesSlice,
+  visualizationSlice,
+  notificationSlice,
+  tabsSlice,
+} from '../../store';
 import { EDUCATION_MODE } from '../../const';
 import {
   MODE_THEMES_LIST,
   USER_INSTANCES_THEMES_LIST,
   URL_THEMES_LIST,
   EXPIRED_ACCOUNT_DUMMY_INSTANCE_ID,
+  SEARCH_PANEL_TABS,
 } from '../../const';
 import Results from '../Results/Results';
 import Highlights from './Highlights/Highlights';
 import { getThemeName } from '../../utils';
+import CommercialData from '../CommercialDataPanel/CommercialData';
 
 const NO_THEME = 'no-theme-selected';
-const HIGHLIGHTS_TAB = 'highlights';
-const SEARCH_TAB = 'search';
 
 class SearchPanel extends Component {
   state = {
     searchError: null,
-    fromMoment: moment
-      .utc()
-      .subtract(1, 'month')
-      .startOf('day'),
+    fromMoment: moment.utc().subtract(1, 'month').startOf('day'),
     toMoment: moment.utc(),
     datepickerIsExpanded: false,
     filterMonths: null,
     searchInProgress: false,
     resultsPanelSelected: false,
-    selectedTab: SEARCH_TAB,
+    shouldShowThemesError: true,
   };
 
   async componentDidUpdate(prevProps) {
     if (prevProps.selectedModeId !== this.props.selectedModeId) {
-      this.setState({
-        selectedTab: SEARCH_TAB,
-      });
+      store.dispatch(tabsSlice.actions.setSelectedTabSearchPanelIndex(SEARCH_PANEL_TABS.SEARCH_TAB));
     }
   }
 
-  handleDatepickerExpanded = expanded => {
+  hideThemesErrorOnClick = () => {
+    this.setState({ shouldShowThemesError: false });
+  };
+
+  handleDatepickerExpanded = (expanded) => {
     this.setState({
       datepickerIsExpanded: expanded,
     });
   };
 
-  setTimeFrom = selectedFromMoment => {
-    this.setState(oldState => {
+  setTimeFrom = (selectedFromMoment) => {
+    this.setState((oldState) => {
       let newState = {
         fromMoment: selectedFromMoment.clone().startOf('day'),
       };
@@ -65,8 +70,8 @@ class SearchPanel extends Component {
     });
   };
 
-  setTimeTo = selectedToMoment => {
-    this.setState(oldState => {
+  setTimeTo = (selectedToMoment) => {
+    this.setState((oldState) => {
       let newState = {
         toMoment: selectedToMoment.clone().endOf('day'),
       };
@@ -74,7 +79,7 @@ class SearchPanel extends Component {
     });
   };
 
-  setFilterMonths = filterMonths => {
+  setFilterMonths = (filterMonths) => {
     this.setState({
       filterMonths: filterMonths,
     });
@@ -101,7 +106,7 @@ class SearchPanel extends Component {
       });
       return;
     }
-    const { results } = await currentQuery.getNextNResults(50).catch(err => {
+    const { results } = await currentQuery.getNextNResults(50).catch((err) => {
       this.setState({
         searchError: { msg: err.message },
       });
@@ -130,17 +135,19 @@ class SearchPanel extends Component {
   backToSearch = () => {
     this.props.resetSearch();
     this.setState(
-      prevState => ({
+      (prevState) => ({
         resultsPanelSelected: false,
       }),
       this.props.shouldDisplayTileGeometries(false),
     );
   };
 
-  setSelectedTab = tab => {
-    this.setState({
-      selectedTab: tab,
-    });
+  setSelectedTab = (tab) => {
+    store.dispatch(tabsSlice.actions.setSelectedTabSearchPanelIndex(tab));
+
+    if (tab !== SEARCH_PANEL_TABS.COMMERCIAL_DATA_TAB) {
+      store.dispatch(commercialDataSlice.actions.setDisplaySearchResults(false));
+    }
   };
 
   handleSelectTheme = async (e, themes) => {
@@ -175,9 +182,12 @@ class SearchPanel extends Component {
       selectedThemesListId,
     } = this.props;
     let themes;
-    urlThemesList = urlThemesList.map(t => ({ ...t, list: URL_THEMES_LIST }));
-    userInstancesThemesList = userInstancesThemesList.map(t => ({ ...t, list: USER_INSTANCES_THEMES_LIST }));
-    modeThemesList = modeThemesList.map(t => ({ ...t, list: MODE_THEMES_LIST }));
+    urlThemesList = urlThemesList.map((t) => ({ ...t, list: URL_THEMES_LIST }));
+    userInstancesThemesList = userInstancesThemesList.map((t) => ({
+      ...t,
+      list: USER_INSTANCES_THEMES_LIST,
+    }));
+    modeThemesList = modeThemesList.map((t) => ({ ...t, list: MODE_THEMES_LIST }));
 
     if (isEducationModeSelected) {
       themes = [...modeThemesList, ...userInstancesThemesList];
@@ -188,7 +198,7 @@ class SearchPanel extends Component {
     }
 
     const selectedThemeIndex = themes.findIndex(
-      t => t.id === selectedThemeId && t.list === selectedThemesListId,
+      (t) => t.id === selectedThemeId && t.list === selectedThemesListId,
     );
     return (
       <div className="theme-select top">
@@ -208,7 +218,7 @@ class SearchPanel extends Component {
           <select
             className="dropdown"
             value={selectedThemeId === null ? NO_THEME : selectedThemeIndex}
-            onChange={e => this.handleSelectTheme(e, themes)}
+            onChange={(e) => this.handleSelectTheme(e, themes)}
           >
             {selectedThemeId === null && <option value={NO_THEME}>...</option>}
             {themes.map((theme, i) => (
@@ -233,10 +243,11 @@ class SearchPanel extends Component {
       themesLists,
       selectedThemesListId,
       error,
+      selectedTab,
     } = this.props;
-    const minDateRange = minDate ? minDate : moment.utc('1982-01-01');
+    const minDateRange = minDate ? minDate : moment.utc('1972-07-01');
     const maxDateRange = maxDate ? maxDate : moment.utc();
-    const { fromMoment, toMoment, searchInProgress, resultsPanelSelected, selectedTab } = this.state;
+    const { fromMoment, toMoment, searchInProgress, resultsPanelSelected } = this.state;
     const isEducationModeSelected = selectedModeId === EDUCATION_MODE.id;
     if (selectedThemeId !== null && !dataSourcesInitialized) {
       return (
@@ -248,10 +259,12 @@ class SearchPanel extends Component {
 
     const displayingResults = resultsAvailable && resultsPanelSelected;
 
-    const selectedTheme = themesLists[selectedThemesListId].find(t => t.id === selectedThemeId);
+    const selectedTheme = themesLists[selectedThemesListId].find((t) => t.id === selectedThemeId);
     const highlightsAvailable = selectedTheme && selectedTheme.pins && selectedTheme.pins.length > 0;
-    const isSearchSelected = selectedTab === SEARCH_TAB;
-    const areHighlightsSelected = selectedTab === HIGHLIGHTS_TAB;
+    const commercialDataTabAvailable = true;
+    const isSearchSelected = selectedTab === SEARCH_PANEL_TABS.SEARCH_TAB;
+    const areHighlightsSelected = selectedTab === SEARCH_PANEL_TABS.HIGHLIGHTS_TAB;
+    const isCommercialDataSelected = selectedTab === SEARCH_PANEL_TABS.COMMERCIAL_DATA_TAB;
     return (
       <>
         {displayingResults && (
@@ -265,16 +278,25 @@ class SearchPanel extends Component {
         )}
         <div className={`search-panel ${displayingResults ? 'hidden' : ''}`}>
           {this.renderThemeSelect(isEducationModeSelected)}
-
           <ul className="discover-tabs">
             <li
-              onClick={() => this.setSelectedTab('search')}
+              onClick={() => this.setSelectedTab(SEARCH_PANEL_TABS.SEARCH_TAB)}
               className={`discover-tab-button ${isSearchSelected ? 'active' : ''}`}
             >
               {t`Search`}
             </li>
+            {!isEducationModeSelected && (
+              <li
+                onClick={() => this.setSelectedTab(SEARCH_PANEL_TABS.COMMERCIAL_DATA_TAB)}
+                className={`discover-tab-button ${commercialDataTabAvailable ? '' : ''} ${
+                  isCommercialDataSelected ? 'active' : ''
+                }`}
+              >
+                {t`Commercial data`}
+              </li>
+            )}
             <li
-              onClick={() => this.setSelectedTab('highlights')}
+              onClick={() => this.setSelectedTab(SEARCH_PANEL_TABS.HIGHLIGHTS_TAB)}
               className={`discover-tab-button ${highlightsAvailable ? '' : ''} ${
                 areHighlightsSelected ? 'active' : ''
               }`}
@@ -282,7 +304,6 @@ class SearchPanel extends Component {
               {t`Highlights`}
             </li>
           </ul>
-
           <div className={`discover-tab ${isSearchSelected ? '' : 'hidden'}`}>
             <div className="top-label">
               {t`Data sources`}
@@ -320,13 +341,16 @@ class SearchPanel extends Component {
                   minDate={fromMoment}
                   maxDate={maxDateRange}
                 />
-                <div className="calendar-holder" ref={e => (this.calendarHolder = e)} />
+                <div className="calendar-holder" ref={(e) => (this.calendarHolder = e)} />
               </div>
               <EOBFilterSearchByMonths onChange={this.setFilterMonths} />
             </div>
-            <EOBButton loading={searchInProgress} onClick={() => this.doSearch()} fluid text={t`Search`} />
           </div>
-
+          {isSearchSelected && (
+            <div className="search-btn-wrapper">
+              <EOBButton loading={searchInProgress} onClick={() => this.doSearch()} fluid text={t`Search`} />
+            </div>
+          )}
           <div className={`discover-tab ${areHighlightsSelected ? '' : 'hidden'}`}>
             <Highlights
               isThemeSelected={selectedThemeId !== null}
@@ -335,6 +359,9 @@ class SearchPanel extends Component {
               setTimeSpanExpanded={this.props.setTimeSpanExpanded}
               setSelectedHighlight={this.props.setSelectedHighlight}
             />
+          </div>
+          <div className={`discover-tab ${isCommercialDataSelected ? '' : 'hidden'}`}>
+            <CommercialData />
           </div>
 
           {error ? (
@@ -352,20 +379,21 @@ class SearchPanel extends Component {
               type="error"
             />
           ) : null}
-
           {this.state.searchError ? (
             <NotificationPanel msg={<div>{this.state.searchError.msg}</div>} type="error" />
           ) : null}
-          {this.props.failedThemeParts.length > 0 && (
+          {this.props.failedThemeParts.length > 0 && this.state.shouldShowThemesError && (
             <NotificationPanel
               type="error"
+              additionalClass="notification-error-themes"
+              hideErrorOnClick={this.hideThemesErrorOnClick}
               msg={
                 <div>
                   {t`Error retrieving additional data!`}
                   <div>
                     <span>{t`These are theme parts which contain unavailable data sources:`}</span>
                     <ul style={{ textAlign: 'left' }}>
-                      {this.props.failedThemeParts.map(f => (
+                      {this.props.failedThemeParts.map((f) => (
                         <li key={f}>{f}</li>
                       ))}
                     </ul>
@@ -380,7 +408,7 @@ class SearchPanel extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   dataSourcesInitialized: store.themes.dataSourcesInitialized,
   mapBounds: store.mainMap.bounds,
   user: store.auth.user.userdata,
@@ -394,6 +422,7 @@ const mapStoreToProps = store => ({
   selectedThemesListId: store.themes.selectedThemesListId,
   selectedLanguage: store.language.selectedLanguage,
   error: store.notification.panelError,
+  selectedTab: store.tabs.selectedTabSearchPanelIndex,
 });
 
 export default connect(mapStoreToProps, null)(SearchPanel);

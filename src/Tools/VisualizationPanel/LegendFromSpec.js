@@ -27,7 +27,7 @@ export default class LegendFromSpec extends React.Component {
 
   renderContinuousLegend(legend) {
     const { minPosition, maxPosition, gradients } = createGradients(legend);
-    const gradientsWithLabels = legend.gradients.filter(g => g.label !== undefined && g.label !== null);
+    const gradientsWithLabels = legend.gradients.filter((g) => g.label !== undefined && g.label !== null);
 
     return (
       <div className="legend-item continuous">
@@ -79,7 +79,7 @@ export default class LegendFromSpec extends React.Component {
       if (Array.isArray(legend)) {
         return (
           <>
-            {legend.map(l =>
+            {legend.map((l) =>
               l.type === 'continuous' ? this.renderContinuousLegend(l) : this.renderDiscreteLegend(l, true),
             )}
           </>

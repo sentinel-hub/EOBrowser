@@ -29,7 +29,7 @@ const ZoomInNotification = ({ datasetId, zoom }) => {
   );
 };
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   datasetId: store.visualization.datasetId,
   zoom: store.mainMap.zoom,
   selectedLanguage: store.language.selectedLanguage,

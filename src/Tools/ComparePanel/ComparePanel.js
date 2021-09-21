@@ -19,7 +19,7 @@ class ComparePanel extends Component {
     compareMode: COMPARE_SPLIT,
   };
 
-  onChangeCompareMode = e => {
+  onChangeCompareMode = (e) => {
     this.setState({
       compareMode: e.target.value,
     });
@@ -30,7 +30,7 @@ class ComparePanel extends Component {
     store.dispatch(compareLayersSlice.actions.setComparedLayers([]));
   };
 
-  dragulaDecorator = componentBackingInstance => {
+  dragulaDecorator = (componentBackingInstance) => {
     if (componentBackingInstance) {
       const drake = dragula([componentBackingInstance], {
         moves: (el, container, handle) => {
@@ -57,7 +57,7 @@ class ComparePanel extends Component {
 
   addAllPins = () => {
     const { pins } = this.props;
-    store.dispatch(compareLayersSlice.actions.addComparedLayers(pins.map(p => p.item)));
+    store.dispatch(compareLayersSlice.actions.addComparedLayers(pins.map((p) => p.item)));
   };
 
   render() {
@@ -109,7 +109,7 @@ class ComparePanel extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   comparedLayers: store.compare.comparedLayers,
   comparedOpacity: store.compare.comparedOpacity,
   comparedClipping: store.compare.comparedClipping,

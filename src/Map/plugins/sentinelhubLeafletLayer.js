@@ -18,11 +18,15 @@ import {
   Landsat8AWSLOTL2Layer,
   Landsat45AWSLTML1Layer,
   Landsat45AWSLTML2Layer,
+  Landsat15AWSLMSSL1Layer,
+  Landsat7AWSLETML1Layer,
+  Landsat7AWSLETML2Layer,
   MODISLayer,
   DEMLayer,
   ProcessingDataFusionLayer,
   CancelToken,
   isCancelled,
+  Interpolator,
 } from '@sentinel-hub/sentinelhub-js';
 
 import Sentinel1DataSourceHandler from '../../Tools/SearchPanel/dataSourceHandlers/Sentinel1DataSourceHandler';
@@ -65,12 +69,16 @@ import {
   AWS_LOTL2,
   AWS_LTML1,
   AWS_LTML2,
+  AWS_LMSSL1,
+  AWS_LETML1,
+  AWS_LETML2,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import DEMDataSourceHandler from '../../Tools/SearchPanel/dataSourceHandlers/DEMDataSourceHandler';
 import { constructLayerFromDatasetId } from '../../junk/EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
 import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
 import { refetchWithDefaultToken } from '../../utils/fetching.utils';
+import { reqConfigMemoryCache, reqConfigGetMap } from '../../const';
 
 class SentinelHubLayer extends L.TileLayer {
   constructor(options) {
@@ -95,6 +103,8 @@ class SentinelHubLayer extends L.TileLayer {
       minQa,
       upsampling,
       downsampling,
+      speckleFilter,
+      orthorectification,
     } = options;
 
     this.layer = this.createLayer(url, {
@@ -109,13 +119,15 @@ class SentinelHubLayer extends L.TileLayer {
       minQa: minQa,
       upsampling: upsampling,
       downsampling: downsampling,
+      speckleFilter: speckleFilter,
+      orthorectification: orthorectification,
     });
 
     const mergedOptions = Object.assign(defaultOptions, options);
     L.setOptions(this, mergedOptions);
   }
 
-  onAdd = map => {
+  onAdd = (map) => {
     this._initContainer();
     this._crs = this.options.crs || map.options.crs;
     L.TileLayer.prototype.onAdd.call(this, map);
@@ -166,8 +178,8 @@ class SentinelHubLayer extends L.TileLayer {
     const onTileImageError = this.options.onTileImageError;
     const onTileImageLoad = this.options.onTileImageLoad;
 
-    this.layer.then(async layer => {
-      let reqConfig = { cancelToken: cancelToken };
+    this.layer.then(async (layer) => {
+      let reqConfig = { cancelToken: cancelToken, ...reqConfigGetMap };
 
       if (this.options.accessToken) {
         reqConfig.authToken = this.options.accessToken;
@@ -175,7 +187,11 @@ class SentinelHubLayer extends L.TileLayer {
 
       if (!layer.evalscript && !layer.evalscriptUrl) {
         try {
-          await layer.updateLayerFromServiceIfNeeded(reqConfig);
+          const reqConfigUpdate = {
+            cancelToken: cancelToken,
+            ...reqConfigMemoryCache,
+          };
+          await layer.updateLayerFromServiceIfNeeded(reqConfigUpdate);
         } catch (error) {
           if (!isCancelled(error)) {
             if (onTileImageError) {
@@ -192,9 +208,9 @@ class SentinelHubLayer extends L.TileLayer {
       }
 
       refetchWithDefaultToken(
-        reqConfig =>
-          layer.getMap(individualTileParams, apiType, reqConfig).then(blob => {
-            tile.onload = function() {
+        (reqConfig) =>
+          layer.getMap(individualTileParams, apiType, reqConfig).then((blob) => {
+            tile.onload = function () {
               URL.revokeObjectURL(tile.src);
               if (onTileImageLoad) {
                 onTileImageLoad();
@@ -205,7 +221,7 @@ class SentinelHubLayer extends L.TileLayer {
             tile.src = objectURL;
           }),
         reqConfig,
-      ).catch(function(error) {
+      ).catch(function (error) {
         if (!isCancelled(error)) {
           if (onTileImageError) {
             onTileImageError(error);
@@ -218,7 +234,7 @@ class SentinelHubLayer extends L.TileLayer {
     return tile;
   };
 
-  setParams = params => {
+  setParams = (params) => {
     this.options = Object.assign(this.options, params);
     const {
       url,
@@ -231,6 +247,8 @@ class SentinelHubLayer extends L.TileLayer {
       minQa,
       upsampling,
       downsampling,
+      speckleFilter,
+      orthorectification,
     } = this.options;
     this.layer = this.createLayer(url, {
       datasetId: datasetId,
@@ -242,12 +260,14 @@ class SentinelHubLayer extends L.TileLayer {
       minQa: minQa,
       upsampling: upsampling,
       downsampling: downsampling,
+      speckleFilter: speckleFilter,
+      orthorectification: orthorectification,
     });
 
     this.redraw();
   };
 
-  setClipping = clipping => {
+  setClipping = (clipping) => {
     this.clipping = clipping;
     this.updateClipping();
   };
@@ -266,8 +286,10 @@ class SentinelHubLayer extends L.TileLayer {
   };
 
   createLayerFromService = async (url, options) => {
-    const { layer: layerId, minQa, upsampling, downsampling } = options;
-    let layer = await LayersFactory.makeLayer(url, layerId);
+    const { layer: layerId, minQa, upsampling, downsampling, speckleFilter, orthorectification } = options;
+    let layer = await LayersFactory.makeLayer(url, layerId, null, reqConfigMemoryCache);
+    await layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
+
     if (layer.maxCloudCoverPercent !== undefined) {
       layer.maxCloudCoverPercent = 100;
     }
@@ -276,9 +298,24 @@ class SentinelHubLayer extends L.TileLayer {
     }
     if (upsampling) {
       layer.upsampling = upsampling;
+    } else if (!layer.upsampling) {
+      layer.upsampling = Interpolator.NEAREST;
     }
     if (downsampling) {
       layer.downsampling = downsampling;
+    } else if (!layer.downsampling) {
+      layer.downsampling = Interpolator.NEAREST;
+    }
+    if (speckleFilter) {
+      layer.speckleFilter = speckleFilter;
+    }
+    if (orthorectification) {
+      if (orthorectification === 'DISABLED') {
+        layer.orthorectify = false;
+      } else {
+        layer.demInstanceType = orthorectification;
+        layer.orthorectify = true;
+      }
     }
     return layer;
   };
@@ -307,16 +344,24 @@ class SentinelHubLayer extends L.TileLayer {
 
   createCustomLayer = async (
     url,
-    { datasetId, evalscript, evalscripturl, minQa, upsampling, downsampling },
+    {
+      datasetId,
+      evalscript,
+      evalscripturl,
+      minQa,
+      upsampling,
+      downsampling,
+      speckleFilter,
+      orthorectification,
+    },
   ) => {
     switch (datasetId) {
       case S1_AWS_IW_VVVH:
       case S1_AWS_IW_VV:
       case S1_AWS_EW_HHHV:
       case S1_AWS_EW_HH:
-        const { polarization, acquisitionMode, resolution } = Sentinel1DataSourceHandler.getDatasetParams(
-          datasetId,
-        );
+        const { polarization, acquisitionMode, resolution } =
+          Sentinel1DataSourceHandler.getDatasetParams(datasetId);
         return await new S1GRDAWSEULayer({
           evalscript: evalscript,
           evalscriptUrl: evalscripturl,
@@ -325,6 +370,8 @@ class SentinelHubLayer extends L.TileLayer {
           resolution: resolution,
           upsampling: upsampling,
           downsampling: downsampling,
+          speckleFilter: speckleFilter,
+          demInstanceType: orthorectification,
         });
       case S1:
       case S1_EW:
@@ -413,6 +460,27 @@ class SentinelHubLayer extends L.TileLayer {
           upsampling: upsampling,
           downsampling: downsampling,
         });
+      case AWS_LMSSL1:
+        return await new Landsat15AWSLMSSL1Layer({
+          evalscript: evalscript,
+          evalscriptUrl: evalscripturl,
+          upsampling: upsampling,
+          downsampling: downsampling,
+        });
+      case AWS_LETML1:
+        return await new Landsat7AWSLETML1Layer({
+          evalscript: evalscript,
+          evalscriptUrl: evalscripturl,
+          upsampling: upsampling,
+          downsampling: downsampling,
+        });
+      case AWS_LETML2:
+        return await new Landsat7AWSLETML2Layer({
+          evalscript: evalscript,
+          evalscriptUrl: evalscripturl,
+          upsampling: upsampling,
+          downsampling: downsampling,
+        });
       case MODIS:
         return await new MODISLayer({
           evalscript: evalscript,
@@ -448,9 +516,9 @@ class SentinelHubLayer extends L.TileLayer {
   };
 
   createBYOCLayer = (url, collectionId, evalscript, evalscripturl, upsampling, downsampling) => {
-    return LayersFactory.makeLayers(url).then(async layers => {
+    return LayersFactory.makeLayers(url, null, null, reqConfigMemoryCache).then(async (layers) => {
       for (let layer of layers) {
-        await layer.updateLayerFromServiceIfNeeded();
+        await layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
         if (
           Array.isArray(collectionId)
             ? collectionId.includes(layer.collectionId)
@@ -469,7 +537,7 @@ class SentinelHubLayer extends L.TileLayer {
 
   createSH12Layer = (url, evalscript, evalscripturl, upsampling, downsampling) => {
     // BUG: we assume that there is only one dataset used within the instance
-    return LayersFactory.makeLayers(url).then(layers => {
+    return LayersFactory.makeLayers(url, null, null, reqConfigMemoryCache).then((layers) => {
       let layer = layers[0];
       layer.evalscript = evalscript;
       layer.evalscripturl = evalscripturl;
@@ -486,16 +554,16 @@ class SentinelHubLayerComponent extends GridLayer {
     const { leaflet: _l, ...options } = this.getOptions(params);
     const layer = new SentinelHubLayer(options);
     if (progress) {
-      layer.on('loading', function() {
+      layer.on('loading', function () {
         progress.start();
         progress.inc();
       });
 
-      layer.on('load', function() {
+      layer.on('load', function () {
         progress.done();
       });
     }
-    layer.on('tileunload', function(e) {
+    layer.on('tileunload', function (e) {
       e.tile.cancelToken.cancel();
     });
     return layer;
@@ -600,6 +668,18 @@ class SentinelHubLayerComponent extends GridLayer {
       options.downsampling = params.downsampling;
     } else {
       options.downsampling = null;
+    }
+
+    if (params.speckleFilter) {
+      options.speckleFilter = params.speckleFilter;
+    } else {
+      options.speckleFilter = null;
+    }
+
+    if (params.orthorectification) {
+      options.orthorectification = params.orthorectification;
+    } else {
+      options.orthorectification = null;
     }
 
     if (params.showlogo !== undefined) {

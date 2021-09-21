@@ -5,7 +5,7 @@ import { t } from 'ttag';
 
 import { EOBCCSlider } from '../../junk/EOBCommon/EOBCCSlider/EOBCCSlider';
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
-import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
+import { LayersFactory, CRS_WGS84 } from '@sentinel-hub/sentinelhub-js';
 import moment from 'moment';
 import { XYFrame } from 'semiotic';
 import Rodal from 'rodal';
@@ -18,6 +18,7 @@ import {
   getDatasetLabel,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { constructCSVFromData } from './FIS.utils';
+import { reqConfigMemoryCache } from '../../const';
 
 import './FIS.scss';
 
@@ -60,7 +61,7 @@ class FIS extends Component {
     store.dispatch(modalSlice.actions.removeModal());
   };
 
-  setMaxCCAllowed = valuePercent => {
+  setMaxCCAllowed = (valuePercent) => {
     this.maxCCAllowed = valuePercent / 100.0;
     this.updateStateWithData();
   };
@@ -97,12 +98,16 @@ class FIS extends Component {
     const shJsDatasetId = datasourceHandler.getSentinelHubDataset(datasetId)
       ? datasourceHandler.getSentinelHubDataset(datasetId).id
       : null;
-    let layer = await LayersFactory.makeLayers(visualizationUrl, (layer, dataset) =>
-      !shJsDatasetId && !customSelected
-        ? dataset === null && layer === FISLayer
-        : customSelected
-        ? dataset.id === shJsDatasetId
-        : dataset.id === shJsDatasetId && layer === FISLayer,
+    let layer = await LayersFactory.makeLayers(
+      visualizationUrl,
+      (layer, dataset) =>
+        !shJsDatasetId && !customSelected
+          ? dataset === null && layer === FISLayer
+          : customSelected
+          ? dataset.id === shJsDatasetId
+          : dataset.id === shJsDatasetId && layer === FISLayer,
+      null,
+      reqConfigMemoryCache,
     );
     this.layer = layer[0];
 
@@ -112,15 +117,9 @@ class FIS extends Component {
 
     const { resolution, fisResolutionCeiling } = datasourceHandler.getResolutionLimits(datasetId);
 
-    const geometry = poiOrAoi === 'aoi' ? aoiGeometry.geometry : poiGeometry;
+    const geometry = poiOrAoi === 'aoi' ? aoiGeometry : poiGeometry;
 
     const recommendedResolution = getRecommendedResolution(geometry, resolution, fisResolutionCeiling);
-    let geometryWithSwitchedCoordinates =
-      // getStats makes request with ESPG:4326, but geojson is in WGS:84.
-      {
-        type: 'Polygon',
-        coordinates: [geometry.coordinates[0].map(coord => [coord[1], coord[0]])],
-      };
 
     let batchFromTime = moment
       .max(fromTime, this.availableData.fromTime.clone().subtract(this.MAX_REQUEST_INTERVAL))
@@ -139,13 +138,14 @@ class FIS extends Component {
     while (fromTime.isBefore(this.availableData.fromTime)) {
       const data = await layer[0]
         .getStats({
-          geometry: geometryWithSwitchedCoordinates,
+          geometry: geometry,
           fromTime: batchFromTime,
           toTime: batchToTime,
           resolution: recommendedResolution,
           bins: 10,
+          crs: CRS_WGS84,
         })
-        .catch(err => this.handleRequestError(err));
+        .catch((err) => this.handleRequestError(err));
 
       if (!data) {
         break;
@@ -208,7 +208,7 @@ class FIS extends Component {
     FileSaver.saveAs(new Blob([csv]), nicename);
   };
 
-  getNicename = extension => {
+  getNicename = (extension) => {
     const { datasetId, layerId, customSelected } = this.props;
     const { fromTime, toTime } = this.state;
 
@@ -220,7 +220,7 @@ class FIS extends Component {
   filterDataAfterTime = (data, fromTime) => {
     const filteredData = {};
     for (let band of data) {
-      filteredData[band.title] = band.coordinates.filter(v => moment(v.date).isSameOrAfter(fromTime));
+      filteredData[band.title] = band.coordinates.filter((v) => moment(v.date).isSameOrAfter(fromTime));
     }
     return filteredData;
   };
@@ -263,7 +263,7 @@ class FIS extends Component {
     let maxY = Number.NEGATIVE_INFINITY;
     for (let channelId in responseData) {
       const validStats = responseData[channelId].filter(
-        stat =>
+        (stat) =>
           stat.basicStats.mean !== 'NaN' &&
           !String(stat.basicStats.min).includes('Infinity') &&
           !String(stat.basicStats.max).includes('Infinity') &&
@@ -297,12 +297,12 @@ class FIS extends Component {
           // all in one list:
           coordinates: [
             // area bounds - bottom:
-            ...currentLineData.coordinates.map(coord => ({
+            ...currentLineData.coordinates.map((coord) => ({
               date: coord.date,
               value: coord.p10,
             })),
             // area bounds - top:
-            ...currentLineData.coordinates.reverse().map(coord => ({
+            ...currentLineData.coordinates.reverse().map((coord) => ({
               date: coord.date,
               value: coord.p90,
             })),
@@ -355,7 +355,7 @@ class FIS extends Component {
       return false;
     }
 
-    if (responseData['C0'][0].histogram.bins.length !== 10) {
+    if (responseData['C0'] && responseData['C0'][0].histogram.bins.length !== 10) {
       return false;
     }
 
@@ -415,7 +415,7 @@ class FIS extends Component {
     const chartDataKey = `${fromTime}-${dataAvailableFromDate}-${maxCCAllowed}`;
     const sharedProps = {
       size: [650, 320],
-      xAccessor: d => moment(d.date),
+      xAccessor: (d) => moment(d.date),
       xExtent: [fromTime, toTime],
       yExtent: [minY, maxY],
       margin: { bottom: 50, left: 50, top: 10, right: 30 }, // otherwise axis labels are clipped on edges
@@ -432,8 +432,8 @@ class FIS extends Component {
                 {...sharedProps}
                 areas={areaData}
                 yAccessor={'value'}
-                areaDataAccessor={d => d.coordinates.filter(v => moment(v.date).isSameOrAfter(fromTime))}
-                areaStyle={d => ({
+                areaDataAccessor={(d) => d.coordinates.filter((v) => moment(v.date).isSameOrAfter(fromTime))}
+                areaStyle={(d) => ({
                   fillOpacity: 0.15,
                   fill: chooseChartSeriesColor(d.seriesIndex, lineData.length),
                 })}
@@ -445,25 +445,27 @@ class FIS extends Component {
                 {...sharedProps}
                 lines={lineData}
                 yAccessor={'mean'}
-                lineDataAccessor={d => d.coordinates.filter(v => moment(v.date).isSameOrAfter(fromTime))}
-                lineStyle={d => ({ stroke: chooseChartSeriesColor(d.key, lineData.length) })}
+                lineDataAccessor={(d) => d.coordinates.filter((v) => moment(v.date).isSameOrAfter(fromTime))}
+                lineStyle={(d) => ({ stroke: chooseChartSeriesColor(d.key, lineData.length) })}
                 axes={[
                   {
                     orient: 'left',
                   },
                   {
                     orient: 'bottom',
-                    tickFormat: d => moment(d).format('D. MMM YY'),
+                    tickFormat: (d) => moment(d).format('D. MMM YY'),
                     ticks: 5,
                   },
                 ]}
                 showLinePoints={true}
-                pointStyle={d => ({
+                pointStyle={(d) => ({
                   fill: chooseChartSeriesColor(d.seriesIndex, lineData.length),
                   stroke: chooseChartSeriesColor(d.seriesIndex, lineData.length),
                 })}
                 hoverAnnotation={true}
-                tooltipContent={dataPoint => this.getTooltipContent(dataPoint, this.shouldDrawDistribution())}
+                tooltipContent={(dataPoint) =>
+                  this.getTooltipContent(dataPoint, this.shouldDrawDistribution())
+                }
                 svgAnnotationRules={svgAnnotationRules}
               />
             </div>
@@ -485,9 +487,9 @@ class FIS extends Component {
                 return (
                   <g
                     key={`legendpart-${index}`}
-                    transform={`translate(${(DIST_HORIZ * index) % 600}, ${Math.floor(
-                      (DIST_HORIZ * index) / 600,
-                    ) * DIST_VERT})`}
+                    transform={`translate(${(DIST_HORIZ * index) % 600}, ${
+                      Math.floor((DIST_HORIZ * index) / 600) * DIST_VERT
+                    })`}
                   >
                     <rect
                       x={0}
@@ -618,22 +620,21 @@ class FIS extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   layerId: store.visualization.layerId,
   datasetId: store.visualization.datasetId,
   visualizationUrl: store.visualization.visualizationUrl,
   evalscript: store.visualization.evalscript,
   customSelected: store.visualization.customSelected,
   toTime: store.visualization.toTime,
-  aoiGeometry:
-    store.aoi.geometry && store.aoi.geometry.features ? store.aoi.geometry.features[0] : store.aoi.geometry,
+  aoiGeometry: store.aoi.geometry,
   poiGeometry: store.poi.geometry,
   poiOrAoi: store.modal.params ? store.modal.params.poiOrAoi : null,
 });
 
 export default connect(mapStoreToProps, null)(FIS);
 
-const svgAnnotationRules = params => {
+const svgAnnotationRules = (params) => {
   const { d, xScale, yScale } = params;
   if (d.type !== 'frame-hover') {
     return null;

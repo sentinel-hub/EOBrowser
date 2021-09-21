@@ -25,13 +25,10 @@ import { getInstantsFromTimeInterval } from '../EOBCommon/utils/timespanHelpers'
 
 import './EOB3TimelapsePanel.scss';
 
-const createDefaultDateRange = time => {
+const createDefaultDateRange = (time) => {
   const { timeTo } = getInstantsFromTimeInterval(time);
   return {
-    from: moment
-      .utc(timeTo)
-      .subtract(1, 'months')
-      .format('YYYY-MM-DD'),
+    from: moment.utc(timeTo).subtract(1, 'months').format('YYYY-MM-DD'),
     to: moment.utc(timeTo).format('YYYY-MM-DD'),
   };
 };
@@ -78,7 +75,7 @@ export class EOB3TimelapsePanel extends Component {
     preparingGifCreation: false,
     loadingData: false,
     allImagesLoading: false,
-    showOverlayLayers: this.props.overlayLayers.map(overlay => ({ name: overlay.name, checked: false })),
+    showOverlayLayers: this.props.overlayLayers.map((overlay) => ({ name: overlay.name, checked: false })),
   };
 
   cancelTokenSource = CancelToken.source();
@@ -153,9 +150,9 @@ export class EOB3TimelapsePanel extends Component {
     }
   }
   datesForGif = (selectedDates, tooCloudy) => {
-    return selectedDates.filter(date => !tooCloudy.includes(date));
+    return selectedDates.filter((date) => !tooCloudy.includes(date));
   };
-  showAlert = errMsg => {
+  showAlert = (errMsg) => {
     this.alertContainer.show(errMsg, { type: 'info' });
   };
 
@@ -191,17 +188,17 @@ export class EOB3TimelapsePanel extends Component {
         aoiBounds,
         filterMonths,
       )
-        .then(flyovers => {
+        .then((flyovers) => {
           // flyover = {fromTime, toTime, coveragePercent, meta: {averageCloudCoverPercent}}
           this.setState({
             allFlyovers: flyovers,
             loadingData: false,
           });
         })
-        .catch(async e => {
+        .catch(async (e) => {
           console.error(e);
 
-          this.setState(prevState => {
+          this.setState((prevState) => {
             const selectedPeriodInLegacy =
               prevState.selectedPeriodForBestImg === 'orbit' ? 'day' : prevState.selectedPeriodForBestImg;
             return {
@@ -246,7 +243,7 @@ export class EOB3TimelapsePanel extends Component {
       onFetchAvailableDates,
       this.cancelTokenSource.token,
     )
-      .then(flyovers => {
+      .then((flyovers) => {
         // flyover = {fromTime, toTime, coveragePercent, meta: {averageCloudCoverPercent}}
 
         this.setState({
@@ -254,7 +251,7 @@ export class EOB3TimelapsePanel extends Component {
           loadingData: false,
         });
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         this.setState({
           error: 'Error fetching data',
@@ -265,7 +262,7 @@ export class EOB3TimelapsePanel extends Component {
 
   updateDate = (key, date) => {
     this.stopGifPreviewLoop();
-    this.setState(oldState => {
+    this.setState((oldState) => {
       const newDateRange = oldState.dateRange;
       newDateRange[key] = date.format ? date.format('YYYY-MM-DD') : date;
       return { dateRange: newDateRange };
@@ -321,18 +318,12 @@ export class EOB3TimelapsePanel extends Component {
       return;
     }
 
-    const imgUrlArr = flyoverArray.map(flyover => {
+    const imgUrlArr = flyoverArray.map((flyover) => {
       // subtracting / adding 1 minute to get all images
       // (backend seems to not include the images with the exact same time as the tiles have)
       // caution: moment.add(), moment.subtract() are in-place functions
-      const formatedFromTimeWithBufferTime = flyover.fromTime
-        .clone()
-        .subtract(1, 'minute')
-        .format();
-      const formatedToTimeWithBufferTime = flyover.toTime
-        .clone()
-        .add(1, 'minute')
-        .format();
+      const formatedFromTimeWithBufferTime = flyover.fromTime.clone().subtract(1, 'minute').format();
+      const formatedToTimeWithBufferTime = flyover.toTime.clone().add(1, 'minute').format();
 
       return {
         url: `${getCurrentBboxUrl(
@@ -358,10 +349,10 @@ export class EOB3TimelapsePanel extends Component {
       };
     });
 
-    const allImagesPromises = imgUrlArr.map(imgUrl => {
+    const allImagesPromises = imgUrlArr.map((imgUrl) => {
       const selectedOverlays = overlayLayers
-        .filter(l => showOverlayLayers.find(layer => layer.name === l.name && layer.checked))
-        .map(overlay => overlay.layer);
+        .filter((l) => showOverlayLayers.find((layer) => layer.name === l.name && layer.checked))
+        .map((overlay) => overlay.layer);
 
       // something here went wrong, time is added above and in fetchBlobObj
       return fetchBlobObj(
@@ -378,11 +369,11 @@ export class EOB3TimelapsePanel extends Component {
         showSHLogo,
         showCopernicusLogo,
       )
-        .then(response => {
+        .then((response) => {
           const dateToBeAdded = response.date;
           this.fetchedImages[dateToBeAdded] = response;
 
-          this.setState(oldState => {
+          this.setState((oldState) => {
             const allDatesWithImgs = [...oldState.allDatesWithImgs, dateToBeAdded].sort(
               (a, b) => new Date(a) - new Date(b),
             );
@@ -396,7 +387,7 @@ export class EOB3TimelapsePanel extends Component {
             };
           });
         })
-        .catch(err => {
+        .catch((err) => {
           if (isCancel(err)) {
             return;
           }
@@ -408,28 +399,28 @@ export class EOB3TimelapsePanel extends Component {
     });
   };
 
-  triggerUserDownload = blob => {
+  triggerUserDownload = (blob) => {
     const { name } = this.props.selectedResult;
     FileSaver.saveAs(blob, `${name.replace(' ', '_')}-timelapse.gif`);
   };
 
-  createGif = datesForGif => {
+  createGif = (datesForGif) => {
     if (datesForGif.length === 0) return;
     this.setState({ error: null, preparingGifCreation: true });
     gifshot.createGIF(
       {
-        images: datesForGif.map(date => this.getDataUrlFromDate(date)),
+        images: datesForGif.map((date) => this.getDataUrlFromDate(date)),
         gifWidth: 512,
         interval: 1 / this.state.intervalSpeed,
         //frameDuration: 5,
         gifHeight: 512,
         numWorkers: 4,
         // sampleInterval: 20,
-        progressCallback: progress => {
+        progressCallback: (progress) => {
           this.setState({ gifCreationProgress: progress });
         },
       },
-      obj => {
+      (obj) => {
         if (obj.error) {
           this.setState({ error: obj.error, preparingGifCreation: false });
         } else {
@@ -447,11 +438,11 @@ export class EOB3TimelapsePanel extends Component {
     this.setState({ sliderValue: 0 });
   };
 
-  changeSliderValue = e => {
+  changeSliderValue = (e) => {
     this.setState({ sliderValue: e });
   };
 
-  startGifPreviewLoop = intervalSpeed => {
+  startGifPreviewLoop = (intervalSpeed) => {
     this.timer && window.clearInterval(this.timer);
     this.timer = window.setInterval(() => {
       this.gifPreviewLoopTick();
@@ -464,7 +455,7 @@ export class EOB3TimelapsePanel extends Component {
   };
 
   gifPreviewLoopTick = () => {
-    this.setState(oldState => {
+    this.setState((oldState) => {
       const datesForGif = this.datesForGif(oldState.selectedDates, oldState.tooCloudy);
       const sliderValue = (oldState.sliderValue + 1) % datesForGif.length;
 
@@ -475,23 +466,23 @@ export class EOB3TimelapsePanel extends Component {
     });
   };
 
-  togglePlay = shouldPlay => {
+  togglePlay = (shouldPlay) => {
     this.setState({ isPlaying: shouldPlay });
   };
 
-  updateIntervalSpeed = e => {
+  updateIntervalSpeed = (e) => {
     this.setState({ intervalSpeed: e.target.value });
   };
 
-  isSelectAllCheckedChange = wasChecked => {
-    this.setState(oldState => {
+  isSelectAllCheckedChange = (wasChecked) => {
+    this.setState((oldState) => {
       if (!wasChecked) {
-        const selectedDates = oldState.allDatesWithImgs.filter(dateTime => {
+        const selectedDates = oldState.allDatesWithImgs.filter((dateTime) => {
           if (!this.props.canWeFilterByClouds) {
             return true;
           }
 
-          const foundFlyover = oldState.allFlyovers.find(flyover =>
+          const foundFlyover = oldState.allFlyovers.find((flyover) =>
             flyover.fromTime.isSame(dateTime, 'second'),
           );
 
@@ -517,16 +508,16 @@ export class EOB3TimelapsePanel extends Component {
     });
   };
 
-  getDataUrlFromDate = date => {
+  getDataUrlFromDate = (date) => {
     if (this.fetchedImages[date] === undefined) return;
     return this.fetchedImages[date].objectUrl;
   };
 
-  toggleDateSelection = date => {
-    this.setState(prevState => {
+  toggleDateSelection = (date) => {
+    this.setState((prevState) => {
       let selectedDates;
       if (prevState.selectedDates.includes(date)) {
-        selectedDates = prevState.selectedDates.filter(d => d !== date);
+        selectedDates = prevState.selectedDates.filter((d) => d !== date);
       } else {
         selectedDates = [...prevState.selectedDates, date].sort((a, b) => new Date(a) - new Date(b));
       }
@@ -537,23 +528,23 @@ export class EOB3TimelapsePanel extends Component {
     });
   };
 
-  setMaxCCPercentAllowed = valuePercent => {
+  setMaxCCPercentAllowed = (valuePercent) => {
     this.setState({
       maxCCPercentAllowed: valuePercent,
     });
   };
 
-  scrollToImage = currentDate => {
+  scrollToImage = (currentDate) => {
     const currentNode = this.imagesRefs[currentDate];
     if (currentNode !== undefined) {
       currentNode.scrollIntoView({ block: 'center', behavior: 'auto' });
     }
   };
 
-  setCurrentImgonClick = date => {
-    this.setState(oldState => {
+  setCurrentImgonClick = (date) => {
+    this.setState((oldState) => {
       const datesForGif = this.datesForGif(oldState.selectedDates, oldState.tooCloudy);
-      const indexOfDate = datesForGif.findIndex(el => el === date);
+      const indexOfDate = datesForGif.findIndex((el) => el === date);
       return {
         sliderValue: indexOfDate,
       };
@@ -561,11 +552,11 @@ export class EOB3TimelapsePanel extends Component {
   };
 
   updateFilterAndCheckedState = () => {
-    this.setState(oldState => {
+    this.setState((oldState) => {
       const tooCloudy =
         this.props.canWeFilterByClouds && !oldState.loadingData
-          ? oldState.allDatesWithImgs.filter(dateTime => {
-              const foundFlyover = oldState.allFlyovers.find(flyover =>
+          ? oldState.allDatesWithImgs.filter((dateTime) => {
+              const foundFlyover = oldState.allFlyovers.find((flyover) =>
                 flyover.fromTime.isSame(dateTime, 'second'),
               );
               if (
@@ -586,9 +577,9 @@ export class EOB3TimelapsePanel extends Component {
     });
   };
 
-  toggleShowOverlayLayers = index => {
+  toggleShowOverlayLayers = (index) => {
     this.setState(
-      prevState => {
+      (prevState) => {
         const { showOverlayLayers } = prevState;
         showOverlayLayers[index] = {
           ...showOverlayLayers[index],
@@ -601,7 +592,7 @@ export class EOB3TimelapsePanel extends Component {
     );
   };
 
-  setFilterMonths = filterMonths => {
+  setFilterMonths = (filterMonths) => {
     this.setState({
       filterMonths: filterMonths,
     });
@@ -660,10 +651,10 @@ export class EOB3TimelapsePanel extends Component {
       return intervals;
     }
 
-    intervals.map(i => i.sort(this.compareFlyoversByImageAndCloudCover));
+    intervals.map((i) => i.sort(this.compareFlyoversByImageAndCloudCover));
 
     let flyoversToReturn = [];
-    intervals.map(i => flyoversToReturn.push(i[0]));
+    intervals.map((i) => flyoversToReturn.push(i[0]));
     return flyoversToReturn;
   }
 
@@ -705,7 +696,7 @@ export class EOB3TimelapsePanel extends Component {
         </div>
 
         <div className="select-period-options">
-          {this.PERIODS_FOR_BEST_IMG.map(p => (
+          {this.PERIODS_FOR_BEST_IMG.map((p) => (
             <label
               key={p.value}
               className={`period ${selectedPeriodForBestImg === p.value ? 'selected' : ''}`}
@@ -743,12 +734,12 @@ export class EOB3TimelapsePanel extends Component {
       selectedPeriodForBestImg,
     } = this.state;
     const { minDate, maxDate } = this.props;
-    const datesForGif = selectedDates.filter(date => !tooCloudy.includes(date));
+    const datesForGif = selectedDates.filter((date) => !tooCloudy.includes(date));
     const isSelectAllChecked = datesForGif.length === allDatesWithImgs.length - tooCloudy.length;
 
     return (
       <div className="eob-timelapse-panel">
-        <AlertContainer ref={a => (this.alertContainer = a)} {...this.alertOptions} />
+        <AlertContainer ref={(a) => (this.alertContainer = a)} {...this.alertOptions} />
         <div className="modalTimelapse">
           <h1>{t`Timelapse`}</h1>
           <div className="wrap">
@@ -759,10 +750,9 @@ export class EOB3TimelapsePanel extends Component {
                     id="date-picker-from"
                     calendarContainer={this.calendarHolder}
                     selectedDay={moment.utc(from)}
-                    setSelectedDay={e => this.updateDate('from', e)}
+                    setSelectedDay={(e) => this.updateDate('from', e)}
                     minDate={moment.utc(minDate)}
                     maxDate={moment.utc(to)}
-                    getAndSetNextPrevDate={this.props.onGetAndSetNextPre}
                     onQueryDatesForActiveMonth={this.props.onQueryDatesForActiveMonth}
                   />
                   <span className="date-picker-separator">-</span>
@@ -770,14 +760,13 @@ export class EOB3TimelapsePanel extends Component {
                     id="date-picker-to"
                     calendarContainer={this.calendarHolder}
                     selectedDay={moment.utc(to)}
-                    setSelectedDay={e => this.updateDate('to', e)}
+                    setSelectedDay={(e) => this.updateDate('to', e)}
                     minDate={moment.utc(from)}
                     maxDate={moment.utc(maxDate)}
-                    getAndSetNextPrevDate={this.props.onGetAndSetNextPre}
                     onQueryDatesForActiveMonth={this.props.onQueryDatesForActiveMonth}
                   />
                 </div>
-                <div className="timelapse-calendar-holder" ref={e => (this.calendarHolder = e)} />
+                <div className="timelapse-calendar-holder" ref={(e) => (this.calendarHolder = e)} />
 
                 <div className="filter-months">
                   <EOBFilterSearchByMonths onChange={this.setFilterMonths} />
@@ -844,7 +833,7 @@ export class EOB3TimelapsePanel extends Component {
                 ) : error ? (
                   <div style={{ color: 'red' }}>{error}</div>
                 ) : (
-                  allDatesWithImgs.map(date => {
+                  allDatesWithImgs.map((date) => {
                     const currDate = datesForGif[sliderValue];
                     return (
                       <div
@@ -864,7 +853,7 @@ export class EOB3TimelapsePanel extends Component {
                         ) : (
                           <span
                             onClick={() => this.toggleDateSelection(date)}
-                            ref={elem => (this.imagesRefs[date] = elem)}
+                            ref={(elem) => (this.imagesRefs[date] = elem)}
                             id={date}
                           />
                         )}
@@ -988,7 +977,7 @@ const Controls = ({
       onBeforeChange={() => stopGifPreviewLoop()}
       onChange={changeSliderValue}
       value={sliderValue}
-      tipFormatter={value => selectedDates[value]}
+      tipFormatter={(value) => selectedDates[value]}
       className="timeline-slider"
     />
     <small className={`timeline-label per-${selectedPeriodForBestImg}`}>

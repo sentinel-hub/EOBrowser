@@ -7,6 +7,7 @@ import {
   AcquisitionMode,
   Polarization,
   Resolution,
+  SpeckleFilterType,
 } from '@sentinel-hub/sentinelhub-js';
 
 import DataSourceHandler from './DataSourceHandler';
@@ -25,6 +26,40 @@ import {
 import { constructBasicEvalscript, constructV3Evalscript } from '../../../utils';
 import { filterLayers } from './filter';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
+import { DATASOURCES } from '../../../const';
+
+export const S1_SUPPORTED_SPECKLE_FILTERS = [
+  {
+    label: SpeckleFilterType.NONE,
+    params: {
+      type: SpeckleFilterType.NONE,
+    },
+  },
+  {
+    label: SpeckleFilterType.LEE + ' 3x3',
+    params: {
+      type: SpeckleFilterType.LEE,
+      windowSizeX: 3,
+      windowSizeY: 3,
+    },
+  },
+  {
+    label: SpeckleFilterType.LEE + ' 5x5',
+    params: {
+      type: SpeckleFilterType.LEE,
+      windowSizeX: 5,
+      windowSizeY: 5,
+    },
+  },
+  {
+    label: SpeckleFilterType.LEE + ' 7x7',
+    params: {
+      type: SpeckleFilterType.LEE,
+      windowSizeX: 7,
+      windowSizeY: 7,
+    },
+  },
+];
 
 export default class Sentinel1DataSourceHandler extends DataSourceHandler {
   KNOWN_BANDS = [
@@ -64,20 +99,24 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
   capabilities = {};
   searchFilters = {};
   isChecked = false;
-  datasource = 'Sentinel-1';
+  datasource = DATASOURCES.S1;
 
   leafletZoomConfig = {
     [S1_AWS_IW_VVVH]: {
-      min: 1,
+      min: 7,
+      max: 18,
     },
     [S1_AWS_IW_VV]: {
-      min: 1,
+      min: 7,
+      max: 18,
     },
     [S1_AWS_EW_HHHV]: {
-      min: 1,
+      min: 6,
+      max: 18,
     },
     [S1_AWS_EW_HH]: {
-      min: 1,
+      min: 6,
+      max: 18,
     },
     [S1_EW_SH]: {
       min: 5,
@@ -98,8 +137,8 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
   polarizations = { IW: {}, EW: {} };
 
   willHandle(service, url, name, layers, preselected) {
-    const hasAWSLayer = !!layers.find(l => l.dataset && l.dataset.id === DATASET_AWSEU_S1GRD.id);
-    const hasEOCloudLayer = !!layers.find(l => l.dataset && l.dataset.id === DATASET_EOCLOUD_S1GRD.id);
+    const hasAWSLayer = !!layers.find((l) => l.dataset && l.dataset.id === DATASET_AWSEU_S1GRD.id);
+    const hasEOCloudLayer = !!layers.find((l) => l.dataset && l.dataset.id === DATASET_EOCLOUD_S1GRD.id);
 
     this.setFilteringOptions(layers, hasAWSLayer, hasEOCloudLayer);
 
@@ -119,7 +158,7 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
 
   saveFISLayers(url, layers) {
     this.FISLayers[url] = {};
-    const fisLayers = layers.filter(l => l.layerId.startsWith('__FIS_'));
+    const fisLayers = layers.filter((l) => l.layerId.startsWith('__FIS_'));
     for (let l of fisLayers) {
       this.FISLayers[url][l.dataset.id] = [...(this.FISLayers[url][l.dataset.id] || []), l.layerId];
     }
@@ -157,14 +196,14 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
     if (hasEOCloudLayer) {
       this.dataLocations.EOC = this.DATA_LOCATIONS.EOC;
     }
-    const IWLayers = layers.filter(l => l.acquisitionMode === 'IW');
-    const EWLayers = layers.filter(l => l.acquisitionMode === 'EW');
+    const IWLayers = layers.filter((l) => l.acquisitionMode === 'IW');
+    const EWLayers = layers.filter((l) => l.acquisitionMode === 'EW');
 
     if (IWLayers.length > 0) {
       this.acquisitionModes.IW = this.ACQUISITION_MODES.IW;
 
-      const hasVV = IWLayers.some(l => l.polarization === Polarization.SV);
-      const hasVVVH = IWLayers.some(l => l.polarization === Polarization.DV);
+      const hasVV = IWLayers.some((l) => l.polarization === Polarization.SV);
+      const hasVVVH = IWLayers.some((l) => l.polarization === Polarization.DV);
 
       if (hasVV) {
         this.polarizations.IW.VV = this.POLARIZATIONS.IW.VV;
@@ -177,8 +216,8 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
     if (EWLayers.length > 0) {
       this.acquisitionModes.EW = this.ACQUISITION_MODES.EW;
 
-      const hasHH = EWLayers.some(l => l.polarization === Polarization.SH);
-      const hasHHHV = EWLayers.some(l => l.polarization === Polarization.DH);
+      const hasHH = EWLayers.some((l) => l.polarization === Polarization.SH);
+      const hasHHHV = EWLayers.some((l) => l.polarization === Polarization.DH);
 
       if (hasHH) {
         this.polarizations.EW.HH = this.POLARIZATIONS.EW.HH;
@@ -223,7 +262,7 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
         selectedDatasets.push(S1_EW);
       }
 
-      selectedDatasets.forEach(datasetId => {
+      selectedDatasets.forEach((datasetId) => {
         // instanceId and layerId are required parameters, although we don't need them for findTiles
         let searchLayer = new S1GRDEOCloudLayer({
           instanceId: true,
@@ -257,7 +296,7 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
       if (isEW_HHHV) {
         selectedDatasets.push(S1_AWS_EW_HHHV);
       }
-      selectedDatasets.forEach(datasetId => {
+      selectedDatasets.forEach((datasetId) => {
         // Evalscript (or instanceId + layerId) is a required parameter, although we don't need it for findTiles
         let searchLayer = new S1GRDAWSEULayer({
           evalscript: true,
@@ -280,7 +319,7 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map(t => ({
+    const tiles = data.map((t) => ({
       sensingTime: t.sensingTime,
       geometry: t.geometry,
       datasource: this.datasource,
@@ -297,29 +336,29 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
   getLayers = (data, datasetId, url, layersExclude, layersInclude) => {
     const datasetParams = Sentinel1DataSourceHandler.getDatasetParams(datasetId);
     let layers = data.filter(
-      layer =>
+      (layer) =>
         filterLayers(layer.layerId, layersExclude, layersInclude) &&
         this.filterLayersS1(layer, datasetParams),
     );
-    layers.forEach(l => {
+    layers.forEach((l) => {
       l.url = url;
     });
     return layers;
   };
 
-  getBands = datasetId => {
+  getBands = (datasetId) => {
     switch (datasetId) {
       case S1_AWS_IW_VV:
-        return this.KNOWN_BANDS.filter(b => ['VV'].includes(b.name));
+        return this.KNOWN_BANDS.filter((b) => ['VV'].includes(b.name));
       case S1_AWS_EW_HHHV:
-        return this.KNOWN_BANDS.filter(b => ['HH', 'HV'].includes(b.name));
+        return this.KNOWN_BANDS.filter((b) => ['HH', 'HV'].includes(b.name));
       case S1_AWS_EW_HH:
-        return this.KNOWN_BANDS.filter(b => ['HH'].includes(b.name));
+        return this.KNOWN_BANDS.filter((b) => ['HH'].includes(b.name));
       case S1:
       case S1_EW:
       case S1_EW_SH:
       case S1_AWS_IW_VVVH:
-        return this.KNOWN_BANDS.filter(b => ['VV', 'VH'].includes(b.name));
+        return this.KNOWN_BANDS.filter((b) => ['VV', 'VH'].includes(b.name));
       default:
         return this.KNOWN_BANDS;
     }
@@ -335,7 +374,7 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
     return false;
   };
 
-  static getDatasetParams = datasetId => {
+  static getDatasetParams = (datasetId) => {
     // Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
     switch (datasetId) {
       case S1_AWS_IW_VVVH:
@@ -383,7 +422,7 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
     }
   };
 
-  getUrlsForDataset = datasetId => {
+  getUrlsForDataset = (datasetId) => {
     switch (datasetId) {
       case S1_AWS_IW_VVVH:
       case S1_AWS_IW_VV:
@@ -399,7 +438,7 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
     }
   };
 
-  getSentinelHubDataset = datasetId => {
+  getSentinelHubDataset = (datasetId) => {
     switch (datasetId) {
       case S1_AWS_IW_VVVH:
       case S1_AWS_IW_VV:
@@ -452,7 +491,61 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
     return true;
   }
 
-  supportsV3Evalscript = datasetId => {
+  supportsSpeckleFilter(datasetId) {
+    return !!this.getSupportedSpeckleFilters(datasetId).length;
+  }
+
+  getSupportedSpeckleFilters(datasetId) {
+    switch (datasetId) {
+      case S1_AWS_IW_VVVH:
+      case S1_AWS_IW_VV:
+      case S1_AWS_EW_HHHV:
+      case S1_AWS_EW_HH:
+        return S1_SUPPORTED_SPECKLE_FILTERS;
+      case S1:
+      case S1_EW:
+      case S1_EW_SH:
+      default:
+        return [];
+    }
+  }
+
+  canApplySpeckleFilter = (datasetId, currentZoom) => {
+    const ZoomThresholdIW = 12;
+    const ZoomThresholdEW = 8;
+
+    switch (datasetId) {
+      case S1_AWS_IW_VVVH:
+      case S1_AWS_IW_VV:
+        return currentZoom >= ZoomThresholdIW;
+      case S1_AWS_EW_HHHV:
+      case S1_AWS_EW_HH:
+        return currentZoom >= ZoomThresholdEW;
+      case S1:
+      case S1_EW:
+      case S1_EW_SH:
+      default:
+        return false;
+    }
+  };
+
+  supportsOrthorectification = (datasetId) => {
+    switch (datasetId) {
+      case S1:
+      case S1_EW:
+      case S1_EW_SH:
+        return false;
+      case S1_AWS_IW_VVVH:
+      case S1_AWS_IW_VV:
+      case S1_AWS_EW_HHHV:
+      case S1_AWS_EW_HH:
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  supportsV3Evalscript = (datasetId) => {
     switch (datasetId) {
       case S1:
       case S1_EW:
@@ -474,7 +567,7 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
       case S1_EW:
       case S1_EW_SH:
         return Object.values(IMAGE_FORMATS).filter(
-          f => f !== IMAGE_FORMATS.KMZ_JPG && f !== IMAGE_FORMATS.KMZ_PNG,
+          (f) => f !== IMAGE_FORMATS.KMZ_JPG && f !== IMAGE_FORMATS.KMZ_PNG,
         );
       default:
         return Object.values(IMAGE_FORMATS);

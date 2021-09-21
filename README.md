@@ -30,6 +30,7 @@ Thanks to the effort of various people and institutions you can enjoy EO Browser
 
 Your language is missing and you want to help to translate it? Contact us at info@sentinel-hub.com for more details.
 
+- Danish (Main functionality): Carsten Skovgård Andersen (Stjernekammeret, Bellahøj Skole)
 - German: ESERO Austria/ESERO Germany
 - Greek: [GET](https://www.getmap.eu/?lang=en)
 - Polish: ESERO Poland

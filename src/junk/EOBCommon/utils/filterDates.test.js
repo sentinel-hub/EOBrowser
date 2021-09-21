@@ -4,11 +4,11 @@ import { applyFilterMonthsToDateRange } from './filterDates';
 // moment.js dates are not being compared properly, so we use this function to avoid
 // having to change them just for tests:
 function expectToEqual(actual, expected) {
-  const actualForComparing = actual.map(a => ({
+  const actualForComparing = actual.map((a) => ({
     fromMoment: a.fromMoment.format(),
     toMoment: a.toMoment.format(),
   }));
-  const expectedForComparing = expected.map(a => ({
+  const expectedForComparing = expected.map((a) => ({
     fromMoment: a.fromMoment.format(),
     toMoment: a.toMoment.format(),
   }));

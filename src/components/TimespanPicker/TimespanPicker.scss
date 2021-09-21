@@ -29,7 +29,15 @@
     .date-input {
       display: flex;
       align-items: center;
-      margin-right: 15px;
+      position: relative;
+      width: 115px;
+
+      .date-picker-loader {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+      }
     }
 
     .time-input {

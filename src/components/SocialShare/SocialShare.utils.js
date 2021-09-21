@@ -19,10 +19,10 @@ export function sendFirebaseRequest(urlLocation) {
       },
     },
   })
-    .then(response => {
+    .then((response) => {
       return response.data.shortLink;
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
       return '';
     });

@@ -13,11 +13,11 @@ stories.add('Default', ({ state, setState }) => (
     <EOBEffectsPanel
       effects={effects}
       isFISLayer={false}
-      onUpdateGainEffect={value => setState({ gainEffect: value })}
-      onUpdateGammaEffect={value => setState({ gammaEffect: value })}
-      onUpdateRedRangeEffect={value => setState({ redRangeEffect: value })}
-      onUpdateGreenRangeEffect={value => setState({ greenRangeEffect: value })}
-      onUpdateBlueRangeEffect={value => setState({ blueRangeEffect: value })}
+      onUpdateGainEffect={(value) => setState({ gainEffect: value })}
+      onUpdateGammaEffect={(value) => setState({ gammaEffect: value })}
+      onUpdateRedRangeEffect={(value) => setState({ redRangeEffect: value })}
+      onUpdateGreenRangeEffect={(value) => setState({ greenRangeEffect: value })}
+      onUpdateBlueRangeEffect={(value) => setState({ blueRangeEffect: value })}
     />
   </div>
 ));
@@ -27,11 +27,11 @@ stories.add('FIS layer', ({ state, setState }) => (
     <EOBEffectsPanel
       effects={effects}
       isFISLayer={true}
-      onUpdateGainEffect={value => setState({ gainEffect: value })}
-      onUpdateGammaEffect={value => setState({ gammaEffect: value })}
-      onUpdateRedRangeEffect={value => setState({ redRangeEffect: value })}
-      onUpdateGreenRangeEffect={value => setState({ greenRangeEffect: value })}
-      onUpdateBlueRangeEffect={value => setState({ blueRangeEffect: value })}
+      onUpdateGainEffect={(value) => setState({ gainEffect: value })}
+      onUpdateGammaEffect={(value) => setState({ gammaEffect: value })}
+      onUpdateRedRangeEffect={(value) => setState({ redRangeEffect: value })}
+      onUpdateGreenRangeEffect={(value) => setState({ greenRangeEffect: value })}
+      onUpdateBlueRangeEffect={(value) => setState({ blueRangeEffect: value })}
     />
   </div>
 ));

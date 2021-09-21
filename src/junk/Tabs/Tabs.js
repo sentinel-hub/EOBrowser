@@ -11,7 +11,7 @@ import './Tabs.scss';
 import { t } from 'ttag';
 
 export class Tabs extends Component {
-  handleSelect = renderKey => {
+  handleSelect = (renderKey) => {
     if (renderKey !== 2) {
       // clear hash routes, except for 2 = Visualization tab
       window.location.hash = '';
@@ -25,7 +25,7 @@ export class Tabs extends Component {
         {this.props.children.map(
           /* Note that we are accessing childrens' props here. This breaks encapsulation principles,
            but allows us to declare tabs in a nicer way (we can define props directly on each tab)*/
-          tab => {
+          (tab) => {
             let icon = null;
             switch (tab.props.icon) {
               case 'search':

@@ -16,7 +16,7 @@ export class EOBPOIPanelButton extends React.Component {
     const title = t`Mark point of interest` + ` ${errorMessage}`;
     return (
       <span
-        onClick={ev => {
+        onClick={(ev) => {
           if (!isEnabled) {
             this.props.onErrorMessage(title);
             return;

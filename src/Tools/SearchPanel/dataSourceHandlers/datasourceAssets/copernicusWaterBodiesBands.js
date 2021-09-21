@@ -3,7 +3,7 @@ import { t } from 'ttag';
 export const WATER_BODIES_BANDS = [
   {
     name: 'WB',
-    description: t`Main Water Bodies detection layer showing water pixels and non-water pixels
+    getDescription: () => t`Main Water Bodies detection layer showing water pixels and non-water pixels
 0 = Sea
 70 = Water
 251 = No data
@@ -12,7 +12,7 @@ export const WATER_BODIES_BANDS = [
   },
   {
     name: 'QUAL',
-    description: t`Quality layer which gives information on water bodies occurrence
+    getDescription: () => t`Quality layer which gives information on water bodies occurrence
 0 = Sea
 71 = Very low occurence
 72 = Low occurence

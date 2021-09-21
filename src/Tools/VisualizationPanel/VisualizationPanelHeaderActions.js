@@ -66,8 +66,8 @@ export const VisualizationPanelHeaderActions = ({
   return (
     <div className="actions">
       {actions
-        .filter(action => action.visible())
-        .map(action => (
+        .filter((action) => action.visible())
+        .map((action) => (
           <div className="action-wrapper" key={action.id} onClick={action.onClick} title={action.title()}>
             <i className={action.icon()} />
           </div>

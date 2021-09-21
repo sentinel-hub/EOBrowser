@@ -71,22 +71,22 @@ In the **Discover** tab you can:
  - **Search** for data.
  - View theme **Highlights.**
 
-The **Theme** dropdown offers you different preconfigured themes as well as own custom configured instances if you are Logged-in. To create an instance, click on
+The **Theme** dropdown offers you different preconfigured themes as well as your own custom configured instances if you are Logged-in. To create an instance, click on
 the settings icon <i className="fa fa-cog" /> and log in with the same credentials as you used for EO Browser.
  
 Under **Search** you can set search criteria:
   - Choose from which satellites you want to receive the data by selecting checkboxes.
-  - Select additional options where applicable, for example cloud coverage with the slider.
-  - Select time range by either typing the date or select the date from the calendar.
+  - Select additional options where applicable, for example, cloud coverage with the slider.
+  - Select the time range by either typing the date or select the date from the calendar.
 
 You can read explanations of satellites by clicking on the question icon
 <i className="fa fa-question-circle" /> next to the data source name.
 
 Once you hit <span class="btn" style="font-size: 12px; padding: 4px 6px 4px 6px">Search</span> you get a list of results. Each result is presented 
-with a preview image, and relevant data specific to the datasource. For some data sources the link icon <i class="fa fa-link" /> is also visible for each result.
+with a preview image, and relevant data specific to the datasource. For some data sources, the link icon <i class="fa fa-link" /> is also visible for each result.
 Clicking on it reveals direct links to the raw image of the result on EO Cloud or SciHub. Clicking on the <span class="btn" style="font-size: 12px; padding: 4px 6px 4px 6px">Visualize</span> button will open the **Visualize** tab for the selected result.
 
-Under **Highlight** you find preselected interessting locations connected to the selected theme.
+Under **Highlight**, you find preselected interesting locations connected to the selected theme.
 `;
 
 const visualizationtabMd = () => t`
@@ -136,7 +136,7 @@ const pinstabMd = () => t`
 The **Pins** tab contains your pinned (favourite/saved) items. Pinned items contain information
 about location, data source and its specific layer, zoom level and time.
 
-For each pin you have several options how to interact with a single pin:
+For each pin you have several options on how to interact with a single pin:
 
 - Change **order** - by clicking on the move icon
 <span style="display: inline-flex; padding-top: 0.05em;">
@@ -158,7 +158,8 @@ In the line above all pins you have different options that apply for all pins:
  - Delete all pins - by clicking on  <i class="fa fa-trash" /> **Clear**.
 `;
 
-const searchPlacesMd = () => t` Search for a location either by scrolling the map with mouse or enter the location in the search
+const searchPlacesMd =
+  () => t` Search for a location either by scrolling the map with a mouse or enter the location in the search
 field.`;
 
 const overlaysMd = () => t`
@@ -193,7 +194,7 @@ Exported images will be cropped to the area of interest in analytical downloads.
 `;
 
 const poiMd = () => t`
-With this tool you can mark a point on the map.
+With this tool, you can mark a point on the map.
 
   You can also view statistical data for some layers by clicking on the chart icon
   <i class="fa fa-bar-chart" />. 
@@ -202,7 +203,7 @@ With this tool you can mark a point on the map.
 `;
 
 const measurementMd = () => t`
-With this tool you can measure distances and areas on the map.
+With this tool, you can measure distances and areas on the map.
 
 Every mouse click creates a new point on the path. To stop adding points, press <code>Esc</code>  key
 or double click on the map.  
@@ -210,7 +211,7 @@ You can remove the measurement by clicking the remove icon <i class="fa fa-close
 `;
 
 const downloadImageMd = () => t`
-With this tool you can download an image of visualized data for the displayed location. You can choose
+With this tool, you can download an image of visualized data for the displayed location. You can choose
 to show captions and you can add your own description.
 By enabling Analytical mode, you can choose between various image formats, image resolutions and
 coordinate systems. You can also select multiple layers and download them as a <code>.zip</code>  file.
@@ -225,15 +226,15 @@ icon. Your data will be clipped to match this area.
 `;
 
 const timelapseMd = () => t`
-With this tool you can create a timelapse animation of the visualized layer and displayed location.
+With this tool, you can create a timelapse animation of the visualised layer and displayed location.
 
-First, choose a time range. You can define your search results further by filtering them by months
+First, choose a time range. You can refine your search results further by filtering them by months
 (filter by months checkbox) and/or selecting one image per defined period (orbit, day, week, month,
 year).
 
 Then press <span class="btn" style="font-size: 12px; padding: 4px 6px 4px 6px"> <i className="fa fa-search" /> Search </span> and select your images.
 You can select all by checking the checkbox or filter the images by cloud coverage by moving the slider. Or you can pick images one by
-one by scrolling through the list and selecting them. Via the **Borders** checkbox you can enable/disable the borders on your image.
+one by scrolling through the list and selecting them. Via the **Borders** checkbox, you can enable/disable the borders on your image.
 
 You can preview the timelapse by pressing the play button on the bottom. You can also set the speed
 (frames per second).
@@ -244,7 +245,7 @@ downloaded as a <code>.gif</code> file.
 
 const happyBrowsingMd = () => t`
 
-You have reached the end of the tutorial. If you have any other question, feel free to ask us on [the forum](https://forum.sentinel-hub.com/)
+You have reached the end of the tutorial. If you have any other questions, feel free to ask us on [the forum](https://forum.sentinel-hub.com/)
 or contact us [via email](mailto:info@sentinel-hub.com?Subject=EO%20Browser%20Feedback).
 
 

@@ -6,6 +6,14 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/dracula.css';
 import './EvalScriptInput.scss';
 import { t } from 'ttag';
+import { JSHINT } from 'jshint';
+
+require('codemirror/addon/lint/javascript-lint');
+require('codemirror/addon/lint/lint.css');
+require('codemirror/addon/lint/lint.js');
+
+window.JSHINT = JSHINT;
+
 export class EvalScriptInput extends React.Component {
   constructor(props) {
     super(props);
@@ -14,10 +22,11 @@ export class EvalScriptInput extends React.Component {
       evalscript,
       isEvalUrl,
       evalscripturl,
+      evalScriptFocused: false,
     };
   }
 
-  updateCode = evalscript => {
+  updateCode = (evalscript) => {
     this.setState({ evalscript }, this.onCallback);
   };
 
@@ -25,15 +34,15 @@ export class EvalScriptInput extends React.Component {
     this.props.onChange(this.state);
   };
 
-  selectEvalMode = isEvalUrl => {
+  selectEvalMode = (isEvalUrl) => {
     this.setState({ isEvalUrl }, this.onCallback);
   };
 
-  updateUrl = e => {
+  updateUrl = (e) => {
     this.setState({ evalscripturl: e.target.value }, this.onCallback);
   };
 
-  onKeyDown = e => {
+  onKeyDown = (e) => {
     const { evalscripturl } = this.state;
     if (!evalscripturl || evalscripturl.trim() === '') {
       return;
@@ -49,7 +58,7 @@ export class EvalScriptInput extends React.Component {
       return;
     }
     fetchEvalscriptFromEvalscripturl(evalscripturl)
-      .then(res => {
+      .then((res) => {
         const { data: text } = res;
         this.updateCode(text);
         this._CM.codeMirror.setValue(text);
@@ -58,7 +67,7 @@ export class EvalScriptInput extends React.Component {
           setTimeout(() => this.setState({ success: false }), 2000);
         });
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e);
         this.setState({ loading: false });
         this.setState({ error: t`Error loading script. Check your URL.` }, () => {
@@ -72,12 +81,16 @@ export class EvalScriptInput extends React.Component {
     return (isEvalUrl && !evalscripturl) || (!isEvalUrl && !evalscript);
   };
 
-  handleRefreshClick = e => {
+  handleRefreshClick = (e) => {
     if (this.refreshEvalscriptDisabled()) {
       return;
     }
 
     this.props.onRefresh();
+  };
+
+  onCloseClick = () => {
+    this.setState({ evalScriptFocused: false });
   };
 
   render() {
@@ -86,18 +99,31 @@ export class EvalScriptInput extends React.Component {
     const options = {
       lineNumbers: true,
       mode: 'javascript',
-      lint: true,
+      lint: {
+        esversion: 6,
+      },
       readOnly: !!isEvalUrl,
       theme: `default${!!isEvalUrl ? ' readonly' : ''}`,
+      gutters: ['CodeMirror-lint-markers'],
     };
     return (
       <div style={{ clear: 'both' }}>
-        <Codemirror
-          value={evalscript || ''}
-          onChange={this.updateCode}
-          options={options}
-          ref={el => (this._CM = el)}
-        />
+        <div className="code-mirror-wrapper">
+          <div
+            className={`react-code-mirror${this.state.evalScriptFocused ? '-resizable' : '-not-resizable'}`}
+          >
+            <i className="fas fa-times"></i>
+            <Codemirror
+              value={evalscript || ''}
+              onChange={this.updateCode}
+              options={options}
+              ref={(el) => (this._CM = el)}
+              onFocusChange={() =>
+                !isEvalUrl && this.setState({ evalScriptFocused: !this.state.evalScriptFocused })
+              }
+            />
+          </div>
+        </div>
         {isEvalUrl && (
           <div className="info-uncheck-url">
             <i className="fa fa-info" />
@@ -114,7 +140,7 @@ export class EvalScriptInput extends React.Component {
             <input
               type="checkbox"
               id="evalscriptUrlCB"
-              onChange={e => this.selectEvalMode(e.target.checked)}
+              onChange={(e) => this.selectEvalMode(e.target.checked)}
               checked={isEvalUrl}
             />
             <label htmlFor="evalscriptUrlCB" style={{ marginTop: '-3px' }}>

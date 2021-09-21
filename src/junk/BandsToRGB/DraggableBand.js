@@ -11,7 +11,7 @@ export const DraggableBand = ({ band, value, onChange, style }) => {
         onChange(value);
       }
     },
-    collect: monitor => ({
+    collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });
@@ -21,7 +21,7 @@ export const DraggableBand = ({ band, value, onChange, style }) => {
       ref={drag}
       key={band.name}
       className="band-item"
-      title={band.description}
+      title={band.getDescription ? band.getDescription() : ''}
       style={{ ...style, backgroundColor: band.color, opacity: isDragging ? 0.4 : 1 }}
     >
       {band.name}

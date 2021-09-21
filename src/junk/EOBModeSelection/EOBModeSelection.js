@@ -30,7 +30,7 @@ const ModeSelectionPanel = ({ highlighted, modes, onMouseLeave, onSelectMode, se
             value={mode.id}
             name={mode.id}
             checked={mode.id === selectedModeId}
-            onChange={e => onSelectMode(e)}
+            onChange={(e) => onSelectMode(e)}
           />
           {mode.label()}
         </label>
@@ -43,7 +43,7 @@ class EOBModeSelection extends React.Component {
   static defaultProps = {
     highlighted: false,
     modes: [],
-    onSelectMode: value => {},
+    onSelectMode: (value) => {},
     selectedModeId: null,
   };
 
@@ -52,7 +52,7 @@ class EOBModeSelection extends React.Component {
   };
 
   toggleExpanded = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       expanded: !prevState.expanded,
     }));
   };
@@ -64,7 +64,7 @@ class EOBModeSelection extends React.Component {
     setTimeout(() => this.setState({ expanded: true }), 100);
   };
 
-  onSelectMode = event => {
+  onSelectMode = (event) => {
     this.props.onSelectMode(event.target.value);
   };
 

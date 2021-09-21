@@ -1,5 +1,10 @@
 import { t } from 'ttag';
 
+export const LAYER_ACCESS = {
+  PUBLIC: 'public',
+  PAID: 'paid',
+};
+
 export const baseLayers = [
   {
     name: 'Voyager',
@@ -8,6 +13,7 @@ export const baseLayers = [
       '\u003ca href="https://www.maptiler.com/copyright/" target="_blank"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href="https://www.openstreetmap.org/copyright" target="_blank"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e',
     urlType: 'VECTOR', // Indicates that this will be drawn on the map with Mapbox-gl
     checked: true,
+    access: LAYER_ACCESS.PUBLIC,
   },
   {
     name: 'Light',
@@ -15,6 +21,13 @@ export const baseLayers = [
     attribution:
       '\u003ca href="https://www.maptiler.com/copyright/" target="_blank"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href="https://www.openstreetmap.org/copyright" target="_blank"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e',
     urlType: 'VECTOR', // Indicates that this will be drawn on the map with Mapbox-gl
+    access: LAYER_ACCESS.PUBLIC,
+  },
+  {
+    name: 'Google Satellite',
+    url: `https://1.aerial.maps.ls.hereapi.com/maptile/2.1/maptile/newest/satellite.day/{z}/{x}/{y}/512/png8?apiKey=7zZjn-HKgDIEjDpbD9hGavCHjAnrTwYckBc1AX0mwwc`,
+    urlType: 'GOOGLE_MAPS',
+    access: LAYER_ACCESS.PAID,
   },
 ];
 

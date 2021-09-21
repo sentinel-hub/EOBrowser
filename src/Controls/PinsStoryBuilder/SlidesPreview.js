@@ -41,19 +41,19 @@ export default class SlidesPreview extends React.Component {
 
   incrementSlideshowIndex = () => {
     const nSlides = this.props.selectedSlides.length;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       slideshowIndex: nSlides > 0 ? (prevState.slideshowIndex + 1) % nSlides : 0,
     }));
   };
 
-  handleSlideshowIndexChange = newIndex => {
+  handleSlideshowIndexChange = (newIndex) => {
     this.setState({
       slideshowIndex: newIndex,
     });
   };
 
   togglePlay = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       isPlaying: !prevState.isPlaying,
     }));
   };
@@ -62,7 +62,7 @@ export default class SlidesPreview extends React.Component {
     this.setState({ isPlaying: false });
   };
 
-  updateSlideshowIndex = value => {
+  updateSlideshowIndex = (value) => {
     this.setState({ slideshowIndex: value });
   };
 

@@ -8,7 +8,11 @@ import { CancelToken } from '@sentinel-hub/sentinelhub-js';
 
 import store, { notificationSlice } from '../../store';
 
-import { checkIfIndexOutputPresent, MISSING_INDEX_OUTPUT_ERROR } from './Histogram.utils';
+import {
+  checkIfIndexOutputPresent,
+  MISSING_INDEX_OUTPUT_ERROR,
+  NO_INDEX_LAYER_SELECTED,
+} from './Histogram.utils';
 
 import {
   getDataSourceHandler,
@@ -51,7 +55,7 @@ class HistogramWrapper extends Component {
       store.dispatch(notificationSlice.actions.displayError(errorMessage));
       return;
     }
-    this.setState(prevState => ({ histogramOpened: !prevState.histogramOpened }));
+    this.setState((prevState) => ({ histogramOpened: !prevState.histogramOpened }));
   };
 
   checkIfEnabled = async () => {
@@ -85,7 +89,7 @@ class HistogramWrapper extends Component {
     if (!isIndexOutputPresent) {
       this.setState({
         histogramEnabled: false,
-        errorMessage: MISSING_INDEX_OUTPUT_ERROR,
+        errorMessage: customSelected ? MISSING_INDEX_OUTPUT_ERROR : NO_INDEX_LAYER_SELECTED,
       });
       return;
     }
@@ -98,7 +102,7 @@ class HistogramWrapper extends Component {
     const title = t`Histogram` + ` ${errorMessage ? `(${errorMessage})` : ''}`;
 
     return (
-      <div className="histogram-wrapper" ref={r => (this.ref = r)}>
+      <div className="histogram-wrapper" ref={(r) => (this.ref = r)}>
         <div className="histogram-button-wrapper" title={title}>
           <div
             className={`histogram-button ${histogramEnabled ? '' : 'disabled'}`}
@@ -118,7 +122,7 @@ class HistogramWrapper extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   modalId: store.modal.id,
   datasetId: store.visualization.datasetId,
   layerId: store.visualization.layerId,

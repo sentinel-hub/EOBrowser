@@ -1,0 +1,114 @@
+@import '../../../variables';
+
+.commercial-data-orders {
+  display: flex;
+  flex-direction: column;
+
+  .actions-container {
+    position: sticky;
+    bottom: -10px;
+    background: $mainLight;
+  }
+
+  .orders-list {
+    display: flex;
+    flex-flow: column;
+    padding: 5px 0;
+
+    > * {
+      padding: 5px 0;
+    }
+
+    .order-status {
+      font-weight: 700;
+    }
+
+    .notification-panel {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+      font-size: 16px;
+
+      p {
+        margin-top: 1em;
+        margin-left: 0.5em;
+      }
+    }
+
+    .orders {
+      .order {
+        border: 1px solid grey;
+        padding: 5px;
+        margin: 2px 0;
+
+        .bold {
+          font-weight: 700;
+        }
+
+        .order-header {
+          display: flex;
+          justify-content: space-between;
+          padding: 5px 0;
+          font-size: 15px;
+
+          &:hover {
+            cursor: pointer;
+            color: $primaryCol;
+          }
+
+          .order-title {
+            display: flex;
+            width: 100%;
+
+            div {
+              padding-right: 1em;
+            }
+          }
+
+          .toggle-details {
+            display: flex;
+            align-items: center;
+          }
+        }
+
+        .order-details {
+          .order-property {
+            display: flex;
+            justify-content: flex-start;
+            font-size: 14px;
+            padding: 2px 0;
+
+            div {
+              margin-right: 5px;
+            }
+
+            i {
+              color: $primaryCol;
+            }
+          }
+
+          .order-property-json {
+            overflow-x: scroll;
+
+            pre {
+              margin: 0;
+            }
+          }
+
+          .buttons {
+            display: flex;
+
+            a {
+              font-size: 14px;
+              font-weight: 500;
+              margin: 10px 10px 10px 0;
+              padding: 5px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

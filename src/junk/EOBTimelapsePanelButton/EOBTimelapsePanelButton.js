@@ -37,7 +37,7 @@ export class EOBTimelapsePanelButton extends React.Component {
       <div
         className="timelapsePanelButton panelButton floatItem"
         title={title}
-        onClick={ev => {
+        onClick={(ev) => {
           if (!isEnabled) {
             this.props.onErrorMessage(title);
             return;

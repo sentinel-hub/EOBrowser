@@ -22,7 +22,7 @@ class Results extends Component {
       });
     }
     if (this.props.selectedTiles && prevProps.selectedTiles !== this.props.selectedTiles) {
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         displayModal: true,
         selectedTiles: this.props.selectedTiles,
       }));
@@ -34,13 +34,13 @@ class Results extends Component {
       loadingMore: true,
     });
     const { results } = await this.props.query.getNextNResults();
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       results: [...prevState.results, ...results],
       loadingMore: false,
     }));
   };
 
-  onResultHover = tile => {
+  onResultHover = (tile) => {
     this.props.setHighlightedTile(tile);
   };
 
@@ -48,7 +48,7 @@ class Results extends Component {
     this.props.setHighlightedTile(null);
   };
 
-  onResultSelected = result => {
+  onResultSelected = (result) => {
     this.setState({ displayModal: false });
     this.props.onResultSelected(result);
   };

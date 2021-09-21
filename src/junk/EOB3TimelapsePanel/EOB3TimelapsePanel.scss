@@ -220,14 +220,15 @@
       flex: 1;
 
       div {
-        border: 2px solid rgba(146, 146, 146, 0);
+        border: 2px solid transparent;
         max-width: 200px;
         max-height: 200px;
+        width: 100%;
         vertical-align: top;
         position: relative;
         cursor: pointer;
         margin: 2px;
-        transition: max-height 0.2s ease-in;
+        transition: max-height 0.1s ease-in;
 
         span {
           height: 22px;
@@ -264,9 +265,8 @@
         }
 
         &.false {
-          background-color: rgba(146, 146, 146, 0.21);
+          background-color: $mainMedium;
           max-height: 20px;
-          transition: max-height 0.2s ease-out;
 
           span {
             &::before {
@@ -284,12 +284,15 @@
           img {
             visibility: hidden;
           }
+
+          i {
+            background-color: $mainMedium;
+          }
         }
 
         &.cloudy {
           background-color: $mainMedium;
           max-height: 20px;
-          transition: max-height 0.2s ease-out;
 
           & .fa-cloud {
             color: #658db0;

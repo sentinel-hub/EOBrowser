@@ -133,7 +133,7 @@ async function stitchTiles(tiles, overlayUrl, width, height, makeReadable, subdo
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
-  const tileDrawnPromises = tiles.map(tile => {
+  const tileDrawnPromises = tiles.map((tile) => {
     return new Promise(async (resolve, reject) => {
       let overlayUrlReplaced = overlayUrl.replace('{z}', tile.z);
       overlayUrlReplaced = overlayUrlReplaced.replace('{x}', tile.x);

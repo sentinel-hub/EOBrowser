@@ -34,7 +34,7 @@ class AuthProvider extends React.Component {
     });
   };
 
-  setAnonToken = token => {
+  setAnonToken = (token) => {
     store.dispatch(authSlice.actions.setAnonToken(token));
   };
 
@@ -56,7 +56,7 @@ class AuthProvider extends React.Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   anonToken: store.auth.anonToken,
 });
 export default connect(mapStoreToProps)(AuthProvider);

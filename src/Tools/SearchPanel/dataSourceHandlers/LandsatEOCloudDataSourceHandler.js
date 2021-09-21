@@ -7,9 +7,10 @@ import {
   DATASET_EOCLOUD_LANDSAT8,
 } from '@sentinel-hub/sentinelhub-js';
 import { ESA_L5, ESA_L7, ESA_L8 } from './dataSourceHandlers';
+import { DATASOURCES } from '../../../const';
 
 export default class LandsatEOCloudDataSourceHandler extends LandsatDataSourceHandler {
-  datasource = 'LandsatEOCloud';
+  datasource = DATASOURCES.EOCLOUD_LANDSAT;
   searchGroupLabel = 'Landsat (ESA Archive)';
   searchGroupKey = 'landsat-eocloud';
 

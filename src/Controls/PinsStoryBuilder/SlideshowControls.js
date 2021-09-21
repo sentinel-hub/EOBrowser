@@ -3,7 +3,7 @@ import { t } from 'ttag';
 import RCSlider from 'rc-slider';
 
 export default class SlideshowControls extends React.Component {
-  updateSpeedFps = ev => {
+  updateSpeedFps = (ev) => {
     const x = parseInt(ev.target.value);
     this.props.updateSpeedFps(x);
   };
@@ -39,7 +39,7 @@ export default class SlideshowControls extends React.Component {
           onBeforeChange={stopPlay}
           onChange={onSlideshowIndexChange}
           value={slideshowIndex}
-          tipFormatter={value => currentSlideLabel}
+          tipFormatter={(value) => currentSlideLabel}
           className="timeline-slider"
         />
 

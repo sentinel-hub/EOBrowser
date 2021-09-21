@@ -59,7 +59,7 @@ export function ImageDownloadForms(props) {
   }
 
   function updateFormData(field, newValue, setState) {
-    setState(prevState => ({
+    setState((prevState) => ({
       ...prevState,
       [field]: newValue,
     }));

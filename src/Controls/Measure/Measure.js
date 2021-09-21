@@ -16,19 +16,19 @@ class Measure extends Component {
     L.DomEvent.disableScrollPropagation(this.ref);
     L.DomEvent.disableClickPropagation(this.ref);
     this.ruler = L.ruler().addTo(this.props.map);
-    this.props.map.on('measure:startMeasure', e => {
+    this.props.map.on('measure:startMeasure', (e) => {
       this.setState({ isMeasuring: true, distance: null, area: null });
     });
-    this.props.map.on('measure:move', e => {
+    this.props.map.on('measure:move', (e) => {
       this.setState({ distance: e.distance, area: e.area });
     });
-    this.props.map.on('measure:pointAdded', e => {
+    this.props.map.on('measure:pointAdded', (e) => {
       this.setState({ distance: e.distance, area: e.area });
     });
-    this.props.map.on('measure:finish', e => {
+    this.props.map.on('measure:finish', (e) => {
       this.setState({ distance: e.distance, area: e.area });
     });
-    this.props.map.on('measure:removed', e => {
+    this.props.map.on('measure:removed', (e) => {
       this.setState({ isMeasuring: false, distance: null, area: null });
     });
   }
@@ -36,7 +36,7 @@ class Measure extends Component {
   render() {
     return (
       <div
-        ref={r => {
+        ref={(r) => {
           this.ref = r;
         }}
         className="measure-wrapper"
@@ -48,14 +48,14 @@ class Measure extends Component {
           hasMeasurement={this.state.isMeasuring}
           distance={this.state.distance}
           area={this.state.area}
-          onErrorMessage={msg => store.dispatch(notificationSlice.actions.displayError(msg))}
+          onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
         />
       </div>
     );
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   user: store.auth.user.userdata,
 });
 

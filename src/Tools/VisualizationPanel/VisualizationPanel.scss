@@ -42,11 +42,11 @@
         font-weight: bold;
         font-size: 13px;
         text-align: left;
+        width: 100%;
       }
 
       .visualization-time-select {
-        padding: 0 10px;
-        margin: 10px 0;
+        margin: 10px;
       }
 
       .timespan-toggle {
@@ -142,17 +142,28 @@
         color: #b6bf00;
       }
 
-      .fa.fa-angle-double-down {
+      .layer-icons-wrapper {
         float: right;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .fa.fa-angle-double-down {
         font-size: 14px;
-        margin: 20px 0 0 0;
+        margin: 5px 0 0 0;
         transition: transform ease-in 0.2s;
-        padding: 5px 0 5px 5px;
+        padding: 3px 0 5px 2px;
+        width: fit-content;
 
         &.show {
           color: #b6bf00;
           transform: rotate(180deg);
         }
+      }
+
+      .fas.fa-edit {
+        font-size: 14px;
+        transition: transform ease-in 0.2s;
       }
     }
 

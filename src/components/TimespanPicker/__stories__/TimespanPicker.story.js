@@ -31,11 +31,7 @@ stories.add('Timespan', ({ state, setState }) => {
 });
 
 function onQueryDatesForActiveMonth(date) {
-  return new Promise(resolve => {
-    resolve([
-      moment(date)
-        .startOf('month')
-        .toDate(),
-    ]);
+  return new Promise((resolve) => {
+    resolve([moment(date).startOf('month').toDate()]);
   });
 }

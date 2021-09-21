@@ -49,7 +49,7 @@ class ToolsFooter extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   user: store.auth.user.userdata,
 });
 

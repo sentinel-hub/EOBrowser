@@ -7,7 +7,7 @@ export const filterLayers = (layerId, layersExclude, layersInclude) => {
   }
   if (layersInclude) {
     if (Array.isArray(layersInclude)) {
-      if (layersInclude.some(filter => filterStringMatches(filter, layerId))) {
+      if (layersInclude.some((filter) => filterStringMatches(filter, layerId))) {
         return true;
       }
     } else {
@@ -18,7 +18,7 @@ export const filterLayers = (layerId, layersExclude, layersInclude) => {
   }
   if (layersExclude) {
     if (Array.isArray(layersExclude)) {
-      if (layersExclude.some(filter => filterStringMatches(filter, layerId))) {
+      if (layersExclude.some((filter) => filterStringMatches(filter, layerId))) {
         return false;
       }
     } else {

@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { EOBPOIPanelButton } from '../../junk/EOBPOIPanelButton/EOBPOIPanelButton';
 import { connect } from 'react-redux';
 import L from 'leaflet';
-import 'leaflet.pm';
-import 'leaflet.pm/dist/leaflet.pm.css';
+import '@geoman-io/leaflet-geoman-free';
+import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 
 import store, { poiSlice, mainMapSlice, notificationSlice, modalSlice } from '../../store';
 import {
@@ -23,7 +23,7 @@ class POI extends Component {
   componentDidMount() {
     L.DomEvent.disableScrollPropagation(this.ref);
     L.DomEvent.disableClickPropagation(this.ref);
-    this.props.map.on('pm:create', e => {
+    this.props.map.on('pm:create', (e) => {
       if (e.shape && e.shape === 'Marker') {
         this.props.map.removeLayer(e.layer);
         this.props.map.pm.disableDraw('Marker');
@@ -40,7 +40,7 @@ class POI extends Component {
   }
 
   enableEdit = () => {
-    this.props.map.eachLayer(l => {
+    this.props.map.eachLayer((l) => {
       if (l.options.id && l.options.id === 'poi-layer') {
         this.POILayerRef = l;
       }
@@ -48,7 +48,7 @@ class POI extends Component {
     this.POILayerRef.pm.enable({
       preventMarkerRemoval: true,
     });
-    this.POILayerRef.on('pm:edit', f => {
+    this.POILayerRef.on('pm:edit', (f) => {
       const geometry = this.generateSmallBBoxAroundPOI(f.target.getLatLng());
       store.dispatch(poiSlice.actions.set({ position: f.target.getLatLng(), geometry: geometry }));
     });
@@ -79,12 +79,6 @@ class POI extends Component {
     const lowRight = [east, south];
     return {
       type: 'Polygon',
-      crs: {
-        type: 'name',
-        properties: {
-          name: 'urn:ogc:def:crs:EPSG::4326',
-        },
-      },
       coordinates: [[lowLeft, lowRight, topRight, topLeft, lowLeft]],
     };
   }
@@ -117,7 +111,7 @@ class POI extends Component {
   render() {
     return (
       <div
-        ref={r => {
+        ref={(r) => {
           this.ref = r;
         }}
         className="poi-wrapper"
@@ -132,14 +126,14 @@ class POI extends Component {
           selectedResult={this.generateSelectedResult()}
           presetLayerName={'True color'} // TO DO
           fisShadowLayer={true} // TO DO
-          onErrorMessage={msg => store.dispatch(notificationSlice.actions.displayError(msg))}
+          onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
         />
       </div>
     );
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   poiPosition: store.poi.position,
   layerId: store.visualization.layerId,
   datasetId: store.visualization.datasetId,

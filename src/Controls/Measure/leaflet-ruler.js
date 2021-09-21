@@ -60,17 +60,17 @@ L.Ruler = L.LayerGroup.extend({
     },
   },
 
-  initialize: function(options) {
+  initialize: function (options) {
     this.initLayers();
     this.active = false;
     this.points = [];
   },
 
-  onAdd: function(map) {
+  onAdd: function (map) {
     this._defaultCursor = this._map._container.style.cursor;
   },
 
-  toggle: function() {
+  toggle: function () {
     this.active = !this.active;
     this.clearData();
     if (this.active) {
@@ -98,7 +98,7 @@ L.Ruler = L.LayerGroup.extend({
     }
   },
 
-  handleMouseClick: function(e) {
+  handleMouseClick: function (e) {
     this.clickedLatLng = [e.latlng.lat, e.latlng.lng];
     this.points.push(this.clickedLatLng);
     this.tempLineLayer.setLatLngs([]);
@@ -114,7 +114,7 @@ L.Ruler = L.LayerGroup.extend({
     this.createMarker(this.clickedLatLng);
   },
 
-  handleMouseMove: function(e) {
+  handleMouseMove: function (e) {
     this.movingLatLng = [e.latlng.lat, e.latlng.lng];
     if (this.points.length > 0) {
       this.createTempLine(this.movingLatLng);
@@ -129,27 +129,25 @@ L.Ruler = L.LayerGroup.extend({
     }
   },
 
-  createMarker: function(latLng) {
-    L.circleMarker(latLng, this.options.circleMarker)
-      .addTo(this.pointLayer)
-      .bringToFront();
+  createMarker: function (latLng) {
+    L.circleMarker(latLng, this.options.circleMarker).addTo(this.pointLayer).bringToFront();
   },
 
-  updateLineString: function() {
+  updateLineString: function () {
     const lineCoords = [this.points];
     this.lineStringLayer.setLatLngs(lineCoords);
   },
 
-  createTempLine: function(movingLatLng) {
+  createTempLine: function (movingLatLng) {
     const lineCoords = [this.clickedLatLng, movingLatLng];
     this.tempLineLayer.setLatLngs(lineCoords);
   },
 
-  updatePolygonLayer: function(coords) {
+  updatePolygonLayer: function (coords) {
     this.polygonLayer.setLatLngs(coords);
   },
 
-  closePath: function() {
+  closePath: function () {
     this.allLayers.removeLayer(this.tempLineLayer);
     this.tempLineLayer.setLatLngs([]);
     const distance = this.calculateDistance();
@@ -162,7 +160,7 @@ L.Ruler = L.LayerGroup.extend({
     this.toggle();
   },
 
-  initLayers: function() {
+  initLayers: function () {
     this.allLayers = L.layerGroup();
     this.polygonLayer = L.polygon([], this.options.polygonStyle);
     this.tempLineLayer = L.polyline([], this.options.tempLineStyle);
@@ -170,7 +168,7 @@ L.Ruler = L.LayerGroup.extend({
     this.pointLayer = L.featureGroup();
   },
 
-  removeMeasurement: function() {
+  removeMeasurement: function () {
     this.active = false;
     this._result = null;
     this._clickedLatLong = null;
@@ -186,11 +184,11 @@ L.Ruler = L.LayerGroup.extend({
     this._map.off('mousemove', this.handleMouseMove, this);
   },
 
-  clearLayers: function() {
+  clearLayers: function () {
     this.allLayers.clearLayers(); //Removes all the layers from the group.
   },
 
-  escape: function(e) {
+  escape: function (e) {
     const polygonCoords = [this.points.concat([this.points[0]])];
     if (e.keyCode === 27) {
       if (this.points.length > 1) {
@@ -203,13 +201,13 @@ L.Ruler = L.LayerGroup.extend({
     }
   },
 
-  clearData: function() {
+  clearData: function () {
     this.points = [];
     this.clickedLatLng = null;
     this.movingLatLng = null;
   },
 
-  calculateDistance: function() {
+  calculateDistance: function () {
     const templineJson = this.tempLineLayer.toGeoJSON();
     const lineStringJson = this.lineStringLayer.toGeoJSON();
     const tempLineDistance = length(templineJson, { units: 'meters' });
@@ -217,7 +215,7 @@ L.Ruler = L.LayerGroup.extend({
     return tempLineDistance + lineStringDistance;
   },
 
-  calculateArea: function() {
+  calculateArea: function () {
     if (this.points.length < 2) {
       return null;
     }
@@ -225,6 +223,6 @@ L.Ruler = L.LayerGroup.extend({
     return area(polygonJson); //returns in sqaure meters
   },
 });
-L.ruler = function(options) {
+L.ruler = function (options) {
   return new L.Ruler(options);
 };

@@ -773,7 +773,7 @@ const EDUCATION_THEMES = [
         lat: 30.6338,
         lng: 30.2879,
         zoom: 10,
-        datasetId: 'AWS_L8L1C',
+        datasetId: 'AWS_LOTL1',
         layerId: '4-NDVI',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/a2b6e4-YOUR-INSTANCEID-HERE',
         toTime: '2019-08-11',
@@ -923,7 +923,7 @@ const EDUCATION_THEMES = [
         lat: 46.5134,
         lng: 8.0502,
         zoom: 12,
-        datasetId: 'AWS_L8L1C',
+        datasetId: 'AWS_LOTL1',
         layerId: '1_TRUE_COLOR',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/a2b6e4-YOUR-INSTANCEID-HERE',
         toTime: '2019-08-18',
@@ -1069,7 +1069,7 @@ const EDUCATION_THEMES = [
         lat: -15.4924,
         lng: 47.1094,
         zoom: 11,
-        datasetId: 'AWS_L8L1C',
+        datasetId: 'AWS_LOTL1',
         layerId: '1_TRUE_COLOR',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/1f6348-YOUR-INSTANCEID-HERE',
         toTime: '2017-01-18',
@@ -1084,7 +1084,7 @@ const EDUCATION_THEMES = [
         lat: -15.4924,
         lng: 47.1094,
         zoom: 11,
-        datasetId: 'AWS_L8L1C',
+        datasetId: 'AWS_LOTL1',
         layerId: '1_TRUE_COLOR',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/1f6348-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-27',
@@ -2766,11 +2766,11 @@ const EDUCATION_THEMES = [
   },
 ];
 
-const educationThemesDefaultMode = EDUCATION_THEMES.map(t => {
+const educationThemesDefaultMode = EDUCATION_THEMES.map((t) => {
   const normalModePostfix = '-NORMAL-MODE';
   const eduThemeNormalMode = { ...t, id: `${t.id}${normalModePostfix}` };
   if (t.pins) {
-    eduThemeNormalMode.pins = t.pins.map(p => ({ ...p, themeId: `${p.themeId}${normalModePostfix}` }));
+    eduThemeNormalMode.pins = t.pins.map((p) => ({ ...p, themeId: `${p.themeId}${normalModePostfix}` }));
   }
   return eduThemeNormalMode;
 });
@@ -2802,6 +2802,13 @@ export const DEFAULT_THEMES = [
       },
 
       {
+        name: 'Landsat 1-5 MSS L1',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/88c5f9-YOUR-INSTANCEID-HERE',
+        preselected: false,
+      },
+
+      {
         name: 'Landsat 4-5 TM L1',
         service: 'WMS',
         url: 'https://services.sentinel-hub.com/ogc/wms/8da429-YOUR-INSTANCEID-HERE',
@@ -2816,9 +2823,16 @@ export const DEFAULT_THEMES = [
       },
 
       {
-        name: 'Landsat 8 USGS',
+        name: 'Landsat 7 ETM+ L1',
         service: 'WMS',
-        url: 'https://services.sentinel-hub.com/ogc/wms/950dce-YOUR-INSTANCEID-HERE',
+        url: 'https://services.sentinel-hub.com/ogc/wms/74d0ab-YOUR-INSTANCEID-HERE',
+        preselected: false,
+      },
+
+      {
+        name: 'Landsat 7 ETM+ L2',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/d752a4-YOUR-INSTANCEID-HERE',
         preselected: false,
       },
 

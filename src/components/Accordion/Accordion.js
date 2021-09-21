@@ -3,15 +3,18 @@ import './Accordion.scss';
 
 export default class Accordion extends React.PureComponent {
   render() {
-    const { title, children, open, toggleOpen } = this.props;
+    const { title, children, open, toggleOpen, hidden, disabled = false } = this.props;
 
     return (
       <div className="accordion-wrap">
-        <div className={open ? 'accordion-title open' : 'accordion-title '} onClick={toggleOpen}>
+        <div
+          className={`${open ? 'accordion-title open ' : 'accordion-title '} ${disabled ? 'disabled' : ''}`}
+          onClick={!disabled ? toggleOpen : null}
+        >
           {title}
-          {open ? <i className="fa fa-chevron-up" /> : <i className="fa fa-chevron-down" />}
+          {open && !hidden ? <i className="fa fa-chevron-up" /> : <i className="fa fa-chevron-down" />}
         </div>
-        {open && <div className="accordion-content">{children}</div>}
+        {open && <div className={`accordion-content ${hidden ? 'hidden' : ''} `}>{children}</div>}
       </div>
     );
   }

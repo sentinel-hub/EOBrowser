@@ -25,7 +25,7 @@ class TerrainViewerButton extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   layerId: store.visualization.layerId,
   datasetId: store.visualization.datasetId,
   visualizationUrl: store.visualization.visualizationUrl,

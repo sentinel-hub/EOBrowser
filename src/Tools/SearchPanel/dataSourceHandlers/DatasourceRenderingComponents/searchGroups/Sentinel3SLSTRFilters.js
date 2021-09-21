@@ -46,12 +46,12 @@ class Sentinel3SLSTRFilters extends React.Component {
   }
 
   toggleAdvancedOpened = () => {
-    this.setState(oldState => ({
+    this.setState((oldState) => ({
       advancedOpened: !oldState.advancedOpened,
     }));
   };
 
-  onMaxCCChange = maxCC => {
+  onMaxCCChange = (maxCC) => {
     this.setState({
       maxCC: maxCC,
     });

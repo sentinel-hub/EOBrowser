@@ -60,7 +60,7 @@ export class Query {
   queryId = moment().format('x');
 
   prepareNewSearch(fromMoment, toMoment, bounds, filterMonths) {
-    if (!dataSourceHandlers.filter(dsh => dsh.isChecked).length) {
+    if (!dataSourceHandlers.filter((dsh) => dsh.isChecked).length) {
       return { success: false, message: t`Please select data source(s)!` };
     }
     this.searchIntervalsDates = applyFilterMonthsToDateRange(fromMoment, toMoment, filterMonths);
@@ -68,7 +68,7 @@ export class Query {
       return { success: false, message: t`Invalid time range!` };
     }
     this.searchIntervalsDates.reverse(); // we want most recent intervals first
-    this.searchIntervals = this.searchIntervalsDates.map(interval => {
+    this.searchIntervals = this.searchIntervalsDates.map((interval) => {
       return new IntervalSearchResults(interval.fromMoment, interval.toMoment, bounds);
     });
     this.currentIntervalHasMore = false;
@@ -128,8 +128,8 @@ class IntervalSearchResults {
   getFetchingFunctions(fromMoment, toMoment, bounds) {
     let fetchingFunctions = [];
     dataSourceHandlers
-      .filter(dsh => dsh.isHandlingAnyUrl())
-      .forEach(dsh => fetchingFunctions.push(...dsh.prepareNewSearch(fromMoment, toMoment, bounds)));
+      .filter((dsh) => dsh.isHandlingAnyUrl())
+      .forEach((dsh) => fetchingFunctions.push(...dsh.prepareNewSearch(fromMoment, toMoment, bounds)));
     return fetchingFunctions;
   }
 
@@ -140,8 +140,8 @@ class IntervalSearchResults {
     let tiles = [];
     for (let i = 0; i < nResults; i++) {
       // Not efficient, but there shouldn't be many fetching functions anyway
-      const shouldContinue = await Promise.all(this.fetchingFunctions.map(ff => ff.nextDate())).then(
-        dates => {
+      const shouldContinue = await Promise.all(this.fetchingFunctions.map((ff) => ff.nextDate())).then(
+        (dates) => {
           const mostRecent = Math.max(...dates);
           if (mostRecent === -Infinity) {
             this.hasMore = false;
@@ -207,7 +207,7 @@ export class FetchingFunction {
       this.datasetId,
       this.convertToStandardTiles,
       this.params,
-    ).catch(err => {
+    ).catch((err) => {
       console.error(err);
       throw new Error(`There was an issue fetching data for ${this.datasetId}`);
     });
@@ -263,8 +263,8 @@ function getTiles(
         offset,
         searchParams,
       )
-        .then(response => resolve(response))
-        .catch(e => reject(e));
+        .then((response) => resolve(response))
+        .catch((e) => reject(e));
     });
   }
   return new Promise((resolve, reject) => {
@@ -277,14 +277,14 @@ function getTiles(
     );
     searchLayer
       .findTiles(bbox, fromTime, toTime, maxCount, offset)
-      .then(response => {
+      .then((response) => {
         const tiles = convertToStandardTiles(response.tiles, datasetId);
         resolve({
           tiles,
           hasMore: response.hasMore,
         });
       })
-      .catch(e => {
+      .catch((e) => {
         reject(e);
       });
   });

@@ -13,6 +13,7 @@ import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 import { FetchingFunction } from '../search';
 import { DEM_MAPZEN, DEM_COPERNICUS_30, DEM_COPERNICUS_90 } from './dataSourceHandlers';
 import { filterLayers } from './filter';
+import { DATASOURCES } from '../../../const';
 
 export default class DEMDataSourceHandler extends DataSourceHandler {
   DATASETS = [DEM_MAPZEN, DEM_COPERNICUS_30, DEM_COPERNICUS_90];
@@ -48,15 +49,15 @@ export default class DEMDataSourceHandler extends DataSourceHandler {
   preselectedDatasets = new Set();
   searchFilters = {};
   isChecked = false;
-  datasource = 'DEM';
+  datasource = DATASOURCES.DEM;
 
   willHandle(service, url, name, layers, preselected) {
-    const demLayers = layers.filter(l => l.dataset && l.dataset.id === DATASET_AWS_DEM.id);
+    const demLayers = layers.filter((l) => l.dataset && l.dataset.id === DATASET_AWS_DEM.id);
     if (demLayers.length === 0) {
       return false;
     }
 
-    demLayers.forEach(l => {
+    demLayers.forEach((l) => {
       const dataset = l.demInstance ? this.getDatasetFromDEMInstance(l.demInstance) : DEM_MAPZEN;
       this.datasets.push(dataset);
       if (preselected) {
@@ -73,8 +74,8 @@ export default class DEMDataSourceHandler extends DataSourceHandler {
     return this.urls.length > 0;
   }
 
-  renderOptionsHelpTooltips = option => {
-    const createTooltip = content => (
+  renderOptionsHelpTooltips = (option) => {
+    const createTooltip = (content) => (
       <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
         {content}
       </HelpTooltip>
@@ -122,7 +123,7 @@ export default class DEMDataSourceHandler extends DataSourceHandler {
 
     datasets = this.searchFilters.selectedOptions;
 
-    datasets.forEach(datasetId => {
+    datasets.forEach((datasetId) => {
       // instanceId and layerId are required parameters, although we don't need them for findTiles
       const searchLayer = new DEMLayer({
         instanceId: true,
@@ -143,7 +144,7 @@ export default class DEMDataSourceHandler extends DataSourceHandler {
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map(t => ({
+    const tiles = data.map((t) => ({
       sensingTime: t.sensingTime,
       geometry: t.geometry,
       datasource: this.datasource,
@@ -159,11 +160,11 @@ export default class DEMDataSourceHandler extends DataSourceHandler {
 
   getLayers = (data, datasetId, url, layersExclude, layersInclude) => {
     let layers = data.filter(
-      layer =>
+      (layer) =>
         filterLayers(layer.layerId, layersExclude, layersInclude) &&
         this.filterLayersByDEMInstance(layer, datasetId),
     );
-    layers.forEach(l => {
+    layers.forEach((l) => {
       l.url = url;
     });
     return layers;
@@ -172,7 +173,7 @@ export default class DEMDataSourceHandler extends DataSourceHandler {
   filterLayersByDEMInstance = (layer, datasetId) =>
     this.getDatasetFromDEMInstance(layer.demInstance) === datasetId;
 
-  getSentinelHubDataset = datasetId => {
+  getSentinelHubDataset = (datasetId) => {
     switch (datasetId) {
       case DEM_MAPZEN:
       case DEM_COPERNICUS_30:
@@ -183,7 +184,7 @@ export default class DEMDataSourceHandler extends DataSourceHandler {
     }
   };
 
-  getDatasetFromDEMInstance = demInstance => {
+  getDatasetFromDEMInstance = (demInstance) => {
     switch (demInstance) {
       case DEMInstanceType.COPERNICUS_30:
         return DEM_COPERNICUS_30;
@@ -206,7 +207,7 @@ export default class DEMDataSourceHandler extends DataSourceHandler {
 
   supportsInterpolation = () => true;
 
-  static getDatasetParams = datasetId => {
+  static getDatasetParams = (datasetId) => {
     switch (datasetId) {
       case DEM_MAPZEN:
         return {

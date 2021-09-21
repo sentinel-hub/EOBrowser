@@ -4,8 +4,8 @@ import ReactDOM from 'react-dom';
 import Dropzone from 'react-dropzone';
 import Rodal from 'rodal';
 import toGeoJSON from '@mapbox/togeojson';
-import { getType } from '@turf/invariant';
-import { coordEach, featureReduce } from '@turf/meta';
+import union from '@turf/union';
+import { coordEach } from '@turf/meta';
 import JSZip from 'jszip';
 import { t } from 'ttag';
 import './EOBUploadGeoFile.scss';
@@ -27,17 +27,17 @@ export class EOBUploadGeoFile extends Component {
             throw new Error('File type not supported');
           }
           if (format === 'kmz') {
-            JSZip.loadAsync(file).then(zip => {
+            JSZip.loadAsync(file).then((zip) => {
               zip
-                .file(Object.keys(zip.files).find(f => f.includes('.kml')))
+                .file(Object.keys(zip.files).find((f) => f.includes('.kml')))
                 .async('string')
-                .then(data => {
+                .then((data) => {
                   this.parseFile(data, 'kml');
                 });
             });
           } else {
             const reader = new FileReader();
-            reader.onload = e => this.parseFile(e.target.result, format);
+            reader.onload = (e) => this.parseFile(e.target.result, format);
             reader.readAsText(file);
           }
         } catch (e) {
@@ -70,10 +70,17 @@ export class EOBUploadGeoFile extends Component {
       if (!area) {
         throw new Error('There was a problem parsing the file');
       }
-      area = this.onlyGetPolygons(area);
-      if (area.features.length === 0) {
-        throw new Error('No Polygons or MultiPolygons found');
+
+      // We will use only save Polygon/Multipolygon geometry types to the store. So here we will convert them to appropriate types
+      if (area.type === 'Feature') {
+        area = area.geometry;
+      } else if (area.type === 'FeatureCollection') {
+        area = this.convertFeaturesToMultiPolygon(area.features);
+      } else if (area.type === 'GeometryCollection') {
+        area = this.convertGeometriesToMultiPolygon(area.geometries);
       }
+      this.ensurePolygonOrMultiPolygon(area);
+      area = this.removeExtraCoordDimensions(area);
 
       this.props.onUpload(area);
     } catch (e) {
@@ -81,33 +88,38 @@ export class EOBUploadGeoFile extends Component {
     }
   };
 
-  flattenCoordsTo2D = feature => {
-    coordEach(feature, (coord, index) => {
+  ensurePolygonOrMultiPolygon = (geometry) => {
+    if (geometry.type !== 'Polygon' && geometry.type !== 'MultiPolygon') {
+      throw new Error('Unsupported GeoJSON geometry type! Only Polygon and MultiPolygon are supported.');
+    }
+  };
+
+  convertFeaturesToMultiPolygon = (features) => {
+    const geometries = features.map((feature) => {
+      this.ensurePolygonOrMultiPolygon(feature.geometry);
+      return feature.geometry;
+    });
+    return this.convertGeometriesToMultiPolygon(geometries);
+  };
+
+  convertGeometriesToMultiPolygon = (geometries) => {
+    let multipolygon = geometries[0];
+    for (let i = 1; i < geometries.length; i++) {
+      multipolygon = union(multipolygon, geometries[i]).geometry;
+    }
+    return multipolygon;
+  };
+
+  removeExtraCoordDimensions = (geometry) => {
+    coordEach(geometry, (coord, index) => {
       if (coord.length > 2) {
-        feature.geometry.coordinates[0][index] = [coord[0], coord[1]];
+        geometry.coordinates[0][index] = [coord[0], coord[1]];
       }
     });
-    return feature;
+    return geometry;
   };
 
-  onlyGetPolygons = geojson => {
-    return featureReduce(
-      geojson,
-      (previousValue, currentFeature) => {
-        if (getType(currentFeature) === 'Polygon' || getType(currentFeature) === 'MultiPolygon') {
-          previousValue.features.push(this.flattenCoordsTo2D(currentFeature));
-        }
-        return previousValue;
-      },
-      { type: 'FeatureCollection', features: [] },
-    );
-  };
-
-  getFileExtension = filename =>
-    filename
-      .toLowerCase()
-      .split('.')
-      .pop();
+  getFileExtension = (filename) => filename.toLowerCase().split('.').pop();
 
   render() {
     const fileUploadTitle = t`File upload`;

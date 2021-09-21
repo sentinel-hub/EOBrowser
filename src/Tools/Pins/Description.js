@@ -11,26 +11,26 @@ class Description extends React.Component {
     newContent: this.props.content,
   };
 
-  handleContentChange = e => {
+  handleContentChange = (e) => {
     e.stopPropagation();
     this.setState({
       newContent: e.target.value ? e.target.value : '',
     });
   };
 
-  handleContentChangeConfirm = e => {
+  handleContentChangeConfirm = (e) => {
     e.stopPropagation();
     this.props.onDescriptionConfirm(this.state.newContent);
     this.toggleEditing();
   };
 
-  handleContentChangeCancel = e => {
+  handleContentChangeCancel = (e) => {
     e.stopPropagation();
     this.toggleEditing();
   };
 
   toggleEditing = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       editing: !prevState.editing,
       newContent: this.props.content,
     }));
@@ -51,7 +51,7 @@ class Description extends React.Component {
             escapeHtml={true}
             source={content || ''}
             renderers={{
-              link: props => <ExternalLink href={props.href}>{props.children}</ExternalLink>,
+              link: (props) => <ExternalLink href={props.href}>{props.children}</ExternalLink>,
             }}
           />
         )}

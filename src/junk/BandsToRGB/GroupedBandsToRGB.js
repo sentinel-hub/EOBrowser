@@ -10,7 +10,7 @@ export class GroupedBandsToRGB extends React.Component {
   static defaultProps = {
     groupedBands: undefined,
     value: undefined,
-    onChange: value => {},
+    onChange: (value) => {},
   };
 
   componentDidMount() {
@@ -19,12 +19,12 @@ export class GroupedBandsToRGB extends React.Component {
       // is difficult to figure out where this happens and why, we go in defensive mode - we simply detect
       // such condition here and trigger onChange() as if the first possible group was selected:
       const { groupedBands } = this.props;
-      const nonEmptyGroupsIds = Object.keys(groupedBands).filter(g => groupedBands[g].length > 0);
+      const nonEmptyGroupsIds = Object.keys(groupedBands).filter((g) => groupedBands[g].length > 0);
       this.changeSelectedGroup(nonEmptyGroupsIds[0]);
     }
   }
 
-  changeSelectedGroup = selectedGroupId => {
+  changeSelectedGroup = (selectedGroupId) => {
     // we don't actually change the selected group per se (because this component is controlled), instead we
     // change the value (by calling onChange) so that when we render, this group is selected:
     const { groupedBands } = this.props;
@@ -41,8 +41,8 @@ export class GroupedBandsToRGB extends React.Component {
     // we guess the selected group from the first band in value (we check which group it belongs to), and assume
     // that other bands belong to the same group:
     const { groupedBands, value } = this.props;
-    const selectedGroupId = Object.keys(groupedBands).find(g =>
-      groupedBands[g].find(b => b.name === value.r),
+    const selectedGroupId = Object.keys(groupedBands).find((g) =>
+      groupedBands[g].find((b) => b.name === value.r),
     );
     return selectedGroupId;
   };
@@ -54,7 +54,7 @@ export class GroupedBandsToRGB extends React.Component {
       return false;
     }
     for (let channel of ['r', 'g', 'b']) {
-      if (!groupedBands[selectedGroupId].find(b => b.name === value[channel])) {
+      if (!groupedBands[selectedGroupId].find((b) => b.name === value[channel])) {
         return false;
       }
     }
@@ -68,12 +68,12 @@ export class GroupedBandsToRGB extends React.Component {
 
     const { groupedBands, value, onChange } = this.props;
     const groupsIds = Object.keys(groupedBands);
-    const nonEmptyGroupsIds = groupsIds.filter(g => groupedBands[g].length > 0);
+    const nonEmptyGroupsIds = groupsIds.filter((g) => groupedBands[g].length > 0);
     const selectedGroupId = this.getSelectedGroupId();
 
     return (
       <div className="grouped-bands-to-rgb">
-        {nonEmptyGroupsIds.map(g => (
+        {nonEmptyGroupsIds.map((g) => (
           <button
             key={g}
             className={`group-tab ${selectedGroupId === g ? 'selected' : ''}`}

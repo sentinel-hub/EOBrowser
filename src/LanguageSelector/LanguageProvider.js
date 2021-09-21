@@ -16,7 +16,7 @@ class LanguageProvider extends React.Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   selectedLanguage: store.language.selectedLanguage,
 });
 

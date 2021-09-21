@@ -1,5 +1,5 @@
 import { configureStore, combineReducers, createSlice, getDefaultMiddleware } from '@reduxjs/toolkit';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import {
   MODES,
@@ -8,6 +8,7 @@ import {
   URL_THEMES_LIST,
   EDUCATION_MODE,
   DEFAULT_LAT_LNG,
+  SEARCH_PANEL_TABS,
 } from './const';
 
 export const aoiSlice = createSlice({
@@ -19,10 +20,19 @@ export const aoiSlice = createSlice({
       state.bounds = action.payload.bounds;
       state.lastEdited = new Date().toISOString();
     },
-    reset: state => {
+    reset: (state) => {
       state.geometry = null;
       state.bounds = null;
       state.lastEdited = new Date().toISOString();
+      state.isDrawing = false;
+      state.shape = null;
+    },
+    startDrawing: (state, action) => {
+      state.isDrawing = action.payload.isDrawing;
+      state.shape = action.payload.shape;
+    },
+    clearMap: (state, action) => {
+      state.clearMap = action.payload;
     },
   },
 });
@@ -36,7 +46,7 @@ export const poiSlice = createSlice({
       state.geometry = action.payload.geometry;
       state.lastEdited = new Date().toISOString();
     },
-    reset: state => {
+    reset: (state) => {
       state.position = null;
       state.geometry = null;
       state.lastEdited = new Date().toISOString();
@@ -167,7 +177,7 @@ export const themesSlice = createSlice({
     },
     setSelectedModeIdAndDefaultTheme: (state, action) => {
       state.selectedModeId = action.payload;
-      const modeThemes = MODES.find(mode => mode.id === state.selectedModeId).themes;
+      const modeThemes = MODES.find((mode) => mode.id === state.selectedModeId).themes;
       state.themesLists[MODE_THEMES_LIST] = modeThemes;
 
       if (state.selectedModeId === EDUCATION_MODE.id) {
@@ -207,15 +217,15 @@ export const themesSlice = createSlice({
         state.selectedThemeId = selectedThemeId;
         state.selectedThemesListId = selectedThemesListId;
       } else {
-        if (state.themesLists[USER_INSTANCES_THEMES_LIST].find(t => t.id === selectedThemeId)) {
+        if (state.themesLists[USER_INSTANCES_THEMES_LIST].find((t) => t.id === selectedThemeId)) {
           state.selectedThemesListId = USER_INSTANCES_THEMES_LIST;
           state.selectedThemeId = selectedThemeId;
         } else {
           const isThemeInUrlThemesList = !!state.themesLists[URL_THEMES_LIST].find(
-            t => t.id === selectedThemeId,
+            (t) => t.id === selectedThemeId,
           );
           const isThemeInModeThemesList = !!state.themesLists[MODE_THEMES_LIST].find(
-            t => t.id === selectedThemeId,
+            (t) => t.id === selectedThemeId,
           );
           const isEducationMode = state.selectedModeId === EDUCATION_MODE.id;
 
@@ -244,7 +254,7 @@ export const themesSlice = createSlice({
     setSelectedThemeIdAndModeId: (state, action) => {
       const { selectedThemeId, selectedModeId, selectedThemesListId } = action.payload;
       state.selectedThemeId = selectedThemeId;
-      const modeThemes = MODES.find(mode => mode.id === selectedModeId).themes;
+      const modeThemes = MODES.find((mode) => mode.id === selectedModeId).themes;
       state.themesLists[MODE_THEMES_LIST] = modeThemes;
       state.selectedModeId = selectedModeId;
       state.selectedThemesListId = selectedThemesListId;
@@ -293,6 +303,8 @@ export const visualizationSlice = createSlice({
     minQa: undefined,
     upsampling: undefined,
     downsampling: undefined,
+    speckleFilter: undefined,
+    orthorectification: undefined,
     error: undefined,
   },
   reducers: {
@@ -370,6 +382,12 @@ export const visualizationSlice = createSlice({
     setDownsampling: (state, action) => {
       state.downsampling = action.payload;
     },
+    setSpeckleFilter: (state, action) => {
+      state.speckleFilter = action.payload;
+    },
+    setOrthorectification: (state, action) => {
+      state.orthorectification = action.payload;
+    },
     setEffects: (state, action) => {
       if (action.payload.gainEffect !== undefined) {
         state.gainEffect = action.payload.gainEffect;
@@ -404,11 +422,17 @@ export const visualizationSlice = createSlice({
       if (action.payload.downsampling !== undefined) {
         state.downsampling = action.payload.downsampling;
       }
+      if (action.payload.speckleFilter !== undefined) {
+        state.speckleFilter = action.payload.speckleFilter;
+      }
+      if (action.payload.orthorectification !== undefined) {
+        state.orthorectification = action.payload.orthorectification;
+      }
     },
     setError: (state, action) => {
       state.error = action.payload;
     },
-    resetEffects: state => {
+    resetEffects: (state) => {
       state.gainEffect = 1;
       state.gammaEffect = 1;
       state.redRangeEffect = [0, 1];
@@ -420,8 +444,10 @@ export const visualizationSlice = createSlice({
       state.minQa = undefined;
       state.upsampling = undefined;
       state.downsampling = undefined;
+      state.speckleFilter = undefined;
+      state.orthorectification = undefined;
     },
-    resetRgbEffects: state => {
+    resetRgbEffects: (state) => {
       state.redRangeEffect = [0, 1];
       state.greenRangeEffect = [0, 1];
       state.blueRangeEffect = [0, 1];
@@ -494,8 +520,14 @@ export const visualizationSlice = createSlice({
       if (action.payload.downsampling !== undefined) {
         state.downsampling = action.payload.downsampling;
       }
+      if (action.payload.speckleFilter !== undefined) {
+        state.speckleFilter = action.payload.speckleFilter;
+      }
+      if (action.payload.orthorectification !== undefined) {
+        state.orthorectification = action.payload.orthorectification;
+      }
     },
-    reset: state => {
+    reset: (state) => {
       state.fromTime = undefined;
       state.toTime = undefined;
       state.datasetId = undefined;
@@ -517,6 +549,8 @@ export const visualizationSlice = createSlice({
       state.minQa = undefined;
       state.upsampling = undefined;
       state.downsampling = undefined;
+      state.speckleFilter = undefined;
+      state.orthorectification = undefined;
     },
   },
 });
@@ -525,10 +559,15 @@ export const tabsSlice = createSlice({
   name: 'tabs',
   initialState: {
     selectedTabIndex: 0,
+    selectedTabSearchPanelIndex: SEARCH_PANEL_TABS.SEARCH_TAB,
   },
   reducers: {
     setTabIndex: (state, action) => {
       state.selectedTabIndex = action.payload;
+    },
+
+    setSelectedTabSearchPanelIndex: (state, action) => {
+      state.selectedTabSearchPanelIndex = action.payload;
     },
   },
 });
@@ -555,7 +594,7 @@ export const compareLayersSlice = createSlice({
       state.comparedClipping = new Array(action.payload.length).fill([0, 1]);
     },
     addComparedLayers: (state, action) => {
-      const layers = action.payload.map(l => ({ id: uuid(), ...l }));
+      const layers = action.payload.map((l) => ({ id: uuid(), ...l }));
       state.comparedLayers = [...layers, ...state.comparedLayers];
       state.comparedOpacity = [...new Array(action.payload.length).fill(1.0), ...state.comparedOpacity];
       state.comparedClipping = [...new Array(action.payload.length).fill([0, 1]), ...state.comparedClipping];
@@ -651,9 +690,9 @@ export const pinsSlice = createSlice({
       const { pins, pinType } = action.payload;
       state.items = [
         // remove any existing pin items of this type:
-        ...state.items.filter(item => item.type !== pinType),
+        ...state.items.filter((item) => item.type !== pinType),
         // add the pin items for each of the pins:
-        ...pins.map(pin => ({
+        ...pins.map((pin) => ({
           type: pinType,
           item: pin, // misnomer - instead of "item" it should be "pin"
           opacity: 1.0,
@@ -663,7 +702,7 @@ export const pinsSlice = createSlice({
     },
     clearByType: (state, action) => {
       const pinType = action.payload;
-      state.items = state.items.filter(item => item.type !== pinType);
+      state.items = state.items.filter((item) => item.type !== pinType);
     },
     removeItem: (state, action) => {
       const index = action.payload;
@@ -680,7 +719,7 @@ export const timelapseSlice = createSlice({
     displayTimelapseAreaPreview: false,
   },
   reducers: {
-    toggleTimelapseAreaPreview: state => {
+    toggleTimelapseAreaPreview: (state) => {
       state.displayTimelapseAreaPreview = !state.displayTimelapseAreaPreview;
     },
     setTimelapseAreaPreview: (state, action) => {
@@ -720,6 +759,42 @@ export const terrainViewerSlice = createSlice({
   },
 });
 
+export const commercialDataSlice = createSlice({
+  name: 'commercialData',
+  initialState: {
+    searchResults: [],
+    displaySearchResults: false,
+    location: null,
+    highlightedResult: null,
+    selectedOrder: null,
+  },
+  reducers: {
+    setSearchResults: (state, action) => {
+      state.searchResults = action.payload;
+      state.displaySearchResults = action.payload.length > 0;
+    },
+    setLocation: (state, action) => {
+      state.location = action.payload;
+    },
+    setHighlightedResult: (state, action) => {
+      state.highlightedResult = action.payload;
+    },
+    setDisplaySearchResults: (state, action) => {
+      state.displaySearchResults = action.payload;
+    },
+    setSelectedOrder: (state, action) => {
+      state.selectedOrder = action.payload;
+    },
+    reset: (state, action) => {
+      state.highlightedResult = null;
+      state.searchResults = [];
+      state.location = null;
+      state.displaySearchResults = false;
+      state.selectedOrder = null;
+    },
+  },
+});
+
 const reducers = combineReducers({
   aoi: aoiSlice.reducer,
   poi: poiSlice.reducer,
@@ -737,6 +812,7 @@ const reducers = combineReducers({
   timelapse: timelapseSlice.reducer,
   index: indexSlice.reducer,
   terrainViewer: terrainViewerSlice.reducer,
+  commercialData: commercialDataSlice.reducer,
 });
 
 const store = configureStore({

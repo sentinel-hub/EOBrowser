@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import cloneDeep from 'lodash.clonedeep';
 import dragula from 'react-dragula';
 import moment from 'moment';
+import distance from '@turf/distance';
 import React, { Component } from 'react';
 import { t, ngettext, msgid } from 'ttag';
 
@@ -24,6 +25,7 @@ import store, {
 
 import { getDataSourceHandler } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import {
+  formatDeprecatedPins,
   getPinsFromServer,
   getPinsFromSessionStorage,
   removePinsFromServer,
@@ -56,12 +58,17 @@ class PinPanel extends Component {
     sharePins: false,
     updatingPins: false,
     updatingPinsError: null,
+    isOrderAscendingDate: false,
+    isOrderAscendingLocation: false,
+    isOrderAZDatasetId: false,
+    isOrderAZTitle: false,
+    activeOrdering: null,
   };
 
   componentDidMount() {
     if (this.props.user) {
       this.fetchUserPins()
-        .then(pins => {
+        .then((pins) => {
           this.setPinsInArray(pins, SAVED_PINS);
           this.setState({
             operation: null,
@@ -78,7 +85,7 @@ class PinPanel extends Component {
     }
   }
 
-  deleteUserPins = async pinIds => {
+  deleteUserPins = async (pinIds) => {
     this.setState({
       updatingPins: true,
       updatingPinsError: null,
@@ -104,7 +111,8 @@ class PinPanel extends Component {
     });
     try {
       const pins = await getPinsFromServer();
-      return pins;
+      const formattedPins = formatDeprecatedPins(pins);
+      return formattedPins;
     } catch (e) {
       this.setState({
         updatingPinsError: e.message,
@@ -117,7 +125,7 @@ class PinPanel extends Component {
     }
   };
 
-  saveLocalUserPins = async pins => {
+  saveLocalUserPins = async (pins) => {
     this.setState({
       updatingPins: true,
       updatingPinsError: null,
@@ -158,19 +166,36 @@ class PinPanel extends Component {
   };
 
   componentDidUpdate(prevProps) {
+    let prevPinsIds = prevProps.pinItems.map((pin) => pin.item._id).sort((a, b) => a.localeCompare(b));
+    let currentPinsIds = this.props.pinItems.map((pin) => pin.item._id).sort((a, b) => a.localeCompare(b));
+
+    let prevPinsTitles = prevProps.pinItems.map((pin) => pin.item.title).sort((a, b) => a.localeCompare(b));
+    let currentPinsTitles = this.props.pinItems
+      .map((pin) => pin.item.title)
+      .sort((a, b) => a.localeCompare(b));
+
+    // (If ids have changed) or (if titles have changed and is ordered by title)
+    if (
+      !prevPinsIds.every((pinId, idx) => pinId === currentPinsIds[idx]) ||
+      (!prevPinsTitles.every((pinTitle, idx) => pinTitle === currentPinsTitles[idx]) &&
+        this.state.activeOrdering === 'title')
+    ) {
+      this.setState({ activeOrdering: null });
+    }
+
     if (prevProps.user !== this.props.user) {
       if (!this.props.user) {
         this.removePinsFromArray(SAVED_PINS);
         this.cancelSharePins();
       } else {
         // user logged in
-        if (this.props.pinItems.filter(p => p.type === UNSAVED_PINS).length) {
+        if (this.props.pinItems.filter((p) => p.type === UNSAVED_PINS).length) {
           let pins = getPinsFromSessionStorage();
           if (!pins.length) {
             return;
           }
           this.saveLocalUserPins(pins)
-            .then(pins => {
+            .then((pins) => {
               sessionStorage.setItem(PINS_LC_NAME, JSON.stringify([]));
               this.removePinsFromArray(UNSAVED_PINS);
               this.setPinsInArray(pins.pins, SAVED_PINS);
@@ -178,7 +203,7 @@ class PinPanel extends Component {
             .catch(() => {});
         } else {
           this.fetchUserPins()
-            .then(pins => this.setPinsInArray(pins, SAVED_PINS))
+            .then((pins) => this.setPinsInArray(pins, SAVED_PINS))
             .catch(() => {});
         }
       }
@@ -187,7 +212,7 @@ class PinPanel extends Component {
     if (prevProps.lastAddedPin !== this.props.lastAddedPin) {
       if (this.props.user) {
         this.fetchUserPins()
-          .then(pins => this.setPinsInArray(pins, SAVED_PINS))
+          .then((pins) => this.setPinsInArray(pins, SAVED_PINS))
           .catch(() => {});
       } else {
         let pins = getPinsFromSessionStorage();
@@ -196,7 +221,7 @@ class PinPanel extends Component {
     }
   }
 
-  removePinsFromArray = pinType => {
+  removePinsFromArray = (pinType) => {
     store.dispatch(pinsSlice.actions.clearByType(pinType));
   };
 
@@ -209,7 +234,7 @@ class PinPanel extends Component {
     );
   };
 
-  dragulaDecorator = componentBackingInstance => {
+  dragulaDecorator = (componentBackingInstance) => {
     if (componentBackingInstance) {
       const drake = dragula([componentBackingInstance], {
         moves: (el, container, handle) => {
@@ -217,7 +242,7 @@ class PinPanel extends Component {
             return true;
           }
         },
-        accepts: function(el, target, source, sibling) {
+        accepts: function (el, target, source, sibling) {
           if (!sibling) {
             return false;
           }
@@ -239,7 +264,9 @@ class PinPanel extends Component {
     pinItems.splice(oldIndex, 1); // remove pinItem from the old place
     pinItems.splice(newIndex, 0, pinItem); // add it elsewhere
 
-    const pins = pinItems.filter(p => p.type === pinItem.type).map(p => p.item);
+    this.setState({ activeOrdering: null }); // manually changing the pin order
+
+    const pins = pinItems.filter((p) => p.type === pinItem.type).map((p) => p.item);
     if (pinItem.type === UNSAVED_PINS) {
       savePinsToSessionStorage(pins, true);
     }
@@ -250,7 +277,7 @@ class PinPanel extends Component {
     }
   };
 
-  onRemovePin = index => {
+  onRemovePin = (index) => {
     const confirmation = window.confirm(t`WARNING: You're about to delete a pin. Do you wish to continue?`);
     if (!confirmation) {
       return;
@@ -262,7 +289,7 @@ class PinPanel extends Component {
       if (!pins.length) {
         return;
       }
-      pins = pins.filter(p => p._id !== pin._id);
+      pins = pins.filter((p) => p._id !== pin._id);
       sessionStorage.setItem(PINS_LC_NAME, JSON.stringify(pins));
       store.dispatch(pinsSlice.actions.removeItem(index));
       this.props.setLastAddedPin(null);
@@ -292,8 +319,8 @@ class PinPanel extends Component {
 
     if (this.props.user) {
       const pinIds = this.props.pinItems
-        .filter(p => p.type === SAVED_PINS && !!p.item._id)
-        .map(p => p.item._id);
+        .filter((p) => p.type === SAVED_PINS && !!p.item._id)
+        .map((p) => p.item._id);
 
       if (pinIds.length) {
         this.deleteUserPins(pinIds)
@@ -326,6 +353,8 @@ class PinPanel extends Component {
       minQa,
       upsampling,
       downsampling,
+      speckleFilter,
+      orthorectification,
       terrainViewerSettings,
     } = pin;
 
@@ -343,11 +372,14 @@ class PinPanel extends Component {
       return;
     }
 
-    const modeFromPinThemeId = MODES.find(m => m.themes.find(t => t.id === themeId));
+    const modeFromPinThemeId = MODES.find((m) => m.themes.find((t) => t.id === themeId));
     let selectedModeId = this.props.selectedModeId;
     let selectedThemesListId = this.props.selectedThemesListId;
 
-    if (this.props.urlThemesList.find(t => t.id === themeId) && this.props.selectedModeId !== DEFAULT_MODE) {
+    if (
+      this.props.urlThemesList.find((t) => t.id === themeId) &&
+      this.props.selectedModeId !== DEFAULT_MODE
+    ) {
       // themeId is one of the url themes, we set the default mode if not set
       selectedModeId = DEFAULT_MODE.id;
       selectedThemesListId = URL_THEMES_LIST;
@@ -355,12 +387,12 @@ class PinPanel extends Component {
       // themeId is in one of the modes themes and we set the mode if it's other than currently selected
       selectedModeId = modeFromPinThemeId.id;
       selectedThemesListId = MODE_THEMES_LIST;
-    } else if (this.props.userInstancesThemesList.find(t => t.id === themeId)) {
+    } else if (this.props.userInstancesThemesList.find((t) => t.id === themeId)) {
       // themeId is in a user instance, we keep the current mode.
       selectedThemesListId = USER_INSTANCES_THEMES_LIST;
     } else if (
       selectedThemesListId !== MODE_THEMES_LIST &&
-      this.props.modeThemesList.find(t => t.id === themeId)
+      this.props.modeThemesList.find((t) => t.id === themeId)
     ) {
       // Check mode themes when theme is not found in userInstancesThemesList or urlThemesList
       // and change selectedThemesListId accordingly
@@ -424,6 +456,12 @@ class PinPanel extends Component {
     if (downsampling) {
       visualizationParams.downsampling = downsampling;
     }
+    if (speckleFilter) {
+      visualizationParams.speckleFilter = speckleFilter;
+    }
+    if (orthorectification) {
+      visualizationParams.orthorectification = orthorectification;
+    }
 
     store.dispatch(visualizationSlice.actions.setVisualizationParams(visualizationParams));
     this.props.setSelectedPin(this.props.item);
@@ -435,9 +473,9 @@ class PinPanel extends Component {
     }
   };
 
-  onTogglePinForSelection = pinForSharing => {
+  onTogglePinForSelection = (pinForSharing) => {
     //check if pin is already in list of pins for sharing
-    const isPinSelected = this.state.selectedPins.find(pin => pin === pinForSharing);
+    const isPinSelected = this.state.selectedPins.find((pin) => pin === pinForSharing);
 
     //if pin is not already selected, add it to the list. Otherwise remove it from the list
     if (!isPinSelected) {
@@ -446,7 +484,7 @@ class PinPanel extends Component {
       });
     } else {
       this.setState({
-        selectedPins: [...this.state.selectedPins.filter(pin => pin !== pinForSharing)],
+        selectedPins: [...this.state.selectedPins.filter((pin) => pin !== pinForSharing)],
       });
     }
   };
@@ -456,7 +494,7 @@ class PinPanel extends Component {
     pinItems[index].item[key] = value;
 
     const pinType = pinItems[index].type;
-    const pins = pinItems.filter(p => p.type === pinType).map(p => p.item);
+    const pins = pinItems.filter((p) => p.type === pinType).map((p) => p.item);
 
     if (pinType === UNSAVED_PINS) {
       savePinsToSessionStorage(pins, true);
@@ -470,7 +508,7 @@ class PinPanel extends Component {
   };
 
   cancelSharePins = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       operation: prevState.operation === OPERATION_SHARE ? null : prevState.operation,
       selectedPins: [],
     }));
@@ -492,9 +530,9 @@ class PinPanel extends Component {
     }
 
     const { pinItems } = this.props;
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       operation: prevState.operation === OPERATION_SHARE ? null : OPERATION_SHARE,
-      selectedPins: prevState.operation === OPERATION_SHARE ? [] : pinItems.map(pin => pin.item),
+      selectedPins: prevState.operation === OPERATION_SHARE ? [] : pinItems.map((pin) => pin.item),
     }));
   };
 
@@ -533,18 +571,109 @@ class PinPanel extends Component {
     );
   };
 
-  toggleSelectAllPins = areAllPinsSelected => {
+  toggleSelectAllPins = (areAllPinsSelected) => {
     if (areAllPinsSelected) {
       this.setState({
         selectedPins: [],
       });
     } else {
       const { pinItems } = this.props;
-      const allPins = pinItems.map(pin => pin.item);
+      const allPins = pinItems.map((pin) => pin.item);
       this.setState({
         selectedPins: [...allPins],
       });
     }
+  };
+
+  calculateGeoLocationDistance = (pinLat, pinLng) => {
+    const { currentMapLat, currentMapLng } = this.props;
+    const from = {
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [currentMapLng, currentMapLat] },
+    };
+    const to = {
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [pinLng, pinLat] },
+    };
+    const options = { units: 'kilometers' };
+    return distance(from, to, options);
+  };
+
+  compareByDate = (a, b) => {
+    return new Date(a.item.toTime) - new Date(b.item.toTime);
+  };
+
+  compareByLocation = (a, b) => {
+    const distanceToA = this.calculateGeoLocationDistance(a.item.lat, a.item.lng);
+    const distanceToB = this.calculateGeoLocationDistance(b.item.lat, b.item.lng);
+
+    return distanceToA - distanceToB;
+  };
+
+  compareByDatasetId = (a, b) => {
+    return a.item.datasetId.localeCompare(b.item.datasetId);
+  };
+
+  compareByTitle = (a, b) => {
+    return a.item.title.toLowerCase().localeCompare(b.item.title.toLowerCase());
+  };
+
+  orderPins = (compareFunction, shouldOrderBeAscending) => {
+    const { pinItems } = this.props;
+    let orderedPinItems = pinItems.slice().sort((a, b) => a.item._id.localeCompare(b.item._id));
+    orderedPinItems.sort(compareFunction);
+
+    if (!shouldOrderBeAscending) {
+      orderedPinItems.reverse();
+    }
+
+    store.dispatch(pinsSlice.actions.updateItems(orderedPinItems));
+  };
+
+  handleOrderPins = (activeOrdering) => {
+    this.setState(
+      (prevState) => {
+        switch (activeOrdering) {
+          case 'date':
+            return { isOrderAscendingDate: !prevState.isOrderAscendingDate, activeOrdering: activeOrdering };
+          case 'location':
+            return {
+              isOrderAscendingLocation: !prevState.isOrderAscendingLocation,
+              activeOrdering: activeOrdering,
+            };
+          case 'datasetId':
+            return { isOrderAZDatasetId: !prevState.isOrderAZDatasetId, activeOrdering: activeOrdering };
+          case 'title':
+            return { isOrderAZTitle: !prevState.isOrderAZTitle, activeOrdering: activeOrdering };
+          default:
+            return {
+              isOrderAscendingDate: false,
+              isOrderAscendingLocation: false,
+              isOrderAZDatasetId: false,
+              isOrderAZTitle: false,
+              activeOrdering: activeOrdering,
+            };
+        }
+      },
+      () => {
+        switch (this.state.activeOrdering) {
+          case 'date':
+            this.orderPins(this.compareByDate, this.state.isOrderAscendingDate);
+            break;
+          case 'location':
+            this.orderPins(this.compareByLocation, this.state.isOrderAscendingLocation);
+            break;
+          case 'datasetId':
+            this.orderPins(this.compareByDatasetId, this.state.isOrderAZDatasetId);
+            break;
+          case 'title':
+            this.orderPins(this.compareByTitle, this.state.isOrderAZTitle);
+            break;
+          default:
+            break;
+        }
+      },
+    );
   };
 
   render() {
@@ -556,13 +685,12 @@ class PinPanel extends Component {
     const loggedIn = this.props.user ? true : false;
     const noPinMsg = t`No pins. Go to the Visualize tab to save a pin or upload a JSON file with saved pins.`;
     const NOT_LOGGED_IN_AND_TEMP_PIN_MSG = t`Note that the pins will be saved only if you log in. Otherwise, the pins will be lost once the application is closed.`;
-
     return (
       <div className="pin-panel">
         <div className="pins-header">
           <div className="pins-controls">
             <PinTools
-              pins={pinItems.map(p => p.item)}
+              pins={pinItems.map((p) => p.item)}
               setLastAddedPin={this.props.setLastAddedPin}
               onDeleteAllPins={this.onRemoveAllPins}
               isUserLoggedIn={loggedIn}
@@ -579,7 +707,41 @@ class PinPanel extends Component {
             </div>
           )}
         </div>
-
+        <div className="pins-order">
+          <div>{t`Order by:`}</div>
+          <div
+            className={`order-btn ${this.state.activeOrdering === 'date' ? 'active-ordering' : ''}`}
+            onClick={() => this.handleOrderPins('date')}
+          >
+            {t`Date`}
+            <i
+              className={`fas fa-chevron-up ${this.state.isOrderAscendingDate ? '' : 'turn-upside-down'}`}
+            ></i>
+          </div>
+          <div
+            className={`order-btn ${this.state.activeOrdering === 'location' ? 'active-ordering' : ''}`}
+            onClick={() => this.handleOrderPins('location')}
+          >
+            {t`Location`}
+            <i
+              className={`fas fa-chevron-up ${this.state.isOrderAscendingLocation ? '' : 'turn-upside-down'}`}
+            ></i>
+          </div>
+          <div
+            className={`order-btn ${this.state.activeOrdering === 'datasetId' ? 'active-ordering' : ''}`}
+            onClick={() => this.handleOrderPins('datasetId')}
+          >
+            {t`DatasetId`}
+            <i className={`fas fa-chevron-up ${this.state.isOrderAZDatasetId ? '' : 'turn-upside-down'}`}></i>
+          </div>
+          <div
+            className={`order-btn ${this.state.activeOrdering === 'title' ? 'active-ordering' : ''}`}
+            onClick={() => this.handleOrderPins('title')}
+          >
+            {t`Title`}
+            <i className={`fas fa-chevron-up ${this.state.isOrderAZTitle ? '' : 'turn-upside-down'}`}></i>
+          </div>
+        </div>
         <div className="pins-container" key={this.props.lastAddedPin} ref={this.dragulaDecorator}>
           <UpdatingStatus updatingPins={updatingPins} updatingPinsError={updatingPinsError} />
           {pinItems.map((pin, index) => (
@@ -599,7 +761,7 @@ class PinPanel extends Component {
                   ? this.onTogglePinForSelection(pin.item)
                   : this.onPinSelect(pin.item, arePinsSelectable)
               }
-              selectedForSharing={!!selectedPins.find(sharedPin => sharedPin === pin.item)}
+              selectedForSharing={!!selectedPins.find((sharedPin) => sharedPin === pin.item)}
             />
           ))}
           {/* no pins found and not logged in notification banner */}
@@ -632,7 +794,7 @@ class PinPanel extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   user: store.auth.user.userdata,
   access_token: store.auth.user.access_token,
   bounds: store.mainMap.bounds,
@@ -645,6 +807,8 @@ const mapStoreToProps = store => ({
   userInstancesThemesList: store.themes.themesLists[USER_INSTANCES_THEMES_LIST],
   pinItems: store.pins.items,
   selectedLanguage: store.language.selectedLanguage,
+  currentMapLat: store.mainMap.lat,
+  currentMapLng: store.mainMap.lng,
 });
 
 export default connect(mapStoreToProps, null)(PinPanel);

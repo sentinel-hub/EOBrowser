@@ -69,18 +69,18 @@ export default class CurveEditor extends React.Component {
   }
 
   addEventHandlersToCanvas() {
-    this.scope.view.onClick = event => {
+    this.scope.view.onClick = (event) => {
       this.scope.activate();
       this.interactivePointsLayer.activate();
 
       const curvePoints = this.interactivePointsLayer
         .getItems({
-          match: p => p.name && p.name.includes('curvePoint'),
+          match: (p) => p.name && p.name.includes('curvePoint'),
         })
         .sort((a, b) => a.position.x - b.position.x);
 
       const DELTA = 30;
-      const tooClosePoint = curvePoints.find(p => Math.abs(p.position.x - event.point.x) <= DELTA);
+      const tooClosePoint = curvePoints.find((p) => Math.abs(p.position.x - event.point.x) <= DELTA);
 
       if (tooClosePoint) {
         tooClosePoint.position = event.point;
@@ -134,16 +134,16 @@ export default class CurveEditor extends React.Component {
     point.onMouseEnter = () => this.scope.view.element.classList.add('on-point');
     point.onMouseLeave = () => this.scope.view.element.classList.remove('on-point');
 
-    point.onMouseDrag = event => {
+    point.onMouseDrag = (event) => {
       point.position.x = capToRange(event.point.x, 0, this.props.canvasSize);
       point.position.y = capToRange(event.point.y, 0, this.props.canvasSize);
 
       const curvePoints = this.interactivePointsLayer
-        .getItems({ match: p => p.name && p.name.includes('curvePoint') && p.id !== point.id })
+        .getItems({ match: (p) => p.name && p.name.includes('curvePoint') && p.id !== point.id })
         .sort((a, b) => a.position.x - b.position.x);
 
       const DELTA = 10;
-      const tooClosePoint = curvePoints.find(p => Math.abs(p.position.x - point.position.x) <= DELTA);
+      const tooClosePoint = curvePoints.find((p) => Math.abs(p.position.x - point.position.x) <= DELTA);
 
       if (tooClosePoint) {
         point.remove();
@@ -177,7 +177,7 @@ export default class CurveEditor extends React.Component {
     this.interactivePointsLayer.activate();
     this.interactivePointsLayer.removeChildren();
 
-    this.props.effect.points.forEach(p => {
+    this.props.effect.points.forEach((p) => {
       const x = (p.x * this.props.canvasSize) / this.props.maxColorValue;
       const y = this.props.canvasSize - (p.y * this.props.canvasSize) / this.props.maxColorValue;
       this.renderPoint(new paper.Point(x, y));
@@ -190,11 +190,11 @@ export default class CurveEditor extends React.Component {
     this.interactiveLineLayer.removeChildren();
 
     const curvePoints = this.interactivePointsLayer
-      .getItems({ match: p => p.name && p.name.includes('curvePoint') })
+      .getItems({ match: (p) => p.name && p.name.includes('curvePoint') })
       .sort((a, b) => a.position.x - b.position.x);
     const startPoint = curvePoints[0];
     const endPoint = curvePoints[curvePoints.length - 1];
-    const innerPoints = curvePoints.filter(p => p.id !== startPoint.id && p.id !== endPoint.id);
+    const innerPoints = curvePoints.filter((p) => p.id !== startPoint.id && p.id !== endPoint.id);
 
     // make a path to the startPoint, if it's not on the left edge
     let startPath = new paper.Path({ name: `curvePath_start`, strokeColor: 'black' });
@@ -210,8 +210,8 @@ export default class CurveEditor extends React.Component {
     // make a path between startPoint and endPoint
     let innerPath = new paper.Path({ name: `curvePath_inner`, strokeColor: 'black' });
     innerPath.add(new paper.Point(startPoint.position), new paper.Point(endPoint.position));
-    innerPoints.forEach(p => {
-      let index = innerPath.segments.findIndex(s => s.point.x > p.position.x);
+    innerPoints.forEach((p) => {
+      let index = innerPath.segments.findIndex((s) => s.point.x > p.position.x);
       innerPath.insert(index, new paper.Point(p.position));
     });
     innerPath.smooth({ type: 'catmull-rom', factor: 0.5 }); // 0.5 = no self-intersections
@@ -219,17 +219,17 @@ export default class CurveEditor extends React.Component {
 
   computeAndSaveNewValues() {
     const curvePoints = this.interactivePointsLayer
-      .getItems({ match: p => p.name && p.name.includes('curvePoint') })
+      .getItems({ match: (p) => p.name && p.name.includes('curvePoint') })
       .sort((a, b) => a.position.x - b.position.x);
 
     const startPath = this.interactiveLineLayer.getItem({
-      match: p => p.name && p.name.includes('curvePath_start'),
+      match: (p) => p.name && p.name.includes('curvePath_start'),
     });
     const innerPath = this.interactiveLineLayer.getItem({
-      match: p => p.name && p.name.includes('curvePath_inner'),
+      match: (p) => p.name && p.name.includes('curvePath_inner'),
     });
     const endPath = this.interactiveLineLayer.getItem({
-      match: p => p.name && p.name.includes('curvePath_end'),
+      match: (p) => p.name && p.name.includes('curvePath_end'),
     });
     const paths = { startPath, innerPath, endPath };
 

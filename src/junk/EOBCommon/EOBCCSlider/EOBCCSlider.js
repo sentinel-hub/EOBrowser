@@ -8,24 +8,30 @@ export class EOBCCSlider extends React.Component {
   static defaultProps = {
     sliderWidth: 50,
     cloudCoverPercentage: 100,
-    onChange: value => {},
+    onChange: (value) => {},
+    min: 0,
+    max: 100,
+    showIcons: true,
+    unit: '%',
   };
 
   render() {
     return (
       <div className="cc-slider">
-        <i className="fa fa-sun-o">&nbsp;</i>
+        {this.props.showIcons && <i className="fa fa-sun-o">&nbsp;</i>}
         <div className="rcStyler" style={{ width: this.props.sliderWidth }}>
           <RCSlider
-            min={0}
-            max={100}
+            min={this.props.min}
+            max={this.props.max}
             step={1}
             defaultValue={this.props.cloudCoverPercentage}
             onChange={this.props.onChange}
           />
         </div>
-        <i className="fa fa-cloud">&nbsp;</i>
-        <span className="percentage">{this.props.cloudCoverPercentage}&nbsp;%</span>
+        {this.props.showIcons && <i className="fa fa-cloud">&nbsp;</i>}
+        <div className="percentage">
+          {this.props.cloudCoverPercentage}&nbsp;{this.props.unit ? this.props.unit : ''}
+        </div>
       </div>
     );
   }

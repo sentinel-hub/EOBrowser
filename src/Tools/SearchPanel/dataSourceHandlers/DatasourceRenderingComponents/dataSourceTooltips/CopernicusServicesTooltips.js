@@ -44,11 +44,11 @@ Monitoring of water bodies, droughts, floods and climate change.
 `;
 
 const GlobalSurfaceWaterMarkdown = () => t`
-The **Global Surface Water** collection is derived from Landsat 5, 7 and 8 imagery and shows various aspects of the spatio-temporal distribution of surface water between 1984 and 2019 at a global scale in six different layers. Surface water is considered as any uncovered stretch of water (fresh and salt water areas) greater than 30m² visible from space, including natural and artificial water bodies. More information [here](https://collections.sentinel-hub.com/global-surface-water/).
+The **Global Surface Water** collection is derived from Landsat 5, 7 and 8 imagery and shows various aspects of the spatio-temporal distribution of surface water between 1984 and 2020 (with annual revisions) at a global scale in six different layers. Surface water is considered as any uncovered stretch of water (fresh and salt water areas) greater than 30m² visible from space, including natural and artificial water bodies. More information [here](https://collections.sentinel-hub.com/global-surface-water/).
 
 **Coverage**: Global coverage from longitude 170°E to 180°W and latitude 80°N to 50°S.
 
-**Data Availability**: Surface water dynamics between 1984 and 2019.
+**Data Availability**: 1984 - 2019, 1984 - 2020.
 
 **Spatial resolution**: 30 meters.
 

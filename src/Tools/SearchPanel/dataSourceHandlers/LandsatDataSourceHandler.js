@@ -8,6 +8,9 @@ import {
   DATASET_AWS_LOTL2,
   DATASET_AWS_LTML1,
   DATASET_AWS_LTML2,
+  DATASET_AWS_LMSSL1,
+  DATASET_AWS_LETML1,
+  DATASET_AWS_LETML2,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
@@ -27,15 +30,28 @@ import {
   AWS_LOTL2,
   AWS_LTML1,
   AWS_LTML2,
+  AWS_LMSSL1,
+  AWS_LETML1,
+  AWS_LETML2,
 } from './dataSourceHandlers';
 import { getLandsatBandForDataset, getGroupedBands } from './datasourceAssets/landsatBands';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 
-export const LANDSAT_COPYRIGHT_TEXT = number =>
+export const LANDSAT_COPYRIGHT_TEXT = (number) =>
   `Landsat ${number} image courtesy of the U.S. Geological Survey`;
 
 export default class LandsatDataSourceHandler extends DataSourceHandler {
-  urls = { ESA5: [], ESA7: [], ESA8: [], USGS8: [], LOTL1: [], LOTL2: [] };
+  urls = {
+    ESA5: [],
+    ESA7: [],
+    ESA8: [],
+    USGS8: [],
+    LOTL1: [],
+    LOTL2: [],
+    LMSSL1: [],
+    LETML1: [],
+    LETML2: [],
+  };
   datasetSearchLabels = {
     [ESA_L5]: t`Landsat 5 (ESA archive)`,
     [ESA_L7]: t`Landsat 7 (ESA archive)`,
@@ -43,6 +59,9 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
     [AWS_L8L1C]: t`Landsat 8 (USGS archive)`,
     [AWS_LOTL1]: t`Landsat 8 L1`,
     [AWS_LOTL2]: t`Landsat 8 L2`,
+    [AWS_LMSSL1]: t`Landsat 1-5 MSS L1`,
+    [AWS_LETML1]: t`Landsat 7 ETM+ L1`,
+    [AWS_LETML2]: t`Landsat 7 ETM+ L2`,
   };
   allLayers = [];
   datasets = [];
@@ -78,20 +97,35 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
       min: 9,
       max: 18,
     },
+    [AWS_LMSSL1]: {
+      min: 8,
+      max: 18,
+    },
+    [AWS_LETML1]: {
+      min: 8,
+      max: 18,
+    },
+    [AWS_LETML2]: {
+      min: 8,
+      max: 18,
+    },
   };
 
   knownDatasets = [
     { shDataset: DATASET_AWS_L8L1C, datasetId: AWS_L8L1C, urlId: 'USGS8' },
     { shDataset: DATASET_AWS_LOTL1, datasetId: AWS_LOTL1, urlId: 'LOTL1' },
     { shDataset: DATASET_AWS_LOTL2, datasetId: AWS_LOTL2, urlId: 'LOTL2' },
+    { shDataset: DATASET_AWS_LMSSL1, datasetId: AWS_LMSSL1, urlId: 'LMSSL1' },
+    { shDataset: DATASET_AWS_LETML1, datasetId: AWS_LETML1, urlId: 'LETML1' },
+    { shDataset: DATASET_AWS_LETML2, datasetId: AWS_LETML2, urlId: 'LETML2' },
     { shDataset: DATASET_EOCLOUD_LANDSAT5, datasetId: ESA_L5, urlId: 'ESA5' },
     { shDataset: DATASET_EOCLOUD_LANDSAT7, datasetId: ESA_L7, urlId: 'ESA7' },
     { shDataset: DATASET_EOCLOUD_LANDSAT8, datasetId: ESA_L8, urlId: 'ESA8' },
   ];
 
   initializeDatasets(layers, url, preselected) {
-    this.knownDatasets.forEach(ds => {
-      if (layers.find(l => l.dataset === ds.shDataset)) {
+    this.knownDatasets.forEach((ds) => {
+      if (layers.find((l) => l.dataset === ds.shDataset)) {
         this.datasets.push(ds.datasetId);
         this.urls[ds.urlId].push(url);
         if (preselected) {
@@ -110,13 +144,16 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
 
     this.datasets = Array.from(new Set(this.datasets)); // make datasets unique
     this.allLayers.push(
-      ...layers.filter(l =>
+      ...layers.filter((l) =>
         [
           DATASET_AWS_L8L1C,
           DATASET_AWS_LOTL1,
           DATASET_AWS_LOTL2,
           DATASET_AWS_LTML1,
           DATASET_AWS_LTML2,
+          DATASET_AWS_LMSSL1,
+          DATASET_AWS_LETML1,
+          DATASET_AWS_LETML2,
           DATASET_EOCLOUD_LANDSAT5,
           DATASET_EOCLOUD_LANDSAT7,
           DATASET_EOCLOUD_LANDSAT8,
@@ -167,8 +204,8 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
     const datasets = this.searchFilters.selectedOptions;
     const maxCC = this.searchFilters.maxCC;
 
-    datasets.forEach(datasetId => {
-      let searchLayer = this.allLayers.find(l => l.dataset === this.getSentinelHubDataset(datasetId));
+    datasets.forEach((datasetId) => {
+      let searchLayer = this.allLayers.find((l) => l.dataset === this.getSentinelHubDataset(datasetId));
       searchLayer.maxCloudCoverPercent = maxCC;
 
       const ff = new FetchingFunction(
@@ -186,7 +223,7 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map(t => ({
+    const tiles = data.map((t) => ({
       sensingTime: t.sensingTime,
       geometry: t.geometry,
       datasource: this.datasource,
@@ -202,7 +239,7 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
     return tiles;
   };
 
-  getUrlsForDataset = datasetId => {
+  getUrlsForDataset = (datasetId) => {
     switch (datasetId) {
       case ESA_L5:
         return this.urls.ESA5;
@@ -220,14 +257,20 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
         return this.urls.LTML1;
       case AWS_LTML2:
         return this.urls.LTML2;
+      case AWS_LMSSL1:
+        return this.urls.LMSSL1;
+      case AWS_LETML1:
+        return this.urls.LETML1;
+      case AWS_LETML2:
+        return this.urls.LETML2;
       default:
         return [];
     }
   };
 
-  getBands = datasetId => getLandsatBandForDataset(datasetId);
+  getBands = (datasetId) => getLandsatBandForDataset(datasetId);
 
-  getSentinelHubDataset = datasetId => {
+  getSentinelHubDataset = (datasetId) => {
     switch (datasetId) {
       case ESA_L5:
         return DATASET_EOCLOUD_LANDSAT5;
@@ -245,6 +288,12 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
         return DATASET_AWS_LTML1;
       case AWS_LTML2:
         return DATASET_AWS_LTML2;
+      case AWS_LMSSL1:
+        return DATASET_AWS_LMSSL1;
+      case AWS_LETML1:
+        return DATASET_AWS_LETML1;
+      case AWS_LETML2:
+        return DATASET_AWS_LETML2;
       default:
         return null;
     }
@@ -255,13 +304,16 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
       case ESA_L5:
       case ESA_L7:
       case ESA_L8:
-        return constructBasicEvalscript(bands, config);
+        return constructBasicEvalscript(bands, config, this.getBands(datasetId));
       case AWS_L8L1C:
       case AWS_LOTL1:
       case AWS_LOTL2:
       case AWS_LTML1:
       case AWS_LTML2:
-        return constructV3Evalscript(bands, config);
+      case AWS_LMSSL1:
+      case AWS_LETML1:
+      case AWS_LETML2:
+        return constructV3Evalscript(bands, config, this.getBands(datasetId));
       default:
         return '';
     }
@@ -279,9 +331,13 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
         return { resolution: 1 };
       case AWS_L8L1C:
       case AWS_LOTL2:
+      case AWS_LETML1:
+      case AWS_LETML2:
         return { resolution: 30, fisResolutionCeiling: 1490 };
       case AWS_LOTL1:
         return { resolution: 15, fisResolutionCeiling: 1490 };
+      case AWS_LMSSL1:
+        return { resolution: 60, fisResolutionCeiling: 1490 };
       default:
         return {};
     }
@@ -292,7 +348,14 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
   }
 
   supportsV3Evalscript(datasetId) {
-    if (datasetId === AWS_L8L1C || datasetId === AWS_LOTL1 || datasetId === AWS_LOTL2) {
+    if (
+      datasetId === AWS_L8L1C ||
+      datasetId === AWS_LOTL1 ||
+      datasetId === AWS_LOTL2 ||
+      datasetId === AWS_LMSSL1 ||
+      datasetId === AWS_LETML1 ||
+      datasetId === AWS_LETML2
+    ) {
       return true;
     }
     return false;
@@ -304,16 +367,16 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
       case ESA_L7:
       case ESA_L8:
         return Object.values(IMAGE_FORMATS).filter(
-          f => f !== IMAGE_FORMATS.KMZ_JPG && f !== IMAGE_FORMATS.KMZ_PNG,
+          (f) => f !== IMAGE_FORMATS.KMZ_JPG && f !== IMAGE_FORMATS.KMZ_PNG,
         );
       default:
         return Object.values(IMAGE_FORMATS);
     }
   }
 
-  groupChannels = datasetId => getGroupedBands(datasetId);
+  groupChannels = (datasetId) => getGroupedBands(datasetId);
 
-  getSibling = datasetId => {
+  getSibling = (datasetId) => {
     switch (datasetId) {
       case AWS_LOTL1:
         return { siblingId: AWS_LOTL2, siblingShortName: 'L2' };
@@ -324,7 +387,7 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
     }
   };
 
-  getCopyrightText = datasetId => {
+  getCopyrightText = (datasetId) => {
     switch (datasetId) {
       case ESA_L5:
         return LANDSAT_COPYRIGHT_TEXT('5');
@@ -338,6 +401,11 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
       case AWS_LTML1:
       case AWS_LTML2:
         return LANDSAT_COPYRIGHT_TEXT('4-5');
+      case AWS_LMSSL1:
+        return LANDSAT_COPYRIGHT_TEXT('1-5');
+      case AWS_LETML1:
+      case AWS_LETML2:
+        return LANDSAT_COPYRIGHT_TEXT('7 ETM+');
       default:
         return '';
     }

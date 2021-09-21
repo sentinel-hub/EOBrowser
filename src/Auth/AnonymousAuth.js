@@ -11,7 +11,7 @@ export default class AnonymousAuth extends React.Component {
   captchaRef = undefined;
 
   componentDidMount() {
-    window.addEventListener('message', e => {
+    window.addEventListener('message', (e) => {
       if (e.data.access_token) {
         this.props.setAnonToken(e.data.access_token);
         const tokenExpiresIn = (e.data.expires_in - this.UPDATE_SECONDS_BEFORE_EXPIRY) * 1000;
@@ -22,7 +22,7 @@ export default class AnonymousAuth extends React.Component {
     });
   }
 
-  onCaptchaExecuted = token => {
+  onCaptchaExecuted = (token) => {
     this.iFrame.src =
       process.env.REACT_APP_AUTH_BASEURL +
       'oauth/token/assisted?client_id=' +
@@ -36,9 +36,9 @@ export default class AnonymousAuth extends React.Component {
 
   render() {
     return (
-      <iframe className="anon-frame" ref={node => (this.iFrame = node)} title="auth">
+      <iframe className="anon-frame" ref={(node) => (this.iFrame = node)} title="auth">
         <Captcha
-          ref={node => (this.captchaRef = node)}
+          ref={(node) => (this.captchaRef = node)}
           onExecute={this.onCaptchaExecuted}
           sitekey={this.RECAPTCHA_SITE_KEY}
           action="token_assisted_anonymous"
@@ -58,7 +58,7 @@ class Captcha extends React.Component {
       const script = document.createElement('script');
       script.type = 'text/javascript';
       script.async = true;
-      script.onload = e => {
+      script.onload = (e) => {
         this.executeCaptcha();
       };
       script.src = 'https://www.google.com/recaptcha/api.js?render=' + this.props.sitekey;
@@ -72,13 +72,13 @@ class Captcha extends React.Component {
         .execute(this.props.sitekey, {
           action: this.props.action,
         })
-        .then(captchaToken => {
+        .then((captchaToken) => {
           this.props.onExecute(captchaToken);
         });
     });
   };
 
   render() {
-    return <div ref={el => (this.instance = el)} />;
+    return <div ref={(el) => (this.instance = el)} />;
   }
 }

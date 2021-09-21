@@ -13,7 +13,7 @@ import InvalidPin from './InvalidPin';
 export default class Pin extends Component {
   state = { showDescription: false };
 
-  zoomToPin = event => {
+  zoomToPin = (event) => {
     event.stopPropagation();
     const { zoom, lat, lng } = this.props.item;
     const { lat: parsedLat, lng: parsedLng, zoom: parsedZoom } = parsePosition(lat, lng, zoom);
@@ -26,14 +26,14 @@ export default class Pin extends Component {
     );
   };
 
-  toggleDescription = event => {
+  toggleDescription = (event) => {
     event.stopPropagation();
     this.setState({
       showDescription: !this.state.showDescription,
     });
   };
 
-  addPinToCompare = e => {
+  addPinToCompare = (e) => {
     e.stopPropagation();
     const effects = constructEffectsFromPinOrHighlight(this.props.item);
     const pin = { ...this.props.item, ...effects };
@@ -63,7 +63,7 @@ export default class Pin extends Component {
             {allowRemove && (
               <div
                 className="remove-pin"
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   this.props.onRemovePin(index);
                 }}
@@ -87,7 +87,7 @@ export default class Pin extends Component {
               ) : (
                 <EditableString
                   text={title}
-                  onEditSave={title => this.props.savePinProperty(index, 'title', title)}
+                  onEditSave={(title) => this.props.savePinProperty(index, 'title', title)}
                 />
               )}
             </div>
@@ -123,7 +123,7 @@ export default class Pin extends Component {
             canEdit={true}
             content={description}
             showContent={this.state.showDescription}
-            onDescriptionConfirm={description =>
+            onDescriptionConfirm={(description) =>
               this.props.savePinProperty(index, 'description', description)
             }
           />

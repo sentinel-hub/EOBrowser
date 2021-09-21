@@ -13,12 +13,12 @@ export function getEvalscriptSetup(evalscript) {
     const { input, output } = getSetupObjects(parsed);
 
     if (input.value.elements[0].type === 'Literal') {
-      setup['bands'] = input.value.elements.map(e => e.value);
+      setup['bands'] = input.value.elements.map((e) => e.value);
     } else {
       setup['bands'] = [];
       for (let obj of input.value.elements) {
-        const datasource = obj.properties.find(p => p.key.name === 'datasource');
-        const bands = obj.properties.find(p => p.key.name === 'bands').value.elements.map(e => e.value);
+        const datasource = obj.properties.find((p) => p.key.name === 'datasource');
+        const bands = obj.properties.find((p) => p.key.name === 'bands').value.elements.map((e) => e.value);
         setup.bands.push({ datasource: datasource ? datasource.value.value : null, bands: bands });
       }
     }
@@ -27,26 +27,26 @@ export function getEvalscriptSetup(evalscript) {
     // the 'default' output is not guaranteed to be the first one, so we try to find it
     // if we don't find it, the first output object is used
     const outputArr = output.value.elements
-      ? output.value.elements.map(e => e.properties)
+      ? output.value.elements.map((e) => e.properties)
       : [output.value.properties];
     let outputObj = outputArr[0];
     for (let o of outputArr) {
-      const idObj = o.find(p => p.key.name === 'id');
+      const idObj = o.find((p) => p.key.name === 'id');
       if (idObj && idObj.value.value === DEFAULT_OUTPUT_ID) {
         outputObj = o;
         break;
       }
     }
 
-    const id = outputObj.find(p => p.key.name === 'id');
+    const id = outputObj.find((p) => p.key.name === 'id');
     if (id) {
       setup.id = id.value.value;
     }
-    const sampleType = outputObj.find(p => p.key.name === 'sampleType');
+    const sampleType = outputObj.find((p) => p.key.name === 'sampleType');
     if (sampleType) {
       setup.sampleType = sampleType.value.value;
     }
-    setup.nBands = outputObj.find(p => p.key.name === 'bands').value.value;
+    setup.nBands = outputObj.find((p) => p.key.name === 'bands').value.value;
     return setup;
   } catch (e) {
     return null;
@@ -68,10 +68,10 @@ export function setEvalscriptSampleType(evalscript, sampleType) {
     if (output.value.elements) {
       // find the index of the default output object
       // use the first index if default output object is not found
-      const outputArr = output.value.elements.map(e => e.properties);
+      const outputArr = output.value.elements.map((e) => e.properties);
       let defaultOutputIndex = 0;
       for (let index in outputArr) {
-        const idObj = outputArr[index].find(p => p.key.name === 'id');
+        const idObj = outputArr[index].find((p) => p.key.name === 'id');
         if (idObj && idObj.value.value === DEFAULT_OUTPUT_ID) {
           defaultOutputIndex = index;
           break;
@@ -79,7 +79,7 @@ export function setEvalscriptSampleType(evalscript, sampleType) {
       }
 
       const _sampleType = output.value.elements[defaultOutputIndex].properties.find(
-        p => p.key.name === 'sampleType',
+        (p) => p.key.name === 'sampleType',
       );
       if (_sampleType) {
         _sampleType.value.value = sampleType;
@@ -90,7 +90,7 @@ export function setEvalscriptSampleType(evalscript, sampleType) {
         output.value.elements[defaultOutputIndex].properties.push(newProperty);
       }
     } else {
-      const _sampleType = output.value.properties.find(p => p.key.name === 'sampleType');
+      const _sampleType = output.value.properties.find((p) => p.key.name === 'sampleType');
       if (_sampleType) {
         _sampleType.value.value = sampleType;
         _sampleType.value.raw = `""${sampleType}""`;
@@ -116,7 +116,7 @@ export function setEvalscriptOutputScale(evalscript, scaleFactor) {
       comment: true,
     });
     escodegen.attachComments(parsed, parsed.comments, parsed.tokens);
-    const evaluatePixelFunction = parsed.body.find(d => d.id && d.id.name === 'evaluatePixel');
+    const evaluatePixelFunction = parsed.body.find((d) => d.id && d.id.name === 'evaluatePixel');
     evaluatePixelFunction.id.name = '__noScaleFactor__evaluatePixel';
     const newEvaluatePixel = `
     function evaluatePixel(sample, scene, inputMetadata, customData, outputMetadata) {
@@ -142,9 +142,9 @@ export function setEvalscriptOutputScale(evalscript, scaleFactor) {
 }
 
 function getSetupObjects(tree) {
-  const setupFunction = tree.body.find(d => d.id && d.id.name === 'setup');
-  const input = setupFunction.body.body[0].argument.properties.find(p => p.key.name === 'input');
-  const output = setupFunction.body.body[0].argument.properties.find(p => p.key.name === 'output');
+  const setupFunction = tree.body.find((d) => d.id && d.id.name === 'setup');
+  const input = setupFunction.body.body[0].argument.properties.find((p) => p.key.name === 'input');
+  const output = setupFunction.body.body[0].argument.properties.find((p) => p.key.name === 'output');
   return { input: input, output: output };
 }
 
@@ -162,10 +162,10 @@ export function setEvalscriptOutputBandNumber(evalscript, nBands) {
     if (output.value.elements) {
       // find the index of the default output object
       // use the first index if default output object is not found
-      const outputArr = output.value.elements.map(e => e.properties);
+      const outputArr = output.value.elements.map((e) => e.properties);
       let defaultOutputIndex = 0;
       for (let index in outputArr) {
-        const idObj = outputArr[index].find(p => p.key.name === 'id');
+        const idObj = outputArr[index].find((p) => p.key.name === 'id');
         if (idObj && idObj.value.value === DEFAULT_OUTPUT_ID) {
           defaultOutputIndex = index;
           break;
@@ -173,12 +173,12 @@ export function setEvalscriptOutputBandNumber(evalscript, nBands) {
       }
 
       const originalNBands = output.value.elements[defaultOutputIndex].properties.find(
-        p => p.key.name === 'bands',
+        (p) => p.key.name === 'bands',
       );
       originalNBands.value.raw = nBands.toString();
       originalNBands.value.value = nBands;
     } else {
-      const originalNBands = output.value.properties.find(p => p.key.name === 'bands');
+      const originalNBands = output.value.properties.find((p) => p.key.name === 'bands');
       originalNBands.value.raw = nBands.toString();
       originalNBands.value.value = nBands;
     }
@@ -196,20 +196,20 @@ export function checkIfIndexOutputInEvalscript(evalscript) {
   let isIndexOutputPresent = false;
   try {
     const parsed = parseScript(evalscript, { jsx: true, tolerant: true });
-    const setupFunction = parsed.body.find(d => d.id && d.id.name === 'setup');
-    const output = setupFunction.body.body[0].argument.properties.find(p => p.key.name === 'output');
+    const setupFunction = parsed.body.find((d) => d.id && d.id.name === 'setup');
+    const output = setupFunction.body.body[0].argument.properties.find((p) => p.key.name === 'output');
     const outputArr = output.value.elements
-      ? output.value.elements.map(e => e.properties)
+      ? output.value.elements.map((e) => e.properties)
       : [output.value.properties];
 
     for (let o of outputArr) {
-      const idObj = o.find(p => p.key.name === 'id');
+      const idObj = o.find((p) => p.key.name === 'id');
       const isIdIndex = idObj ? idObj.value.value === OUTPUT_ID : false;
 
-      const sampleTypeObj = o.find(p => p.key.name === 'sampleType');
+      const sampleTypeObj = o.find((p) => p.key.name === 'sampleType');
       const isSampleTypeFloat32 = sampleTypeObj ? sampleTypeObj.value.value === SAMPLE_TYPE : false;
 
-      const nBandsObj = o.find(p => p.key.name === 'bands');
+      const nBandsObj = o.find((p) => p.key.name === 'bands');
       const isOneChannelOutput = nBandsObj ? nBandsObj.value.value === N_BANDS : false;
 
       isIndexOutputPresent = isIdIndex && isSampleTypeFloat32 && isOneChannelOutput;

@@ -1,21 +1,11 @@
 import moment from 'moment';
 
 export const isNextMonthAvailable = (maxDate, selectedDay) => {
-  return (
-    selectedDay
-      .clone()
-      .add(1, 'month')
-      .startOf('month') <= maxDate
-  );
+  return selectedDay.clone().add(1, 'month').startOf('month') <= maxDate;
 };
 
 export const isPreviousMonthAvailable = (minDate, selectedDay) => {
-  return (
-    selectedDay
-      .clone()
-      .subtract(1, 'month')
-      .endOf('month') >= minDate
-  );
+  return selectedDay.clone().subtract(1, 'month').endOf('month') >= minDate;
 };
 
 export const getAvailableYears = (fromDate, toDate) => {
@@ -49,11 +39,6 @@ export function convertDateToUTC(date) {
   );
 }
 
-export const momentToDate = momentObj => {
-  return convertDateToUTC(
-    momentObj
-      .clone()
-      .utc()
-      .toDate(),
-  );
+export const momentToDate = (momentObj) => {
+  return convertDateToUTC(momentObj.clone().utc().toDate());
 };

@@ -6,6 +6,7 @@ import { t } from 'ttag';
 import CopyToClipboard from './CopyToClipboard';
 import { getDatasetLabel } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
+import { DATASOURCES } from '../../const';
 
 class ResultItem extends React.Component {
   state = {
@@ -13,7 +14,7 @@ class ResultItem extends React.Component {
   };
 
   toggleLinksPanel = async () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       linksVisible: !prevState.linksVisible,
     }));
   };
@@ -26,7 +27,7 @@ class ResultItem extends React.Component {
     const { sensingTime, datasetId, datasource, metadata } = this.props.tile;
     return (
       <div
-        onMouseEnter={e => this.props.onHover(this.props.tile)}
+        onMouseEnter={(e) => this.props.onHover(this.props.tile)}
         onMouseLeave={this.props.onStopHover}
         className="result-item"
       >
@@ -50,14 +51,18 @@ class ResultItem extends React.Component {
               <i className="fa fa-satellite" />
               {getDatasetLabel(datasetId)}
             </div>
-            <div className="detail" title={t`Sensing time`}>
-              <i className="fa fa-calendar" />
-              {moment.utc(sensingTime).format('YYYY-MM-DD')}
-            </div>
-            <div className="detail" title={t`Sensing time`}>
-              <i className="fa fa-clock-o" />
-              {moment.utc(sensingTime).format('HH:mm:ss')} UTC
-            </div>
+            {datasource !== DATASOURCES.DEM && (
+              <>
+                <div className="detail" title={t`Sensing time`}>
+                  <i className="fa fa-calendar" />
+                  {moment.utc(sensingTime).format('YYYY-MM-DD')}
+                </div>
+                <div className="detail" title={t`Sensing time`}>
+                  <i className="fa fa-clock-o" />
+                  {moment.utc(sensingTime).format('HH:mm:ss')} UTC
+                </div>
+              </>
+            )}
             {metadata.cloudCoverage !== undefined && (
               <div className="detail" title={t`Cloud coverage`}>
                 <i className="fa fa-cloud" />

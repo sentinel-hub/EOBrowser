@@ -12,7 +12,7 @@ stories.add('Default', ({ state, setState }) => {
   return (
     <div className="custom-ccslider">
       <EOBCCSlider
-        onChange={value => setState({ value: value })}
+        onChange={(value) => setState({ value: value })}
         cloudCoverPercentage={state.value}
         sliderWidth={100}
       />

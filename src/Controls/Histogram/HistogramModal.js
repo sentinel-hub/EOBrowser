@@ -11,6 +11,7 @@ import {
   getLayerName,
   checkIfIndexOutputPresent,
   MISSING_INDEX_OUTPUT_ERROR,
+  NO_INDEX_LAYER_SELECTED,
 } from './Histogram.utils';
 import {
   getDatasetLabel,
@@ -87,7 +88,7 @@ class HistogramModal extends Component {
     if (!isIndexOutputPresent) {
       this.setState({
         refreshEnabled: false,
-        refreshTooltip: MISSING_INDEX_OUTPUT_ERROR,
+        refreshTooltip: customSelected ? MISSING_INDEX_OUTPUT_ERROR : NO_INDEX_LAYER_SELECTED,
       });
       return;
     }
@@ -141,7 +142,7 @@ class HistogramModal extends Component {
     const supportsV3Evalscript = dsHandler && dsHandler.supportsV3Evalscript(datasetId);
 
     return (
-      <div className="histogram-modal" ref={r => (this.ref = r)}>
+      <div className="histogram-modal" ref={(r) => (this.ref = r)}>
         <i className="close-btn fa fa-close" onClick={this.onHistogramModalClose} />
 
         <div className="title-bar">
@@ -174,7 +175,7 @@ class HistogramModal extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   bounds: store.aoi.bounds ? store.aoi.bounds : store.mainMap.bounds,
   pixelBounds: store.mainMap.pixelBounds,
   aoiGeometry: store.aoi.geometry

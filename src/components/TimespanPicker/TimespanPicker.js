@@ -33,7 +33,7 @@ export class TimespanPicker extends Component {
     this.props.applyTimespan(fromTime, toTime);
   };
 
-  setFromTime = time => {
+  setFromTime = (time) => {
     const { autoApply } = this.props;
     this.setState(
       {
@@ -43,7 +43,7 @@ export class TimespanPicker extends Component {
     );
   };
 
-  setToTime = time => {
+  setToTime = (time) => {
     const { autoApply } = this.props;
     this.setState(
       {
@@ -79,7 +79,7 @@ export class TimespanPicker extends Component {
           maxDate={this.props.maxDate}
           onQueryDatesForActiveMonth={onQueryDatesForActiveMonth}
         />
-        <div className="timespan-calendar-holder" ref={e => (this.calendarHolder = e)} />
+        <div className="timespan-calendar-holder" ref={(e) => (this.calendarHolder = e)} />
         {!autoApply && (
           <div className="apply-button">
             <button className="btn" onClick={this.apply}>

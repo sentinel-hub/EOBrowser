@@ -6,4 +6,17 @@
   text-align: center;
   color: orange;
   font-size: 14px;
+
+  &.notification-error-themes {
+    min-height: 130px;
+    overflow-y: auto;
+  }
+
+  .fa.fa-times {
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 16px;
+  }
 }

@@ -35,7 +35,7 @@ class SocialShare extends Component {
     const shortUrl = await sendFirebaseRequest(currentUrl);
 
     if (!shortUrl.length) {
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         shortUrl: '',
         lastShortenedUrl: currentUrl,
         currentRetries: prevState.currentRetries + 1,

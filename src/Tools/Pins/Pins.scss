@@ -24,6 +24,55 @@
   }
 }
 
+.pins-order {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  height: 15px;
+  font-size: 12px;
+  border-bottom: 1px solid $primaryCol;
+  padding: 2px 0;
+  color: $primaryCol;
+
+  .order-btn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 5px;
+    padding-left: 3px;
+    cursor: pointer;
+    transition: all ease 0.2s;
+    background-color: $mainMedium;
+
+    .fas.fa-chevron-up {
+      padding-left: 3px;
+      padding-right: 3px;
+      height: fit-content;
+      width: fit-content;
+      transition: all ease 0.2s;
+      opacity: 0;
+
+      &.turn-upside-down {
+        transform: rotate(-180deg);
+      }
+    }
+
+    &:hover {
+      .fas.fa-chevron-up {
+        opacity: 1;
+      }
+    }
+
+    &.active-ordering {
+      .fas.fa-chevron-up {
+        opacity: 1;
+      }
+    }
+  }
+}
+
 .error {
   color: orange;
   text-align: center;

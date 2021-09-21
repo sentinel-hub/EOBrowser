@@ -71,7 +71,7 @@ export async function legacyFetchDates(
     const newDates = await onFetchAvailableDates(interval.fromMoment, interval.toMoment, boundsGeojson);
 
     let newFlyovers = await Promise.all(
-      newDates.map(async d => {
+      newDates.map(async (d) => {
         let flyover = {
           fromTime: moment.utc(d).startOf('day'),
           toTime: moment.utc(d).endOf('day'),
@@ -124,7 +124,7 @@ async function legacyGetCC(
   let layerInfo;
   const widthOrHeight = getWidthOrHeight() + PADDING;
   const originalLayerId = selectedResult.preset;
-  const originalLayerInfo = presets[selectedResult.name].find(layer => layer.id === originalLayerId);
+  const originalLayerInfo = presets[selectedResult.name].find((layer) => layer.id === originalLayerId);
 
   const cloudCoverageLayerinfo = cloudCoverageLayers[selectedResult.name]
     ? cloudCoverageLayers[selectedResult.name]
@@ -207,7 +207,7 @@ export async function fetchSHLayerFlyovers(
 
   // sentinelhub-js returns Date objects that must be transformed to Moment objects
   // https://link.medium.com/2zIHrAfLi5
-  allFlyovers = allFlyovers.map(f => ({
+  allFlyovers = allFlyovers.map((f) => ({
     ...f,
     fromTime: moment.utc(f.fromTime),
     toTime: moment.utc(f.toTime),
@@ -216,7 +216,7 @@ export async function fetchSHLayerFlyovers(
 }
 
 function getActiveInstance(name, instances) {
-  return instances.find(inst => inst.name === name) || {};
+  return instances.find((inst) => inst.name === name) || {};
 }
 
 export function getCurrentBboxUrl(
@@ -285,10 +285,7 @@ export async function fetchBlobObj(
 ) {
   try {
     // something here went wrong, time is added here and in EOB3TimelapsePanel.js where it is called from
-    request.url += `&time=${moment
-      .utc(request.date)
-      .startOf('day')
-      .toISOString()}/${moment
+    request.url += `&time=${moment.utc(request.date).startOf('day').toISOString()}/${moment
       .utc(request.date)
       .endOf('day')
       .toISOString()}&preview=3`;
@@ -302,15 +299,23 @@ export async function fetchBlobObj(
 
     if (!supportsTimeRange) {
       overrideGetMapParams.fromTime = null;
-      overrideGetMapParams.toTime = moment
-        .utc(request.date)
-        .endOf('day')
-        .toDate();
+      overrideGetMapParams.toTime = moment.utc(request.date).endOf('day').toDate();
     }
 
     const overrideLayerConstructorParams = {};
     if (effects.minQa !== undefined) {
       overrideLayerConstructorParams.minQa = effects.minQa;
+    }
+    if (effects.speckleFilter !== undefined) {
+      overrideLayerConstructorParams.speckleFilter = effects.speckleFilter;
+    }
+    if (effects.demInstanceType !== undefined) {
+      if (effects.demInstanceType === 'DISABLED') {
+        overrideLayerConstructorParams.orthorectify = false;
+      } else {
+        overrideLayerConstructorParams.orthorectify = true;
+        overrideLayerConstructorParams.demInstanceType = effects.demInstanceType;
+      }
     }
 
     let blob;
@@ -461,7 +466,7 @@ function decorateBlob(date, dateToBeShown, blob, showSHLogo = true, showCopernic
       }
     };
 
-    mainImg.onerror = err => {
+    mainImg.onerror = (err) => {
       reject(err);
     };
     mainImg.src = URL.createObjectURL(blob);

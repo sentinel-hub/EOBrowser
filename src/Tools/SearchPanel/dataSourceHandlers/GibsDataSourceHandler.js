@@ -21,6 +21,7 @@ import {
 } from './dataSourceHandlers';
 import { filterLayers } from './filter';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
+import { DATASOURCES } from '../../../const';
 
 function parseISO8601TimeIntervalFormat(ISO8601string) {
   const [startStr, endStr, periodStr] = ISO8601string.split('/');
@@ -140,7 +141,7 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
   isChecked = false;
   KNOWN_URL = 'https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi';
   allResults = null;
-  datasource = 'GIBS';
+  datasource = DATASOURCES.GIBS;
 
   willHandle(service, url, name, configs, preselected) {
     if (url !== this.KNOWN_URL) {
@@ -185,7 +186,7 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
 
     const selectedDatasets = this.searchFilters.selectedOptions;
 
-    selectedDatasets.forEach(dataset => {
+    selectedDatasets.forEach((dataset) => {
       // Performance optimization - instead of WMS GetCapabilities request:
       //   const url = `${this.KNOWN_URL}?SERVICE=WMS&REQUEST=GetCapabilities`;
       // we use a cached version:
@@ -223,12 +224,12 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
   ) => {
     const datasourceId = params.datasetId;
     if (!this.allResults) {
-      const capabilities = await axios.get(url).then(r => {
+      const capabilities = await axios.get(url).then((r) => {
         return r.data;
       });
       const parseString = require('xml2js').parseString;
       const data = await new Promise((resolve, reject) =>
-        parseString(capabilities, function(err, result) {
+        parseString(capabilities, function (err, result) {
           if (err) reject(err);
           else resolve(result);
         }),
@@ -236,7 +237,7 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
 
       // GIBS GetCapabilities uses recursion to group layers, this function allows us to flatten them:
       function flattenLayers(layers, result = []) {
-        layers.forEach(l => {
+        layers.forEach((l) => {
           result.push(l);
           if (l.Layer) {
             flattenLayers(l.Layer, result);
@@ -246,8 +247,8 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
       }
 
       const allLayers = flattenLayers(data.WMS_Capabilities.Capability[0].Layer)
-        .filter(layer => layer.Name)
-        .map(layer => {
+        .filter((layer) => layer.Name)
+        .map((layer) => {
           const dimension = layer.Dimension
             ? {
                 name: layer.Dimension[0].$.name,
@@ -266,7 +267,7 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
     }
     // We are mocking dataset and tiles here, by finding the first layer that's name starts with a "datasourceId" ie GIBS_MODIS_TERRA
     // and then creating tiles depending on the start, end date and the period/frequency
-    const applicableLayer = this.allResults.find(l => l.name.startsWith(datasourceId));
+    const applicableLayer = this.allResults.find((l) => l.name.startsWith(datasourceId));
     let allDates = [];
 
     if (!applicableLayer.dimension) {
@@ -292,12 +293,7 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
           let firstDate = safeStart.startOf('day');
 
           while (currDate.diff(firstDate) >= 0) {
-            partialDates.push(
-              currDate
-                .clone()
-                .utc()
-                .toISOString(),
-            );
+            partialDates.push(currDate.clone().utc().toISOString());
             currDate.subtract(intervalPeriod);
           }
           allDates = partialDates.concat(allDates);
@@ -312,7 +308,7 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
   };
 
   convertToStandardTiles = (tiles, datasetId) => {
-    return tiles.map(d => ({
+    return tiles.map((d) => ({
       datasource: this.datasource,
       datasetId,
       sensingTime: d,
@@ -334,11 +330,11 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
 
   getLayers = (data, datasetId, url, layersExclude, layersInclude) => {
     let layers = data.filter(
-      layer =>
+      (layer) =>
         filterLayers(layer.layerId, layersExclude, layersInclude) &&
         this.filterLayersGIBS(layer.layerId, datasetId),
     );
-    layers.forEach(l => {
+    layers.forEach((l) => {
       l.url = url;
     });
     return layers;

@@ -17,7 +17,7 @@ class EOBAdvancedHolder extends React.Component {
     openAccordion: 0, // composite accordion displayed by default
   };
 
-  toggleAccordion = index => {
+  toggleAccordion = (index) => {
     if (index !== this.state.openAccordion) {
       this.setState({ openAccordion: index });
       window.location.hash = CUSTOM_VISUALIZATION_URL_ROUTES[index];

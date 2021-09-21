@@ -7,7 +7,7 @@ export function capToRange(val, min, max) {
 }
 
 export function transformCurvePoints(points, canvasSize, maxColorValue) {
-  const curvePoints = points.map(p => {
+  const curvePoints = points.map((p) => {
     let x = capToRange(p.position.x, 0, canvasSize);
     x = (x * maxColorValue) / canvasSize;
 
@@ -76,7 +76,7 @@ export function computeNewValuesFromPoints(points) {
   const scope = new paper.PaperScope();
   scope.setup(canvas);
 
-  const transformedPoints = points.map(p => {
+  const transformedPoints = points.map((p) => {
     const x = (p.x * CURVE_EDITOR_CANVAS_SIZE) / MAX_COLOR_VALUE;
     const y = CURVE_EDITOR_CANVAS_SIZE - (p.y * CURVE_EDITOR_CANVAS_SIZE) / MAX_COLOR_VALUE;
     return { x, y };
@@ -84,7 +84,7 @@ export function computeNewValuesFromPoints(points) {
 
   const startPoint = transformedPoints[0];
   const endPoint = transformedPoints[transformedPoints.length - 1];
-  const innerPoints = transformedPoints.filter(p => p !== startPoint && p !== endPoint);
+  const innerPoints = transformedPoints.filter((p) => p !== startPoint && p !== endPoint);
 
   let startPath = new paper.Path();
   startPath.add(new paper.Point(-1, startPoint.y), new paper.Point(startPoint));
@@ -94,8 +94,8 @@ export function computeNewValuesFromPoints(points) {
 
   let innerPath = new paper.Path();
   innerPath.add(new paper.Point(startPoint), new paper.Point(endPoint));
-  innerPoints.forEach(p => {
-    let index = innerPath.segments.findIndex(s => s.point.x > p.x);
+  innerPoints.forEach((p) => {
+    let index = innerPath.segments.findIndex((s) => s.point.x > p.x);
     innerPath.insert(index, new paper.Point(p));
   });
   innerPath.smooth({ type: 'catmull-rom', factor: 0.5 }); // 0.5 = no self-intersections

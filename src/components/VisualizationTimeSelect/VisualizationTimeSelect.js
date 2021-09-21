@@ -14,7 +14,7 @@ export class VisualizationTimeSelect extends Component {
     this.props.updateSelectedTime(fromTime, toTime);
   };
 
-  updateDate = date => {
+  updateDate = (date) => {
     const fromTime = date.clone().startOf('day');
     const toTime = date.clone().endOf('day');
     this.props.updateSelectedTime(fromTime, toTime);
@@ -22,7 +22,7 @@ export class VisualizationTimeSelect extends Component {
 
   toggleTimespan = () => {
     this.setState(
-      prevState => {
+      (prevState) => {
         return { timespanExpanded: !prevState.timespanExpanded };
       },
       () => {
@@ -39,11 +39,14 @@ export class VisualizationTimeSelect extends Component {
       minDate,
       onQueryDatesForActiveMonth,
       showNextPrev,
-      getAndSetNextPrevDate,
+      maxCloudCover,
       fromTime,
       toTime,
       timespanSupported,
+      onQueryFlyoversForActiveMonth,
+      hasCloudCoverage,
     } = this.props;
+
     const { timespanExpanded } = this.state;
     if (!toTime) {
       return null;
@@ -53,7 +56,9 @@ export class VisualizationTimeSelect extends Component {
       return (
         <>
           <div className="visualization-time-select">
-            <b className="time-select-type">{t`Date`}:</b>
+            <div>
+              <b className="time-select-type">{t`Date:`}</b>
+            </div>
             <DatePicker
               id="visualization-date-picker"
               calendarContainer={this.calendarHolder}
@@ -62,12 +67,11 @@ export class VisualizationTimeSelect extends Component {
               minDate={minDate}
               maxDate={maxDate}
               showNextPrevDateArrows={showNextPrev}
-              getAndSetNextPrevDate={getAndSetNextPrevDate}
               onQueryDatesForActiveMonth={onQueryDatesForActiveMonth}
             />
             <div />
           </div>
-          <div className="visualization-calendar-holder" ref={e => (this.calendarHolder = e)} />
+          <div className="visualization-calendar-holder" ref={(e) => (this.calendarHolder = e)} />
         </>
       );
     }
@@ -75,29 +79,44 @@ export class VisualizationTimeSelect extends Component {
     return (
       <>
         <div className="visualization-time-select">
-          <b className="time-select-type"> {timespanExpanded ? t`Timespan:` : t`Date:`}</b>
-          {!timespanExpanded && (
-            <DatePicker
-              id="visualization-date-picker"
-              calendarContainer={this.calendarHolder}
-              selectedDay={toTime.clone().startOf('day')}
-              setSelectedDay={this.updateDate}
-              minDate={minDate}
-              maxDate={maxDate}
-              showNextPrevDateArrows={showNextPrev}
-              getAndSetNextPrevDate={getAndSetNextPrevDate}
-              onQueryDatesForActiveMonth={onQueryDatesForActiveMonth}
-            />
-          )}
+          <div>
+            <b className="time-select-type">{timespanExpanded ? t`Timespan:` : t`Date:`}</b>
+            {!timespanExpanded &&
+              (hasCloudCoverage ? (
+                <DatePicker
+                  id="cloud-cover-datepicker-wrap"
+                  calendarContainer={this.calendarHolder}
+                  selectedDay={toTime.clone().utc().startOf('day')}
+                  setSelectedDay={this.updateDate}
+                  minDate={minDate}
+                  maxDate={maxDate}
+                  showNextPrevDateArrows={showNextPrev}
+                  onQueryDatesForActiveMonth={onQueryFlyoversForActiveMonth}
+                  hasCloudCoverFilter={true}
+                  setMaxCloudCover={(value) => this.setState({ setMaxCloudCover: value })}
+                  maxCloudCover={maxCloudCover}
+                />
+              ) : (
+                <DatePicker
+                  id="visualization-date-picker"
+                  calendarContainer={this.calendarHolder}
+                  selectedDay={toTime.clone().utc().startOf('day')}
+                  setSelectedDay={this.updateDate}
+                  minDate={minDate}
+                  maxDate={maxDate}
+                  showNextPrevDateArrows={showNextPrev}
+                  onQueryDatesForActiveMonth={onQueryDatesForActiveMonth}
+                />
+              ))}
+          </div>
           {timespanExpanded && (
-            <div className="timespan-label" onClick={this.toggleTimespan}>
-              {`${fromTime
-                .clone()
-                .utc()
-                .format('YYYY-MM-DD HH:mm')} - ${toTime
-                .clone()
-                .utc()
-                .format('YYYY-MM-DD HH:mm')}`}
+            <div className="timespan-title-wrap">
+              <div className="timespan-label" onClick={this.toggleTimespan}>
+                {`${fromTime.clone().utc().format('YYYY-MM-DD HH:mm')} - ${toTime
+                  .clone()
+                  .utc()
+                  .format('YYYY-MM-DD HH:mm')}`}
+              </div>
             </div>
           )}
           <div className="timespan-toggle" onClick={this.toggleTimespan}>
@@ -114,7 +133,7 @@ export class VisualizationTimeSelect extends Component {
             onQueryDatesForActiveMonth={onQueryDatesForActiveMonth}
           />
         )}
-        <div className="visualization-calendar-holder" ref={e => (this.calendarHolder = e)} />
+        <div className="visualization-calendar-holder" ref={(e) => (this.calendarHolder = e)} />
       </>
     );
   }

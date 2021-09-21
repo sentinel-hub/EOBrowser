@@ -17,7 +17,7 @@ class SharePinsLink extends Component {
     isCopiedToClipboard: false,
   };
 
-  createSharePinsLink = async pins => {
+  createSharePinsLink = async (pins) => {
     try {
       const shareLink = await createShareLink(pins);
       this.setState({
@@ -92,7 +92,7 @@ class SharePinsLink extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   selectedPins: store.modal.params ? store.modal.params.selectedPins : null,
   onClose: store.modal.params ? store.modal.params.onClose : null,
 });

@@ -16,7 +16,7 @@ stories.add('Datepicker', ({ state, setState }) => {
       <div className="date-pickers-wrapper" style={{ background: '#3b3d4d' }}>
         <DatePicker
           id="date-picker-story"
-          setSelectedDay={date => setState({ selectedDate: date })}
+          setSelectedDay={(date) => setState({ selectedDate: date })}
           selectedDay={selectedDate}
           calendarContainer={document.body}
           minDate={moment.utc('1984-01-01')}
@@ -33,7 +33,7 @@ stories.add('Datepicker custom dates', ({ state, setState }) => {
     <Provider store={store}>
       <div style={{ background: '#3b3d4d' }}>
         <DatePicker
-          setSelectedDay={date => setState({ selectedDate: date })}
+          setSelectedDay={(date) => setState({ selectedDate: date })}
           selectedDay={selectedDate}
           showNextPrev={false}
           minDate={moment.utc('1984-01-01')}
@@ -47,7 +47,7 @@ stories.add('Datepicker custom dates', ({ state, setState }) => {
 });
 
 stories.add('Datepicker prev/next buttons', ({ state, setState }) => {
-  const getAndSetNextPrevDate = async direction => {
+  const getAndSetNextPrevDate = async (direction) => {
     const currentDate = state.selectedDate
       ? moment.utc(state.selectedDate.format('YYYY-MM-DD'))
       : moment.utc();
@@ -59,7 +59,7 @@ stories.add('Datepicker prev/next buttons', ({ state, setState }) => {
     <Provider store={store}>
       <div style={{ background: '#3b3d4d' }}>
         <DatePicker
-          setSelectedDay={date => setState({ selectedDate: date })}
+          setSelectedDay={(date) => setState({ selectedDate: date })}
           selectedDay={selectedDate}
           showNextPrevDateArrows={true}
           minDate={moment.utc('1984-01-01')}
@@ -74,7 +74,7 @@ stories.add('Datepicker prev/next buttons', ({ state, setState }) => {
 });
 
 stories.add('Datepicker prev/next buttons err', ({ state, setState }) => {
-  const getAndSetNextPrevDate = async direction => {
+  const getAndSetNextPrevDate = async (direction) => {
     return new Promise((resolve, reject) => {
       console.log('No  available dates');
       reject('No  available dates');
@@ -85,7 +85,7 @@ stories.add('Datepicker prev/next buttons err', ({ state, setState }) => {
     <Provider store={store}>
       <div style={{ background: '#3b3d4d' }}>
         <DatePicker
-          setSelectedDay={date => setState({ selectedDate: date })}
+          setSelectedDay={(date) => setState({ selectedDate: date })}
           selectedDay={selectedDate}
           showNextPrevDateArrows={true}
           minDate={moment.utc('1984-01-01')}
@@ -100,12 +100,7 @@ stories.add('Datepicker prev/next buttons err', ({ state, setState }) => {
 });
 
 function onQueryDatesForActiveMonth(date) {
-  return new Promise(resolve => {
-    resolve([
-      moment
-        .utc(date)
-        .startOf('month')
-        .toDate(),
-    ]);
+  return new Promise((resolve) => {
+    resolve([moment.utc(date).startOf('month').toDate()]);
   });
 }

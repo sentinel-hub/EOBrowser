@@ -47,7 +47,7 @@ class PrintForm extends React.Component {
               max={80}
               step={0.1}
               value={imageWidthInches}
-              onChange={ev => {
+              onChange={(ev) => {
                 updateFormData('imageWidthInches', ev.target.value);
               }}
             />
@@ -79,7 +79,7 @@ class PrintForm extends React.Component {
               max={600}
               step={50}
               value={resolutionDpi}
-              onChange={ev => updateFormData('resolutionDpi', ev.target.value)}
+              onChange={(ev) => updateFormData('resolutionDpi', ev.target.value)}
             />
           </div>
         </div>

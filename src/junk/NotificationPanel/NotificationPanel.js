@@ -2,7 +2,7 @@ import React from 'react';
 
 import './NotificationPanel.scss';
 
-export const NotificationPanel = ({ type, msg }) => {
+export const NotificationPanel = ({ type, msg, additionalClass, hideErrorOnClick }) => {
   let icon = '';
   switch (type) {
     case 'error':
@@ -28,7 +28,8 @@ export const NotificationPanel = ({ type, msg }) => {
   }
 
   return (
-    <div className="notification">
+    <div className={`notification ${additionalClass ? additionalClass : ''}`}>
+      {additionalClass && <i className="fa fa-times" title="Hide the error" onClick={hideErrorOnClick} />}
       {icon !== '' && <i className={`fa fa-${icon}`} style={{ marginRight: '6px' }} />}
       {msg}
     </div>

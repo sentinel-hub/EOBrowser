@@ -7,7 +7,7 @@ import './DisplayWall.scss';
 
 const stories = storiesOf('LocationSearchBox', module);
 
-const setMapLocation = data => {
+const setMapLocation = (data) => {
   console.log('this function gets called when user selects the location', data.location);
 };
 
@@ -34,7 +34,7 @@ class SimulateInputFromOutside extends Component {
     this.setState({ value: 'ljub' });
   };
 
-  onChange = value => {
+  onChange = (value) => {
     this.setState({ value: value });
   };
 
@@ -97,7 +97,7 @@ class DisplayWall extends Component {
     this.setState({ value: 'ljub' });
   };
 
-  onChange = value => {
+  onChange = (value) => {
     this.setState({ value: value });
   };
 

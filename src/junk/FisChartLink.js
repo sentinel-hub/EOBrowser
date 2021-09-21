@@ -3,7 +3,7 @@ import { t } from 'ttag';
 
 import { isCustomPreset } from './EOBCommon/utils/utils';
 
-export const FisChartLink = props => {
+export const FisChartLink = (props) => {
   const isSelectedResult = !!props.selectedResult;
   const isCustomLayer = props.selectedResult && isCustomPreset(props.selectedResult.preset);
   const isShadowLayerAvailable = props.selectedResult && !!props.fisShadowLayer;
@@ -33,7 +33,7 @@ export const FisChartLink = props => {
       // jsx-a11y/anchor-is-valid
       // eslint-disable-next-line
       <a
-        onClick={e => {
+        onClick={(e) => {
           e.preventDefault();
           props.onErrorMessage(errorMessage);
         }}

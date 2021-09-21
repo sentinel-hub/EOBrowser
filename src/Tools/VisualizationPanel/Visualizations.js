@@ -33,7 +33,7 @@ class Visualizations extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   selectedVisualizationId: store.visualization.layerId,
   customSelected: store.visualization.customSelected,
   datasetId: store.visualization.datasetId,

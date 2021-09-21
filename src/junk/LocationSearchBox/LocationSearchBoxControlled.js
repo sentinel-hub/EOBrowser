@@ -13,8 +13,8 @@ import './LocationSearchBox.scss';
 class LocationSearchBoxControlled extends React.PureComponent {
   static defaultProps = {
     value: '',
-    onChange: value => {},
-    onSelect: item => {},
+    onChange: (value) => {},
+    onSelect: (item) => {},
     minChar: 4,
     resultsShown: 5,
     placeholder: 'Search...',
@@ -47,8 +47,9 @@ class LocationSearchBoxControlled extends React.PureComponent {
   componentDidMount() {
     this.debouncedOnInputChange = debounce(this.onInputChangeDelayed, 700);
 
-    if (this.props.googleAccessToken) {
-      this.loadGoogleMapsScript();
+    if (this.props.googleAPI) {
+      this.googleAutocompleteService = new this.props.googleAPI.maps.places.AutocompleteService();
+      this.googleGeocoder = new this.props.googleAPI.maps.Geocoder();
     }
   }
 
@@ -60,6 +61,11 @@ class LocationSearchBoxControlled extends React.PureComponent {
     // This fixes behavoiur of having a dropdown appear when the input's characters are removed all at once
     if (this.props.value.length > 0) {
       this.input.focus();
+    }
+
+    if (this.props.googleAPI && !prevProps.googleAPI) {
+      this.googleAutocompleteService = new this.props.googleAPI.maps.places.AutocompleteService();
+      this.googleGeocoder = new this.props.googleAPI.maps.Geocoder();
     }
   }
 
@@ -74,24 +80,24 @@ class LocationSearchBoxControlled extends React.PureComponent {
   };
 
   handleSearchClick = () => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       return {
         isSearchVisible: !prevState.isSearchVisible,
       };
     });
   };
 
-  handleInputChange = e => {
+  handleInputChange = (e) => {
     const value = e.target.value;
     this.props.onChange(value);
   };
 
-  isCoordinate = string => {
+  isCoordinate = (string) => {
     const coordRegex = /^[ ]*[+-]?[0-9]{1,2}([.][0-9]+)?[ ]*[,][ ]*[+-]?[0-9]{1,3}([.][0-9]+)?[ ]*$/g;
     return coordRegex.test(string);
   };
 
-  onInputChangeDelayed = async value => {
+  onInputChangeDelayed = async (value) => {
     if (value.length >= this.props.minChar) {
       if (this.isCoordinate(value)) {
         const [lat, lng] = value.trim().split(',');
@@ -106,7 +112,7 @@ class LocationSearchBoxControlled extends React.PureComponent {
         this.setState({
           locationResults: locations,
         });
-      } else if (this.props.googleAccessToken) {
+      } else if (this.props.googleAPI) {
         this.fetchLocationsGoogle(value);
       } else if (this.props.mapboxAccessToken) {
         try {
@@ -135,7 +141,7 @@ class LocationSearchBoxControlled extends React.PureComponent {
     }
   };
 
-  fetchLocationsMapbox = async keyword => {
+  fetchLocationsMapbox = async (keyword) => {
     const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${keyword}.json`;
     const requestParams = {
       params: {
@@ -157,7 +163,7 @@ class LocationSearchBoxControlled extends React.PureComponent {
     };
 
     const { data } = await axios(url, requestParams);
-    const locations = data.features.map(location => ({
+    const locations = data.features.map((location) => ({
       placeId: location.id,
       label: location.matching_place_name || location.place_name,
       location: location.center,
@@ -166,28 +172,12 @@ class LocationSearchBoxControlled extends React.PureComponent {
     return locations;
   };
 
-  loadGoogleMapsScript = () => {
-    if (window.google) {
-      this.googleAutocompleteService = new window.google.maps.places.AutocompleteService();
-      this.googleGeocoder = new window.google.maps.Geocoder();
-    } else {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${this.props.googleAccessToken}&libraries=places`;
-      script.async = false;
-      script.onload = () => {
-        this.googleAutocompleteService = new window.google.maps.places.AutocompleteService();
-        this.googleGeocoder = new window.google.maps.Geocoder();
-      };
-      document.body.appendChild(script);
-    }
-  };
-
-  fetchLocationsGoogle = async keywords => {
+  fetchLocationsGoogle = async (keywords) => {
     const options = {
       input: keywords,
     };
 
-    this.googleAutocompleteService.getPlacePredictions(options, suggestions => {
+    this.googleAutocompleteService.getPlacePredictions(options, (suggestions) => {
       if (!suggestions) {
         this.setState({
           locationResults: [],
@@ -195,7 +185,7 @@ class LocationSearchBoxControlled extends React.PureComponent {
         return;
       }
 
-      const locations = suggestions.map(location => ({
+      const locations = suggestions.map((location) => ({
         placeId: location.place_id,
         label: location.description,
         location: null,
@@ -212,9 +202,9 @@ class LocationSearchBoxControlled extends React.PureComponent {
 
     if (this.isCoordinate(inputValue) || this.props.mapboxAccessToken) {
       this.props.onSelect(item);
-    } else if (this.props.googleAccessToken) {
+    } else if (this.props.googleAPI) {
       this.googleGeocoder.geocode({ placeId: item.placeId }, (results, status) => {
-        if (status !== window.google.maps.GeocoderStatus.OK) {
+        if (status !== this.props.googleAPI.maps.GeocoderStatus.OK) {
           console.error(`Geocoder failed converting placeId to lat/lng, status: ${status}`);
           return;
         }
@@ -241,10 +231,10 @@ class LocationSearchBoxControlled extends React.PureComponent {
 
     const autoComplete = (
       <Autocomplete
-        ref={el => (this.input = el)}
+        ref={(el) => (this.input = el)}
         value={value}
         items={locationResults}
-        getItemValue={item => item.label}
+        getItemValue={(item) => item.label}
         onSelect={this.onSelectHandle}
         onChange={this.handleInputChange}
         inputProps={{ placeholder: placeholder, style: inputStyle }}

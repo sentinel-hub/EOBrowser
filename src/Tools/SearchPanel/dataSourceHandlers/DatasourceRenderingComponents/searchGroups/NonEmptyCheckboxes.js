@@ -14,9 +14,9 @@ export default class NonEmptyCheckboxes extends React.Component {
     }
   }
 
-  toggleChecked = ev => {
+  toggleChecked = (ev) => {
     const v = ev.target.value;
-    this.setState(oldState => {
+    this.setState((oldState) => {
       let newChecked = new Set(oldState.checked);
       if (oldState.checked.has(v)) {
         newChecked.delete(v);
@@ -32,7 +32,7 @@ export default class NonEmptyCheckboxes extends React.Component {
   render() {
     return (
       <div className="checkboxes">
-        {Object.keys(this.props.choices).map(k => (
+        {Object.keys(this.props.choices).map((k) => (
           <label key={k} className="checkboxItem">
             <input
               type="checkbox"

@@ -1,0 +1,38 @@
+@import '../../variables';
+
+div.commercial-data-description {
+  padding: 5px;
+
+  strong {
+    color: $textCol;
+  }
+
+  p {
+    font-size: 1em;
+
+    img {
+      width: 100%;
+    }
+  }
+
+  a {
+    color: $primaryCol;
+  }
+
+  ul {
+    padding-inline-start: 1.5em;
+
+    li {
+      padding: 5px;
+    }
+  }
+
+  .commercial-video-player {
+    width: 100%;
+    height: 250px;
+  }
+}
+
+.commercial-data-button {
+  margin: 15px 0;
+}

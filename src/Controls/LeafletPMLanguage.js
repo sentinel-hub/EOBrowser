@@ -1,11 +1,11 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'ttag';
-import 'leaflet.pm';
+import '@geoman-io/leaflet-geoman-free';
 
 class LeafletPMLanguage extends Component {
-  // Sets the language for leaflet.pm, which is used in POI and AOI components
-  // https://www.npmjs.com/package/leaflet.pm#customize-language
+  // Sets the language for geoman, which is used in POI and AOI components
+  // https://github.com/geoman-io/leaflet-geoman#customize-language
 
   componentDidMount() {
     this.setLanguage(this.props.selectedLanguage);
@@ -17,7 +17,7 @@ class LeafletPMLanguage extends Component {
     }
   }
 
-  setLanguage = selectedLanguage => {
+  setLanguage = (selectedLanguage) => {
     const translation = {
       tooltips: {
         placeMarker: t`Click to place marker`,
@@ -34,7 +34,7 @@ class LeafletPMLanguage extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   selectedLanguage: store.language.selectedLanguage,
 });
 

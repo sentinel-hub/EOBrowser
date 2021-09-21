@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { t } from 'ttag';
 
 import UserAuth from '../../Auth/UserAuth';
+import { LOCAL_STORAGE_AUTH_KEY } from '../../Auth/authHelpers';
 import LanguageSelector from '../../LanguageSelector/LanguageSelector';
 import sgLogo from './sgLogo.png';
 import './Header.scss';
@@ -21,7 +22,7 @@ class HeaderWithLogin extends Component {
   };
 
   onLogOut = () => {
-    localStorage.removeItem(this.LOCAL_STORAGE_AUTH_KEY);
+    localStorage.removeItem(LOCAL_STORAGE_AUTH_KEY);
     store.dispatch(authSlice.actions.resetUser());
   };
 
@@ -64,7 +65,7 @@ class HeaderWithLogin extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   user: store.auth.user.userdata,
   selectedLanguage: store.language.selectedLanguage,
 });

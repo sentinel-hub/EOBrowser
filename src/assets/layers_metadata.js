@@ -335,13 +335,37 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'AWS_LTML2', layerId: '1_TRUE_COLOR' },
     ],
     description: () =>
-      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 4-5 TM has 7 bands. The true color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here]( https://www.usgs.gov/centers/eros/science/usgs-eros-archive-landsat-archives-landsat-4-5-thematic-mapper-tm-level-1-data?qt-science_center_objects=0#qt-science_center_objects).`,
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 4-5 TM has 7 bands. The true color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://www.usgs.gov/faqs/what-are-band-designations-landsat-satellites).`,
   },
   {
     match: [
       { datasourceId: 'AWS_LTML1', layerId: 'THERMAL' },
       { datasourceId: 'AWS_LTML2', layerId: 'THERMAL' },
     ],
+    legend: {
+      type: 'continuous',
+      minPosition: 223,
+      maxPosition: 348,
+      gradients: [
+        { position: 223, color: '#000000', label: '<= -50' },
+        { position: 253, color: '#AE0000', label: '-20' },
+        { position: 263, color: '#FF6E00', label: '-10' },
+        { position: 272, color: '#FF8600' },
+        { position: 273, color: '#FFFFFF', label: '0' },
+        { position: 274, color: '#fefce7' },
+        { position: 283, color: '#FDE191', label: '10' },
+        { position: 293, color: '#f69855', label: '20' },
+        { position: 303, color: '#f66927', label: '30' },
+        { position: 323, color: '#aa2d1d', label: '50' },
+        { position: 342, color: '#650401', label: '90' },
+        { position: 348, color: '#3d0200', label: '>= 100 [°C]' },
+      ],
+    },
+    description: () =>
+      t`# Thermal band 6\n\nThis thermal visualization is based on band 6 (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). At the central wavelength of 11040 nm it measures in the thermal infrared, or TIR. Instead of measuring the temperature of the air, like weather stations do, band 6 reports on the ground itself, which is often much hotter. Thermal band 6 is useful in providing surface temperatures and is collected with a 120-meter resolution, resampled to 30-meter.\n\n\n\nMore info [here](https://www.usgs.gov/faqs/what-are-band-designations-landsat-satellites).`,
+  },
+  {
+    match: [{ datasourceId: 'AWS_LETML2', layerId: 'THERMAL' }],
     legend: {
       type: 'continuous',
       minPosition: 223,
@@ -362,9 +386,56 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Thermal band 6\n\nThis thermal visualization is based on band 6 (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). At the central wavelength of 11040 nm it measures in the thermal infrared, or TIR. Instead of measuring the temperature of the air, like weather stations do, band 6 reports on the ground itself, which is often much hotter. Thermal band 6 is useful in providing surface temperatures and is collected with a 120-meter resolution, resampled to 30-meter.\n\n\n\nMore info [here](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-landsat-archives-landsat-4-5-thematic-mapper-tm-level-1-data?qt-science_center_objects=0#qt-science_center_objects).`,
+      t`# Thermal Visualization\n\nThis thermal visualization is based on band B06 (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). At the central wavelength of 10400-12500 nm it measures in the thermal infrared, or TIR. Instead of measuring the temperature of the air, like weather stations do, band B06 reports on the ground itself, which is often much hotter. Thermal band B06 is useful in providing surface temperatures and is collected with a 60-meter resolution, resampled to 30-meter.\n\n\n\nMore info [here](https://www.usgs.gov/faqs/what-are-band-designations-landsat-satellites) and [here](https://custom-scripts.sentinel-hub.com/landsat-7-etm/thermal/).`,
   },
-
+  {
+    match: [{ datasourceId: 'AWS_LETML1', layerId: 'THERMAL-VCID_1' }],
+    legend: {
+      type: 'continuous',
+      minPosition: 223,
+      maxPosition: 348,
+      gradients: [
+        { position: 223, color: '#003d99', label: '<= -50' },
+        { position: 253, color: '#2e82ff', label: '-20' },
+        { position: 263, color: '#80b3ff', label: '-10' },
+        { position: 272, color: '#e0edff' },
+        { position: 273, color: '#ffffff', label: '0' },
+        { position: 274, color: '#fefce7' },
+        { position: 283, color: '#FDE191', label: '10' },
+        { position: 293, color: '#f69855', label: '20' },
+        { position: 303, color: '#f66927', label: '30' },
+        { position: 323, color: '#aa2d1d', label: '50' },
+        { position: 342, color: '#650401', label: '90' },
+        { position: 348, color: '#3d0200', label: '>= 100 [°C]' },
+      ],
+    },
+    description: () =>
+      t`# Thermal B06_VCID_1 Visualization\n\nThis thermal visualization is based on band B06_VCID_1 (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). At the central wavelength of 10400-12500 nm it measures in the thermal infrared, or TIR. Instead of measuring the temperature of the air, like weather stations do, B06_VCID_1 reports on the ground itself, which is often much hotter. It is useful in providing surface temperatures and is collected with a 60-meter resolution, resampled to 30-meters. As its dinamic range is wider than that of B06_VCID_2, it is less likely to oversaturate over hot areas. \n\n\n\nMore info [here](https://www.usgs.gov/faqs/why-do-landsat-7-level-1-products-contain-two-thermal-bands?qt-news_science_products=0#qt-news_science_products).`,
+  },
+  {
+    match: [{ datasourceId: 'AWS_LETML1', layerId: 'THERMAL-VCID_2' }],
+    legend: {
+      type: 'continuous',
+      minPosition: 223,
+      maxPosition: 348,
+      gradients: [
+        { position: 223, color: '#003d99', label: '<= -50' },
+        { position: 253, color: '#2e82ff', label: '-20' },
+        { position: 263, color: '#80b3ff', label: '-10' },
+        { position: 272, color: '#e0edff' },
+        { position: 273, color: '#ffffff', label: '0' },
+        { position: 274, color: '#fefce7' },
+        { position: 283, color: '#FDE191', label: '10' },
+        { position: 293, color: '#f69855', label: '20' },
+        { position: 303, color: '#f66927', label: '30' },
+        { position: 323, color: '#aa2d1d', label: '50' },
+        { position: 342, color: '#650401', label: '90' },
+        { position: 348, color: '#3d0200', label: '>= 100 [°C]' },
+      ],
+    },
+    description: () =>
+      t`# Thermal B06_VCID_2 Visualization\n\nThis thermal visualization is based on band B06_VCID_2 (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). At the central wavelength of 10400-12500 nm it measures in the thermal infrared, or TIR. Instead of measuring the temperature of the air, like weather stations do, B06_VCID_2 reports on the ground itself, which is often much hotter. It is useful in providing surface temperatures and is collected with a 60-meter resolution, resampled to 30-meters. Its dinamic range is narrower than that of B06_VCID_1, which means it is more likely to oversaturate over hot areas, but in turn has slightly higher radiometric sensitivity.\n\n\n\nMore info [here](https://www.usgs.gov/faqs/why-do-landsat-7-level-1-products-contain-two-thermal-bands?qt-news_science_products=0#qt-news_science_products).`,
+  },
   {
     match: [
       { datasourceId: 'S2L1C', layerId: '3_NDVI' },
@@ -385,6 +456,9 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: '6_NDVI' },
       { datasourceId: 'S2L1C', layerId: '5_NDVI' },
       { datasourceId: 'S2L2A', layerId: '5_NDVI' },
+      { datasourceId: 'AWS_LETML2', layerId: 'NDVI' },
+      { datasourceId: 'AWS_LETML1', layerId: 'NDVI' },
+      { datasourceId: 'AWS_LMSSL1', layerId: 'NDVI' },
     ],
     legend: {
       type: 'continuous',
@@ -444,7 +518,6 @@ export const PREDEFINED_LAYERS_METADATA = [
     description: () =>
       t`# Normalized Difference Vegetation Index (NDVI)\n\nThe normalized difference vegetation index is a simple, but effective index for quantifying green vegetation. It is a measure of the state of vegetation health based on how plants reflect light at certain wavelengths. The value range of the NDVI is -1 to 1. Negative values of NDVI (values approaching -1) correspond to water. Values close to zero (-0.1to 0.1) generally correspond to barren areas of rock, sand, or snow. Low, positive values represent shrub and grassland (approximately 0.2 to 0.4), while high values indicate temperate and tropical rainforests (values approaching 1).\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/ndvi/) and [here.](https://eos.com/ndvi/)`,
   },
-
   {
     match: [
       { datasourceId: 'S2L1C', layerId: '4_EVI' },
@@ -556,6 +629,8 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: '2_MOISTURE-INDEX' },
       { datasourceId: 'S2L1C', layerId: '99_MOISTURE-INDEX' },
       { datasourceId: 'S2L2A', layerId: '99_MOISTURE-INDEX' },
+      { datasourceId: 'AWS_LETML2', layerId: 'MOISTURE-INDEX' },
+      { datasourceId: 'AWS_LETML1', layerId: 'MOISTURE-INDEX' },
     ],
     legend: {
       type: 'continuous',
@@ -589,6 +664,9 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'MODIS', layerId: 'NDWI' },
       { datasourceId: 'AWS_LTML1', layerId: '5_NDWI' },
       { datasourceId: 'AWS_LTML2', layerId: '5_NDWI' },
+      { datasourceId: 'AWS_LETML1', layerId: 'NDWI' },
+      { datasourceId: 'AWS_LETML2', layerId: 'NDWI' },
+      { datasourceId: 'AWS_LMSSL1', layerId: 'NDWI' },
     ],
     legend: {
       type: 'continuous',
@@ -640,10 +718,26 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: 'FALSE-COLOR' },
       { datasourceId: 'S2L1C', layerId: '2_FALSE-COLOR' },
       { datasourceId: 'S2L2A', layerId: '2_FALSE-COLOR' },
+      { datasourceId: 'AWS_LETML2', layerId: 'FALSE-COLOR' },
+      { datasourceId: 'AWS_LETML1', layerId: 'FALSE-COLOR' },
     ],
 
     description: () =>
       t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/false_color_infrared/) and [here.](https://earthobservatory.nasa.gov/features/FalseColor/page6.php)`,
+  },
+
+  {
+    match: [{ datasourceId: 'AWS_LMSSL1', layerId: 'FALSE-COLOR-ULTRA-RED' }],
+
+    description: () =>
+      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black. In this case, the NIR band used in the red channel is Ultra Red band 3 (700 - 800 nm), which is particularly useful for distinguishing vegetation boundaries between land and water and various landforms. \n\n\n\nMore info [here](https://eos.com/find-satellite/landsat-5-mss/) and [here](https://custom-scripts.sentinel-hub.com/landsat-1-5-mss/false-color-ultrared/).`,
+  },
+
+  {
+    match: [{ datasourceId: 'AWS_LMSSL1', layerId: 'FALSE-COLOR-NEAR-INFRARED' }],
+
+    description: () =>
+      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black. In this case, the NIR band used in the red channel is the NIR band 4 (800 - 1100 nm), which penetrates atmospheric haze, emphasizes vegetation, and distinguishes between land and water. \n\n\n\nMore info [here](https://eos.com/find-satellite/landsat-5-mss/) and [here](https://custom-scripts.sentinel-hub.com/landsat-1-5-mss/false-color-nir/).`,
   },
 
   {
@@ -654,7 +748,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://gisgeography.com/landsat-8-bands-combinations/)`,
+      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/false_color_infrared/) and [here.](https://gisgeography.com/landsat-8-bands-combinations/)`,
   },
 
   {
@@ -694,7 +788,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Sentinel-2 has 13 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/) and [here.](http://www.fis.uni-bonn.de/en/recherchetools/infobox/professionals/remote-sensing-systems/spectroscopy).`,
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Sentinel-2 has 13 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/true_color/) and [here.](http://www.fis.uni-bonn.de/en/recherchetools/infobox/professionals/remote-sensing-systems/spectroscopy).`,
   },
 
   {
@@ -727,7 +821,15 @@ export const PREDEFINED_LAYERS_METADATA = [
     description: () =>
       t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 8 has 11 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
   },
+  {
+    match: [
+      { datasourceId: 'AWS_LETML2', layerId: '1_TRUE_COLOR' },
+      { datasourceId: 'AWS_LETML1', layerId: '1_TRUE_COLOR' },
+    ],
 
+    description: () =>
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/landsat-7-etm/true-color//)`,
+  },
   {
     match: [{ datasourceId: 'ENVISAT_MERIS', layerId: '1_TRUE_COLOR' }],
 
@@ -769,7 +871,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# False Color Urban composite\n\nThis composite is used to visualize urbanized areas more clearly. Vegetation is visible in shades of green, while urbanized areas are represented by white, grey, or purple. Soils, sand, and minerals are shown in a variety of colors. Snow and ice appear as dark blue, and water as black or blue. Flooded areas are very dark blue and almost black. The composite is useful for detecting wildfires and calderas of volcanoes, as they are displayed in shades of red and yellow.\n\n\n\nMore info [here.](https://eos.com/false-color/)`,
+      t`# False Color Urban composite\n\nThis composite is used to visualize urbanized areas more clearly. Vegetation is visible in shades of green, while urbanized areas are represented by white, grey, or purple. Soils, sand, and minerals are shown in a variety of colors. Snow and ice appear as dark blue, and water as black or blue. Flooded areas are very dark blue and almost black. The composite is useful for detecting wildfires and calderas of volcanoes, as they are displayed in shades of red and yellow.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/false-color-urban-rgb/) and [here.](https://eos.com/false-color/)`,
   },
 
   {
@@ -824,6 +926,8 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: '5_SWIR' },
       { datasourceId: 'S2L1C', layerId: 'SWIR' },
       { datasourceId: 'S2L2A', layerId: 'SWIR' },
+      { datasourceId: 'AWS_LETML2', layerId: 'SWIR' },
+      { datasourceId: 'AWS_LETML1', layerId: 'SWIR' },
     ],
     titles: () => ({
       [EDUCATION_MODE.id]: `SWIR`,
@@ -832,7 +936,22 @@ export const PREDEFINED_LAYERS_METADATA = [
       [EDUCATION_MODE.id]: `Short Wave Infrared Composite`,
     }),
     description: () =>
-      t`# Short wave infrared composite (SWIR)\n\nShort wave infrared (SWIR) measurements can help scientists estimate how much water is present in plants and soil, as water absorbs SWIR wavelengths. Short wave infrared bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. In this composite vegetation appears in shades of green, soils and built-up areas are in various shades of brown, and water appears black. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/composites/)`,
+      t`# Short wave infrared composite (SWIR)\n\nShort wave infrared (SWIR) measurements can help scientists estimate how much water is present in plants and soil, as water absorbs SWIR wavelengths. Short wave infrared bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. In this composite vegetation appears in shades of green, soils and built-up areas are in various shades of brown, and water appears black. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/swir-rgb/)`,
+  },
+
+  {
+    match: [
+      { datasourceId: 'AWS_LETML2', layerId: 'SWIR' },
+      { datasourceId: 'AWS_LETML1', layerId: 'SWIR' },
+    ],
+    titles: () => ({
+      [EDUCATION_MODE.id]: `SWIR`,
+    }),
+    shortDescriptions: () => ({
+      [EDUCATION_MODE.id]: `Short Wave Infrared Composite`,
+    }),
+    description: () =>
+      t`# Short wave infrared composite (SWIR)\n\nShort wave infrared (SWIR) measurements can help scientists estimate how much water is present in plants and soil, as water absorbs SWIR wavelengths. Short wave infrared bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. In this composite vegetation appears in shades of green, soils and built-up areas are in various shades of brown, and water appears black. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/swir-rgb/)`,
   },
 
   {
@@ -849,7 +968,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       [EDUCATION_MODE.id]: `Normalised Difference Snow Index`,
     }),
     description: () =>
-      t`# Normalised Difference Snow Index (NDSI)\n\nThe Sentinel-2 normalised difference snow index can be used to differentiate between cloud and snow cover as snow absorbs in the short-wave infrared light, but reflects the visible light, whereas cloud is generally reflective in both wavelengths. Snow cover is represented in bright vivid blue.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/ndsi/) and [here.](https://earth.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-2a/algorithm)`,
+      t`# Normalised Difference Snow Index (NDSI)\n\nThe Sentinel-2 normalised difference snow index can be used to differentiate between cloud and snow cover as snow absorbs in the short-wave infrared light, but reflects the visible light, whereas cloud is generally reflective in both wavelengths. Snow cover is represented in bright vivid blue.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/ndsi-visualized/).`,
   },
 
   {
@@ -1062,7 +1181,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Scene classification\n\n\n\nScene classification was developed to distinguish between cloudy pixels, clear pixels and water pixels of Sentinel-2 data and is a result of ESA's Scene classification algorithm. Twelve different classifications are provided including classes of clouds, vegetation, soils/desert, water and snow. It does not constitute a land cover classification map in a strict sense.\n\n\n\nMore info [here.](https://earth.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-2a/algorithm)`,
+      t`# Scene classification\n\n\n\nScene classification was developed to distinguish between cloudy pixels, clear pixels and water pixels of Sentinel-2 data and is a result of ESA's Scene classification algorithm. Twelve different classifications are provided including classes of clouds, vegetation, soils/desert, water and snow. It does not constitute a land cover classification map in a strict sense.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/scene-classification/).`,
   },
 
   {

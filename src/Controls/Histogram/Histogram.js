@@ -20,7 +20,7 @@ export default class Histogram extends Component {
         {
           orient: 'bottom',
           ticks: 10,
-          tickFormat: d => {
+          tickFormat: (d) => {
             const pos = Math.round((this.props.data.length - 1) * d);
             return this.props.data[pos].value.toFixed(2);
           },
@@ -30,7 +30,7 @@ export default class Histogram extends Component {
       ],
 
       hoverAnnotation: true,
-      tooltipContent: d => d.column.name,
+      tooltipContent: (d) => d.column.name,
       margin: { bottom: 50, left: 80, top: 30, right: 30 }, // otherwise axis labels are clipped on edges
     };
     return (

@@ -1,16 +1,25 @@
 import React from 'react';
-import { Map as LeafletMap, Pane, LayersControl, GeoJSON, Marker, FeatureGroup } from 'react-leaflet';
+import {
+  Map as LeafletMap,
+  Pane,
+  LayersControl,
+  GeoJSON,
+  Rectangle,
+  Marker,
+  FeatureGroup,
+} from 'react-leaflet';
 import inside from 'turf-inside';
 import { connect } from 'react-redux';
 import NProgress from 'nprogress';
+import ReactLeafletGoogleLayer from './plugins/ReactLeafletGoogleLayer';
 import 'nprogress/nprogress.css';
 
-import store, { mainMapSlice, visualizationSlice } from '../store';
+import store, { commercialDataSlice, mainMapSlice, visualizationSlice } from '../store';
 import 'leaflet/dist/leaflet.css';
 import './Map.scss';
 import L from 'leaflet';
 import moment from 'moment';
-
+import { AOI_SHAPE, SEARCH_PANEL_TABS } from '../const';
 import Controls from '../Controls/Controls';
 import SearchBox from '../SearchBox/SearchBox';
 import Tutorial from '../Tutorial/Tutorial';
@@ -19,17 +28,19 @@ import LeafletControls from './LeafletControls/LeafletControls';
 import AboutSHLinks from './AboutSHLinks/AboutSHLinks';
 import SentinelHubLayerComponent from './plugins/sentinelhubLeafletLayer';
 import GlTileLayer from './plugins/GlTileLayer';
-import { baseLayers, overlayTileLayers } from './Layers';
+import { baseLayers, overlayTileLayers, LAYER_ACCESS } from './Layers';
 import {
   getDatasetLabel,
   getDataSourceHandler,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getAppropriateAuthToken, getGetMapAuthToken } from '../App';
-import { constructErrorMessage } from '../utils';
+import { constructErrorMessage, validateEvalScript } from '../utils';
 import TimelapseAreaPreview from '../Controls/Timelapse/TimelapseAreaPreview';
 
 import { DEFAULT_ZOOM_CONFIGURATION } from '../Tools/SearchPanel/dataSourceHandlers/DataSourceHandler';
+import { checkUserAccount } from '../Tools/CommercialDataPanel/commercialData.utils';
 import MaptilerLogo from './maptiler-logo-adaptive.svg';
+import { SpeckleFilterType } from '@sentinel-hub/sentinelhub-js';
 
 const BASE_PANE_ID = 'baseMapPane';
 const BASE_PANE_ZINDEX = 5;
@@ -52,13 +63,31 @@ class Map extends React.Component {
     showSpinner: false,
     parent: `#map`,
   });
+  state = {
+    accountInfo: {
+      payingAccount: false,
+      quotasEnabled: false,
+    },
+  };
 
-  updateViewport = viewport => {
+  async componentDidMount() {
+    const accountInfo = await checkUserAccount(this.props.auth.user);
+    this.setState({ accountInfo: accountInfo });
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (prevProps.auth !== this.props.auth) {
+      const accountInfo = await checkUserAccount(this.props.auth.user);
+      this.setState({ accountInfo: accountInfo });
+    }
+  }
+
+  updateViewport = (viewport) => {
     viewport.center = Object.values(L.latLng(...viewport.center).wrap());
     store.dispatch(mainMapSlice.actions.setViewport(viewport));
   };
 
-  setBounds = ev => {
+  setBounds = (ev) => {
     store.dispatch(
       mainMapSlice.actions.setBounds({
         bounds: ev.target.getBounds(),
@@ -67,7 +96,7 @@ class Map extends React.Component {
     );
   };
 
-  onPreviewClick = e => {
+  onPreviewClick = (e) => {
     const clickedPoint = {
       type: 'Feature',
       geometry: {
@@ -75,11 +104,11 @@ class Map extends React.Component {
         coordinates: [e.latlng.lng, e.latlng.lat],
       },
     };
-    const selectedTiles = this.props.query.allResults.filter(tile => inside(clickedPoint, tile));
+    const selectedTiles = this.props.query.allResults.filter((tile) => inside(clickedPoint, tile));
     this.props.setSelectedTiles(selectedTiles);
   };
 
-  getZoomConfiguration = datasetId => {
+  getZoomConfiguration = (datasetId) => {
     try {
       const dataSourceHandler = getDataSourceHandler(datasetId);
       const zoomConfiguration = dataSourceHandler.getLeafletZoomConfig(datasetId);
@@ -90,8 +119,12 @@ class Map extends React.Component {
     }
   };
 
-  onTileError = async error => {
-    const message = await constructErrorMessage(error);
+  onTileError = async (error) => {
+    let message = await constructErrorMessage(error);
+
+    if (message.split('\n').length <= 1 && !validateEvalScript(this.props.evalscript)) {
+      message += '\nEvalscript V3 needs to include `setup()` and `evaluatePixel()` functions.';
+    }
     store.dispatch(visualizationSlice.actions.setError(message));
   };
 
@@ -122,6 +155,7 @@ class Map extends React.Component {
       dataFusion,
       dataSourcesInitialized,
       selectedTabIndex,
+      selectedTabSearchPanelIndex,
       displayingTileGeometries,
       comparedLayers,
       comparedOpacity,
@@ -137,16 +171,30 @@ class Map extends React.Component {
       minQa,
       upsampling,
       downsampling,
+      speckleFilter,
+      orthorectification,
       selectedLanguage,
       auth,
       displayTimelapseAreaPreview,
+      googleAPI,
     } = this.props;
 
     const zoomConfig = this.getZoomConfiguration(datasetId);
 
+    const shownBaseLayers =
+      this.state.accountInfo.payingAccount && googleAPI
+        ? baseLayers
+        : baseLayers.filter((baseLayer) => baseLayer.access === LAYER_ACCESS.PUBLIC);
+
+    let speckleFilterProp = speckleFilter;
+    const dsh = getDataSourceHandler(datasetId);
+    if (dsh && !dsh.canApplySpeckleFilter(datasetId, this.props.zoom)) {
+      speckleFilterProp = { type: SpeckleFilterType.NONE };
+    }
+
     return (
       <LeafletMap
-        ref={el => (this.mapRef = el)}
+        ref={(el) => (this.mapRef = el)}
         minZoom={0}
         onViewportChanged={this.updateViewport}
         center={[this.props.lat, this.props.lng]}
@@ -157,14 +205,15 @@ class Map extends React.Component {
         attributionControl={false}
         scaleControl={false}
         fadeAnimation={false}
+        tap={false}
         id="map"
-        onOverlayAdd={ev => {
+        onOverlayAdd={(ev) => {
           store.dispatch(mainMapSlice.actions.addOverlay(ev.layer.options.overlayTileLayerId));
           if (ev.layer.options.pane === SENTINELHUB_LAYER_PANE_ID) {
             store.dispatch(visualizationSlice.actions.setVisibleOnMap(true));
           }
         }}
-        onOverlayRemove={ev => {
+        onOverlayRemove={(ev) => {
           store.dispatch(mainMapSlice.actions.removeOverlay(ev.layer.options.overlayTileLayerId));
           if (ev.layer.options.pane === SENTINELHUB_LAYER_PANE_ID) {
             store.dispatch(visualizationSlice.actions.setVisibleOnMap(false));
@@ -174,6 +223,7 @@ class Map extends React.Component {
         <Pane name={BASE_PANE_ID} style={{ zIndex: BASE_PANE_ZINDEX }} />
 
         <LayersControl
+          key={shownBaseLayers.length} // force rerender of layers-control to reset the selected layer if google maps was selected and user logs out.
           position="topright"
           sortLayers={true}
           sortFunction={(a, b) => {
@@ -186,15 +236,22 @@ class Map extends React.Component {
             );
           }}
         >
-          {baseLayers.map(baseLayer => (
+          {shownBaseLayers.map((baseLayer) => (
             <BaseLayer checked={baseLayer.checked} name={baseLayer.name} key={baseLayer.name}>
-              <GlTileLayer
-                style={baseLayer.url}
-                accessToken={process.env.REACT_APP_MAPBOX_KEY}
-                attribution={baseLayer.attribution}
-                pane={BASE_PANE_ID}
-                preserveDrawingBuffer={baseLayer.preserveDrawingBuffer}
-              />
+              {baseLayer.urlType === 'VECTOR' ? (
+                <GlTileLayer
+                  style={baseLayer.url}
+                  attribution={baseLayer.attribution}
+                  pane={BASE_PANE_ID}
+                  preserveDrawingBuffer={baseLayer.preserveDrawingBuffer}
+                />
+              ) : baseLayer.urlType === 'GOOGLE_MAPS' ? (
+                <ReactLeafletGoogleLayer
+                  apiKey={process.env.REACT_APP_GOOGLE_MAP_KEY}
+                  type={'satellite'}
+                  pane={BASE_PANE_ID}
+                />
+              ) : null}
               )
             </BaseLayer>
           ))}
@@ -234,6 +291,8 @@ class Map extends React.Component {
                   minQa={minQa}
                   upsampling={upsampling}
                   downsampling={downsampling}
+                  speckleFilter={speckleFilterProp}
+                  orthorectification={orthorectification}
                   getMapAuthToken={getGetMapAuthToken(auth)}
                   onTileImageError={this.onTileError}
                   onTileImageLoad={this.onTileLoad}
@@ -267,6 +326,8 @@ class Map extends React.Component {
                   minQa,
                   upsampling,
                   downsampling,
+                  speckleFilterProp,
+                  orthorectification,
                   themeId,
                 } = p;
                 const dsh = getDataSourceHandler(datasetId);
@@ -283,20 +344,11 @@ class Map extends React.Component {
                     pinTimeFrom = moment.utc(fromTime).toDate();
                     pinTimeTo = moment.utc(toTime).toDate();
                   } else {
-                    pinTimeFrom = moment
-                      .utc(toTime)
-                      .startOf('day')
-                      .toDate();
-                    pinTimeTo = moment
-                      .utc(toTime)
-                      .endOf('day')
-                      .toDate();
+                    pinTimeFrom = moment.utc(toTime).startOf('day').toDate();
+                    pinTimeTo = moment.utc(toTime).endOf('day').toDate();
                   }
                 } else {
-                  pinTimeTo = moment
-                    .utc(toTime)
-                    .endOf('day')
-                    .toDate();
+                  pinTimeTo = moment.utc(toTime).endOf('day').toDate();
                 }
                 const index = comparedLayers.length - 1 - i;
                 return (
@@ -328,6 +380,8 @@ class Map extends React.Component {
                     minQa={minQa}
                     upsampling={upsampling}
                     downsampling={downsampling}
+                    speckleFilter={speckleFilterProp}
+                    orthorectification={orthorectification}
                     pane={SENTINELHUB_LAYER_PANE_ID}
                     progress={this.progress}
                     accessToken={getAppropriateAuthToken(auth, themeId)}
@@ -338,7 +392,7 @@ class Map extends React.Component {
                 );
               })}
 
-          {overlayTileLayers().map(overlayTileLayer => (
+          {overlayTileLayers().map((overlayTileLayer) => (
             <Overlay
               name={overlayTileLayer.name}
               key={`${overlayTileLayer.id}-${this.props.selectedLanguage}`}
@@ -347,7 +401,6 @@ class Map extends React.Component {
               <Pane name={overlayTileLayer.pane} style={{ zIndex: overlayTileLayer.zIndex }}>
                 <GlTileLayer
                   style={overlayTileLayer.url}
-                  accessToken={process.env.REACT_APP_MAPBOX_KEY}
                   attribution={overlayTileLayer.attribution}
                   overlayTileLayerId={overlayTileLayer.id}
                   pane={overlayTileLayer.pane}
@@ -358,11 +411,12 @@ class Map extends React.Component {
           ))}
         </LayersControl>
 
-        <GeoJSON
-          id="aoi-layer"
-          data={this.props.aoiGeometry ? this.props.aoiGeometry : null}
-          key={this.props.aoiLastEdited}
-        />
+        {(this.props.aoiShape === AOI_SHAPE.polygon || !this.props.aoiShape) && this.props.aoiGeometry && (
+          <GeoJSON id="aoi-layer" data={this.props.aoiGeometry} key={this.props.aoiLastEdited} />
+        )}
+        {this.props.aoiShape === AOI_SHAPE.rectangle && this.props.aoiBounds && (
+          <Rectangle id="aoi-layer" bounds={this.props.aoiBounds} key={this.props.aoiLastEdited} />
+        )}
         {!this.props.poiPosition ? null : <Marker id="poi-layer" position={this.props.poiPosition} />}
 
         {this.props.query && selectedTabIndex === 0 && displayingTileGeometries ? (
@@ -380,8 +434,56 @@ class Map extends React.Component {
           <TimelapseAreaPreview lat={lat} lng={lng} zoom={zoom} mapBounds={mapBounds} />
         )}
 
+        {this.props.commercialDataDisplaySearchResults &&
+          !!this.props.commercialDataHighlightedResult &&
+          selectedTabIndex === 0 && (
+            <GeoJSON
+              id="commercialDataResult"
+              data={this.props.commercialDataHighlightedResult.geometry}
+              key={this.props.commercialDataHighlightedResult.id}
+              style={() => highlightedTileStyle}
+            />
+          )}
+
+        {this.props.commercialDataDisplaySearchResults &&
+        selectedTabIndex === 0 &&
+        this.props.commercialDataSearchResults &&
+        this.props.commercialDataSearchResults.length > 0 ? (
+          <FeatureGroup
+            onClick={(e) => {
+              store.dispatch(
+                commercialDataSlice.actions.setLocation({ lat: e.latlng.lat, lng: e.latlng.lng }),
+              );
+            }}
+          >
+            {this.props.commercialDataSearchResults.map((result, i) => (
+              <PreviewLayer tile={result} key={`preview-layer-${i}`} />
+            ))}
+          </FeatureGroup>
+        ) : null}
+
+        {!!this.props.commercialDataSelectedOrder &&
+          !!this.props.commercialDataSelectedOrder.input &&
+          !!this.props.commercialDataSelectedOrder.input.bounds &&
+          !!this.props.commercialDataSelectedOrder.input.bounds.geometry &&
+          selectedTabIndex === 0 &&
+          selectedTabSearchPanelIndex === SEARCH_PANEL_TABS.COMMERCIAL_DATA_TAB && (
+            <GeoJSON
+              id="commercialDataSelectedOrder"
+              data={this.props.commercialDataSelectedOrder.input.bounds.geometry}
+              key={this.props.commercialDataSelectedOrder.id}
+              style={() => ({
+                weight: 2,
+                color: 'green',
+                opacity: 1,
+                fillColor: 'green',
+                fillOpacity: 0.3,
+              })}
+            />
+          )}
+
         <LeafletControls key={selectedLanguage} />
-        <SearchBox />
+        <SearchBox googleAPI={googleAPI} />
         <Tutorial selectedLanguage={this.props.selectedLanguage} />
         <Controls
           selectedLanguage={this.props.selectedLanguage}
@@ -397,7 +499,7 @@ class Map extends React.Component {
   }
 }
 
-const mapStoreToProps = store => {
+const mapStoreToProps = (store) => {
   return {
     lat: store.mainMap.lat,
     lng: store.mainMap.lng,
@@ -405,6 +507,8 @@ const mapStoreToProps = store => {
     mapBounds: store.mainMap.bounds,
     enabledOverlaysId: store.mainMap.enabledOverlaysId,
     aoiGeometry: store.aoi.geometry,
+    aoiShape: store.aoi.shape,
+    aoiBounds: store.aoi.bounds,
     aoiLastEdited: store.aoi.lastEdited,
     displayTimelapseAreaPreview: store.timelapse.displayTimelapseAreaPreview,
     poiPosition: store.poi.position,
@@ -433,11 +537,18 @@ const mapStoreToProps = store => {
     minQa: store.visualization.minQa,
     upsampling: store.visualization.upsampling,
     downsampling: store.visualization.downsampling,
+    speckleFilter: store.visualization.speckleFilter,
+    orthorectification: store.visualization.orthorectification,
     error: store.visualization.error,
     comparedLayers: store.compare.comparedLayers,
     comparedOpacity: store.compare.comparedOpacity,
     comparedClipping: store.compare.comparedClipping,
     auth: store.auth,
+    commercialDataSearchResults: store.commercialData.searchResults,
+    commercialDataHighlightedResult: store.commercialData.highlightedResult,
+    commercialDataDisplaySearchResults: store.commercialData.displaySearchResults,
+    commercialDataSelectedOrder: store.commercialData.selectedOrder,
+    selectedTabSearchPanelIndex: store.tabs.selectedTabSearchPanelIndex,
   };
 };
 

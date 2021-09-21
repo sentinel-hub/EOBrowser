@@ -17,7 +17,7 @@ class CopyToClipboard extends Component {
     this.elem.removeEventListener('copy', this.putTextInClipboard);
   }
 
-  putTextInClipboard = e => {
+  putTextInClipboard = (e) => {
     e.clipboardData.setData('text/plain', this.props.value);
     e.preventDefault();
     this.setState({ copied: true });
@@ -33,7 +33,7 @@ class CopyToClipboard extends Component {
     }, 200);
   };
 
-  selectAllText = e => {
+  selectAllText = (e) => {
     e.target.select();
   };
 
@@ -41,7 +41,7 @@ class CopyToClipboard extends Component {
     return (
       <div
         className="copy-wrapper"
-        ref={elem => {
+        ref={(elem) => {
           this.elem = elem;
         }}
       >

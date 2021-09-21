@@ -7,7 +7,7 @@ import Accordion from '../Accordion';
 
 const stories = storiesOf('Accordion', module);
 
-const AccordionDemo = props => {
+const AccordionDemo = (props) => {
   const [open, setOpen] = React.useState();
 
   return (

@@ -16,14 +16,14 @@ const YearMonthForm = ({ minFromDate, maxToDate, onChange, locale, selectedDay }
   return (
     <form className="year-month-form">
       <select name="month" onChange={handleChange} value={selectedDay.get('month')}>
-        {months.map(month => (
+        {months.map((month) => (
           <option key={month.name} value={month.index}>
             {month.name}
           </option>
         ))}
       </select>
       <select name="year" onChange={handleChange} value={selectedDay.get('year')}>
-        {years.map(year => (
+        {years.map((year) => (
           <option key={year} value={year}>
             {year}
           </option>

@@ -13,20 +13,20 @@ const sliderStyle = {
 const SLIDER_BUG_OFFSET = 100;
 
 export class SliderThreshold extends Component {
-  onUpdate = update => {
+  onUpdate = (update) => {
     this.props.onSliderUpdate(this.divideWithOffset(update));
   };
 
-  onChange = values => {
+  onChange = (values) => {
     this.props.onSliderChange(this.divideWithOffset(values));
   };
 
-  divideWithOffset = values => {
-    return values.map(item => item / SLIDER_BUG_OFFSET);
+  divideWithOffset = (values) => {
+    return values.map((item) => item / SLIDER_BUG_OFFSET);
   };
 
-  multiplyWithOffset = values => {
-    return values.map(item => item * SLIDER_BUG_OFFSET);
+  multiplyWithOffset = (values) => {
+    return values.map((item) => item * SLIDER_BUG_OFFSET);
   };
 
   calculateGradient = (handlePositions, gradient, values) => {

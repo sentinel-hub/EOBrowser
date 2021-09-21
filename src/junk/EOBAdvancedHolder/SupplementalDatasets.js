@@ -15,10 +15,8 @@ function SupplementalDatasets(props) {
       <div className="supplemental-dataset-label">{t`Additional datasets:`}</div>
 
       {supplementalDatasets.map((dataset, i) => {
-        const {
-          additionalMosaickingOrders,
-          additionalParametersComponent = null,
-        } = availableSupplementalDatasets[dataset.id];
+        const { additionalMosaickingOrders, additionalParametersComponent = null } =
+          availableSupplementalDatasets[dataset.id];
         const maxDate =
           availableSupplementalDatasets[dataset.id].dataset.maxDate === null
             ? moment.utc()
@@ -55,7 +53,7 @@ function SupplementalDatasets(props) {
         <select
           className="dropdown-normal-ui"
           value={selectedDataset}
-          onChange={ev => setSelectedDataset(ev.target.value)}
+          onChange={(ev) => setSelectedDataset(ev.target.value)}
         >
           {Object.entries(availableSupplementalDatasets).map(([datasetId, datasetInfo]) => (
             <option key={datasetId} value={datasetId}>

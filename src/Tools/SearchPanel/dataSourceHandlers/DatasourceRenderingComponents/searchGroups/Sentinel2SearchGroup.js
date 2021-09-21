@@ -42,13 +42,13 @@ class Sentinel2SearchGroup extends React.Component {
     };
   }
 
-  onOptionsChange = options => {
+  onOptionsChange = (options) => {
     this.setState({
       selectedOptions: options,
     });
   };
 
-  onMaxCCChange = maxCC => {
+  onMaxCCChange = (maxCC) => {
     this.setState({
       maxCC: maxCC,
     });
@@ -65,7 +65,7 @@ class Sentinel2SearchGroup extends React.Component {
 
   toggleAdvancedOpened = () => {
     this.setState(
-      oldState => ({
+      (oldState) => ({
         advancedOpened: !oldState.advancedOpened,
       }),
       () => {
@@ -80,14 +80,8 @@ class Sentinel2SearchGroup extends React.Component {
   };
 
   render() {
-    const {
-      key,
-      options,
-      hasMaxCCFilter,
-      renderOptionsFilters,
-      renderOptionsHelpTooltips,
-      optionsLabels,
-    } = this.props;
+    const { key, options, hasMaxCCFilter, renderOptionsFilters, renderOptionsHelpTooltips, optionsLabels } =
+      this.props;
     const { advancedOpened, maxCC, selectedOptions } = this.state;
     return (
       <>
@@ -106,7 +100,7 @@ class Sentinel2SearchGroup extends React.Component {
 
               {advancedOpened && (
                 <div>
-                  {options.map(option => (
+                  {options.map((option) => (
                     <div key={option}>
                       <div className="title">
                         <label>

@@ -2,7 +2,7 @@
 
 .calendar-wrapper {
   color: #fff;
-  margin-top: 10px;
+  margin-top: 12  px;
 
   .year-month-form {
     padding: 0 2.5rem;
@@ -124,6 +124,19 @@
   .date-nav-button.disabled {
     i {
       color: #aaa;
+    }
+  }
+
+  .cc-slider {
+    width: 100%;
+  }
+
+  .cloud-cover-calendar-cc-section {
+    display: flex;
+    padding: 10px 10px 0 10px;
+
+    .time-select-type {
+      flex-shrink: 2;
     }
   }
 }

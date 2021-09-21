@@ -13,6 +13,7 @@ export const ModalId = {
   SHAREPINSLINK: 'SharePinsLink',
   PINS_STORY_BUILDER: 'PinsStoryBuilder',
   TERRAIN_VIEWER: 'TerrainViewer',
+  PRIVATE_THEMEID_LOGIN: 'PrivateThemeIdLogin',
 };
 
 export const Modals = {
@@ -22,6 +23,7 @@ export const Modals = {
   [ModalId.SHAREPINSLINK]: () => <SharePinsLink />,
   [ModalId.PINS_STORY_BUILDER]: () => <PinsStoryBuilder />,
   [ModalId.TERRAIN_VIEWER]: ({ setLastAddedPin }) => <TerrainViewer setLastAddedPin={setLastAddedPin} />,
+  [ModalId.PRIVATE_THEMEID_LOGIN]: () => {},
 };
 
 export function propsSufficientToRender(props) {

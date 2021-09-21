@@ -1,5 +1,5 @@
 import axios from 'axios';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 import moment from 'moment';
 import isEqual from 'lodash.isequal';
 import { t } from 'ttag';
@@ -12,7 +12,12 @@ import { b64DecodeUnicode } from '../../utils/base64MDN';
 import { getTokenFromLocalStorage } from '../../Auth/authHelpers';
 import { getDataSourceHandler, getDatasetLabel } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
-import { datasourceToDatasetId, dataSourceToThemeId, datasourceToUrl } from '../../utils/handleOldUrls';
+import {
+  datasourceToDatasetId,
+  dataSourceToThemeId,
+  datasourceToUrl,
+  getNewDatasetPropertiesIfDeprecatedDatasetId,
+} from '../../utils/handleOldUrls';
 import { ensureCorrectDataFusionFormat, getThemeName } from '../../utils';
 import {
   defaultGain,
@@ -25,7 +30,7 @@ import {
 const PINS_LC_NAME = 'eob-pins';
 
 // check if the pin was already converted by this version of EOB3
-const needsConversion = pin => {
+const needsConversion = (pin) => {
   if (!pin.tag || pin.tag === '') {
     return true;
   }
@@ -57,7 +62,7 @@ const convertActiveLayer = (pin, newPin) => {
   const { activeLayer } = pin;
   if (activeLayer) {
     const visualizationUrl = pin.activeLayer.baseUrls.WMS;
-    const theme = DEFAULT_THEMES.find(t => t.content.map(d => d.url).includes(visualizationUrl));
+    const theme = DEFAULT_THEMES.find((t) => t.content.map((d) => d.url).includes(visualizationUrl));
     newPin.datasetId = activeLayer.shortName ? activeLayer.shortName : activeLayer.id;
     newPin.themeId = theme ? theme.id : DEFAULT_THEMES[0].id;
     newPin.visualizationUrl = visualizationUrl;
@@ -65,7 +70,7 @@ const convertActiveLayer = (pin, newPin) => {
   return newPin;
 };
 
-const addTag = newPin => {
+const addTag = (newPin) => {
   newPin.tag = VERSION_INFO.tag;
   return newPin;
 };
@@ -99,14 +104,8 @@ const convertTime = (pin, newPin) => {
       newPin.fromTime = times[0];
       newPin.toTime = times[1];
     } else {
-      newPin.fromTime = moment
-        .utc(times[0])
-        .startOf('day')
-        .toISOString();
-      newPin.toTime = moment
-        .utc(times[0])
-        .endOf('day')
-        .toISOString();
+      newPin.fromTime = moment.utc(times[0]).startOf('day').toISOString();
+      newPin.toTime = moment.utc(times[0]).endOf('day').toISOString();
     }
   }
   return newPin;
@@ -115,7 +114,7 @@ const convertTime = (pin, newPin) => {
 const convertEffects = (pin, newPin) => {
   const { gainOverride, gammaOverride, redRangeOverride, greenRangeOverride, blueRangeOverride } = pin;
   const { gain, gamma, redRange, greenRange, blueRange } = pin;
-  const { downsampling, upsampling } = pin;
+  const { downsampling, upsampling, speckleFilter, orthorectification } = pin;
   if (
     isEffectValueSetAndNotDefault(gainOverride, defaultGain) &&
     !isEffectValueSetAndNotDefault(gain, defaultGain)
@@ -153,6 +152,14 @@ const convertEffects = (pin, newPin) => {
 
   if (!!downsampling) {
     newPin.downsampling = downsampling;
+  }
+
+  if (speckleFilter) {
+    newPin.speckleFilter = speckleFilter;
+  }
+
+  if (orthorectification) {
+    newPin.orthorectification = orthorectification;
   }
 
   return newPin;
@@ -237,13 +244,13 @@ export function getPinsFromServer() {
     };
     axios
       .get(url, requestParams)
-      .then(async res => {
+      .then(async (res) => {
         try {
           if (res.data.pins_eob3) {
             resolve(res.data.pins_eob3);
           } else {
             // If pins_eob3 don't exist, create them
-            const convertedPins = res.data.pins.map(pin => convertToNewFormat(pin));
+            const convertedPins = res.data.pins.map((pin) => convertToNewFormat(pin));
             res.data.pins_eob3 = convertedPins;
             await axios.put(url, res.data, requestParams);
             resolve(preparePins(convertedPins));
@@ -253,7 +260,7 @@ export function getPinsFromServer() {
           resolve([]);
         }
       })
-      .catch(e => {
+      .catch((e) => {
         if (e && e.response && e.response.status === 404) {
           resolve([]);
           return;
@@ -275,27 +282,27 @@ export function removePinsFromServer(ids) {
     };
     axios
       .get(url, requestParams)
-      .then(res => res.data)
-      .catch(e => {
+      .then((res) => res.data)
+      .catch((e) => {
         // if no user data is found, ignore the error:
         if (e && e.response && e.response.status === 404) {
           return {};
         }
         throw e;
       })
-      .then(userData => {
-        userData.pins_eob3 = userData.pins_eob3.filter(p => !ids.includes(p._id));
+      .then((userData) => {
+        userData.pins_eob3 = userData.pins_eob3.filter((p) => !ids.includes(p._id));
         axios
           .put(url, userData, requestParams)
           .then(() => {
             resolve(userData.pins_eob3);
           })
-          .catch(e => {
+          .catch((e) => {
             console.error('Unable to remove the pin!', e);
             reject(e);
           });
       })
-      .catch(e => {
+      .catch((e) => {
         console.error('Unable to retrieve user data!', e);
         reject(e);
       });
@@ -305,7 +312,7 @@ export function removePinsFromServer(ids) {
 export function savePinsToServer(pins, replace = false) {
   const access_token = store.getState().auth.user.access_token;
   let lastUniqueId;
-  pins = pins.map(p => {
+  pins = pins.map((p) => {
     if (!p._id) {
       const uniqueId = `${uuid()}-pin`;
       p._id = uniqueId;
@@ -323,15 +330,15 @@ export function savePinsToServer(pins, replace = false) {
     };
     axios
       .get(url, requestParams)
-      .then(res => res.data)
-      .catch(e => {
+      .then((res) => res.data)
+      .catch((e) => {
         // if no user data is found, ignore the error:
         if (e && e.response && e.response.status === 404) {
           return {};
         }
         throw e;
       })
-      .then(userData => {
+      .then((userData) => {
         if (Array.isArray(userData)) {
           // userData can be an array in some instances. If it's an empty array, we make it an object and use it normally. Otherwise, we don't change it.
           if (userData.length) {
@@ -351,12 +358,12 @@ export function savePinsToServer(pins, replace = false) {
           .then(() => {
             resolve({ uniqueId: lastUniqueId, pins: userData.pins_eob3 });
           })
-          .catch(e => {
+          .catch((e) => {
             console.error('Unable to save pins!', e);
             reject(e);
           });
       })
-      .catch(e => {
+      .catch((e) => {
         console.error('Unable to retrieve user data!', e);
         reject(e);
       });
@@ -365,7 +372,7 @@ export function savePinsToServer(pins, replace = false) {
 
 export function savePinsToSessionStorage(newPins, replace = false) {
   let lastUniqueId;
-  newPins = newPins.map(p => {
+  newPins = newPins.map((p) => {
     if (!p._id) {
       const uniqueId = `${uuid()}-pin`;
       p._id = uniqueId;
@@ -396,7 +403,15 @@ export function getPinsFromSessionStorage() {
   } else {
     pins = JSON.parse(pins);
   }
-  return preparePins(pins);
+
+  const formattedPins = pins.map((pin) => {
+    return {
+      ...pin,
+      ...getNewDatasetPropertiesIfDeprecatedDatasetId(pin.datasetId, pin.visualizationUrl),
+    };
+  });
+
+  return preparePins(formattedPins);
 }
 
 export async function createShareLink(pins) {
@@ -413,7 +428,7 @@ export async function getSharedPins(sharedPinsListId) {
   return data;
 }
 
-const pinPropertiesSubset = pin => ({
+const pinPropertiesSubset = (pin) => ({
   datasetId: pin.datasetId,
   evalscript: pin.evalscript,
   evalscripturl: pin.evalscripturl,
@@ -437,7 +452,7 @@ const pinPropertiesSubset = pin => ({
 export function getPinsFromStorage(user) {
   return new Promise((resolve, reject) => {
     if (user) {
-      getPinsFromServer().then(pins => resolve(pins));
+      getPinsFromServer().then((pins) => resolve(pins));
     } else {
       const pinsFromLocalStorage = getPinsFromSessionStorage();
       resolve(pinsFromLocalStorage);
@@ -461,9 +476,9 @@ export async function importSharedPins(sharedPinsListId) {
 
   //merge sharedPins with pins
   const newPins = [];
-  sharedPins.items.forEach(sharedPin => {
+  sharedPins.items.forEach((sharedPin) => {
     //for each shared pin check if it already exists in existing pins list
-    const existingPin = existingPins.find(pin =>
+    const existingPin = existingPins.find((pin) =>
       isEqual(pinPropertiesSubset(pin), pinPropertiesSubset(sharedPin)),
     );
 
@@ -496,7 +511,7 @@ export async function layerFromPin(pin, reqConfig) {
     (_, dataset) => (!shJsDataset ? true : dataset === shJsDataset),
     null,
     reqConfig,
-  ).catch(err => {
+  ).catch((err) => {
     console.error(err);
     return null;
   });
@@ -505,7 +520,7 @@ export async function layerFromPin(pin, reqConfig) {
   }
   let layer;
   if (layerId) {
-    layer = layers.find(l => l.layerId === layerId);
+    layer = layers.find((l) => l.layerId === layerId);
     if (layer) {
       await layer.updateLayerFromServiceIfNeeded(reqConfig);
     }
@@ -539,7 +554,7 @@ export const constructTimespanString = ({ fromTime, toTime } = {}) => {
 };
 
 function preparePins(pins) {
-  return pins.map(pin => {
+  return pins.map((pin) => {
     if (pin.dataFusion) {
       const dataFusionInCorrectFormat = ensureCorrectDataFusionFormat(pin.dataFusion, pin.datasetId);
       pin.dataFusion = dataFusionInCorrectFormat;
@@ -587,13 +602,15 @@ export function constructPinFromProps(props) {
     minQa,
     upsampling,
     downsampling,
+    speckleFilter,
+    orthorectification,
     selectedThemeId,
     selectedThemesListId,
     themesLists,
     terrainViewerSettings,
   } = props;
   const isGIBS = !fromTime; //GIBS only has toTime
-  const themeName = getThemeName(themesLists[selectedThemesListId].find(t => t.id === selectedThemeId));
+  const themeName = getThemeName(themesLists[selectedThemesListId].find((t) => t.id === selectedThemeId));
   return {
     title: `${getDatasetLabel(datasetId)}: ${customSelected ? 'Custom' : layerId} (${themeName})`,
     lat: lat,
@@ -620,6 +637,17 @@ export function constructPinFromProps(props) {
     minQa: minQa,
     upsampling: upsampling,
     downsampling: downsampling,
+    speckleFilter: speckleFilter,
+    orthorectification: orthorectification,
     terrainViewerSettings: terrainViewerSettings,
   };
+}
+
+export function formatDeprecatedPins(pins) {
+  return pins.map((pin) => {
+    return {
+      ...pin,
+      ...getNewDatasetPropertiesIfDeprecatedDatasetId(pin.datasetId, pin.visualizationUrl),
+    };
+  });
 }

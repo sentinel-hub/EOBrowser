@@ -14,7 +14,7 @@ stories.add('Default', ({ state, setState }) => {
       <EOBModeSelection
         modes={MODES}
         selectedModeId={modeId}
-        onSelectMode={modeId => setState({ modeId: modeId })}
+        onSelectMode={(modeId) => setState({ modeId: modeId })}
         highlighted={modeId === EDUCATION_MODE.id}
       />
     </div>
@@ -28,7 +28,7 @@ stories.add('Education', ({ state, setState }) => {
       <EOBModeSelection
         modes={MODES}
         selectedModeId={modeId}
-        onSelectMode={modeId => setState({ modeId: modeId })}
+        onSelectMode={(modeId) => setState({ modeId: modeId })}
         highlighted={modeId === EDUCATION_MODE.id}
       />
     </div>

@@ -22,7 +22,7 @@ class ComparedLayer extends Component {
     );
   };
 
-  onChange = e => {
+  onChange = (e) => {
     if (this.props.compareMode === 'opacity') {
       store.dispatch(compareLayersSlice.actions.updateOpacity({ index: this.props.index, value: e }));
     } else {
@@ -62,7 +62,7 @@ class ComparedLayer extends Component {
           <div
             className="zoom-to-layer"
             title={t`Zoom to location`}
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
               this.zoomToPin();
             }}
@@ -71,7 +71,7 @@ class ComparedLayer extends Component {
           </div>
           <div
             className="remove-layer"
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
               this.removeLayer();
             }}
@@ -110,7 +110,7 @@ class ComparedLayer extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   anonToken: store.auth.anonToken,
   authToken: store.auth.user.access_token,
   selectedLanguage: store.language.selectedLanguage,

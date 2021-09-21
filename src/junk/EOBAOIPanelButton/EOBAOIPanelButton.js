@@ -4,6 +4,8 @@ import { t } from 'ttag';
 
 import { FisChartLink } from '../FisChartLink';
 import { getLoggedInErrorMsg } from '../ConstMessages';
+import { AOI_SHAPE } from '../../const';
+
 import '../EOBPanel.scss';
 
 export class EOBAOIPanelButton extends React.Component {
@@ -32,7 +34,20 @@ export class EOBAOIPanelButton extends React.Component {
       {
         // jsx-a11y/anchor-is-valid
         // eslint-disable-next-line
-        <a onClick={this.props.onDrawPolygon} title={t`Draw area of interest for image downloads`}>
+        <a
+          onClick={() => this.props.onDrawShape(AOI_SHAPE.rectangle)}
+          title={t`Draw rectangular area of interest for image downloads`}
+        >
+          <i className={`far fa-square`} />
+        </a>
+      }
+      {
+        // jsx-a11y/anchor-is-valid
+        // eslint-disable-next-line
+        <a
+          onClick={() => this.props.onDrawShape(AOI_SHAPE.polygon)}
+          title={t`Draw polygonal area of interest for image downloads`}
+        >
           <i className={`fa fa-pencil`} />
         </a>
       }
@@ -53,41 +68,41 @@ export class EOBAOIPanelButton extends React.Component {
     setTimeout(() => this.setState({ copyGeometryConfirmation: false }), 400);
   };
 
-  renderAioInfo = () => (
-    <span className="aoiCords">
-      <span
-        className="copy-coord"
-        title={t`Copy geometry to clipboard`}
-        onClick={this.copyGeometryToClipboard}
-      >
-        {this.state.copyGeometryConfirmation ? (
-          <i className="fas fa-check-circle" />
-        ) : (
-          <i className="far fa-copy" />
+  renderAioInfo = () => {
+    const area = (
+      parseFloat(
+        geo_area.geometry(this.props.aoiBounds ? this.props.aoiBounds : this.props.mapGeometry.geometry),
+      ) / 1000000
+    ).toFixed(2);
+
+    return (
+      <span className="aoiCords">
+        <span
+          className="copy-coord"
+          title={t`Copy geometry to clipboard`}
+          onClick={this.copyGeometryToClipboard}
+        >
+          {this.state.copyGeometryConfirmation ? (
+            <i className="fas fa-check-circle" />
+          ) : (
+            <i className="far fa-copy" />
+          )}
+        </span>
+        {!isNaN(area) && (
+          <span className="area-text">
+            {area} {t`km`}
+            <sup>2</sup>
+          </span>
         )}
-      </span>
-      <span className="area-text">
-        {(
-          parseFloat(
-            geo_area.geometry(
-              this.props.aoiBounds ? this.props.aoiBounds.geometry : this.props.mapGeometry.geometry,
-            ),
-          ) / 1000000
-        ).toFixed(2)}{' '}
-        {t`km`}
-        <sup>2</sup>
-      </span>
-      <span>
-        {
-          // jsx-a11y/anchor-is-valid
-          // eslint-disable-next-line
-          <a onClick={() => this.props.centerOnFeature('aoiLayer')} title={t`Center map on feature`}>
-            <i className={`fa fa-crosshairs`} />
-          </a>
-        }
-        {this.props.aoiBounds &&
-          this.props.aoiBounds.geometry &&
-          this.props.aoiBounds.geometry.coordinates[0].length > 3 && (
+        <span>
+          {
+            // jsx-a11y/anchor-is-valid
+            // eslint-disable-next-line
+            <a onClick={() => this.props.centerOnFeature('aoiLayer')} title={t`Center map on feature`}>
+              <i className={`fa fa-crosshairs`} />
+            </a>
+          }
+          {this.props.aoiBounds && (
             <FisChartLink
               aoiOrPoi={'aoi'}
               selectedResult={this.props.selectedResult}
@@ -97,19 +112,20 @@ export class EOBAOIPanelButton extends React.Component {
               onErrorMessage={this.props.onErrorMessage}
             />
           )}
-        {
-          // jsx-a11y/anchor-is-valid
-          // eslint-disable-next-line
-          <a
-            onClick={this.props.resetAoi}
-            title={this.props.isAoiClip ? t`Cancel edit.` : t`Remove geometry`}
-          >
-            <i className={`fa fa-close`} />
-          </a>
-        }
+          {
+            // jsx-a11y/anchor-is-valid
+            // eslint-disable-next-line
+            <a
+              onClick={this.props.resetAoi}
+              title={this.props.isAoiClip ? t`Cancel edit.` : t`Remove geometry`}
+            >
+              <i className={`fa fa-close`} />
+            </a>
+          }
+        </span>
       </span>
-    </span>
-  );
+    );
+  };
 
   render() {
     const { aoiBounds, isAoiClip } = this.props;
@@ -124,7 +140,7 @@ export class EOBAOIPanelButton extends React.Component {
         className="aoiPanel panelButton floatItem"
         onMouseEnter={!this.props.disabled ? this.showOptions : null}
         onMouseLeave={!this.props.disabled ? this.hideOptions : null}
-        onClick={ev => {
+        onClick={(ev) => {
           if (!isEnabled) {
             this.props.onErrorMessage(title);
           }

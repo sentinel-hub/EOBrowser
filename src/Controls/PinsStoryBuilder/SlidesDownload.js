@@ -20,16 +20,16 @@ class SlidesDownload extends React.Component {
     this.setState({ error: null, preparingGif: true });
     gifshot.createGIF(
       {
-        images: selectedSlides.map(s => images[s.id]),
+        images: selectedSlides.map((s) => images[s.id]),
         interval: 1 / speedFps,
         gifWidth: imageWidth,
         gifHeight: imageHeight,
         numWorkers: 4,
-        progressCallback: progress => {
+        progressCallback: (progress) => {
           this.setState({ gifCreationProgress: Math.round(progress * 100) });
         },
       },
-      obj => {
+      (obj) => {
         if (obj.error) {
           this.setState({
             error: obj.error,

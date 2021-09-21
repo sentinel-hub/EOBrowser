@@ -13,7 +13,7 @@ stories.add('Default', ({ state, setState }) => {
 
   const toTime = state.toTime || moment.utc().endOf('day');
 
-  const getAndSetNextPrevDate = async direction => {
+  const getAndSetNextPrevDate = async (direction) => {
     await onGetAndSetNextPrevDate(direction, state.toTime, setState);
   };
 
@@ -38,7 +38,7 @@ stories.add('Timespan disabled', ({ state, setState }) => {
   const fromTime = state.fromTime || moment.utc().startOf('day');
   const toTime = state.toTime || moment.utc().endOf('day');
 
-  const getAndSetNextPrevDate = async direction => {
+  const getAndSetNextPrevDate = async (direction) => {
     await onGetAndSetNextPrevDate(direction, state.toTime, setState);
   };
 
@@ -60,16 +60,11 @@ stories.add('Timespan disabled', ({ state, setState }) => {
 });
 
 stories.add('Timespan disabled with interval as input', ({ state, setState }) => {
-  const fromTime =
-    state.fromTime ||
-    moment
-      .utc()
-      .subtract(7, 'day')
-      .startOf('day');
+  const fromTime = state.fromTime || moment.utc().subtract(7, 'day').startOf('day');
 
   const toTime = state.toTime || moment.utc().endOf('day');
 
-  const getAndSetNextPrevDate = async direction => {
+  const getAndSetNextPrevDate = async (direction) => {
     await onGetAndSetNextPrevDate(direction, state.toTime, setState);
   };
 
@@ -91,13 +86,8 @@ stories.add('Timespan disabled with interval as input', ({ state, setState }) =>
 });
 
 function onQueryDatesForActiveMonth(date) {
-  return new Promise(resolve => {
-    resolve([
-      moment
-        .utc(date)
-        .startOf('month')
-        .toDate(),
-    ]);
+  return new Promise((resolve) => {
+    resolve([moment.utc(date).startOf('month').toDate()]);
   });
 }
 
@@ -113,7 +103,7 @@ const onGetAndSetNextPrevDate = async (direction, toTime, setState) => {
   });
 };
 
-const WrappedVisualizationTimeSelect = props => (
+const WrappedVisualizationTimeSelect = (props) => (
   <Provider store={store}>
     <div style={{ background: '#3b3d4d', height: '50vh' }}>{props.children}</div>
   </Provider>

@@ -1,6 +1,8 @@
 import L from 'leaflet';
 import geo_area from '@mapbox/geojson-area';
 
+import { MAX_SH_IMAGE_SIZE } from '../../../const';
+
 export function roundDegrees(deg, zoom) {
   if (!Number.isFinite(deg)) {
     return deg;
@@ -18,8 +20,6 @@ export function wgs84ToMercator({ lat, lng }) {
   return projected;
 }
 
-export const MAX_PX = 2500; // SH services have a limit for a max image size of 2500px*2500px
-
 export function getPixelSize(mapBounds, aoiBounds, nativeRes = 10) {
   const bounds = aoiBounds ? aoiBounds.bounds : mapBounds;
   const NE = wgs84ToMercator(bounds['_northEast']);
@@ -27,7 +27,7 @@ export function getPixelSize(mapBounds, aoiBounds, nativeRes = 10) {
   const polyW = NE.x - SW.x;
   const polyH = NE.y - SW.y;
   const maxWH = Math.max(polyW, polyH);
-  const idealRes = maxWH / MAX_PX;
+  const idealRes = maxWH / MAX_SH_IMAGE_SIZE;
 
   const logOutputRes = Math.max(0, Math.ceil(Math.log2(idealRes / nativeRes)));
   const outputRes = nativeRes * Math.pow(2, logOutputRes);

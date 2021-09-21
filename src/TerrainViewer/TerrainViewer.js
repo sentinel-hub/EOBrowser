@@ -4,7 +4,7 @@ import Rodal from 'rodal';
 import FileSaver from 'file-saver';
 import { t } from 'ttag';
 import { BBox, CRS_EPSG3857, MimeTypes, CancelToken } from '@sentinel-hub/sentinelhub-js';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 import Toggle from 'react-toggle';
 
 import store, { modalSlice, terrainViewerSlice } from '../store';
@@ -23,6 +23,7 @@ import { getGetMapAuthToken } from '../App';
 import { savePinsToServer, savePinsToSessionStorage, constructPinFromProps } from '../Tools/Pins/Pin.utils';
 import SocialShare from '../components/SocialShare/SocialShare';
 import { constructGetMapParamsEffects } from '../utils/effectsUtils';
+import { DATASOURCES, reqConfigGetMap, reqConfigMemoryCache } from '../const';
 
 import 'rodal/lib/rodal.css';
 
@@ -47,15 +48,23 @@ function TerrainViewer(props) {
   const [hasPinBeenSaved, setHasPinBeenSaved] = useState(false);
 
   const { toTime, lat, lng, zoom, pixelBounds, datasetId, locale, auth, terrainViewerSettings } = props;
-  const isGIBS = datasourceForDatasetId(datasetId) === 'GIBS';
+  const isGIBS = datasourceForDatasetId(datasetId) === DATASOURCES.GIBS;
   const fromTime = isGIBS ? null : props.fromTime;
   const { width, height } = getMapDimensions(pixelBounds);
   const rendererWidth = Math.floor((width - 80) * 0.85);
   const rendererHeight = Math.floor((height / width) * rendererWidth);
   const { x: defaultX, y: defaultY } = wgs84ToMercator({ lat: lat, lng: lng });
-  const { x = defaultX, y = defaultY, z = getHeightFromZoom(zoom), rotV = 10, rotH = 0 } =
-    terrainViewerSettings || {};
+  const {
+    x = defaultX,
+    y = defaultY,
+    z = getHeightFromZoom(zoom),
+    rotV = 10,
+    rotH = 0,
+    settings,
+    sunTime,
+  } = terrainViewerSettings || {};
   const cancelToken = new CancelToken();
+  const minZoom = getDataSourceHandler(datasetId).getLeafletZoomConfig(datasetId).min || 7;
 
   useEffect(() => {
     window.activeTerrainViewers[activeTerrainViewerComponentId] = null;
@@ -78,6 +87,21 @@ function TerrainViewer(props) {
       return;
     }
 
+    const equatorLen = 40075016.685578488;
+    const zoomLevel = Math.max(
+      0,
+      Math.min(19, 1 + Math.floor(Math.log(equatorLen / ((maxX - minX) * 1.001)) / Math.log(2))),
+    );
+    const numTiles = 1 << zoomLevel;
+    const tileX = Math.floor(((minX + maxX + equatorLen) * numTiles) / (2 * equatorLen));
+    const tileY = numTiles - 1 - Math.floor(((minY + maxY + equatorLen) * numTiles) / (2 * equatorLen));
+    const mapTilerUrl = `https://api.maptiler.com/maps/streets/256/${zoomLevel}/${tileX}/${tileY}.png?key=${process.env.REACT_APP_MAPTILER_KEY}`;
+
+    if (zoomLevel <= minZoom) {
+      callback(mapTilerUrl);
+      return;
+    }
+
     const getMapParams = {
       bbox: new BBox(CRS_EPSG3857, minX, minY, maxX, maxY),
       format: MimeTypes.JPEG,
@@ -88,16 +112,21 @@ function TerrainViewer(props) {
       preview: 2,
       effects: constructGetMapParamsEffects(props),
     };
-    const reqConfig = { cancelToken: cancelToken, authToken: getGetMapAuthToken(auth), retries: 0 };
+    const reqConfig = {
+      cancelToken: cancelToken,
+      authToken: getGetMapAuthToken(auth),
+      retries: 0,
+      ...reqConfigGetMap,
+    };
 
     getMapTile(layer, getMapParams, minX, minY, maxX, maxY, width, height, callback, reqConfig);
   }
 
   async function on3DInitialized() {
     const layer = await getLayerFromParams(props);
+    await layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
 
     window.set3DLocale(locale);
-
     if (
       Object.keys(window.activeTerrainViewers).length === 1 &&
       window.activeTerrainViewers[activeTerrainViewerComponentId] === null
@@ -108,6 +137,8 @@ function TerrainViewer(props) {
       const terrainViewerId = window.create3DViewer('terrain-map-container', x, y, z, rotH, rotV);
       window.activeTerrainViewers[activeTerrainViewerComponentId] = terrainViewerId;
       setTerrainViewerId(terrainViewerId);
+      window.set3DSunTime(terrainViewerId, sunTime);
+      window.set3DSettings(terrainViewerId, settings);
       setLoadingViewer(false);
     }
   }
@@ -115,7 +146,7 @@ function TerrainViewer(props) {
   function removeUnnecessaryScripts() {
     // The 3D scripts adds some elements to document.head, which clashes with existing styles. This removes them
     const newChildren = [...document.head.children];
-    const elementsToRemove = newChildren.filter(elem => !originalChildren.includes(elem));
+    const elementsToRemove = newChildren.filter((elem) => !originalChildren.includes(elem));
     for (let elem of elementsToRemove) {
       document.head.removeChild(elem);
     }
@@ -132,11 +163,24 @@ function TerrainViewer(props) {
     setHasPinBeenSaved(false);
     store.dispatch(
       terrainViewerSlice.actions.setTerrainViewerSettings({
+        ...terrainViewerSettings,
         x: x,
         y: y,
         z: z,
         rotH: rotH,
         rotV: rotV,
+      }),
+    );
+  }
+
+  function on3DLoadingStateChanged(viewerId, isLoading, type) {}
+
+  function on3DSettingsChanged(viewerId) {
+    store.dispatch(
+      terrainViewerSlice.actions.setTerrainViewerSettings({
+        ...terrainViewerSettings,
+        sunTime: window.get3DSunTime(viewerId),
+        settings: window.get3DSettings(viewerId),
       }),
     );
   }
@@ -168,7 +212,7 @@ function TerrainViewer(props) {
       width = Math.floor((height * rendererWidth) / rendererHeight);
     }
     const imageUrl = await window.print3D(terrainViewerId, width, height);
-    const blob = await fetch(imageUrl).then(res => res.blob());
+    const blob = await fetch(imageUrl).then((res) => res.blob());
     const title = showLogoAndCaptions ? getTitle(fromTime, toTime, datasetId, layerId, customSelected) : null;
 
     const dsh = getDataSourceHandler(datasetId);
@@ -216,6 +260,8 @@ function TerrainViewer(props) {
   window.on3DButtonClicked = on3DButtonClicked;
   window.on3DInitialized = on3DInitialized;
   window.on3DPositionChanged = on3DPositionChanged;
+  window.on3DLoadingStateChanged = on3DLoadingStateChanged;
+  window.on3DSettingsChanged = on3DSettingsChanged;
 
   const isUserLoggedIn = props.user && props.user.userdata;
 
@@ -287,7 +333,7 @@ function TerrainViewer(props) {
   );
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   lat: store.mainMap.lat,
   lng: store.mainMap.lng,
   zoom: store.mainMap.zoom,
@@ -313,6 +359,8 @@ const mapStoreToProps = store => ({
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
   minQa: store.visualization.minQa,
+  speckleFilter: store.visualization.speckleFilter,
+  orthorectification: store.visualization.orthorectification,
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,
   selectedThemeId: store.themes.selectedThemeId,

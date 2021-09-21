@@ -7,7 +7,7 @@ class LocationSearchBox extends React.PureComponent {
     value: '',
   };
 
-  handleInputChange = value => {
+  handleInputChange = (value) => {
     this.setState({ value: value });
   };
 

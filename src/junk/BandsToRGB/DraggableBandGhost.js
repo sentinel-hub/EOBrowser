@@ -8,7 +8,7 @@ import { DraggableBand } from './DraggableBand';
 export const DraggableBandGhost = ({ bands }) => {
   const GeneratePreview = () => {
     const { style, item } = React.useContext(PreviewContext);
-    const ghost = bands.find(band => band.name === item.name);
+    const ghost = bands.find((band) => band.name === item.name);
 
     return <DraggableBand band={ghost} style={style} />;
   };

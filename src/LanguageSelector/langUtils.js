@@ -5,6 +5,7 @@ export const LOCAL_STORAGE_KEY = 'eobrowser_lang';
 export const DEFAULT_LANG = 'en';
 export const SUPPORTED_LANGUAGES = [
   { langCode: 'en', text: 'English', flagCode: 'GB' },
+  { langCode: 'da', text: 'Dansk', flagCode: 'DK' },
   { langCode: 'de', text: 'Deutsch', flagCode: 'DE' },
   { langCode: 'es', text: 'español', flagCode: 'ES' },
   { langCode: 'el', text: 'ελληνικά', flagCode: 'GR' },
@@ -12,7 +13,7 @@ export const SUPPORTED_LANGUAGES = [
   { langCode: 'sl', text: 'slovenščina', flagCode: 'SI' },
 ];
 
-export const changeLanguage = locale => {
+export const changeLanguage = (locale) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useLocale(locale);
   saveLang(locale);
@@ -28,12 +29,12 @@ export const getLanguage = () => {
   return storedLang;
 };
 
-const saveLang = locale => {
+const saveLang = (locale) => {
   localStorage.setItem(LOCAL_STORAGE_KEY, locale);
 };
 
 export const initLanguages = () => {
-  SUPPORTED_LANGUAGES.forEach(locale => {
+  SUPPORTED_LANGUAGES.forEach((locale) => {
     if (locale.langCode !== DEFAULT_LANG) {
       require(`moment/locale/${locale.langCode}`);
       const ttagObject = require(`../translations/${locale.langCode}.po.json`);
@@ -51,7 +52,7 @@ function makeDebugTranslations(ttagObject) {
     if (translations[key].msgid.length === 0) {
       continue;
     }
-    translations[key].msgstr = translations[key].msgstr.map(str =>
+    translations[key].msgstr = translations[key].msgstr.map((str) =>
       replaceStringWithXs(str === '' ? key : str),
     );
   }

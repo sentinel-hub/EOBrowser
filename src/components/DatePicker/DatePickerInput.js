@@ -53,16 +53,15 @@ function DatePickerInput(props) {
     if (prevDateDisabled) {
       return;
     }
-    await getAndSetNextPrevDate('prev', selectedDay).catch(err => setPrevDateDisabled(true));
+    await getAndSetNextPrevDate('prev', selectedDay).catch((err) => setPrevDateDisabled(true));
   }
 
   async function getNextDate() {
     if (nextDateDisabled) {
       return;
     }
-    await getAndSetNextPrevDate('next', selectedDay).catch(err => setNextDateDisabled(true));
+    await getAndSetNextPrevDate('next', selectedDay).catch((err) => setNextDateDisabled(true));
   }
-
   return (
     <div className="date-picker-input-wrapper">
       {showNextPrevDateArrows && (

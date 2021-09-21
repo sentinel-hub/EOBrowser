@@ -42,6 +42,7 @@ import { findMatchingLayerMetadata } from '../../Tools/VisualizationPanel/legend
 import { constructDataFusionLayer } from '../../junk/EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
 import { constructEffectsFromPinOrHighlight, constructGetMapParamsEffects } from '../../utils/effectsUtils';
+import { reqConfigMemoryCache, reqConfigGetMap } from '../../const';
 
 import './PinsStoryBuilder.scss';
 
@@ -55,7 +56,7 @@ const blobToCanvas = async (blob, w, h) => {
 };
 
 const canvasToBlob = async (canvas, mimeType, qualityArgument = undefined) => {
-  return new Promise(resolve => canvas.toBlob(resolve, mimeType, qualityArgument));
+  return new Promise((resolve) => canvas.toBlob(resolve, mimeType, qualityArgument));
 };
 
 class PinsStoryBuilder extends React.Component {
@@ -67,7 +68,7 @@ class PinsStoryBuilder extends React.Component {
     const bbox = new BBox(CRS_EPSG4326, ...dimensions.bounds);
     const bboxGeoJSON = bbox.toGeoJSON();
     this.state = {
-      slides: this.props.initialPins.map(pin => ({
+      slides: this.props.initialPins.map((pin) => ({
         pin: pin,
         id: pin._id,
         title: pin.title,
@@ -100,7 +101,7 @@ class PinsStoryBuilder extends React.Component {
   componentWillUnmount() {
     this.cancelToken.cancel();
     const { images } = this.state;
-    Object.keys(images).forEach(slideId => {
+    Object.keys(images).forEach((slideId) => {
       URL.revokeObjectURL(images[slideId]);
     });
   }
@@ -148,13 +149,13 @@ class PinsStoryBuilder extends React.Component {
     }
 
     if (showCaptions) {
-      const copyrightText = slides.find(s => {
+      const copyrightText = slides.find((s) => {
         const ds = datasourceForDatasetId(s.pin.datasetId);
         return s.withinBounds && s.selected && ds && ds.includes('Sentinel');
       })
         ? SENTINEL_COPYRIGHT_TEXT
         : '';
-      const drawCopernicusLogo = slides.some(s => {
+      const drawCopernicusLogo = slides.some((s) => {
         const ds = datasourceForDatasetId(s.pin.datasetId);
         return s.withinBounds && s.selected && ds && ds.includes('Sentinel');
       });
@@ -201,7 +202,7 @@ class PinsStoryBuilder extends React.Component {
           continue;
         }
 
-        const layer = await layerFromPin(pin);
+        const layer = await layerFromPin(pin, reqConfigMemoryCache);
         if (!layer) {
           console.warn('Could not find a suitable layer for pin!', pin);
           continue;
@@ -213,16 +214,8 @@ class PinsStoryBuilder extends React.Component {
         const dsh = getDataSourceHandler(datasetId);
         const pinFromTime = fromTime
           ? moment.utc(fromTime).toDate()
-          : moment
-              .utc(toTime)
-              .startOf('day')
-              .toDate();
-        const pinToTime = fromTime
-          ? moment.utc(toTime).toDate()
-          : moment
-              .utc(toTime)
-              .endOf('day')
-              .toDate();
+          : moment.utc(toTime).startOf('day').toDate();
+        const pinToTime = fromTime ? moment.utc(toTime).toDate() : moment.utc(toTime).endOf('day').toDate();
 
         const supportsTimeRange = dsh ? dsh.supportsTimeRange() : true;
         const effects = constructEffectsFromPinOrHighlight(pin);
@@ -244,6 +237,7 @@ class PinsStoryBuilder extends React.Component {
         const reqConfig = {
           authToken: authToken,
           cancelToken: this.cancelToken,
+          ...reqConfigGetMap,
         };
 
         let blob;
@@ -278,7 +272,7 @@ class PinsStoryBuilder extends React.Component {
           blob = await canvasToBlob(baseCanvas, 'image/png');
         }
 
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           images: {
             ...prevState.images,
             [slideId]: URL.createObjectURL(blob),
@@ -299,8 +293,8 @@ class PinsStoryBuilder extends React.Component {
     store.dispatch(modalSlice.actions.removeModal());
   };
 
-  onToggleSlide = index => {
-    this.setState(prevState => {
+  onToggleSlide = (index) => {
+    this.setState((prevState) => {
       const slides = [...prevState.slides];
       slides[index].selected = !slides[index].selected;
       return slides;
@@ -308,7 +302,7 @@ class PinsStoryBuilder extends React.Component {
   };
 
   saveNewSlideTitle = (index, title) => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       const slides = [...prevState.slides];
       slides[index].title = title;
       return slides;
@@ -318,13 +312,13 @@ class PinsStoryBuilder extends React.Component {
     }
   };
 
-  updateSpeedFps = value => {
+  updateSpeedFps = (value) => {
     this.setState({
       speedFps: Math.max(Math.min(parseInt(value), 10), 1),
     });
   };
 
-  updateImagesOptions = value => {
+  updateImagesOptions = (value) => {
     this.setState({
       imagesOptions: value,
     });
@@ -333,9 +327,9 @@ class PinsStoryBuilder extends React.Component {
 
   resetImages = () => {
     // before resetting the images, make sure we remove all ObjectURLs:
-    this.setState(prevState => {
+    this.setState((prevState) => {
       const { images } = prevState;
-      Object.keys(images).forEach(slideId => {
+      Object.keys(images).forEach((slideId) => {
         URL.revokeObjectURL(images[slideId]);
       });
       return {
@@ -354,8 +348,8 @@ class PinsStoryBuilder extends React.Component {
       imagesOptions,
     } = this.state;
 
-    const selectedSlides = slides.filter(s => s.withinBounds && s.selected);
-    const allImagesDownloaded = selectedSlides.every(s => images[s.id] !== undefined);
+    const selectedSlides = slides.filter((s) => s.withinBounds && s.selected);
+    const allImagesDownloaded = selectedSlides.every((s) => images[s.id] !== undefined);
     return (
       <Rodal
         animation="slideUp"
@@ -408,19 +402,19 @@ class PinsStoryBuilder extends React.Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   lat: store.mainMap.lat,
   lng: store.mainMap.lng,
   zoom: store.mainMap.zoom,
   enabledOverlaysId: store.mainMap.enabledOverlaysId,
-  initialPins: store.pins.items.map(pi => pi.item),
+  initialPins: store.pins.items.map((pi) => pi.item),
   mapBounds: store.mainMap.bounds,
   auth: store.auth,
 });
 export default connect(mapStoreToProps)(PinsStoryBuilder);
 
 class ImagesOptions extends React.Component {
-  toggleOption = option => {
+  toggleOption = (option) => {
     this.props.onChange({
       ...this.props.values,
       [option]: !this.props.values[option],

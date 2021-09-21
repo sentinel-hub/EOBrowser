@@ -24,10 +24,10 @@ export function removeAoiWithEmptyCoords(geojson) {
       }
       return geojson;
     case 'FeatureCollection':
-      const features = geojson.features.filter(feature => !isCoordsEmpty(feature));
+      const features = geojson.features.filter((feature) => !isCoordsEmpty(feature));
       return features.length > 0
         ? featureCollection(
-            geojson.features.filter(feature => {
+            geojson.features.filter((feature) => {
               return !isCoordsEmpty(feature);
             }),
           )
@@ -71,4 +71,33 @@ function getProj(crs) {
   const proj = `+proj=utm +zone=${projZone} +datum=WGS84 +units=m +no_defs`;
   proj4.defs(name, proj);
   return name;
+}
+
+//calculate zoom level for leaflet bounds
+export function getBoundsZoomLevel(bounds) {
+  const WORLD_DIM = { height: 256, width: 256 };
+  const ZOOM_MAX = 21;
+
+  function latRad(lat) {
+    const sin = Math.sin((lat * Math.PI) / 180);
+    const radX2 = Math.log((1 + sin) / (1 - sin)) / 2;
+    return Math.max(Math.min(radX2, Math.PI), -Math.PI) / 2;
+  }
+
+  function zoom(mapPx, worldPx, fraction) {
+    return Math.floor(Math.log(mapPx / worldPx / fraction) / Math.LN2);
+  }
+
+  const ne = bounds.getNorthEast();
+  const sw = bounds.getSouthWest();
+
+  const latFraction = (latRad(ne.lat) - latRad(sw.lat)) / Math.PI;
+
+  const lngDiff = ne.lng - sw.lng;
+  const lngFraction = (lngDiff < 0 ? lngDiff + 360 : lngDiff) / 360;
+
+  const latZoom = zoom(window.innerHeight, WORLD_DIM.height, latFraction);
+  const lngZoom = zoom(window.innerWidth, WORLD_DIM.width, lngFraction);
+
+  return Math.min(latZoom, lngZoom, ZOOM_MAX);
 }

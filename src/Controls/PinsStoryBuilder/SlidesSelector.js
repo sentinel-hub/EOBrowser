@@ -10,7 +10,7 @@ import { constructEffectsFromPinOrHighlight } from '../../utils/effectsUtils';
 export default class SlidesSelector extends React.Component {
   render() {
     const { slides, onToggleSlide, saveNewSlideTitle } = this.props;
-    const slidesWithinBounds = slides.filter(s => s.withinBounds);
+    const slidesWithinBounds = slides.filter((s) => s.withinBounds);
     const N_PINS_OUTSIDE_BOUNDS = slides.length - slidesWithinBounds.length;
     let warningMsg = null;
     if (slidesWithinBounds.length === 0) {
@@ -29,7 +29,7 @@ export default class SlidesSelector extends React.Component {
                 title={slide.title}
                 onClick={() => onToggleSlide(i)}
                 selected={slide.selected}
-                saveNewSlideTitle={title => saveNewSlideTitle(i, title)}
+                saveNewSlideTitle={(title) => saveNewSlideTitle(i, title)}
               />
             ),
         )}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { gettext } from 'ttag';
+import { gettext, t } from 'ttag';
 
 import Legend from './Legend';
 import ExternalLink from '../../ExternalLink/ExternalLink';
@@ -21,7 +21,7 @@ export default class VisualizationLayer extends Component {
   state = { detailsOpen: false };
 
   toggleDetails = () => {
-    this.setState(prevState => ({ detailsOpen: !prevState.detailsOpen }));
+    this.setState((prevState) => ({ detailsOpen: !prevState.detailsOpen }));
   };
 
   getIconSrc(viz) {
@@ -54,11 +54,13 @@ export default class VisualizationLayer extends Component {
       datasetId,
       selectedThemeId,
       selectedModeId,
+      setEvalScriptAndCustomVisualization,
     } = this.props;
 
     const iconSrc = this.getIconSrc(viz);
     const vizId = viz.duplicateLayerId ? viz.duplicateLayerId : viz.layerId;
     const isActive = selectedVisualizationId === vizId && !customSelected;
+    const hasEvalScript = viz.evalscript !== null;
 
     const layerMetadata = findMatchingLayerMetadata(datasetId, viz.layerId, selectedThemeId);
     const longDescription = getDescriptionFromMetadata(layerMetadata);
@@ -75,11 +77,27 @@ export default class VisualizationLayer extends Component {
           className={isActive ? 'layer active' : 'layer'}
         >
           <img className="icon" crossOrigin="Anonymous" src={iconSrc} alt="" />
-          {isActive && hasDetails && (
-            <i
-              className={`fa fa-angle-double-down ${this.state.detailsOpen ? 'show' : ''}`}
-              onClick={this.toggleDetails}
-            />
+          {isActive && (
+            <div className="layer-icons-wrapper">
+              {hasEvalScript && (
+                <i
+                  className={`fas fa-edit`}
+                  title={t`Show evalscript`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.location.hash = '#custom-script'; // open accordion option for evalscript
+                    setEvalScriptAndCustomVisualization(vizId);
+                  }}
+                ></i>
+              )}
+              {hasDetails && (
+                <i
+                  className={`fa fa-angle-double-down ${this.state.detailsOpen ? 'show' : ''}`}
+                  title={t`Show details`}
+                  onClick={this.toggleDetails}
+                />
+              )}
+            </div>
           )}
           {this.getTranslatedDynamicString(title)}
           <small>{this.getTranslatedDynamicString(shortDescription)}</small>
@@ -91,7 +109,7 @@ export default class VisualizationLayer extends Component {
                   escapeHtml={true}
                   source={longDescription}
                   renderers={{
-                    link: props => <ExternalLink href={props.href}>{props.children}</ExternalLink>,
+                    link: (props) => <ExternalLink href={props.href}>{props.children}</ExternalLink>,
                   }}
                 />
               </div>

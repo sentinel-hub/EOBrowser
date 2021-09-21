@@ -6,10 +6,11 @@ import LandsatDataSourceHandler from './LandsatDataSourceHandler';
 import { Landsat45AWSTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/LandsatTooltip';
 import { AWS_LTML1, AWS_LTML2 } from './dataSourceHandlers';
 import { getGroupedBands } from './datasourceAssets/landsatBands';
+import { DATASOURCES } from '../../../const';
 
 export default class Landsat45AWSDataSourceHandler extends LandsatDataSourceHandler {
   urls = { LTML1: [], LTML2: [] };
-  datasource = 'Landsat45AWS';
+  datasource = DATASOURCES.AWS_LANDSAT45;
   searchGroupLabel = 'Landsat 4-5 TM';
   searchGroupKey = 'landsat45-aws';
   datasetSearchLabels = {
@@ -37,7 +38,7 @@ export default class Landsat45AWSDataSourceHandler extends LandsatDataSourceHand
     return <Landsat45AWSTooltip />;
   }
 
-  getSibling = datasetId => {
+  getSibling = (datasetId) => {
     switch (datasetId) {
       case AWS_LTML1:
         return { siblingId: AWS_LTML2, siblingShortName: 'L2' };
@@ -48,5 +49,5 @@ export default class Landsat45AWSDataSourceHandler extends LandsatDataSourceHand
     }
   };
 
-  groupChannels = datasetId => getGroupedBands(datasetId, ['B06']);
+  groupChannels = (datasetId) => getGroupedBands(datasetId);
 }

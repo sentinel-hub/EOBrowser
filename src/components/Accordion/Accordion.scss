@@ -2,10 +2,6 @@
 
 .accordion-wrap {
   border-bottom: 2px solid $mainMedium;
-
-  &:last-of-type {
-    padding-bottom: 8px;
-  }
 }
 
 .accordion-title {
@@ -21,6 +17,11 @@
   &:hover {
     background-color: $mainDark;
     color: $primaryCol;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    color: #aaa;
   }
 }
 

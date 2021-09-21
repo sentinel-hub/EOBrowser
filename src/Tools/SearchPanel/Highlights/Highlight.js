@@ -14,9 +14,9 @@ class Highlight extends Component {
     showDescription: false,
   };
 
-  toggleDescription = e => {
+  toggleDescription = (e) => {
     e.stopPropagation();
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showDescription: !prevState.showDescription,
     }));
   };
@@ -27,7 +27,7 @@ class Highlight extends Component {
     return description !== '' && description;
   };
 
-  addHighlightToCompare = e => {
+  addHighlightToCompare = (e) => {
     e.stopPropagation();
     const effects = constructEffectsFromPinOrHighlight(this.props.pin);
     const highlight = { ...this.props.pin, ...effects };

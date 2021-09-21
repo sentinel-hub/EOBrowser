@@ -8,6 +8,7 @@ import {
   ApiType,
   ProcessingDataFusionLayer,
   DEMLayer,
+  Interpolator,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
@@ -36,6 +37,7 @@ import {
 } from '../../utils/parseEvalscript';
 import { WARNINGS } from './ImageDownloadWarningPanel';
 import { refetchWithDefaultToken } from '../../utils/fetching.utils';
+import { reqConfigMemoryCache, MAX_SH_IMAGE_SIZE } from '../../const';
 
 import copernicus from '../../junk/EOBCommon/assets/copernicus.png';
 import SHlogo from '../../junk/EOBCommon/assets/shLogo.png';
@@ -49,8 +51,6 @@ const FONT_SIZES = {
   normal: { base: 6.5016, min: 11 },
   copyright: { base: 5, min: 9 },
 };
-
-const IMAGE_SIZE_LIMIT = 2500;
 
 export function getMapDimensions(pixelBounds, resolutionDivisor = 1) {
   const width = pixelBounds.max.x - pixelBounds.min.x;
@@ -77,7 +77,7 @@ export function getImageDimensionFromBounds(bounds, datasetId) {
   const dsh = getDataSourceHandler(datasetId);
   const { resolution } = dsh.getResolutionLimits(datasetId);
   const maxResolution = resolution || 10;
-  const maxImageWidth = Math.min(width / maxResolution, IMAGE_SIZE_LIMIT);
+  const maxImageWidth = Math.min(width / maxResolution, MAX_SH_IMAGE_SIZE);
   const maxImageHeight = maxImageWidth * ratio;
   return { width: Math.floor(maxImageWidth), height: Math.floor(maxImageHeight) };
 }
@@ -118,19 +118,20 @@ export async function fetchImage(layer, options) {
 
   const reqConfig = {
     cancelToken: cancelToken,
+    retries: 5,
   };
 
   if (getMapAuthToken) {
     reqConfig.authToken = getMapAuthToken;
   }
 
-  if (width > IMAGE_SIZE_LIMIT || height > IMAGE_SIZE_LIMIT) {
+  if (width > MAX_SH_IMAGE_SIZE || height > MAX_SH_IMAGE_SIZE) {
     return refetchWithDefaultToken(
-      reqConfig => layer.getHugeMap(getMapParams, apiType, reqConfig),
+      (reqConfig) => layer.getHugeMap(getMapParams, apiType, reqConfig),
       reqConfig,
     );
   } else {
-    return refetchWithDefaultToken(reqConfig => layer.getMap(getMapParams, apiType, reqConfig), reqConfig);
+    return refetchWithDefaultToken((reqConfig) => layer.getMap(getMapParams, apiType, reqConfig), reqConfig);
   }
 }
 
@@ -185,10 +186,10 @@ export async function fetchImageFromParams(params, raiseWarning) {
 
   if (
     !(imageFormat === IMAGE_FORMATS.JPG || imageFormat === IMAGE_FORMATS.PNG) &&
-    (width > IMAGE_SIZE_LIMIT || height > IMAGE_SIZE_LIMIT)
+    (width > MAX_SH_IMAGE_SIZE || height > MAX_SH_IMAGE_SIZE)
   ) {
     throw Error(
-      `Can't download images with mimetype '${mimeType}' having any dimension greater than ${IMAGE_SIZE_LIMIT} pixels.`,
+      `Can't download images with mimetype '${mimeType}' having any dimension greater than ${MAX_SH_IMAGE_SIZE} pixels.`,
     );
   }
 
@@ -199,7 +200,7 @@ export async function fetchImageFromParams(params, raiseWarning) {
     getMapAuthToken: getMapAuthToken,
   };
 
-  const blob = await fetchImage(layer, options).catch(err => {
+  const blob = await fetchImage(layer, options).catch((err) => {
     throw err;
   });
 
@@ -269,7 +270,7 @@ async function overrideEvalscriptIfNeeded(
   const { sampleType, scaleFactor } = IMAGE_FORMATS_INFO[imageFormat];
   const layerName = customSelected ? 'Custom' : layer.title;
   if (!layer.evalscript && !layer.evalscriptUrl) {
-    await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken });
+    await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken, ...reqConfigMemoryCache });
     if (!layer.evalscript) {
       raiseWarning(WARNINGS.NO_EVALSCRIPT, layerName);
       return;
@@ -306,7 +307,7 @@ async function getAppropriateApiType(layer, imageFormat, isRawBand, cancelToken)
     }
     if (!isKMZ) {
       if (!layer.evalscript && !layer.evalscriptUrl) {
-        await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken });
+        await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken, ...reqConfigMemoryCache });
       }
       return layer.supportsApiType(ApiType.PROCESSING) ? ApiType.PROCESSING : ApiType.WMS;
     }
@@ -317,14 +318,7 @@ async function getAppropriateApiType(layer, imageFormat, isRawBand, cancelToken)
 export function getTitle(fromTime, toTime, datasetId, layerTitle, customSelected) {
   const format = 'YYYY-MM-DD HH:mm';
   const datasetLabel = checkIfCustom(datasetId) ? datasetLabels[CUSTOM] : datasetLabels[datasetId];
-  return `${
-    fromTime
-      ? fromTime
-          .clone()
-          .utc()
-          .format(format) + ' - '
-      : ''
-  }${toTime
+  return `${fromTime ? fromTime.clone().utc().format(format) + ' - ' : ''}${toTime
     .clone()
     .utc()
     .format(format)}, ${datasetLabel}, ${customSelected ? 'Custom script' : layerTitle}`;
@@ -344,14 +338,7 @@ export function getNicename(fromTime, toTime, datasetId, layerTitle, customSelec
 
   const datasetLabel = checkIfCustom(datasetId) ? datasetLabels[CUSTOM] : datasetLabels[datasetId];
 
-  return `${
-    fromTime
-      ? fromTime
-          .clone()
-          .utc()
-          .format(format) + '_'
-      : ''
-  }${toTime
+  return `${fromTime ? fromTime.clone().utc().format(format) + '_' : ''}${toTime
     .clone()
     .utc()
     .format(format)}_${datasetLabel.replace(/ /gi, '_')}_${layerName}`;
@@ -372,15 +359,19 @@ export async function getLayerFromParams(params, cancelToken) {
     minQa,
     upsampling,
     downsampling,
+    speckleFilter,
+    orthorectification,
   } = params;
   let layer;
 
   const reqConfig = {
     cancelToken: cancelToken,
+    ...reqConfigMemoryCache,
   };
 
   if (layerId) {
     layer = await LayersFactory.makeLayer(visualizationUrl, layerId, null, reqConfig);
+    await layer.updateLayerFromServiceIfNeeded(reqConfig);
   } else if (isDataFusionEnabled(dataFusion)) {
     layer = await constructDataFusionLayer(dataFusion, evalscript, evalscripturl, fromTime, toTime);
   } else if (customSelected) {
@@ -394,11 +385,12 @@ export async function getLayerFromParams(params, cancelToken) {
     );
     const isBYOC = checkIfCustom(datasetId);
     if (isBYOC) {
-      await Promise.all(layers.map(l => l.updateLayerFromServiceIfNeeded(reqConfig)));
-      layers = layers.filter(l => l.collectionId === datasetId);
+      await Promise.all(layers.map((l) => l.updateLayerFromServiceIfNeeded(reqConfig)));
+      layers = layers.filter((l) => l.collectionId === datasetId);
     }
     if (layers.length > 0) {
       layer = layers[0];
+      await layer.updateLayerFromServiceIfNeeded(reqConfig);
       layer.evalscript = evalscript;
       layer.evalscriptUrl = evalscripturl;
     }
@@ -412,9 +404,24 @@ export async function getLayerFromParams(params, cancelToken) {
     }
     if (upsampling) {
       layer.upsampling = upsampling;
+    } else if (!layer.upsampling) {
+      layer.upsampling = Interpolator.NEAREST;
     }
     if (downsampling) {
       layer.downsampling = downsampling;
+    } else if (!layer.downsampling) {
+      layer.downsampling = Interpolator.NEAREST;
+    }
+    if (speckleFilter) {
+      layer.speckleFilter = speckleFilter;
+    }
+    if (orthorectification) {
+      if (orthorectification === 'DISABLED') {
+        layer.orthorectify = false;
+      } else {
+        layer.orthorectify = true;
+        layer.demInstanceType = orthorectification;
+      }
     }
   }
   return layer;
@@ -499,13 +506,16 @@ export function getAllBands(datasetId) {
 export async function getAllLayers(url, datasetId, selectedTheme) {
   const dsh = getDataSourceHandler(datasetId);
   const shJsDataset = dsh ? dsh.getSentinelHubDataset(datasetId) : null;
-  const { layersExclude, layersInclude } = selectedTheme.content.find(t => t.url === url);
-  const allLayers = await LayersFactory.makeLayers(url, (layerId, dataset) =>
-    !shJsDataset ? true : dataset.id === shJsDataset.id,
+  const { layersExclude, layersInclude } = selectedTheme.content.find((t) => t.url === url);
+  const allLayers = await LayersFactory.makeLayers(
+    url,
+    (layerId, dataset) => (!shJsDataset ? true : dataset.id === shJsDataset.id),
+    null,
+    reqConfigMemoryCache,
   );
   await Promise.all(
-    allLayers.map(async l => {
-      await l.updateLayerFromServiceIfNeeded();
+    allLayers.map(async (l) => {
+      await l.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
     }),
   );
   return dsh.getLayers(allLayers, datasetId, url, layersExclude, layersInclude);
@@ -587,7 +597,7 @@ export function isTiff(imageFormat) {
 */
 
 export const drawMapOverlaysOnCanvas = async (ctx, lat, lng, zoom, width, enabledOverlaysId) => {
-  const enabledOverlays = overlayTileLayers().filter(overlayTileLayer =>
+  const enabledOverlays = overlayTileLayers().filter((overlayTileLayer) =>
     enabledOverlaysId.includes(overlayTileLayer.id),
   );
   enabledOverlays.sort((a, b) => a.zIndex - b.zIndex);
@@ -613,7 +623,7 @@ export const drawMapOverlaysOnCanvas = async (ctx, lat, lng, zoom, width, enable
         overlay.zoomOffset,
       );
     }
-    ctx.drawImage(overlayCanvas, 0, 0);
+    ctx.drawImage(overlayCanvas, 0, 0, canvasWidth, canvasHeight);
   }
 };
 
@@ -859,7 +869,7 @@ export async function loadImage(url) {
     const img = document.createElement('img');
     img.crossOrigin = 'Anonymous';
     img.onload = () => resolve(img);
-    img.onerror = e => {
+    img.onerror = (e) => {
       reject(t`Error fetching image:` + ` ${url} ${e}`);
     };
     img.src = url;
@@ -960,7 +970,9 @@ function createSVGLegendDiscrete(legend) {
 
   let maxLabelWidth = 0;
   maxLabelWidth = Math.max(
-    ...items.filter(item => item.label).map(item => getLabelWidth(item.label, FONT_SIZE, FONT_FAMILY) + 5),
+    ...items
+      .filter((item) => item.label)
+      .map((item) => getLabelWidth(item.label, FONT_SIZE, FONT_FAMILY) + 5),
     maxLabelWidth,
   );
   svg.setAttribute('width', `${maxLabelWidth + 2 * MARGIN_LEFT + LEGEND_ITEM_HEIGHT}px`);
@@ -981,14 +993,14 @@ function getLabelWidth(txt, fontSize, fontFamily) {
 /*
 create SVG element
 */
-const createSVGElement = elem => document.createElementNS('http://www.w3.org/2000/svg', elem);
+const createSVGElement = (elem) => document.createElementNS('http://www.w3.org/2000/svg', elem);
 
 /*
 set SVG element attributes.
 */
 
 const setSVGElementAttributes = (elem, attributes) => {
-  Object.keys(attributes).forEach(key => elem.setAttributeNS(null, key, attributes[key]));
+  Object.keys(attributes).forEach((key) => elem.setAttributeNS(null, key, attributes[key]));
 };
 
 /*
@@ -1059,7 +1071,7 @@ function createSVGLegendContinous(legend) {
       },
     ];
 
-    stops.forEach(s => {
+    stops.forEach((s) => {
       let stop = createSVGElement('stop');
       setSVGElementAttributes(stop, {
         offset: s.offset,
@@ -1083,7 +1095,7 @@ function createSVGLegendContinous(legend) {
   });
 
   //add ticks
-  ticks.forEach(line => {
+  ticks.forEach((line) => {
     if (line.label) {
       let l = createSVGElement('line');
       const pos = (1 - (line.position - minPosition) / (maxPosition - minPosition)) * LEGEND_HEIGHT;
@@ -1099,7 +1111,7 @@ function createSVGLegendContinous(legend) {
   });
 
   //add labels
-  ticks.forEach(item => {
+  ticks.forEach((item) => {
     if (item.label) {
       let text = createSVGElement('text');
       const pos = (1 - (item.position - minPosition) / (maxPosition - minPosition)) * LEGEND_HEIGHT;
@@ -1115,7 +1127,7 @@ function createSVGLegendContinous(legend) {
   //calculate max label width
   let maxLabelWidth = 0;
   maxLabelWidth = Math.max(
-    ...ticks.filter(t => t.label).map(val => getLegendTextWidth(val.label, FONT_SIZE, FONT_FAMILY) + 10),
+    ...ticks.filter((t) => t.label).map((val) => getLegendTextWidth(val.label, FONT_SIZE, FONT_FAMILY) + 10),
     maxLabelWidth,
   );
 
@@ -1126,7 +1138,7 @@ function createSVGLegendContinous(legend) {
   return svg;
 }
 
-export const createSVGLegend = legendSpec => {
+export const createSVGLegend = (legendSpec) => {
   let legendImage;
   if (Array.isArray(legendSpec)) {
     for (let legend of legendSpec) {

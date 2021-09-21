@@ -3,7 +3,7 @@ import { SHV3_LOCATIONS_ROOT_URL } from '@sentinel-hub/sentinelhub-js';
 
 import store from '../store';
 
-export function getCollectionInformation(collectionId, locationId) {
+export function getCollectionInformation(collectionId, locationId, subType) {
   const auth = store.getState()['auth'];
   const token = auth.user && auth.user.access_token ? auth.user.access_token : auth.anonToken;
   const headers = {
@@ -14,5 +14,8 @@ export function getCollectionInformation(collectionId, locationId) {
     headers: headers,
   };
   const baseUrl = SHV3_LOCATIONS_ROOT_URL[locationId];
-  return axios.get(`${baseUrl}api/v1/catalog/collections/${collectionId}`, requestConfig);
+  return axios.get(
+    `${baseUrl}api/v1/catalog/collections/${subType === 'BATCH' ? 'batch' : 'byoc'}-${collectionId}`,
+    requestConfig,
+  );
 }

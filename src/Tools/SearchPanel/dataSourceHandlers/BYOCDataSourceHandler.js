@@ -1,5 +1,5 @@
 import React from 'react';
-import { BYOCLayer, DATASET_BYOC } from '@sentinel-hub/sentinelhub-js';
+import { BYOCLayer, DATASET_BYOC, BYOCSubTypes } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
 import DataSourceHandler from './DataSourceHandler';
@@ -9,6 +9,7 @@ import { FetchingFunction } from '../search';
 import { convertGeoJSONToEPSG4326 } from '../../../utils/coords';
 import { filterLayers } from './filter';
 import { constructV3Evalscript, isFunction } from '../../../utils';
+import { DATASOURCES } from '../../../const';
 
 const CRS_EPSG4326_urn = 'urn:ogc:def:crs:EPSG::4326';
 
@@ -22,7 +23,7 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
   preselectedDatasets = new Set();
   searchFilters = {};
   isChecked = false;
-  datasource = 'CUSTOM';
+  datasource = DATASOURCES.CUSTOM;
 
   leafletZoomConfig = {
     CUSTOM: { min: 0, max: 25 },
@@ -33,7 +34,7 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
   willHandle(service, url, name, layers, preselected) {
     name = isFunction(name) ? name() : name;
     const customLayers = layers.filter(
-      l =>
+      (l) =>
         l instanceof BYOCLayer &&
         l.collectionId &&
         !this.COPERNICUS_SERVICES_KNOWN_COLLECTIONS.includes(l.collectionId),
@@ -41,12 +42,13 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
     if (customLayers.length === 0) {
       return false;
     }
-    customLayers.forEach(layer => {
+    customLayers.forEach((layer) => {
       this.collections[layer.collectionId] = {
         title: layer.collectionTitle || layer.title,
         url: url,
         themeName: name.replace(t`Based on: `, ''),
         availableBands: layer.availableBands,
+        subType: layer.subType,
       };
       // Once collections endpoint will be working properly,
       // title should be replaced with actual collection name (if service will provide such information)
@@ -57,7 +59,7 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
     }
 
     this.datasets = Object.keys(this.collections);
-    this.datasets.forEach(id => {
+    this.datasets.forEach((id) => {
       this.datasetSearchIds[id] = id;
       this.datasetSearchLabels[id] = this.collections[id].title;
     });
@@ -103,15 +105,19 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
       datasets = this.searchFilters.selectedOptions;
     }
 
-    datasets.forEach(datasetId => {
+    datasets.forEach((datasetId) => {
       // InstanceId, layerId and evalscript are required parameters, although we don't need them for findTiles.
       // As we don't have any layer related information at this stage, some dummy values are set for those 3 params to prevent
       // querying configuration service for dataset defaults
+      const subType = this.collections[datasetId].subType
+        ? this.collections[datasetId].subType
+        : BYOCSubTypes.BYOC;
       const searchLayer = new BYOCLayer({
         instanceId: true,
         layerId: true,
         evalscript: '//',
         collectionId: datasetId,
+        subType: subType,
       });
       const ff = new FetchingFunction(
         datasetId,
@@ -127,14 +133,14 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map(t => {
+    const tiles = data.map((t) => {
       if (t.geometry && t.geometry.crs && t.geometry.crs.properties.name !== CRS_EPSG4326_urn) {
         convertGeoJSONToEPSG4326(t.geometry);
       }
       return {
         sensingTime: t.sensingTime,
         geometry: t.geometry,
-        datasource: 'CUSTOM',
+        datasource: this.datasource,
         datasetId: datasetId,
         metadata: {},
       };
@@ -157,8 +163,8 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
   }
 
   getLayers = (data, datasetId, url, layersExclude, layersInclude) => {
-    let layers = data.filter(layer => layer.collectionId === datasetId && filterLayers(layer.layerId));
-    layers.forEach(l => {
+    let layers = data.filter((layer) => layer.collectionId === datasetId && filterLayers(layer.layerId));
+    layers.forEach((l) => {
       l.url = url;
     });
     return layers;
@@ -169,7 +175,7 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
     return availableBands && !!availableBands.length;
   }
 
-  getDatasetLabel = datasetId => {
+  getDatasetLabel = (datasetId) => {
     let collectionLabel;
     const collectionData = this.collections[datasetId];
     if (collectionData) {
@@ -179,7 +185,7 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
     return collectionLabel || 'CUSTOM';
   };
 
-  getBands = datasetId => {
+  getBands = (datasetId) => {
     return this.collections[datasetId].availableBands;
   };
 
@@ -199,7 +205,7 @@ function setup() {
 let factor = 1/2000;
 function evaluatePixel(sample) {
   return [${Object.values(bands)
-    .map(e => 'factor * sample.' + e)
+    .map((e) => 'factor * sample.' + e)
     .join(',')}, sample.dataMask ];
 }`;
   };

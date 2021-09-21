@@ -36,6 +36,7 @@ import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
 import { getGetMapAuthToken } from '../../App';
 
 import './ImageDownload.scss';
+import { DATASOURCES } from '../../const';
 
 function ImageDownload(props) {
   const [selectedTab, setSelectedTab] = useState(TABS.BASIC);
@@ -54,7 +55,7 @@ function ImageDownload(props) {
   const getMapAuthToken = getGetMapAuthToken(props.auth);
 
   let cancelToken;
-  useEffect(cancelToken => {
+  useEffect((cancelToken) => {
     return () => {
       if (cancelToken) {
         cancelToken.cancel();
@@ -65,9 +66,9 @@ function ImageDownload(props) {
   useEffect(() => {
     setAllBands(getAllBands(props.datasetId));
     const selectedTheme = props.themesLists[props.selectedThemesListId].find(
-      t => t.id === props.selectedThemeId,
+      (t) => t.id === props.selectedThemeId,
     );
-    getAllLayers(props.visualizationUrl, props.datasetId, selectedTheme).then(allLayers =>
+    getAllLayers(props.visualizationUrl, props.datasetId, selectedTheme).then((allLayers) =>
       setAllLayers(allLayers),
     );
     setSupportedImageFormats(getSupportedImageFormats(props.datasetId));
@@ -147,6 +148,8 @@ function ImageDownload(props) {
       minQa,
       upsampling,
       downsampling,
+      speckleFilter,
+      orthorectification,
       bounds,
       aoiGeometry,
     } = props;
@@ -183,6 +186,8 @@ function ImageDownload(props) {
       minQa: minQa,
       upsampling: upsampling,
       downsampling: downsampling,
+      speckleFilter: speckleFilter,
+      orthorectification: orthorectification,
       cancelToken: cancelToken,
       showLogo: showLogo,
       shouldClipExtraBands: shouldClipExtraBands,
@@ -235,13 +240,13 @@ function ImageDownload(props) {
     }
 
     const images = await Promise.all(
-      requestsParams.map(params =>
-        fetchImageFromParams(params, addWarning).catch(err => {
+      requestsParams.map((params) =>
+        fetchImageFromParams(params, addWarning).catch((err) => {
           setError(err);
           return null;
         }),
       ),
-    ).then(images => images.filter(img => img !== null));
+    ).then((images) => images.filter((img) => img !== null));
 
     const { ext: imageExt } = IMAGE_FORMATS_INFO[imageFormat];
 
@@ -264,14 +269,8 @@ function ImageDownload(props) {
 
   async function downloadPrint(formData) {
     const { aoiGeometry } = props;
-    const {
-      imageWidthInches,
-      resolutionDpi,
-      imageFormat,
-      showCaptions,
-      showLegend,
-      userDescription,
-    } = formData;
+    const { imageWidthInches, resolutionDpi, imageFormat, showCaptions, showLegend, userDescription } =
+      formData;
 
     setError(null);
     setWarnings(null);
@@ -310,7 +309,7 @@ function ImageDownload(props) {
   function checkIfCurrentLayerHasLegend() {
     const { layerId, datasetId, selectedThemeId } = props;
     if (layerId) {
-      const layer = allLayers.find(l => l.layerId === layerId);
+      const layer = allLayers.find((l) => l.layerId === layerId);
       if (layer) {
         if (layer.legend || layer.legendUrl) {
           return true;
@@ -329,7 +328,7 @@ function ImageDownload(props) {
   }
 
   function addWarning(warningType, layerName) {
-    setWarnings(prevWarnings => {
+    setWarnings((prevWarnings) => {
       if (!prevWarnings) {
         return { [warningType]: [layerName] };
       }
@@ -350,7 +349,7 @@ function ImageDownload(props) {
 
   const hasLegendData = checkIfCurrentLayerHasLegend();
   const isUserLoggedIn = props.user && props.user.userdata;
-  const isGIBS = datasourceForDatasetId(props.datasetId) === 'GIBS';
+  const isGIBS = datasourceForDatasetId(props.datasetId) === DATASOURCES.GIBS;
 
   return (
     <Rodal
@@ -421,7 +420,7 @@ function ImageDownload(props) {
   );
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   lat: store.mainMap.lat,
   lng: store.mainMap.lng,
   zoom: store.mainMap.zoom,
@@ -429,11 +428,7 @@ const mapStoreToProps = store => ({
   pixelBounds: store.mainMap.pixelBounds,
   enabledOverlaysId: store.mainMap.enabledOverlaysId,
   user: store.auth.user,
-  aoiGeometry: store.aoi.geometry
-    ? store.aoi.geometry.features
-      ? store.aoi.geometry.features[0].geometry
-      : store.aoi.geometry.geometry
-    : null,
+  aoiGeometry: store.aoi.geometry,
   layerId: store.visualization.layerId,
   evalscript: store.visualization.evalscript,
   evalscripturl: store.visualization.evalscripturl,
@@ -453,6 +448,8 @@ const mapStoreToProps = store => ({
   blueCurveEffect: store.visualization.blueCurveEffect,
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
+  speckleFilter: store.visualization.speckleFilter,
+  orthorectification: store.visualization.orthorectification,
   minQa: store.visualization.minQa,
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,

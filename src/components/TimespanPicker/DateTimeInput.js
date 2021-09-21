@@ -5,7 +5,7 @@ import DatePicker from '../DatePicker/DatePicker';
 import { NumericInput } from './NumericInput';
 
 export class DateTimeInput extends Component {
-  setDay = day => {
+  setDay = (day) => {
     const { selectedTime } = this.props;
     const newSelectedTime = selectedTime
       .clone()
@@ -13,7 +13,7 @@ export class DateTimeInput extends Component {
     this.props.setSelectedTime(newSelectedTime);
   };
 
-  setHours = hours => {
+  setHours = (hours) => {
     const { selectedTime } = this.props;
     const newSelectedTime = selectedTime.clone().hours(hours);
     if (!this.isWithinAvailableRange(newSelectedTime)) {
@@ -22,7 +22,7 @@ export class DateTimeInput extends Component {
     this.props.setSelectedTime(newSelectedTime);
   };
 
-  setMinutes = minutes => {
+  setMinutes = (minutes) => {
     const { selectedTime } = this.props;
     const newSelectedTime = selectedTime.clone().minutes(minutes);
     if (!this.isWithinAvailableRange(newSelectedTime)) {
@@ -31,7 +31,7 @@ export class DateTimeInput extends Component {
     this.props.setSelectedTime(newSelectedTime);
   };
 
-  isWithinAvailableRange = newSelectedDay => {
+  isWithinAvailableRange = (newSelectedDay) => {
     const { minDate, maxDate } = this.props;
     return newSelectedDay >= minDate && newSelectedDay <= maxDate;
   };
@@ -43,14 +43,8 @@ export class DateTimeInput extends Component {
       return null;
     }
 
-    const hours = selectedTime
-      .clone()
-      .utc()
-      .format('HH');
-    const minutes = selectedTime
-      .clone()
-      .utc()
-      .format('mm');
+    const hours = selectedTime.clone().utc().format('HH');
+    const minutes = selectedTime.clone().utc().format('mm');
 
     return (
       <div className="date-time-input">

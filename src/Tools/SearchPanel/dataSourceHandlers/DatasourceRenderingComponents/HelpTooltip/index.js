@@ -9,14 +9,14 @@ class HelpTooltip extends Component {
   };
 
   toggleTooltip = () => {
-    this.setState(oldState => ({
+    this.setState((oldState) => ({
       opened: !oldState.opened,
     }));
   };
 
-  handleClickOutside = e => {
-    const clickIsInside = Array.from(document.querySelectorAll('[class^="react-tooltip-lite"]')).some(elem =>
-      elem.contains(e.target),
+  handleClickOutside = (e) => {
+    const clickIsInside = Array.from(document.querySelectorAll('[class^="react-tooltip-lite"]')).some(
+      (elem) => elem.contains(e.target),
     );
     if (this.props.closeOnClickOutside && !clickIsInside) {
       this.setState({

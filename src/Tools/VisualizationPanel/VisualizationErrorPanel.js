@@ -30,7 +30,7 @@ function VisualizationErrorPanel(props) {
   );
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   error: store.visualization.error,
   selectedMode: store.modes.selectedMode,
   selectedTabIndex: store.tabs.selectedTabIndex,

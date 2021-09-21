@@ -9,82 +9,83 @@ import { FetchingFunction } from '../search';
 import { constructBasicEvalscript } from '../../../utils';
 import { ENVISAT_MERIS } from './dataSourceHandlers';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
+import { DATASOURCES } from '../../../const';
 
 export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
   KNOWN_BANDS = [
     {
       name: 'B01',
-      description: t`Band 1 - Yellow substance and detrital pigments - 412.5 nm`,
+      getDescription: () => t`Band 1 - Yellow substance and detrital pigments - 412.5 nm`,
       color: '#4900A5',
     },
     {
       name: 'B02',
-      description: t`Band 2 - Chlorophyll absorption maximum - 442 nm`,
+      getDescription: () => t`Band 2 - Chlorophyll absorption maximum - 442 nm`,
       color: '#000AFF',
     },
     {
       name: 'B03',
-      description: t`Band 3 - Chlorophyll and other pigments - 490 nm`,
+      getDescription: () => t`Band 3 - Chlorophyll and other pigments - 490 nm`,
       color: '#00FFFF',
     },
     {
       name: 'B04',
-      description: t`Band 4 - Suspended sediment, red tides - 510 nm`,
+      getDescription: () => t`Band 4 - Suspended sediment, red tides - 510 nm`,
       color: '#00FF00',
     },
     {
       name: 'B05',
-      description: t`Band 5 - Chlorophyll absorption minimum - 560 nm`,
+      getDescription: () => t`Band 5 - Chlorophyll absorption minimum - 560 nm`,
       color: '#B6FF00',
     },
     {
       name: 'B06',
-      description: t`Band 6 - Suspended sediment - 620 nm`,
+      getDescription: () => t`Band 6 - Suspended sediment - 620 nm`,
       color: '#FF6200',
     },
     {
       name: 'B07',
-      description: t`Band 7 - Chlorophyll absorption & fluo. reference - 665 nm`,
+      getDescription: () => t`Band 7 - Chlorophyll absorption & fluo. reference - 665 nm`,
       color: '#FF0000',
     },
     {
       name: 'B08',
-      description: t`Band 8 - Chlorophyll fluorescence peak - 681 nm`,
+      getDescription: () => t`Band 8 - Chlorophyll fluorescence peak - 681 nm`,
       color: '#FF0000',
     },
     {
       name: 'B09',
-      description: t`Band 9 - Fluo. reference, atmosphere corrections - 709 nm`,
+      getDescription: () => t`Band 9 - Fluo. reference, atmosphere corrections - 709 nm`,
       color: '#EA0000',
     },
     {
       name: 'B10',
-      description: t`Band 10 - Vegetation, cloud - 753 nm`,
+      getDescription: () => t`Band 10 - Vegetation, cloud - 753 nm`,
       color: '#880000',
     },
     {
       name: 'B11',
-      description: t`Band 11 - O2 R- branch absorption band - 761 nm`,
+      getDescription: () => t`Band 11 - O2 R- branch absorption band - 761 nm`,
       color: '#880000',
     },
     {
       name: 'B12',
-      description: t`Band 12 - Atmosphere corrections - 779 nm`,
+      getDescription: () => t`Band 12 - Atmosphere corrections - 779 nm`,
       color: '#4E0000',
     },
     {
       name: 'B13',
-      description: t`Band 13 - Vegetation, water vapour reference - 865 nm`,
+      getDescription: () => t`Band 13 - Vegetation, water vapour reference - 865 nm`,
       color: '#000',
     },
     {
       name: 'B14',
-      description: t`Band 14 - Atmosphere corrections - 885 nm`,
+      getDescription: () => t`Band 14 - Atmosphere corrections - 885 nm`,
       color: '#000',
     },
     {
       name: 'B15',
-      description: t`Band 15 - Water vapour, land - 900 nm`,
+      getDescription: () => t`Band 15 - Water vapour, land - 900 nm`,
       color: '#000',
     },
   ];
@@ -94,7 +95,7 @@ export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
   searchFilters = {};
   preselected = false;
   isChecked = false;
-  datasource = 'Envisat Meris';
+  datasource = DATASOURCES.ENVISAT_MERIS;
 
   leafletZoomConfig = {
     [ENVISAT_MERIS]: {
@@ -104,7 +105,7 @@ export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
   };
 
   willHandle(service, url, name, layers, preselected) {
-    const usesDataset = !!layers.find(l => l.dataset && l.dataset === DATASET_EOCLOUD_ENVISAT_MERIS);
+    const usesDataset = !!layers.find((l) => l.dataset && l.dataset === DATASET_EOCLOUD_ENVISAT_MERIS);
     if (!usesDataset) {
       return false;
     }
@@ -157,7 +158,7 @@ export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map(t => ({
+    const tiles = data.map((t) => ({
       sensingTime: t.sensingTime,
       geometry: t.geometry,
       datasource: this.datasource,
@@ -199,7 +200,7 @@ export default class EnvisatMerisDataSourceHandler extends DataSourceHandler {
 
   getSupportedImageFormats() {
     return Object.values(IMAGE_FORMATS).filter(
-      f => f !== IMAGE_FORMATS.KMZ_JPG && f !== IMAGE_FORMATS.KMZ_PNG,
+      (f) => f !== IMAGE_FORMATS.KMZ_JPG && f !== IMAGE_FORMATS.KMZ_PNG,
     );
   }
 }

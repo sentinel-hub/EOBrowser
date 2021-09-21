@@ -5,9 +5,9 @@ returns legend definition from layers_metadata.json for provided datasource and 
 */
 export function findMatchingLayerMetadata(datasourceId, layerId, themeId) {
   const layerMetadata = PREDEFINED_LAYERS_METADATA.find(
-    l =>
+    (l) =>
       !!l.match.find(
-        m =>
+        (m) =>
           m.datasourceId === datasourceId && m.layerId === layerId && (m.theme ? m.theme === themeId : true),
       ),
   );
@@ -45,7 +45,7 @@ returns min and max position for continuous legend
 export function getMinMaxPosition(legend) {
   let minPosition = legend.minPosition || 0.0;
   let maxPosition = legend.maxPosition || 1.0;
-  legend.gradients.forEach(el => {
+  legend.gradients.forEach((el) => {
     minPosition = Math.min(minPosition, el.position);
     maxPosition = Math.max(maxPosition, el.position);
   });
@@ -59,8 +59,8 @@ export function createGradients(legend) {
   const { minPosition, maxPosition } = getMinMaxPosition(legend);
   let gradients = [];
   const rules = legend.gradients
-    .filter(g => g.color)
-    .map(r => ({
+    .filter((g) => g.color)
+    .map((r) => ({
       ...r,
       relPosition: (r.position - minPosition) / (maxPosition - minPosition),
     }));

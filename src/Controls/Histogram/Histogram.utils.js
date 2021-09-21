@@ -1,6 +1,6 @@
 import { t } from 'ttag';
 import { fromBlob } from 'geotiff';
-import { LayersFactory, ApiType } from '@sentinel-hub/sentinelhub-js';
+import { LayersFactory, ApiType, BBox } from '@sentinel-hub/sentinelhub-js';
 
 import {
   getMapDimensions,
@@ -10,21 +10,34 @@ import {
 import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { constructErrorMessage } from '../../utils';
 import { checkIfIndexOutputInEvalscript } from '../../utils/parseEvalscript';
+import { reqConfigMemoryCache, MAX_SH_IMAGE_SIZE } from '../../const';
+import { refetchWithDefaultToken } from '../../utils/fetching.utils';
 
 export const MISSING_INDEX_OUTPUT_ERROR =
-  t`Setup function in evalscript does not contain the correct index output` +
-  ` ('{ id: "index", bands: 1, sampleType: "FLOAT32" }')`;
+  t`The setup function in the evalscript does not contain the correct output. The output needs to include:` +
+  `\n\n` +
+  `{ id: "index", bands: 1, sampleType: "FLOAT32" }`;
+
+export const NO_INDEX_LAYER_SELECTED = t`You are visualising a layer that doesn't represent an index. The histogram feature currently only works for index layers (e.g. NDVI).\n\n Please select an index layer to use this feature.`;
 
 export async function getLayerName(visualizationUrl, layerId, cancelToken) {
   try {
-    let layer = await LayersFactory.makeLayer(visualizationUrl, layerId, null, { cancelToken: cancelToken });
+    let layer = await LayersFactory.makeLayer(visualizationUrl, layerId, null, {
+      ...reqConfigMemoryCache,
+      cancelToken: cancelToken,
+    });
     return layer.title;
   } catch (e) {
     return layerId;
   }
 }
 
-async function getTiffImage(layer, props, cancelToken) {
+// This function receives props for requesting tiff images from Sentinel Hub and returns an array of blobs.
+// The width or height may exceed the Sentinel Hub's limit of 2500px.
+// In that case, the function calculates the width, height and bboxes for requesting smaller chunks.
+// When width and height do not exceed the limit, the function requests 1 image and
+// returns an array with 1 element for the sake of consistency.
+async function getTiffImages(layer, props, cancelToken) {
   const { bounds, fromTime, toTime, pixelBounds, aoiGeometry, datasetId } = props;
 
   const { width: defaultWidth, height: defaultHeight } = getImageDimensionFromBounds(bounds, datasetId);
@@ -60,24 +73,64 @@ async function getTiffImage(layer, props, cancelToken) {
     cache: { expiresIn: 0 },
   };
 
-  const blob = await layer.getMap(getMapParams, ApiType.PROCESSING, reqConfig);
-  return blob;
+  if (width <= MAX_SH_IMAGE_SIZE && height <= MAX_SH_IMAGE_SIZE) {
+    const blob = await refetchWithDefaultToken(
+      (reqConfig) => layer.getMap(getMapParams, ApiType.PROCESSING, reqConfig),
+      reqConfig,
+    );
+    return [blob];
+  }
+
+  let blobPromises = [];
+
+  const xSplitBy = Math.ceil(width / MAX_SH_IMAGE_SIZE);
+  const chunkWidth = Math.ceil(width / xSplitBy);
+  const ySplitBy = Math.ceil(height / MAX_SH_IMAGE_SIZE);
+  const chunkHeight = Math.ceil(height / ySplitBy);
+
+  const { minX: lng0, minY: lat0, maxX: lng1, maxY: lat1 } = originalBBox;
+  const xToLng = (x) => Math.min(lng0, lng1) + (x / width) * Math.abs(lng1 - lng0);
+  const yToLat = (y) => Math.max(lat0, lat1) - (y / height) * Math.abs(lat1 - lat0);
+
+  for (let x = 0; x < width; x += chunkWidth) {
+    const xTo = Math.min(x + chunkWidth, width);
+    for (let y = 0; y < height; y += chunkHeight) {
+      const yTo = Math.min(y + chunkHeight, height);
+      const paramsChunk = {
+        ...getMapParams,
+        width: xTo - x,
+        height: yTo - y,
+        bbox: new BBox(originalBBox.crs, xToLng(x), yToLat(yTo), xToLng(xTo), yToLat(y)),
+      };
+      const blobPromise = refetchWithDefaultToken(
+        (reqConfig) => layer.getMap(paramsChunk, ApiType.PROCESSING, reqConfig),
+        reqConfig,
+      );
+      blobPromises.push(blobPromise);
+    }
+  }
+
+  const resolvedBlobs = await Promise.all(blobPromises);
+  return resolvedBlobs;
 }
 
 export async function getDataForLayer(props, cancelToken) {
   try {
     const { visualizationUrl, layerId } = props;
-    let layer = await LayersFactory.makeLayer(visualizationUrl, layerId, null, { cancelToken: cancelToken });
-    await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken });
+    let layer = await LayersFactory.makeLayer(visualizationUrl, layerId, null, {
+      cancelToken: cancelToken,
+      ...reqConfigMemoryCache,
+    });
+    await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken, ...reqConfigMemoryCache });
     // add minQa, upsampling, downsampling, but no effects (they are only for visualization)
 
     const isIndexOutputPresent = checkIfIndexOutputPresent(props);
     if (!isIndexOutputPresent) {
-      throw new Error(MISSING_INDEX_OUTPUT_ERROR);
+      throw new Error(NO_INDEX_LAYER_SELECTED);
     }
 
-    const blob = await getTiffImage(layer, props, cancelToken);
-    const histogram = await getHistogramFromTiff(blob);
+    const blobs = await getTiffImages(layer, props, cancelToken);
+    const histogram = await getHistogramFromTiffs(blobs);
     return { histogram: histogram };
   } catch (e) {
     const errMessage = await constructErrorMessage(e);
@@ -101,7 +154,7 @@ export async function getDataForIndex(props, cancelToken) {
       visualizationUrl,
       (_, dataset) => (!shJsDataset ? true : dataset.id === shJsDataset.id),
       null,
-      { cancelToken: cancelToken },
+      { ...reqConfigMemoryCache, cancelToken: cancelToken },
     );
     let layer;
     if (layers.length > 0) {
@@ -110,8 +163,8 @@ export async function getDataForIndex(props, cancelToken) {
     }
     // add minQa, upsampling, downsampling, but no effects (they are only for visualization)
 
-    const blob = await getTiffImage(layer, props, cancelToken);
-    const histogram = await getHistogramFromTiff(blob);
+    const blobs = await getTiffImages(layer, props, cancelToken);
+    const histogram = await getHistogramFromTiffs(blobs);
     return { histogram: histogram };
   } catch (e) {
     const errMessage = await constructErrorMessage(e);
@@ -120,14 +173,20 @@ export async function getDataForIndex(props, cancelToken) {
   }
 }
 
-async function getHistogramFromTiff(blob) {
+async function getHistogramFromTiffs(blobs) {
   const numOfDigits = 3;
-  const tiffData = await fromBlob(blob);
-  const imageData = await tiffData.getImage();
-  const [data] = await imageData.readRasters();
+  let combinedData = [];
+
+  for (const blob of blobs) {
+    const tiffData = await fromBlob(blob);
+    const imageData = await tiffData.getImage();
+    const [data] = await imageData.readRasters();
+    combinedData = [...combinedData, ...data];
+  }
+
   let min = Number.POSITIVE_INFINITY;
   let max = Number.NEGATIVE_INFINITY;
-  for (let v of data) {
+  for (let v of combinedData) {
     if (v < min) {
       min = v;
     }
@@ -144,7 +203,7 @@ async function getHistogramFromTiff(blob) {
     histogramArray[i] = { value: parseFloat((min + i * step).toFixed(numOfDigits)), occurrences: 0 };
   }
 
-  for (let v of data) {
+  for (let v of combinedData) {
     if (isNaN(v)) {
       continue;
     }
@@ -171,7 +230,10 @@ export async function checkIfIndexOutputPresent(props, cancelToken) {
 
   let layer = null;
   try {
-    layer = await LayersFactory.makeLayer(visualizationUrl, layerId, null, { cancelToken: cancelToken });
+    layer = await LayersFactory.makeLayer(visualizationUrl, layerId, null, {
+      cancelToken: cancelToken,
+      ...reqConfigMemoryCache,
+    });
   } catch (e) {
     return false;
   }
@@ -181,7 +243,7 @@ export async function checkIfIndexOutputPresent(props, cancelToken) {
   }
 
   try {
-    await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken });
+    await layer.updateLayerFromServiceIfNeeded({ ...reqConfigMemoryCache, cancelToken: cancelToken });
     return checkIfIndexOutputInEvalscript(layer.evalscript);
   } catch (e) {
     return false;

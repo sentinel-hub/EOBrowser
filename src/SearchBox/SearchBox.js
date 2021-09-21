@@ -12,7 +12,7 @@ class SearchBox extends Component {
     L.DomEvent.disableScrollPropagation(this.ref);
     L.DomEvent.disableClickPropagation(this.ref);
   }
-  setMapLocation = data => {
+  setMapLocation = (data) => {
     const [lng, lat] = data.location;
     store.dispatch(
       mainMapSlice.actions.setPosition({
@@ -23,15 +23,16 @@ class SearchBox extends Component {
     );
   };
   render() {
+    const { googleAPI } = this.props;
     return (
       <div
-        ref={r => {
+        ref={(r) => {
           this.ref = r;
         }}
         className="search-box-wrapper"
       >
         <LocationSearchBox
-          googleAccessToken={process.env.REACT_APP_GOOGLE_TOKEN}
+          googleAPI={googleAPI}
           placeholder={t`Go to Place`}
           minChar={4}
           resultsShown={5}

@@ -23,6 +23,7 @@ import { GLOBAL_LAND_COVER_BANDS } from './datasourceAssets/copernicusGlobalLand
 import { WATER_BODIES_BANDS } from './datasourceAssets/copernicusWaterBodiesBands';
 import { GLOBAL_SURFACE_WATER_BANDS } from './datasourceAssets/copernicusGlobalSurfaceWaterBands';
 import { convertGeoJSONToEPSG4326 } from '../../../utils/coords';
+import { DATASOURCES } from '../../../const';
 
 export default class CopernicusServicesDataSourceHandler extends DataSourceHandler {
   getDatasetSearchLabels = () => ({
@@ -40,7 +41,7 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
   };
   datasets = [];
   allLayers = [];
-  datasource = 'Copernicus Services';
+  datasource = DATASOURCES.COPERNICUS;
 
   leafletZoomConfig = {
     [COPERNICUS_CORINE_LAND_COVER]: {
@@ -72,7 +73,7 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
     let handlesAny = false;
 
     for (let datasetId of Object.keys(this.KNOWN_COLLECTIONS)) {
-      const layersWithDataset = layers.filter(l =>
+      const layersWithDataset = layers.filter((l) =>
         this.KNOWN_COLLECTIONS[datasetId].includes(l.collectionId),
       );
       if (layersWithDataset.length > 0) {
@@ -114,7 +115,7 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
     );
   }
 
-  renderOptionsHelpTooltips = option => {
+  renderOptionsHelpTooltips = (option) => {
     switch (option) {
       case COPERNICUS_CORINE_LAND_COVER:
         return (
@@ -154,8 +155,8 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
     let fetchingFunctions = [];
 
     const { selectedOptions } = this.searchFilters;
-    selectedOptions.forEach(datasetId => {
-      const searchLayer = this.allLayers.find(l =>
+    selectedOptions.forEach((datasetId) => {
+      const searchLayer = this.allLayers.find((l) =>
         this.KNOWN_COLLECTIONS[datasetId].includes(l.collectionId),
       );
       const ff = new FetchingFunction(
@@ -172,7 +173,7 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map(t => {
+    const tiles = data.map((t) => {
       if (t.geometry && t.geometry.crs && t.geometry.crs.properties.name !== CRS_EPSG4326.urn) {
         convertGeoJSONToEPSG4326(t.geometry);
       }
@@ -187,7 +188,7 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
     return tiles;
   };
 
-  getUrlsForDataset = datasetId => {
+  getUrlsForDataset = (datasetId) => {
     switch (datasetId) {
       case COPERNICUS_CORINE_LAND_COVER:
         return this.urls.COPERNICUS_CORINE_LAND_COVER;
@@ -204,7 +205,7 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
 
   getSentinelHubDataset = () => DATASET_BYOC;
 
-  getBands = datasetId => {
+  getBands = (datasetId) => {
     switch (datasetId) {
       case COPERNICUS_CORINE_LAND_COVER:
         return CORINE_LAND_COVER_BANDS;
@@ -234,7 +235,7 @@ function evaluatePixel(sample) {
   return [${Object.values(bands)
     .map((e, i) => `sample.CLC === ${e}`)
     .join(',')}, ${JSON.stringify(
-        Object.values(bands).map(b => parseInt(b)),
+        Object.values(bands).map((b) => parseInt(b)),
       )}.includes(sample.CLC) ? sample.dataMask : 0];
 }
 `;
@@ -259,12 +260,12 @@ function setup() {
 let factor = ${factor};
 function evaluatePixel(sample) {
   return [${Object.values(bands)
-    .map(e => 'factor * sample.' + e)
+    .map((e) => 'factor * sample.' + e)
     .join(',')}, sample.dataMask ];
 }`;
   };
 
-  areBandsClasses = datasetId => {
+  areBandsClasses = (datasetId) => {
     if (datasetId === COPERNICUS_CORINE_LAND_COVER) {
       return true;
     }

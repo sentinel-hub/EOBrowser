@@ -13,8 +13,8 @@ stories.add('EOB', ({ state, setState }) => {
     <div id="root">
       <Tabs
         activeIndex={mainTabIndex}
-        onSelect={index => setState({ index: index })}
-        onErrorMessage={msg => setState({ errorMsg: msg })}
+        onSelect={(index) => setState({ index: index })}
+        onErrorMessage={(msg) => setState({ errorMsg: msg })}
       >
         <Tab id="SearchTab" title="Search" icon="search" renderKey={0}>
           Search

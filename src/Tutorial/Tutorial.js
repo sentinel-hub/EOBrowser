@@ -146,7 +146,7 @@ class Tutorial extends Component {
     document.getElementById('tutorial-animatedinfopanel-button').classList.add('activate-close-animation');
   }
 
-  callback = tour => {
+  callback = (tour) => {
     const { action, index, size, type } = tour;
 
     // controlled tutorial
@@ -177,13 +177,13 @@ class Tutorial extends Component {
     }
   };
 
-  handleStartTutorial = e => {
+  handleStartTutorial = (e) => {
     e.preventDefault();
     this.resetClosingTutorialAnimation();
     this.setState({ run: true });
   };
 
-  handleCloseFirstStep = e => {
+  handleCloseFirstStep = (e) => {
     e.preventDefault();
     this.executeClosingTutorialAnimation();
     this.setState({ run: false });
@@ -203,7 +203,7 @@ class Tutorial extends Component {
           id="infoButton"
           className="tutorial-infopanel-button tutorial-panel-button"
           title={t`Show info`}
-          onClick={ev => {
+          onClick={(ev) => {
             this.handleStartTutorial(ev);
           }}
         >

@@ -31,7 +31,7 @@ stories.add('Timelapse EFFECTS (proba-v)', ({ state, setState }) => {
         isCompareMode={false}
         isLoggedIn={true}
         openTimelapsePanel={() => setState({ openTimelapsePanel: true })}
-        onErrorMessage={msg => setState({ errorMsg: msg })}
+        onErrorMessage={(msg) => setState({ errorMsg: msg })}
       />
       {state.openTimelapsePanel && (
         <EOB3TimelapsePanel
@@ -73,7 +73,7 @@ function mockEveryDay(fromDate, toDate, boundsGeojson) {
     d = d.add(1, 'day');
   }
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     resolve(dates);
   });
 }
@@ -84,12 +84,8 @@ function onGetAndSetNextPrev(direction) {
 
 function onQueryDatesForActiveMonth(date) {
   console.log('Log: onQueryDatesForActiveMonth -> date', date);
-  return new Promise(resolve => {
-    resolve([
-      moment(date)
-        .startOf('month')
-        .format('YYYY-MM-DD'),
-    ]);
+  return new Promise((resolve) => {
+    resolve([moment(date).startOf('month').format('YYYY-MM-DD')]);
   });
 }
 

@@ -96,7 +96,7 @@ export default class BasicForm extends React.Component {
               <input
                 className="full-width"
                 value={userDescription}
-                onChange={ev => updateFormData('userDescription', ev.target.value)}
+                onChange={(ev) => updateFormData('userDescription', ev.target.value)}
                 maxLength="64"
               />
             </div>
@@ -108,7 +108,7 @@ export default class BasicForm extends React.Component {
             <select
               className="dropdown"
               value={imageFormat}
-              onChange={e => updateFormData('imageFormat', e.target.value)}
+              onChange={(e) => updateFormData('imageFormat', e.target.value)}
             >
               <option value={IMAGE_FORMATS.JPG}>{IMAGE_FORMATS_INFO[IMAGE_FORMATS.JPG].text}</option>
               <option value={IMAGE_FORMATS.PNG}>{IMAGE_FORMATS_INFO[IMAGE_FORMATS.PNG].text}</option>

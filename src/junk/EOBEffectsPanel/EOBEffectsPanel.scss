@@ -10,6 +10,20 @@
     }
   }
 
+  .title {
+    display: flex;
+    color: #868fa0;
+    font-weight: bold;
+    margin: 10px 0 20px;
+  }
+
+  hr {
+    border-style: solid;
+    border-bottom: none;
+    margin: 25px 0;
+    color: #868fa0;
+  }
+
   .effect-container {
     margin-bottom: 15px;
     display: flex;
@@ -65,11 +79,13 @@
       select {
         // width of the slider + 2 times label and its margin
         width: calc(120px + 2 * 36px + 2 * 15px);
-        text-transform: capitalize;
+      }
 
-        .interpolation-option {
-          text-transform: capitalize;
-        }
+      .alert {
+        padding: 0 5px;
+        color: red;
+        cursor: default;
+        font-weight: bold;
       }
     }
   }

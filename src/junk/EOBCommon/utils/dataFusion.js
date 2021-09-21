@@ -12,6 +12,9 @@ import {
   DATASET_AWS_LOTL2,
   DATASET_AWS_LTML1,
   DATASET_AWS_LTML2,
+  DATASET_AWS_LETML1,
+  DATASET_AWS_LETML2,
+  DATASET_AWS_LMSSL1,
   DATASET_MODIS,
   DATASET_AWS_DEM,
   S1GRDAWSEULayer,
@@ -25,6 +28,9 @@ import {
   Landsat8AWSLOTL2Layer,
   Landsat45AWSLTML1Layer,
   Landsat45AWSLTML2Layer,
+  Landsat7AWSLETML1Layer,
+  Landsat7AWSLETML2Layer,
+  Landsat15AWSLMSSL1Layer,
   MODISLayer,
   DEMLayer,
   ProcessingDataFusionLayer,
@@ -86,6 +92,7 @@ export function constructLayerFromDatasetId(datasetId, mosaickingOrder, addition
         polarization = S1_DEFAULT_PARAMS.polarization,
         acquisitionMode = S1_DEFAULT_PARAMS.acquisitionMode,
         resolution = S1_DEFAULT_PARAMS.resolution,
+        speckleFilter = S1_DEFAULT_PARAMS.speckleFilter,
       } = additionalParameters;
       const orthorectify = orthorectification === '' ? false : true;
       const demInstanceType = orthorectification === '' ? null : orthorectification;
@@ -97,6 +104,7 @@ export function constructLayerFromDatasetId(datasetId, mosaickingOrder, addition
         acquisitionMode: acquisitionMode,
         resolution: resolution,
         demInstanceType: demInstanceType,
+        speckleFilter: speckleFilter,
       });
     case DATASET_S2L1C.id:
       return new S2L1CLayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
@@ -110,8 +118,14 @@ export function constructLayerFromDatasetId(datasetId, mosaickingOrder, addition
       return new S5PL2Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_AWS_LTML1.id:
       return new Landsat45AWSLTML1Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
+    case DATASET_AWS_LMSSL1.id:
+      return new Landsat15AWSLMSSL1Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_AWS_LTML2.id:
       return new Landsat45AWSLTML2Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
+    case DATASET_AWS_LETML1.id:
+      return new Landsat7AWSLETML1Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
+    case DATASET_AWS_LETML2.id:
+      return new Landsat7AWSLETML2Layer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_AWS_L8L1C.id:
       return new Landsat8AWSLayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_AWS_LOTL1.id:

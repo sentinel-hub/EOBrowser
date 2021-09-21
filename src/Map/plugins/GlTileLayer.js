@@ -1,18 +1,18 @@
 import L from 'leaflet';
-import mapboxgl from 'mapbox-gl';
+import maplibregl from 'maplibre-gl';
 import { GridLayer, withLeaflet } from 'react-leaflet';
 
-import 'mapbox-gl/dist/mapbox-gl.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 // https://docs.mapbox.com/mapbox-gl-js/example/mapbox-gl-rtl-text/
-mapboxgl.setRTLTextPlugin(
-  'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js',
+maplibregl.setRTLTextPlugin(
+  'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js', // maplibre uses mapbox's rtl text plugin
   null,
   true, // By setting the lazy parameter to true, the plugin is only loaded when the map first encounters Hebrew or Arabic text.
 );
 class GlTileLayer extends GridLayer {
   createLeafletElement(props) {
-    return new MapboxGL(props);
+    return new MaplibreGL(props);
   }
 }
 export default withLeaflet(GlTileLayer);
@@ -35,7 +35,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 // This is an edited copy of https://github.com/mapbox/mapbox-gl-leaflet
 // Reason for copy and edit is because current versions of the library doesnt support using custom panes
-const MapboxGL = L.Layer.extend({
+const MaplibreGL = L.Layer.extend({
   options: {
     updateInterval: 32,
     // How much to extend the overlay view (relative to map size)
@@ -46,17 +46,17 @@ const MapboxGL = L.Layer.extend({
     interactive: false,
   },
 
-  initialize: function(options) {
+  initialize: function (options) {
     L.setOptions(this, options);
 
     if (options.accessToken) {
-      mapboxgl.accessToken = options.accessToken;
+      maplibregl.accessToken = options.accessToken;
     }
     // setup throttling the update event when panning
     this._throttledUpdate = L.Util.throttle(this._update, this.options.updateInterval, this);
   },
 
-  onAdd: function(map) {
+  onAdd: function (map) {
     if (!this._container) {
       this._initContainer();
     }
@@ -73,7 +73,7 @@ const MapboxGL = L.Layer.extend({
     }
   },
 
-  onRemove: function(map) {
+  onRemove: function (map) {
     if (this._map._proxy && this._map.options.zoomAnimation) {
       L.DomEvent.off(this._map._proxy, L.DomUtil.TRANSITION_END, this._transitionEnd, this);
     }
@@ -87,7 +87,7 @@ const MapboxGL = L.Layer.extend({
     this._glMap = null;
   },
 
-  getEvents: function() {
+  getEvents: function () {
     return {
       move: this._throttledUpdate, // sensibly throttle updating while panning
       zoomanim: this._animateZoom, // applys the zoom animation to the <canvas>
@@ -98,19 +98,19 @@ const MapboxGL = L.Layer.extend({
     };
   },
 
-  getMapboxMap: function() {
+  getMapboxMap: function () {
     return this._glMap;
   },
 
-  getCanvas: function() {
+  getCanvas: function () {
     return this._glMap.getCanvas();
   },
 
-  getSize: function() {
+  getSize: function () {
     return this._map.getSize().multiplyBy(1 + this.options.padding * 2);
   },
 
-  getBounds: function() {
+  getBounds: function () {
     var halfSize = this.getSize().multiplyBy(0.5);
     var center = this._map.latLngToContainerPoint(this._map.getCenter());
     return L.latLngBounds(
@@ -119,11 +119,11 @@ const MapboxGL = L.Layer.extend({
     );
   },
 
-  getContainer: function() {
+  getContainer: function () {
     return this._container;
   },
 
-  _initContainer: function() {
+  _initContainer: function () {
     var container = (this._container = L.DomUtil.create('div', 'leaflet-gl-layer'));
 
     var size = this.getSize();
@@ -136,7 +136,7 @@ const MapboxGL = L.Layer.extend({
     L.DomUtil.setPosition(container, topLeft);
   },
 
-  _initGL: function() {
+  _initGL: function () {
     var center = this._map.getCenter();
 
     var options = L.extend({}, this.options, {
@@ -146,7 +146,7 @@ const MapboxGL = L.Layer.extend({
       attributionControl: false,
     });
 
-    this._glMap = new mapboxgl.Map(options);
+    this._glMap = new maplibregl.Map(options);
 
     // allow GL base map to pan beyond min/max latitudes
     this._glMap.transform.latRange = null;
@@ -170,7 +170,7 @@ const MapboxGL = L.Layer.extend({
     }
   },
 
-  _update: function(e) {
+  _update: function (e) {
     // update the offset so we can correct for it later when we zoom
     this._offset = this._map.containerPointToLayerPoint([0, 0]);
 
@@ -192,7 +192,7 @@ const MapboxGL = L.Layer.extend({
     // calling setView directly causes sync issues because it uses requestAnimFrame
 
     var tr = gl.transform;
-    tr.center = mapboxgl.LngLat.convert([center.lng, center.lat]);
+    tr.center = maplibregl.LngLat.convert([center.lng, center.lat]);
     tr.zoom = this._map.getZoom() - 1;
 
     if (gl.transform.width !== size.x || gl.transform.height !== size.y) {
@@ -214,7 +214,7 @@ const MapboxGL = L.Layer.extend({
   },
 
   // update the map constantly during a pinch zoom
-  _pinchZoom: function(e) {
+  _pinchZoom: function (e) {
     this._glMap.jumpTo({
       zoom: this._map.getZoom() - 1,
       center: this._map.getCenter(),
@@ -223,7 +223,7 @@ const MapboxGL = L.Layer.extend({
 
   // borrowed from L.ImageOverlay
   // https://github.com/Leaflet/Leaflet/blob/master/src/layer/ImageOverlay.js#L139-L144
-  _animateZoom: function(e) {
+  _animateZoom: function (e) {
     var scale = this._map.getZoomScale(e.zoom);
     var padding = this._map.getSize().multiplyBy(this.options.padding * scale);
     var viewHalf = this.getSize()._divideBy(2);
@@ -239,11 +239,11 @@ const MapboxGL = L.Layer.extend({
     L.DomUtil.setTransform(this._glMap._actualCanvas, offset.subtract(this._offset), scale);
   },
 
-  _zoomStart: function(e) {
+  _zoomStart: function (e) {
     this._zooming = true;
   },
 
-  _zoomEnd: function() {
+  _zoomEnd: function () {
     var scale = this._map.getZoomScale(this._map.getZoom()),
       offset = this._map._latLngToNewLayerPoint(
         this._map.getBounds().getNorthWest(),
@@ -258,8 +258,8 @@ const MapboxGL = L.Layer.extend({
     this._update();
   },
 
-  _transitionEnd: function(e) {
-    L.Util.requestAnimFrame(function() {
+  _transitionEnd: function (e) {
+    L.Util.requestAnimFrame(function () {
       var zoom = this._map.getZoom();
       var center = this._map.getCenter();
       var offset = this._map.latLngToContainerPoint(this._map.getBounds().getNorthWest());
@@ -270,7 +270,7 @@ const MapboxGL = L.Layer.extend({
       // enable panning once the gl map is ready again
       this._glMap.once(
         'moveend',
-        L.Util.bind(function() {
+        L.Util.bind(function () {
           this._zoomEnd();
         }, this),
       );
@@ -283,7 +283,7 @@ const MapboxGL = L.Layer.extend({
     }, this);
   },
 
-  _resize: function(e) {
+  _resize: function (e) {
     this._transitionEnd(e);
   },
 });

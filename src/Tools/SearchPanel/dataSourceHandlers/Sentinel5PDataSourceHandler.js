@@ -18,6 +18,7 @@ import {
   S5_OTHER,
 } from './dataSourceHandlers';
 import { filterLayers } from './filter';
+import { DATASOURCES } from '../../../const';
 
 export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
   S5PDATASETS = [S5_O3, S5_NO2, S5_SO2, S5_CO, S5_HCHO, S5_CH4, S5_AER_AI, S5_CLOUD];
@@ -51,7 +52,7 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
   preselectedDatasets = new Set();
   searchFilters = {};
   isChecked = false;
-  datasource = 'Sentinel-5';
+  datasource = DATASOURCES.S5;
 
   leafletZoomConfig = {
     [S5_O3]: {
@@ -93,16 +94,16 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
   };
 
   willHandle(service, url, name, layers, preselected) {
-    const s5pLayers = layers.filter(l => l.dataset && l.dataset.id === DATASET_S5PL2.id);
+    const s5pLayers = layers.filter((l) => l.dataset && l.dataset.id === DATASET_S5PL2.id);
     if (s5pLayers.length === 0) {
       return false;
     }
 
-    s5pLayers.forEach(l => {
-      let dataset = this.S5PDATASETS.find(d => this.isVisualizationLayerForDataset(d, l.layerId));
+    s5pLayers.forEach((l) => {
+      let dataset = this.S5PDATASETS.find((d) => this.isVisualizationLayerForDataset(d, l.layerId));
       if (!dataset) {
         // if the layer is a channel, do not warn about it:
-        const channel = this.S5PDATASETS.find(d => this.isChannelLayerForDataset(d, l.title));
+        const channel = this.S5PDATASETS.find((d) => this.isChannelLayerForDataset(d, l.title));
         if (!channel) {
           if (l.title.startsWith('__')) {
             // It's a shadow layer
@@ -188,7 +189,7 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
       datasets = this.searchFilters.selectedOptions;
     }
 
-    datasets.forEach(datasetId => {
+    datasets.forEach((datasetId) => {
       // instanceId and layerId are required parameters, although we don't need them for findTiles
       const searchLayer = new S5PL2Layer({
         instanceId: true,
@@ -209,7 +210,7 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map(t => ({
+    const tiles = data.map((t) => ({
       sensingTime: t.sensingTime,
       geometry: t.geometry,
       datasource: this.datasource,
@@ -228,11 +229,11 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
 
   getLayers = (data, datasetId, url, layersExclude, layersInclude) => {
     let layers = data.filter(
-      layer =>
+      (layer) =>
         filterLayers(layer.layerId, layersExclude, layersInclude) &&
         this.filterLayersS5(layer.layerId, datasetId),
     );
-    layers.forEach(l => {
+    layers.forEach((l) => {
       l.url = url;
     });
     return layers;
@@ -240,7 +241,7 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
 
   filterLayersS5 = (layerId, datasetId) => {
     if (datasetId === S5_OTHER) {
-      if (!this.S5PDATASETS.filter(d => layerId.startsWith(this.datasetSearchIds[d])).length) {
+      if (!this.S5PDATASETS.filter((d) => layerId.startsWith(this.datasetSearchIds[d])).length) {
         return true;
       }
       return false;
@@ -248,7 +249,7 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
     return layerId.startsWith(this.datasetSearchIds[datasetId]);
   };
 
-  getBands = datasetId => {
+  getBands = (datasetId) => {
     switch (datasetId) {
       case S5_CLOUD:
         return [
@@ -268,7 +269,7 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
 
   getSentinelHubDataset = () => DATASET_S5PL2;
 
-  getProductType = datasetId => {
+  getProductType = (datasetId) => {
     switch (datasetId) {
       case S5_O3:
         return 'O3';

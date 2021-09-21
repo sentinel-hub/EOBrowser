@@ -16,15 +16,34 @@
     filter: drop-shadow($boxShadow);
   }
 
+  .google-logo {
+    position: fixed;
+    bottom: 21px;
+    left: 90px;
+    z-index: 999;
+    width: 75px;
+    opacity: 0.75;
+    -webkit-filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  }
+
   @media (max-width: 1200px) {
     .maptiler-logo {
       bottom: 35px;
+    }
+
+    .google-logo {
+      bottom: 31px;
     }
   }
 
   @media (max-width: 768px) {
     .maptiler-logo {
       bottom: 60px;
+    }
+
+    .google-logo {
+      bottom: 56px;
     }
   }
 
@@ -47,6 +66,14 @@
 
         .leaflet-retina .leaflet-control-layers-toggle {
           background-image: url(layers2x.png);
+        }
+      }
+    }
+
+    .leaflet-bottom.leaflet-left {
+      a:not(.leaflet-control-attribution) {
+        div {
+          left: 500px;
         }
       }
     }

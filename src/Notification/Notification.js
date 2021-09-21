@@ -29,7 +29,7 @@ class Notification extends Component {
   }
 }
 
-const mapStoreToProps = store => ({
+const mapStoreToProps = (store) => ({
   type: store.notification.type,
   msg: store.notification.msg,
 });

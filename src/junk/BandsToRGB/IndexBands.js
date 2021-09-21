@@ -39,7 +39,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
 
   const [loading, setLoading] = useState(true);
 
-  const { gradient, handlePositions } = useSelector(state => state.index);
+  const { gradient, handlePositions } = useSelector((state) => state.index);
 
   const equationArray = [...equation]; // split string into array
 
@@ -64,7 +64,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
     store.dispatch(indexSlice.actions.setHandlePositions([0, 1]));
   }
 
-  const initEvalFromUrl = parsed => {
+  const initEvalFromUrl = (parsed) => {
     setValues(parsed.positions);
     setEquation(parsed.equation);
     setColorRamp(parsed.colors);
@@ -74,19 +74,19 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   };
 
   const initColors = (values, currentGradient, min, max) => {
-    return values.map(item => pickColor(currentGradient[0], currentGradient[1], item, min, max));
+    return values.map((item) => pickColor(currentGradient[0], currentGradient[1], item, min, max));
   };
 
-  const onDraggableBandChange = selectedIndexBands => {
+  const onDraggableBandChange = (selectedIndexBands) => {
     onChange(selectedIndexBands, { equation, colorRamp, values });
   };
 
-  const onEquationChange = selectedEquation => {
+  const onEquationChange = (selectedEquation) => {
     setEquation(selectedEquation);
     onChange(layers, { equation: selectedEquation, colorRamp, values });
   };
 
-  const onGradientChange = selectedGradient => {
+  const onGradientChange = (selectedGradient) => {
     const newColors = initColors(handlePositions, selectedGradient, min, max);
     onChange(layers, { equation, colorRamp: newColors, values });
     store.dispatch(indexSlice.actions.setGradient(selectedGradient));
@@ -94,7 +94,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
     setOpen(false);
   };
 
-  const onSliderChange = newValues => {
+  const onSliderChange = (newValues) => {
     if (newValues.includes(NaN)) {
       return;
     }
@@ -106,7 +106,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
     onChange(layers, { equation, colorRamp: newColors, values });
   };
 
-  const onSliderUpdate = newValues => {
+  const onSliderUpdate = (newValues) => {
     if (newValues.includes(NaN)) {
       return;
     }
@@ -145,7 +145,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
     setColorRamp(newColors);
   };
 
-  const onMinChange = newMin => {
+  const onMinChange = (newMin) => {
     const parsedMin = parseFloat(newMin);
 
     if (!isNaN(parsedMin) && FLOAT_REGEX.test(newMin) && parsedMin >= -10 && parsedMin <= 10) {
@@ -161,7 +161,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
     }
   };
 
-  const onMaxChange = newMax => {
+  const onMaxChange = (newMax) => {
     const parsedMax = parseFloat(newMax);
 
     if (!isNaN(parsedMax) && FLOAT_REGEX.test(newMax) && parsedMax >= -10 && parsedMax <= 10) {
@@ -202,7 +202,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
           key={equation}
           defaultValue={equation}
           className="dropdown index"
-          onChange={e => onEquationChange(e.target.value)}
+          onChange={(e) => onEquationChange(e.target.value)}
         >
           {EQUATIONS.map((equation, i) => (
             <option key={i}>{equation}</option>
@@ -239,7 +239,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
                   onClick={() => onGradientChange(GRADIENTS[index])}
                   className="gradient-option"
                   style={{
-                    background: `linear-gradient(90deg, ${g.map(item => item.replace('0x', '#'))} 100%)`,
+                    background: `linear-gradient(90deg, ${g.map((item) => item.replace('0x', '#'))} 100%)`,
                   }}
                 />
               ))}
@@ -277,8 +277,8 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
           />
         </div>
         <div className="scale-wrap">
-          <input type="text" value={min} onChange={e => onMinChange(e.target.value)} />
-          <input type="text" value={max} onChange={e => onMaxChange(e.target.value)} />
+          <input type="text" value={min} onChange={(e) => onMinChange(e.target.value)} />
+          <input type="text" value={max} onChange={(e) => onMaxChange(e.target.value)} />
         </div>
       </div>
     </React.Fragment>

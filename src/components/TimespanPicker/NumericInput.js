@@ -9,7 +9,7 @@ export const NumericInput = ({ label, value, min, max, setValue }) => (
       min={min}
       max={max}
       value={value}
-      onChange={e => {
+      onChange={(e) => {
         if (parseInt(e.target.value) < min || parseInt(e.target.value) > max) {
           return;
         }

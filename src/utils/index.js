@@ -15,6 +15,7 @@ import {
 
 import { b64EncodeUnicode } from './base64MDN';
 import { getDataSourceHandler } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { BAND_UNIT } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 
 export function getUrlParams() {
   const urlParamString = window.location.search.length > 0 ? window.location.search : window.location.hash;
@@ -62,6 +63,8 @@ export function userCanAccessLockedFunctionality(user, selectedTheme) {
   - minQa: minQa (min quality) for Sentinel-5P
   - upsampling: upsampling (SH datasets only)
   - downsampling: downsampling (SH datasets only)
+  - speckleFilter: speckle filter (Sentinel 1)
+  - orthorectification: orthorectification (Sentinel 1 only)
   - dataFusion: dataFusion settings
   - handlePositions: positions of pins in index feature.
   - gradient: gradient used to calculate color in index feature. 
@@ -95,6 +98,8 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
     minQa,
     upsampling,
     downsampling,
+    speckleFilter,
+    orthorectification,
     dataFusion,
     handlePositions,
     gradient,
@@ -184,6 +189,12 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
     if (downsampling !== undefined) {
       params.downsampling = downsampling;
     }
+    if (speckleFilter !== undefined) {
+      params.speckleFilter = JSON.stringify(speckleFilter);
+    }
+    if (orthorectification !== undefined) {
+      params.orthorectification = JSON.stringify(orthorectification);
+    }
     if (isDataFusionEnabled(dataFusion)) {
       params.dataFusion = JSON.stringify(dataFusion);
     }
@@ -194,7 +205,7 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
   }
 
   const escapedParams = Object.keys(params)
-    .map(k => `${k}=${encodeURIComponent(params[k])}`)
+    .map((k) => `${k}=${encodeURIComponent(params[k])}`)
     .join('&');
 
   const newUrl =
@@ -214,24 +225,24 @@ function hexToRgb(hex) {
   return `[${round(r / 255, 2)},${round(g / 255, 2)},${round(b / 255, 2)}]`;
 }
 
-export function constructV3Evalscript(bands, config) {
+export function constructV3Evalscript(bands, config, bandsWithUnits) {
   // custom config formula used in index feature
   if (config) {
     const { equation, colorRamp, values } = config;
     const indexEquation = [...equation]
-      .map(item => (item === 'B' && `samples.${bands.b}`) || (item === 'A' && `samples.${bands.a}`) || item)
+      .map((item) => (item === 'B' && `samples.${bands.b}`) || (item === 'A' && `samples.${bands.a}`) || item)
       .join('');
     // temp fix with index instead of actual positions, to be removed in next commit
     return `//VERSION=3
 const colorRamp = [${colorRamp.map((color, index) => `[${values[index]},${color.replace('#', '0x')}]`)}]
-    
+
 let viz = new ColorRampVisualizer(colorRamp);
-      
+
 function setup() {
   return {
     input: ["${[...new Set(Object.values(bands))].join('","')}", "dataMask"],
     output: [
-      { id:"default", bands: 4 }, 
+      { id:"default", bands: 4 },
       { id: "index", bands: 1, sampleType: 'FLOAT32' }
     ]
   };
@@ -242,21 +253,23 @@ function evaluatePixel(samples) {
   const minIndex = ${values[0]};
   const maxIndex = ${values[values.length - 1]};
   let visVal = null;
-  
+
   if(index > maxIndex || index < minIndex) {
     visVal = [0, 0, 0, 0];
   }
   else {
     visVal = [...viz.process(index),samples.dataMask];
-  };
+  }
 
   // The library for tiffs works well only if there is only one channel returned.
   // So we encode the "no data" as NaN here and ignore NaNs on frontend.
   const indexVal = samples.dataMask === 1 ? index : NaN;
-  
+
   return { default: visVal, index: [indexVal] };
 }`;
   }
+
+  const bandsContainKelvin = Object.values(bands).some((band) => bandUnitIsKelvin(band, bandsWithUnits));
 
   // If no configuration is passed a default evalscript gets generated
   // NOTE: changing the format will likely break parseEvalscriptBands method.
@@ -269,52 +282,80 @@ function setup() {
 }
 
 function evaluatePixel(sample) {
+  ${bandsContainKelvin ? `const visualizer = new HighlightCompressVisualizer(200, 375);` : ``}
   return [${Object.values(bands)
-    .map(e => '2.5 * sample.' + e)
-    .join(',')}, sample.dataMask ];
+    .map((band) =>
+      bandUnitIsKelvin(band, bandsWithUnits) ? `visualizer.process(sample.${band})` : `2.5 * sample.${band}`,
+    )
+    .join(', ')}, sample.dataMask];
 }`;
 }
 
-export function constructBasicEvalscript(bands, config) {
+function bandUnitIsKelvin(band, bandsWithUnits) {
+  if (!bandsWithUnits) {
+    return false;
+  }
+
+  let bandWithUnits = bandsWithUnits.find((b) => b.name === band);
+  return bandWithUnits.unit === BAND_UNIT.KELVIN;
+}
+
+export function constructBasicEvalscript(bands, config, bandsWithUnits) {
   // custom config used for index feature
   if (config) {
     const { equation, colorRamp, values } = config;
 
     const indexEquation = [...equation]
-      .map(item => (item === 'B' && `${bands.b}`) || (item === 'A' && `${bands.a}`) || item)
+      .map((item) => (item === 'B' && `${bands.b}`) || (item === 'A' && `${bands.a}`) || item)
       .join('');
 
     return `var index = ${indexEquation};
 return colorBlend(
   index,
-    [${values.map(value => value)}],
-    [${colorRamp.map(color => hexToRgb(color.replace('#', '0x')))}]
+    [${values.map((value) => value)}],
+    [${colorRamp.map((color) => hexToRgb(color.replace('#', '0x')))}]
 );`;
   }
   // NOTE: changing the format will likely break parseEvalscriptBands method.
   return `return [${Object.values(bands)
-    .map(e => '2.5*' + e)
+    .map((band) => (bandUnitIsKelvin(band, bandsWithUnits) ? '' : '2.5*') + band)
     .join(',')}];`;
+}
+
+export function validateEvalScript(evalscript) {
+  try {
+    if (evalscript.startsWith('//VERSION=3')) {
+      const setupFunction = /function\s+?setup\s*?\(.*?\)\s*?\{.*?\}/s;
+      const evaluatePixelFunction = /function\s+?evaluatePixel\s*?\(.*?\)\s*?\{.*?\}/s;
+
+      return setupFunction.test(evalscript) && evaluatePixelFunction.test(evalscript);
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 export function parseEvalscriptBands(evalscript) {
   try {
     if (evalscript.startsWith('//VERSION=3')) {
       return evalscript
-        .split('\n')[9]
+        .split('\n')[10]
         .split('[')[1]
         .split(']')[0]
         .split(',')
-        .map(b => b.replace('2.5 * sample.', ''))
-        .map(b => b.replace('factor * sample.', ''))
-        .map(b => b.replace('sample.CLC === ', ''))
+        .map((b) =>
+          b.replace('2.5 * sample.', '').replace('visualizer.process(sample.', '').replace(')', '').trim(),
+        )
+        .map((b) => b.replace('factor * sample.', ''))
+        .map((b) => b.replace('sample.CLC === ', ''))
         .slice(0, -1);
     }
     return evalscript
       .split('[')[1]
       .split(']')[0]
       .split(',')
-      .map(b => b.replace('2.5*', ''));
+      .map((b) => b.replace('2.5*', ''));
   } catch (e) {
     return [];
   }
@@ -328,19 +369,14 @@ export function parseIndexEvalscript(evalscript) {
         .split('\n')[13]
         .split('=')[1]
         .split('/')
-        .map(item =>
-          item
-            .replace('(', '')
-            .replace(')', '')
-            .replace(' ', ''),
-        );
+        .map((item) => item.replace('(', '').replace(')', '').replace(' ', ''));
 
       if (bands[0].indexOf('-') !== -1) {
         equation = '(A-B)/(A+B)';
-        bands = bands[0].split('-').map(item => item.replace('samples.', ''));
+        bands = bands[0].split('-').map((item) => item.replace('samples.', ''));
       } else {
         equation = '(A/B)';
-        bands = bands.map(item => item.replace('samples.', ''));
+        bands = bands.map((item) => item.replace('samples.', ''));
       }
 
       bands = { a: bands[0], b: bands[1] };
@@ -350,15 +386,10 @@ export function parseIndexEvalscript(evalscript) {
         .split('\n')[1]
         .split('=')[1]
         .split(',')
-        .map(item =>
-          item
-            .replace(/\[/g, '')
-            .replace(/]/g, '')
-            .replace(' ', ''),
-        );
+        .map((item) => item.replace(/\[/g, '').replace(/]/g, '').replace(' ', ''));
 
-      let colors = values.filter(item => item.indexOf('0x') !== -1).map(item => item.replace('0x', '#'));
-      let positions = values.filter(item => item.indexOf('0x') === -1).map(item => parseFloat(item));
+      let colors = values.filter((item) => item.indexOf('0x') !== -1).map((item) => item.replace('0x', '#'));
+      let positions = values.filter((item) => item.indexOf('0x') === -1).map((item) => parseFloat(item));
 
       return {
         bands: bands,
@@ -422,7 +453,7 @@ export function readBlob(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       try {
         const json = JSON.parse(e.target.result);
         resolve(json);
@@ -483,7 +514,7 @@ export function ensureCorrectDataFusionFormat(dataFusion, datasetId) {
   }
 }
 
-const shJSdatasetIdToDataset = datasetId => {
+const shJSdatasetIdToDataset = (datasetId) => {
   switch (datasetId) {
     case DATASET_S2L1C.id:
       return DATASET_S2L1C;
