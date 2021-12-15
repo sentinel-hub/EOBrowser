@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import center from '@turf/center';
 import moment from 'moment';
 import { t } from 'ttag';
+import { isMobile } from 'react-device-detect';
 
 import HeaderWithLogin from './Header/Header';
 import SearchPanel from './SearchPanel/SearchPanel';
@@ -14,12 +15,14 @@ import ToolsFooter from './ToolsFooter/ToolsFooter';
 import store, { notificationSlice, visualizationSlice, tabsSlice, compareLayersSlice } from '../store';
 import { savePinsToServer, savePinsToSessionStorage, constructPinFromProps } from './Pins/Pin.utils';
 import { checkIfCustom } from './SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { getNotSupportedIn3DMsg } from '../junk/ConstMessages';
 
 import './Tools.scss';
+import { TABS } from '../const';
 
 class Tools extends Component {
   state = {
-    toolsOpen: true,
+    toolsOpen: !isMobile,
     resultsAvailable: false,
     selectedPin: null,
     selectedResult: null,
@@ -105,7 +108,7 @@ class Tools extends Component {
   setActiveTabIndex = (index) => {
     store.dispatch(tabsSlice.actions.setTabIndex(index));
 
-    if (index === 4) {
+    if (index === TABS.COMPARE_TAB) {
       //Reset the counter badge
       store.dispatch(compareLayersSlice.actions.setNewCompareLayersCount(0));
     }
@@ -188,6 +191,7 @@ class Tools extends Component {
   render() {
     const zoomToTileConfig = this.getZoomToTileConfig();
     const { timespanExpanded, showEffects, resultsAvailable } = this.state;
+    const { is3D } = this.props;
 
     return (
       <div className="tools-wrapper">
@@ -205,7 +209,7 @@ class Tools extends Component {
             onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
             onSelect={this.setActiveTabIndex}
           >
-            <Tab id="SearchTab" title={t`Discover`} icon="search" renderKey={0}>
+            <Tab id="SearchTab" title={t`Discover`} icon="search" renderKey={TABS.DISCOVER_TAB}>
               <SearchPanel
                 onSearchFinished={this.onSearchFinished}
                 resetSearch={this.resetSearch}
@@ -223,7 +227,7 @@ class Tools extends Component {
               id="visualization-tab"
               title={t`Visualize`}
               icon="paint-brush"
-              renderKey={2}
+              renderKey={TABS.VISUALIZE_TAB}
               enabled={!!this.props.datasetId}
             >
               <VisualizationPanel
@@ -241,12 +245,14 @@ class Tools extends Component {
               id="CompareTab"
               title={t`Compare`}
               icon="exchange-alt"
-              renderKey={4}
+              enabled={!is3D}
+              errorMsg={getNotSupportedIn3DMsg()}
+              renderKey={TABS.COMPARE_TAB}
               count={this.props.newCompareLayersCount}
             >
               <ComparePanel />
             </Tab>
-            <Tab id="pins-tab" title={t`Pins`} icon="thumb-tack" renderKey={3}>
+            <Tab id="pins-tab" title={t`Pins`} icon="thumb-tack" renderKey={TABS.PINS_TAB}>
               <PinPanel
                 resetSearch={this.resetSearch}
                 setActiveTabIndex={this.setActiveTabIndex}
@@ -301,6 +307,8 @@ const mapStoreToProps = (store) => ({
   selectedThemeId: store.themes.selectedThemeId,
   selectedModeId: store.themes.selectedModeId,
   newCompareLayersCount: store.compare.newCompareLayersCount,
+  terrainViewerSettings: store.terrainViewer.settings,
+  is3D: store.mainMap.is3D,
 });
 
 export default connect(mapStoreToProps, null)(Tools);

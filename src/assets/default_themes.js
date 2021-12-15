@@ -2964,8 +2964,21 @@ export const DEFAULT_THEMES = [
         url: 'https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi',
       },
       {
+        name: 'Planet NICFI',
+        service: 'WMTS',
+        url: 'https://api.planet.com/basemaps/v1/mosaics/wmts?api_key=8fe044edc78c46ba904bb62e550493a3',
+      },
+      {
+        name: 'ESA WorldCover',
+        url: 'https://services.sentinel-hub.com/ogc/wms/8a1d53-YOUR-INSTANCEID-HERE',
+      },
+      {
         name: 'CORINE Land Cover',
         url: 'https://creodias.sentinel-hub.com/ogc/wms/5da777-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'CORINE Land Cover Accounting Layers',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/390dc3-YOUR-INSTANCEID-HERE',
       },
       {
         name: 'Global Land Cover',
@@ -2978,6 +2991,22 @@ export const DEFAULT_THEMES = [
       {
         name: 'Global Surface Water',
         url: 'https://creodias.sentinel-hub.com/ogc/wms/0a6c72-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'HR-VPP Seasonal Trajectories',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/279b6a-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'HR-VPP Vegetation Indices',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/6cb658-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'HR-VPP Vegetation Phenology and Productivity Parameters Season 1',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/b54da6-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'HR-VPP Vegetation Phenology and Productivity Parameters Season 2',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/b851e1-YOUR-INSTANCEID-HERE',
       },
     ],
   },

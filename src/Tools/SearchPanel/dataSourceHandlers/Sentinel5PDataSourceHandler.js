@@ -16,14 +16,15 @@ import {
   S5_AER_AI,
   S5_CLOUD,
   S5_OTHER,
-} from './dataSourceHandlers';
+} from './dataSourceConstants';
 import { filterLayers } from './filter';
 import { DATASOURCES } from '../../../const';
+import { getS5ProductType } from './datasourceAssets/getS5ProductType';
 
 export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
   S5PDATASETS = [S5_O3, S5_NO2, S5_SO2, S5_CO, S5_HCHO, S5_CH4, S5_AER_AI, S5_CLOUD];
 
-  datasetSearchLabels = {
+  getDatasetSearchLabels = () => ({
     [S5_O3]: t`O3 (Ozone)`,
     [S5_NO2]: t`NO2 (Nitrogen dioxide)`,
     [S5_SO2]: t`SO2 (Sulfur dioxide)`,
@@ -33,7 +34,7 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
     [S5_AER_AI]: t`AER AI (Aerosol Index)`,
     [S5_CLOUD]: t`Cloud`,
     [S5_OTHER]: t`Other`,
-  };
+  });
   datasetSearchIds = {
     [S5_O3]: 'O3',
     [S5_NO2]: 'NO2',
@@ -168,7 +169,7 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
         dataSourceTooltip={<Sentinel5Tooltip />}
         saveFiltersValues={this.saveSearchFilters}
         options={this.datasets}
-        optionsLabels={this.datasetSearchLabels}
+        optionsLabels={this.getDatasetSearchLabels()}
         preselectedOptions={Array.from(this.preselectedDatasets)}
         hasMaxCCFilter={false}
       />
@@ -269,27 +270,8 @@ export default class Sentinel5PDataSourceHandler extends DataSourceHandler {
 
   getSentinelHubDataset = () => DATASET_S5PL2;
 
-  getProductType = (datasetId) => {
-    switch (datasetId) {
-      case S5_O3:
-        return 'O3';
-      case S5_NO2:
-        return 'NO2';
-      case S5_SO2:
-        return 'SO2';
-      case S5_CO:
-        return 'CO';
-      case S5_HCHO:
-        return 'HCHO';
-      case S5_CH4:
-        return 'CH4';
-      case S5_AER_AI:
-        return 'AER_AI';
-      case S5_CLOUD:
-        return 'CLOUD';
-      default:
-        return 'CLOUD';
-    }
+  getS5ProductType = (datasetId) => {
+    return getS5ProductType(datasetId);
   };
 
   getResolutionLimits() {

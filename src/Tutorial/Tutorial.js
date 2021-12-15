@@ -25,6 +25,7 @@ class Tutorial extends Component {
     size,
     skipProps,
     title,
+    popupDisabled,
   }) => (
     <div className="tutorial-wrap">
       <div className="tutorial-body">
@@ -118,7 +119,7 @@ class Tutorial extends Component {
   componentDidMount() {
     const showTutorialVal = window.localStorage.getItem(SHOW_TUTORIAL_LC);
     const showTutorialBool = showTutorialVal ? showTutorialVal === 'true' : true;
-    if (showTutorialBool) {
+    if (showTutorialBool && !this.props.popupDisabled) {
       this.setState({ run: true });
     }
     this.setTutorialContent();

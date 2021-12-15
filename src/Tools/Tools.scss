@@ -30,15 +30,14 @@ $searchBorderColour: #6d7300;
   cursor: pointer;
   z-index: 2;
   transition: all ease 0.4s;
-  top: 3px;
 
   i {
     margin: 5px;
     display: block;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     font-size: 14px;
-    line-height: 24px;
+    line-height: 30px;
     transition: all ease 0.4s;
   }
 
@@ -285,7 +284,7 @@ $searchBorderColour: #6d7300;
     background-color: $mainLight;
     z-index: 1;
 
-    .btn {
+    .eob-btn {
       margin: 15px 10px;
       display: block;
       text-align: center;

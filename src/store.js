@@ -61,6 +61,7 @@ export const mainMapSlice = createSlice({
     lng: DEFAULT_LAT_LNG.lng,
     zoom: 10,
     enabledOverlaysId: ['labels'],
+    is3D: false,
   },
   reducers: {
     setPosition: (state, action) => {
@@ -95,6 +96,9 @@ export const mainMapSlice = createSlice({
       if (overlayIndex !== -1) {
         state.enabledOverlaysId.splice(overlayIndex, 1);
       }
+    },
+    setIs3D: (state, action) => {
+      state.is3D = action.payload;
     },
   },
 });
@@ -253,6 +257,8 @@ export const themesSlice = createSlice({
     },
     setSelectedThemeIdAndModeId: (state, action) => {
       const { selectedThemeId, selectedModeId, selectedThemesListId } = action.payload;
+      state.dataSourcesInitialized =
+        selectedModeId === state.selectedModeId && selectedThemeId === state.selectedThemeId;
       state.selectedThemeId = selectedThemeId;
       const modeThemes = MODES.find((mode) => mode.id === selectedModeId).themes;
       state.themesLists[MODE_THEMES_LIST] = modeThemes;
@@ -748,6 +754,7 @@ export const terrainViewerSlice = createSlice({
   name: 'terrainViewer',
   initialState: {
     settings: null,
+    id: null,
   },
   reducers: {
     setTerrainViewerSettings: (state, action) => {
@@ -755,6 +762,9 @@ export const terrainViewerSlice = createSlice({
     },
     resetTerrainViewerSettings: (state, action) => {
       state.settings = null;
+    },
+    setTerrainViewerId: (state, action) => {
+      state.id = action.payload;
     },
   },
 });

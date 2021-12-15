@@ -1,26 +1,7 @@
 @import '../variables';
 
 /* stylelint-disable */
-.web3dinfoPanel {
-  background: rgba(44, 48, 51, 0.7) !important;
-  color: $textCol !important;
-  border: none !important;
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 12px;
-
-  .coordsViewer {
-    margin-left: 10%;
-  }
-
-  .copyright {
-    .gwt-Anchor {
-      text-decoration: none;
-      color: $primaryCol;
-    }
-  }
-}
-
-.sgDialogBox { z-index: 1000; }
+.gwt-DialogBox { z-index: 500; }
 /* stylelint-enable */
 
 .terrain-viewer-button {
@@ -39,127 +20,188 @@
   overflow: visible;
   right: 10px;
   text-align: center;
+  display: flex;
+  justify-content: center;
 
-  i {
-    font-size: 20px;
-    line-height: 40px;
-    width: 40px;
-    cursor: pointer;
+  .icon {
     color: $primaryCol;
+    cursor: pointer;
+    width: 38px;
+  }
 
-    &.disabled {
+  &.disabled {
+    .icon {
       opacity: 0.5;
     }
   }
 }
 
-.terrain-visualization {
-  color: $textCol;
+@keyframes slide-in {
+  100% {
+    transform: translateX(0%);
+  }
+}
 
-  .title {
-    font-size: 20px;
-    font-weight: normal;
-    height: 50px;
-    padding: 0 15px;
-    line-height: 50px;
+@-webkit-keyframes slide-in {
+  100% {
+    -webkit-transform: translateX(0%);
+  }
+}
+
+@keyframes slide-out {
+  0% {
+    transform: translateX(0%);
   }
 
-  #terrain-map-container {
-    text-align: center;
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@-webkit-keyframes slide-out {
+  0% {
+    -webkit-transform: translateX(0%);
   }
 
-  .download-button-holder {
+  100% {
+    -webkit-transform: translateX(200%);
+  }
+}
+
+@keyframes indeterminate-loading {
+  from {
+    left: 0%;
+    width: 5%;
+  }
+
+  to {
+    left: 100%;
+    width: 5%;
+  }
+}
+
+#terrain-map-container {
+  text-align: center;
+  width: 100%;
+  height: 100%;
+
+  /* stylelint-disable */
+  .statusLoading {
+    display: none;
+  }
+  /* stylelint-enable */
+
+  .loader-bar {
+    background: $primaryCol;
+    position: fixed;
+    z-index: 1031;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    animation: indeterminate-loading 0.8s linear infinite;
+
+    &.hidden {
+      display: none;
+    }
+  }
+
+  .toolbar3d {
+    z-index: 400;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background-color: transparent;
     display: flex;
-    flex-direction: row;
-    margin-top: 10px;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
 
-    .download-button {
-      width: 20%;
-      min-width: 100px;
-    }
-
-    .toggle-captions {
-      margin-left: 20px;
-
-      label {
-        margin-left: 5px;
-      }
-    }
-
-    .actions {
-      width: 80px;
+    .button3d {
+      cursor: pointer;
+      margin-bottom: 10px;
+      width: 40px;
       height: 40px;
-      margin-left: 30px;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-evenly;
+      font-size: 20px;
+      line-height: 40px;
+      background: $mainDark;
+      color: #fff;
+      -webkit-box-shadow: 0 2px 5px #000;
+      box-shadow: 0 2px 5px #000;
+      text-align: center;
 
-      .action-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
+      &.animated {
+        transform: translateX(100%);
+        -webkit-transform: translateX(100%);
+        -webkit-animation: slide-in 2s forwards; /* Safari, Chrome and Opera > 12.1 */
+        -moz-animation: slide-in 2s forwards; /* Firefox < 16 */
+        -ms-animation: slide-in 2s forwards; /* Internet Explorer */
+        -o-animation: slide-in 2s forwards; /* Opera < 12.1 */
+        animation: slide-in 2s forwards;
+      }
+
+      .icon {
+        color: $primaryCol;
+      }
+
+      i {
+        color: $primaryCol;
+      }
+
+      &.help {
+        i {
+          color: $textColor;
+        }
+      }
+
+      &.closing {
+        -webkit-animation: slide-out 2s forwards; /* Safari, Chrome and Opera > 12.1 */
+        -moz-animation: slide-out 2s forwards; /* Firefox < 16 */
+        -ms-animation: slide-out 2s forwards; /* Internet Explorer */
+        -o-animation: slide-out 2s forwards; /* Opera < 12.1 */
+        animation: slide-out 2s forwards;
+      }
+
+      &.enabled {
+        box-shadow: 0 4px 8px $primaryCol;
 
         i {
-          color: $primaryCol;
-          margin-right: 5px;
-          font-size: 20px;
-        }
-
-        &.pin-saved {
-          i {
-            opacity: 0.5;
-            pointer-events: none;
-          }
-        }
-
-        .social-networks {
-          z-index: 5;
-          padding: 5px;
-          background-color: #eee;
-          box-shadow: 0 2px 5px #000;
-          position: fixed;
-          color: #fff;
-          display: flex;
-          margin-top: -80px;
-          margin-right: 180px;
-
-          .copy-to-clipboard {
-            margin-left: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            align-content: center;
-            color: $primaryCol;
-            padding: 3px 8px 3px 3px;
-          }
-
-          .holders {
-            .facebook-share-button,
-            .twitter-share-button,
-            .linkedin-share-button {
-              i {
-                font-size: 30px;
-              }
-            }
-          }
-
-          input {
-            color: $mainDark;
-          }
-
-          input:disabled {
-            background: #ccc;
-          }
-
-          .disabled {
-            pointer-events: none;
-            opacity: 0.5;
-          }
+          color: $primaryColLighter;
         }
       }
+    }
+  }
+
+  .info3dcontainer {
+    z-index: 400;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    flex-direction: row;
+    font-size: 10px;
+    background: $mainDark;
+    color: $textCol;
+    padding: 1px;
+    justify-content: center;
+    min-width: 250px;
+  }
+
+  .attribution {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 400;
+    display: flex;
+    flex-direction: row;
+    background: $mainDark;
+    padding: 1px;
+    justify-content: center;
+    min-width: 250px;
+
+    .attribution-link {
+      text-decoration: none;
+      color: $primaryCol;
+      font-size: 11px;
+      margin-right: 5px;
     }
   }
 }

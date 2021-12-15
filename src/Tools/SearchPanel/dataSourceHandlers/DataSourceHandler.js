@@ -4,17 +4,13 @@ import { constructV3Evalscript } from '../../../utils';
 import { datasetLabels } from './dataSourceHandlers';
 import { filterLayers } from './filter';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
+import { DEFAULT_TILES_SIZE_CONFIG, DEFAULT_ZOOM_CONFIGURATION } from './helper';
 // DataSourceHandler subclasses take care of:
 // - recognizing (WMS / WMTS) URLs as "theirs"
 // - fetching additional information from their services as needed
 // - displaying search form
 // - returning search results corresponding to search input
 // - ...
-
-export const DEFAULT_ZOOM_CONFIGURATION = {
-  min: undefined,
-  max: undefined,
-};
 
 export const SENTINEL_COPYRIGHT_TEXT = `Credit: European Union, contains modified Copernicus Sentinel data ${moment
   .utc()
@@ -51,6 +47,20 @@ export default class DataSourceHandler {
     }
 
     return DEFAULT_ZOOM_CONFIGURATION;
+  }
+
+  getLeafletTileSizeConfig(datasetId) {
+    // returns tileSize 256 or 512 for a specific dataset Id
+    // if a config for provided dataset is not found it returns default size of 512
+    if (!datasetId) {
+      throw new Error('datasetId not provided.');
+    }
+
+    if (this.leafletTileSizeConfig && this.leafletTileSizeConfig[datasetId]) {
+      return this.leafletTileSizeConfig[datasetId];
+    }
+
+    return DEFAULT_TILES_SIZE_CONFIG;
   }
 
   prepareNewSearch(fromMoment, toMoment, queryArea = null) {
@@ -210,4 +220,5 @@ export default class DataSourceHandler {
   isCopernicus = () => true;
 
   isSentinelHub = () => true;
+  supportsImgExport = () => true;
 }

@@ -112,7 +112,7 @@ class Timelapse extends Component {
     this.layer = layer[0];
     await this.layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
     if (this.layer.dataset === DATASET_S5PL2) {
-      this.layer.productType = datasourceHandler.getProductType(datasetId);
+      this.layer.productType = datasourceHandler.getS5ProductType(datasetId);
     }
 
     const canWeFilterByClouds = datasourceHandler.tilesHaveCloudCoverage(datasetId);

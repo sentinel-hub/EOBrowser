@@ -21,6 +21,7 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
   urls = [];
   datasets = [];
   preselectedDatasets = new Set();
+  allLayers = [];
   searchFilters = {};
   isChecked = false;
   datasource = DATASOURCES.CUSTOM;
@@ -65,6 +66,7 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
     });
 
     this.urls.push(url);
+    this.allLayers.push(...layers);
     this.saveFISLayers(url, layers);
     return true;
   }
@@ -223,4 +225,16 @@ function evaluatePixel(sample) {
   isCopernicus = () => false;
 
   isSentinelHub = () => true;
+
+  getDatasetParams = (datasetId) => {
+    const layer = this.allLayers.find((l) => l.collectionId === datasetId);
+    if (layer) {
+      return {
+        collectionId: datasetId,
+        subType: layer.subType,
+        locationId: layer.locationId,
+      };
+    }
+    return {};
+  };
 }

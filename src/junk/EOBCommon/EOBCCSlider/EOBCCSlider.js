@@ -30,7 +30,8 @@ export class EOBCCSlider extends React.Component {
         </div>
         {this.props.showIcons && <i className="fa fa-cloud">&nbsp;</i>}
         <div className="percentage">
-          {this.props.cloudCoverPercentage}&nbsp;{this.props.unit ? this.props.unit : ''}
+          {this.props.cloudCoverPercentage}
+          {this.props.unit ? this.props.unit : ''}
         </div>
       </div>
     );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'ttag';
 
@@ -25,6 +25,7 @@ import { calculateAOICoverage, extractErrorMessage } from './commercialData.util
 import store, { commercialDataSlice } from '../../store';
 
 import moment from 'moment';
+import ReactMarkdown from 'react-markdown';
 
 const Tabs = {
   SEARCH_OPTIONS: 0,
@@ -32,6 +33,7 @@ const Tabs = {
   ORDER_OPTIONS: 2,
   MY_ORDERS: 3,
   MY_QUOTAS: 4,
+  HELP: 5,
 };
 
 const defaultSearchParamsForProvider = (dataProvider) => {
@@ -69,6 +71,34 @@ const pageSize = {
   [TPDICollections.MAXAR_WORLDVIEW]: 50,
 };
 
+const getCommercialHelpText = (quotas) => t`
+**General**  
+The "Commercial data" tab allows you to search, purchase, and visualize Commercial Third-Party data.
+
+**Available constellations**  
+We currently offer data from 4 different commercial data providers:
+- Planet [Planet scope](https://docs.sentinel-hub.com/api/latest/data/planet-scope/) (4 bands, 3m resolution)
+- Airbus [Pleiades](https://docs.sentinel-hub.com/api/latest/data/airbus/pleiades/) (5 bands, 0.5m - 2m resolution)
+- Airbus [SPOT](https://docs.sentinel-hub.com/api/latest/data/airbus/spot/) (5 bands, 1.5m - 6m resolution)
+- Maxar [WorldView](https://docs.sentinel-hub.com/api/latest/data/maxar/world-view/) (5 bands, 0.5m - 2m resolution)
+
+As the term "commercial" implies, the data comes at a cost, which means **in addition to your existing Sentinel Hub subscription, you will need to purchase quota** for the data you are interested in.
+
+**Quota**  
+Check *My quota* to see how much quota you have for each of the constellations. You can purchase quota through the [Sentinel Hub Dashboard](https://apps.sentinel-hub.com/dashboard/#/account/billing).
+
+**Purchase**  
+To purchase commercial data, you must:
+- search for the data (*Search options*),
+- select a product from the results (*Results*),
+- add the product to your order,
+- specify where to save the order (*Order options*),
+- review the order and confirm it (*Created orders (not confirmed)* in *My orders*). Your order will now be listed under *Running orders* and move to *Finished orders* once the data has been purchased and ingested.
+
+**More information**  
+For more information on ordering commercial data ( Third Party Data Import ), please see the [Sentinel Hub Documentation Page](https://docs.sentinel-hub.com/api/latest/api/data-import/).
+`;
+
 const CommercialDataPanel = ({
   user,
   aoiGeometry,
@@ -86,6 +116,9 @@ const CommercialDataPanel = ({
   const [activeOrderId, setActiveOrderId] = useState();
   const [confirmAction, setConfirmAction] = useState(false);
   const [cachedPreviews, setCachedPreviews] = useState([]);
+  const [quotas, setQuotas] = useState([]);
+  const [areQuotasLoading, setAreQuotasLoading] = useState(false);
+  const [quotasError, setQuotasError] = useState(null);
 
   const setSearchResults = (payload) => {
     store.dispatch(commercialDataSlice.actions.setSearchResults(payload));
@@ -274,13 +307,30 @@ const CommercialDataPanel = ({
     store.dispatch(commercialDataSlice.actions.reset());
   };
 
-  React.useEffect(() => {
-    // initialize default parameters when "component is mounted"
-    // this doesn't really make sense as default parameters are already correctly set.
-    // it was added only to forse rerender, otherwise datePicker will crash with Target container is not a DOM element.
+  const fetchQuotas = async (user) => {
+    if (user && !!user.access_token) {
+      try {
+        setAreQuotasLoading(true);
+        setQuotasError(null);
+        const requestsConfig = {
+          authToken: user.access_token,
+        };
+        const result = await TPDI.getQuotas(requestsConfig);
+        setQuotas(result.sort((a, b) => a.collectionId.localeCompare(b.collectionId)));
+      } catch (err) {
+        console.error(err);
+        setQuotasError(t`Unable to get quotas: ${err.message}`);
+        setQuotas([]);
+      } finally {
+        setAreQuotasLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
     reset();
-    // eslint-disable-next-line
-  }, []);
+    fetchQuotas(user);
+  }, [user]);
 
   return (
     <div className="commercial-data-panel">
@@ -356,7 +406,14 @@ const CommercialDataPanel = ({
         title={t`My quotas`}
         toggleOpen={() => toggleAccordion(Tabs.MY_QUOTAS)}
       >
-        <Quotas />
+        <Quotas quotas={quotas} isLoading={areQuotasLoading} error={quotasError} fetchQuotas={fetchQuotas} />
+      </Accordion>
+      <Accordion
+        open={selectedAccordion === Tabs.HELP}
+        title={t`Help`}
+        toggleOpen={() => toggleAccordion(Tabs.HELP)}
+      >
+        <ReactMarkdown source={getCommercialHelpText(quotas)} />
       </Accordion>
       {confirmAction ? ConfirmationDialog(confirmAction, setConfirmAction) : null}
     </div>

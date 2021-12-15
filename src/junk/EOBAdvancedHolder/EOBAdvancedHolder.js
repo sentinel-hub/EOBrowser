@@ -77,7 +77,7 @@ class EOBAdvancedHolder extends React.Component {
         <header>
           {
             // eslint-disable-next-line
-            <a onClick={onBack} className="btn primary">
+            <a onClick={onBack} className="eob-btn primary">
               <i className="fa fa-arrow-left" />
               {t`Back`}
             </a>

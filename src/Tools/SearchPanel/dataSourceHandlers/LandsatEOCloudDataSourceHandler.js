@@ -6,7 +6,7 @@ import {
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
 } from '@sentinel-hub/sentinelhub-js';
-import { ESA_L5, ESA_L7, ESA_L8 } from './dataSourceHandlers';
+import { ESA_L5, ESA_L7, ESA_L8 } from './dataSourceConstants';
 import { DATASOURCES } from '../../../const';
 
 export default class LandsatEOCloudDataSourceHandler extends LandsatDataSourceHandler {
@@ -23,4 +23,6 @@ export default class LandsatEOCloudDataSourceHandler extends LandsatDataSourceHa
   getDataSourceTooltip() {
     return <LandsatEOCloudTooltip />;
   }
+
+  groupChannels = () => {};
 }

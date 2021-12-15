@@ -114,7 +114,7 @@ class POI extends Component {
         ref={(r) => {
           this.ref = r;
         }}
-        className="poi-wrapper"
+        className={`poi-wrapper ${this.props.className}`}
       >
         <EOBPOIPanelButton
           disabled={false}

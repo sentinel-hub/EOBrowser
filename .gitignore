@@ -6,6 +6,8 @@
 # misc
 /build
 .env
+.npm
+.gitlab
 
 npm-debug.log*
 yarn-debug.log*

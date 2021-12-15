@@ -10,7 +10,7 @@ import './EOBEffectsPanel.scss';
 import HelpTooltip from '../../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/HelpTooltip';
 import ExternalLink from '../../ExternalLink/ExternalLink';
 
-import { ORTHORECTIFICATION_OPTIONS } from '../../const';
+import { defaultEffects, ORTHORECTIFICATION_OPTIONS } from '../../const';
 
 export const findSpeckleFilterIndex = (speckleFilters, speckleFilter) =>
   speckleFilter
@@ -23,39 +23,7 @@ const capitalize = (text) => text.toLowerCase().charAt(0).toUpperCase() + text.t
 
 export class EOBEffectsPanel extends React.Component {
   static defaultProps = {
-    effects: {
-      gainEffect: 1,
-      gammaEffect: 1,
-
-      redRangeEffect: [0, 1],
-      greenRangeEffect: [0, 1],
-      blueRangeEffect: [0, 1],
-
-      redCurveEffect: {
-        points: [
-          { x: 0, y: 0 },
-          { x: 1, y: 1 },
-        ],
-      },
-      greenCurveEffect: {
-        points: [
-          { x: 0, y: 0 },
-          { x: 1, y: 1 },
-        ],
-      },
-      blueCurveEffect: {
-        points: [
-          { x: 0, y: 0 },
-          { x: 1, y: 1 },
-        ],
-      },
-
-      minQa: 50,
-      upsampling: '',
-      downsampling: '',
-      speckleFilter: '',
-      orthorectification: '',
-    },
+    effects: defaultEffects,
     isFISLayer: undefined,
     doesDatasetSupportMinQa: undefined,
     doesDatasetSupportInterpolation: undefined,

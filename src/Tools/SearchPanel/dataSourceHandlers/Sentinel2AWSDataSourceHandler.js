@@ -11,7 +11,7 @@ import {
 } from './DatasourceRenderingComponents/dataSourceTooltips/Sentinel2Tooltip';
 import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 import { FetchingFunction } from '../search';
-import { S2L1C, S2L2A } from './dataSourceHandlers';
+import { S2L1C, S2L2A } from './dataSourceConstants';
 import { DATASOURCES } from '../../../const';
 
 export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {

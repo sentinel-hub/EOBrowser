@@ -1,3 +1,5 @@
+import { defaultEffects } from '../../const';
+
 //Regex for matching True color layers
 const TRUE_COLOR_REGEX = /TRUE(\s|-|_)COLOR/i;
 
@@ -13,4 +15,16 @@ export const sortLayers = (layers) => {
   ];
 
   return sortedLayers;
+};
+
+export const haveEffectsChangedFromDefault = (newEffects) => {
+  for (let effectName in newEffects) {
+    if (
+      newEffects[effectName] &&
+      JSON.stringify(defaultEffects[effectName]) !== JSON.stringify(newEffects[effectName])
+    ) {
+      return true;
+    }
+  }
+  return false;
 };

@@ -22,7 +22,7 @@ import {
   S1_EW_SH,
   S1_EW,
   S1,
-} from './dataSourceHandlers';
+} from './dataSourceConstants';
 import { constructBasicEvalscript, constructV3Evalscript } from '../../../utils';
 import { filterLayers } from './filter';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
@@ -420,6 +420,10 @@ export default class Sentinel1DataSourceHandler extends DataSourceHandler {
       default:
         return { polarization: null, acquisitionMode: null };
     }
+  };
+
+  getDatasetParams = (datasetId) => {
+    return Sentinel1DataSourceHandler.getDatasetParams(datasetId);
   };
 
   getUrlsForDataset = (datasetId) => {

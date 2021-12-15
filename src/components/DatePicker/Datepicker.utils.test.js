@@ -50,24 +50,24 @@ describe('isPreviousMonthAvailable', () => {
 
 describe('getAvailableYears', () => {
   it('should return an array of available years', () => {
-    const fromDate = new Date('01-01-2019');
-    const toDate = new Date('01-01-2021');
+    const fromDate = moment.utc('2019-01-01');
+    const toDate = moment.utc('2021-01-01');
 
     const availableYears = getAvailableYears(fromDate, toDate);
     expect(availableYears).toEqual([2019, 2020, 2021]);
   });
 
   it('should return only the current year when min and max date are in the same year', () => {
-    const fromDate = new Date('01-01-2019');
-    const toDate = new Date('01-01-2019');
+    const fromDate = moment.utc('2019-01-01');
+    const toDate = moment.utc('2019-01-01');
 
     const availableYears = getAvailableYears(fromDate, toDate);
     expect(availableYears).toEqual([2019]);
   });
 
   it('should return an empty array when from date is after toDate', () => {
-    const fromDate = new Date('01-01-2022');
-    const toDate = new Date('01-01-2021');
+    const fromDate = moment.utc('2022-01-01');
+    const toDate = moment.utc('2021-01-01');
 
     const availableYears = getAvailableYears(fromDate, toDate);
     expect(availableYears).toEqual([]);

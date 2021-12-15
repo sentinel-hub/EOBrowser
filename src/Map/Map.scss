@@ -29,7 +29,7 @@
 
   @media (max-width: 1200px) {
     .maptiler-logo {
-      bottom: 35px;
+      bottom: 25px;
     }
 
     .google-logo {
@@ -37,13 +37,19 @@
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 890px) {
     .maptiler-logo {
-      bottom: 60px;
+      bottom: 48px;
     }
 
     .google-logo {
       bottom: 56px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .maptiler-logo {
+      bottom: 46px;
     }
   }
 
@@ -78,6 +84,19 @@
       }
     }
   }
+
+  // Prevent visible tile borders on some browsers/devices - https://github.com/Leaflet/Leaflet/issues/3575#issuecomment-688644225
+  .leaflet-tile-container {
+    img[style*="width: 512px"] {
+      width: 512.5px !important;
+      height: 512.5px !important;
+    }
+
+    img[style*="width: 256px"] {
+      width: 256.5px !important;
+      height: 256.5px !important;
+    }
+  }
 }
 
 #nprogress {
@@ -96,11 +115,9 @@
 }
 
 .search-box-wrapper {
-  position: relative;
-  z-index: 401;
-  float: right;
-  margin-right: 160px;
-  margin-top: 10px;
+  position: absolute;
+  right: 160px;
+  top: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,6 +130,11 @@
   border-radius: 0;
   box-shadow: $boxShadow;
   color: white;
+  z-index: 500;
+
+  &.position-with-3d {
+    right: 60px;
+  }
 }
 
 /* stylelint-disable */

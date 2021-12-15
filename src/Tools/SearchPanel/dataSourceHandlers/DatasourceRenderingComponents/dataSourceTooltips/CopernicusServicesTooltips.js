@@ -55,6 +55,79 @@ The **Global Surface Water** collection is derived from Landsat 5, 7 and 8 image
 **Common Usage**: Monitoring of water bodies for water resource management, climate modelling, biodiversity conservation and food security.
 `;
 
+const HRVPPSeasonalTrajectoriesMarkdown = () => t`
+The **Seasonal Trajectories** product is a filtered time series of Plant Phenology Index (PPI) provided yearly on a 10-daily basis. It is part of the Copernicus Land Monitoring Service (CLMS), pan-European High Resolution Vegetation Phenology and Productivity (HR-VPP) product suite. The Seasonal Trajectories PPI is derived through fitting a smoothing and gap filling function to the yearly time-series raw PPI values generated from Sentinel-2 satellite observations. More information [here](https://collections.sentinel-hub.com/seasonal-trajectories/).
+
+**Coverage**: Europe (EEA39 region) from longitude from 25°W to 45°E and latitude 26°N to 72°N.
+
+**Data Availability**: Since January 2017, updated every 10 days.
+
+**Spatial resolution**: 10 meters.
+
+**Common Usage**: Plant phenology monitoring, such as tracking green canopy foliage dynamics through time. 
+`;
+
+const HRVPPVegetationIndicesMarkdown = () => t`
+The **Vegetation Indices** product is part of the Copernicus Land Monitoring Service (CLMS), pan-European High Resolution Vegetation Phenology and Productivity (HR-VPP) product suite. The product is comprised of 4 raw Vegetation Indices generated near real-time (NRT) from Sentinel-2 satellite observations. More information [here](https://collections.sentinel-hub.com/vegetation-indices/).
+
+**Coverage**: Europe (EEA39 region) from longitude from 25°W to 45°E and latitude 26°N to 72°N.
+
+**Data Availability**: Since October 2016, updated daily. 
+
+**Spatial resolution**: 10 meters.
+
+**Common Usage**: Plant phenology assessment and monitoring, including vegetation cover, density, productivity and health.
+`;
+
+const HRVPPVPPS1Markdown = () => t`
+The **Vegetation Phenology and Productivity Parameters** product is part of the Copernicus Land Monitoring Service (CLMS), pan-European High Resolution Vegetation Phenology and Productivity (HR-VPP) product suite. The VPP product is comprised of 13 parameters that describe specific stages of the seasonal vegetation growth cycle. These parameters are extracted from Seasonal Trajectories of the Plant Phenology Index (PPI) derived from Sentinel-2 satellite observations.
+ More information [here](https://collections.sentinel-hub.com/vegetation-phenology-and-productivity-parameters-season-1/).
+
+**Coverage**: Europe (EEA39 region) from longitude from 25°W to 45°E and latitude 26°N to 72°N.
+
+**Data Availability**: Since January 2017, updated annually.
+
+**Spatial resolution**: 10 meters.
+
+**Common Usage**: Detailed assessment of the impacts of human or climate change on the ecosystem through monitoring of vegetation responses to disturbances, e.g. droughts, storms, insect infestations, and to human influence from global to local levels.
+`;
+
+const HRVPPVPPS2Markdown = () => t`
+The **Vegetation Phenology and Productivity Parameters** product is part of the Copernicus Land Monitoring Service (CLMS), pan-European High Resolution Vegetation Phenology and Productivity (HR-VPP) product suite. The VPP product is comprised of 13 parameters that describe specific stages of the seasonal vegetation growth cycle. These parameters are extracted from Seasonal Trajectories of the Plant Phenology Index (PPI) derived from Sentinel-2 satellite observations.
+ More information [here](https://collections.sentinel-hub.com/vegetation-phenology-and-productivity-parameters-season-2/).
+
+**Coverage**: Europe (EEA39 region) from longitude from 25°W to 45°E and latitude 26°N to 72°N.
+
+**Data Availability**: Since January 2017, updated annually.
+
+**Spatial resolution**: 10 meters.
+
+**Common Usage**: Detailed assessment of the impacts of human or climate change on the ecosystem through monitoring of vegetation responses to disturbances, e.g. droughts, storms, insect infestations, and to human influence from global to local levels.
+`;
+
+const CLCAccountingMarkdown = () => t`
+The **Corine Land Cover Accounting Layers** are status layers modified for the purpose of consistent statistical analysis in the land cover change accounting system. The modification combines CLC status and change layers in the 100 m raster in order to create homogeneous quality time series of CLC / CLC-change layers for accounting purposes. The CLC inventory consists of 44 land cover and land use classes derived from a series of satellite missions since it was first established. More information [here](https://collections.eurodatacube.com/corine-land-cover-accounting-layers/).
+
+**Coverage**: Europe (EEA39 region).
+
+**Data Availability**: Since 2000, updated every 6 years. Data available for 2000, 2006, 2012 and 2018.
+
+**Spatial resolution**: 100 meters.
+
+**Common Usage**: Land use and land cover monitoring, analysis and change prediction for various applications, including environment, agriculture, transport and spatial planning.`;
+
+const WorldCoverMarkdown = () => t`
+The **ESA WorldCover** product is the first global land cover map at 10 m resolution based on both Sentinel-1 and Sentinel-2 data. More information [here](https://esa-worldcover.org/).
+
+**Coverage**: Global coverage.
+
+**Data Availability**: 2020.
+
+**Spatial resolution**: 10 meters.
+
+**Common Usage**: Development of novel services to help with preserving biodiversity, food security, carbon assessment and climate modelling.
+`;
+
 const Tooltip = (getMarkdown, url) => {
   return (
     <div>
@@ -85,4 +158,47 @@ const WaterBodiesTooltip = () =>
 const GlobalSurfaceWaterTooltip = () =>
   Tooltip(GlobalSurfaceWaterMarkdown, 'https://global-surface-water.appspot.com/');
 
-export { CorineLandCoverTooltip, GlobalLandCoverTooltip, WaterBodiesTooltip, GlobalSurfaceWaterTooltip };
+const HRVPPSeasonalTrajectoriesTooltip = () =>
+  Tooltip(
+    HRVPPSeasonalTrajectoriesMarkdown,
+    'https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity/seasonal-trajectories',
+  );
+
+const HRVPPVegetationIndicesTooltip = () =>
+  Tooltip(
+    HRVPPVegetationIndicesMarkdown,
+    'https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity/vegetation-indices',
+  );
+
+const HRVPPVPPS1Tooltip = () =>
+  Tooltip(
+    HRVPPVPPS1Markdown,
+    'https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity/vegetation-phenology-and-productivity',
+  );
+
+const HRVPPVPPS2Tooltip = () =>
+  Tooltip(
+    HRVPPVPPS2Markdown,
+    'https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity/vegetation-phenology-and-productivity',
+  );
+
+const CLCAccountingTooltip = () =>
+  Tooltip(
+    CLCAccountingMarkdown,
+    'https://land.copernicus.eu/user-corner/technical-library/clc-product-user-manual',
+  );
+
+const WorldCoverTooltip = () => Tooltip(WorldCoverMarkdown, 'https://esa-worldcover.org/');
+
+export {
+  CorineLandCoverTooltip,
+  GlobalLandCoverTooltip,
+  WaterBodiesTooltip,
+  GlobalSurfaceWaterTooltip,
+  HRVPPSeasonalTrajectoriesTooltip,
+  HRVPPVegetationIndicesTooltip,
+  HRVPPVPPS1Tooltip,
+  HRVPPVPPS2Tooltip,
+  CLCAccountingTooltip,
+  WorldCoverTooltip,
+};

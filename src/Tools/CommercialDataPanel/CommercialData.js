@@ -16,6 +16,8 @@ Observe the planet at resolutions starting at 3 meters and all the way up to 0.5
 
 ![High resolution imagery example.](${process.env.REACT_APP_ROOT_URL}commercial-data-previews/high-res-image-example.png)
 
+&copy CNES (2020), Distribution AIRBUS DS, contains Pleiades data processed by Sentinel Hub
+
 What you need: 
 - An active Sentinel Hub subscription to search the metadata. If you don't have an account yet: [Sign up](https://services.sentinel-hub.com/oauth/subscription?param_domain_id=1&param_redirect_uri=https://apps.sentinel-hub.com/dashboard/oauthCallback.html&param_state=%2F&param_scope=&param_client_id=30cf1d-YOUR-INSTANCEID-HERE&domainId=1).
 - Pre-purchased quota for any of the constellations. Go to [Dashboard](https://apps.sentinel-hub.com/dashboard/#/account/billing) to establish a subscription and purchase commercial data plans. 

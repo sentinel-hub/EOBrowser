@@ -74,6 +74,8 @@ class ThemesProvider extends React.Component {
           this.setMode(selectedMode);
           this.setSelectedThemeIdFromMode(selectedMode);
         }
+      } catch (err) {
+        store.dispatch(visualizationSlice.actions.reset());
       } finally {
         store.dispatch(modalSlice.actions.removeModal());
       }

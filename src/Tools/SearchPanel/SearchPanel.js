@@ -49,6 +49,13 @@ class SearchPanel extends Component {
     if (prevProps.selectedModeId !== this.props.selectedModeId) {
       store.dispatch(tabsSlice.actions.setSelectedTabSearchPanelIndex(SEARCH_PANEL_TABS.SEARCH_TAB));
     }
+    if (
+      !prevProps.is3D &&
+      this.props.is3D &&
+      this.props.selectedTab === SEARCH_PANEL_TABS.COMMERCIAL_DATA_TAB
+    ) {
+      store.dispatch(tabsSlice.actions.setSelectedTabSearchPanelIndex(SEARCH_PANEL_TABS.SEARCH_TAB));
+    }
   }
 
   hideThemesErrorOnClick = () => {
@@ -94,8 +101,8 @@ class SearchPanel extends Component {
     });
     let currentQuery = new Query();
     const searchPreparation = currentQuery.prepareNewSearch(
-      this.state.fromMoment,
-      this.state.toMoment,
+      this.state.fromMoment.clone(),
+      this.state.toMoment.clone(),
       this.props.mapBounds,
       this.state.filterMonths,
     );
@@ -244,6 +251,8 @@ class SearchPanel extends Component {
       selectedThemesListId,
       error,
       selectedTab,
+      is3D,
+      terrainViewerId,
     } = this.props;
     const minDateRange = minDate ? minDate : moment.utc('1972-07-01');
     const maxDateRange = maxDate ? maxDate : moment.utc();
@@ -285,7 +294,7 @@ class SearchPanel extends Component {
             >
               {t`Search`}
             </li>
-            {!isEducationModeSelected && (
+            {!isEducationModeSelected && !is3D && (
               <li
                 onClick={() => this.setSelectedTab(SEARCH_PANEL_TABS.COMMERCIAL_DATA_TAB)}
                 className={`discover-tab-button ${commercialDataTabAvailable ? '' : ''} ${
@@ -358,6 +367,8 @@ class SearchPanel extends Component {
               resetSearch={this.props.resetSearch}
               setTimeSpanExpanded={this.props.setTimeSpanExpanded}
               setSelectedHighlight={this.props.setSelectedHighlight}
+              terrainViewerId={terrainViewerId}
+              is3D={is3D}
             />
           </div>
           <div className={`discover-tab ${isCommercialDataSelected ? '' : 'hidden'}`}>
@@ -411,6 +422,7 @@ class SearchPanel extends Component {
 const mapStoreToProps = (store) => ({
   dataSourcesInitialized: store.themes.dataSourcesInitialized,
   mapBounds: store.mainMap.bounds,
+  is3D: store.mainMap.is3D,
   user: store.auth.user.userdata,
   selectedModeId: store.themes.selectedModeId,
   selectedThemeId: store.themes.selectedThemeId,
@@ -423,6 +435,7 @@ const mapStoreToProps = (store) => ({
   selectedLanguage: store.language.selectedLanguage,
   error: store.notification.panelError,
   selectedTab: store.tabs.selectedTabSearchPanelIndex,
+  terrainViewerId: store.terrainViewer.id,
 });
 
 export default connect(mapStoreToProps, null)(SearchPanel);

@@ -5,6 +5,7 @@ import { t } from 'ttag';
 import BasicForm from './BasicForm';
 import AnalyticalForm from './AnalyticalForm';
 import PrintForm from './PrintForm';
+import TerrainViewerForm from './TerrainViewerForm';
 import { IMAGE_FORMATS } from './consts';
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
 import { getDimensionsInMeters } from './ImageDownload.utils';
@@ -14,6 +15,7 @@ export const TABS = {
   BASIC: 'basic',
   ANALYTICAL: 'analytical',
   PRINT: 'print',
+  TERRAIN_VIEWER: '3d',
 };
 
 export function ImageDownloadForms(props) {
@@ -42,6 +44,14 @@ export function ImageDownloadForms(props) {
     imageFormat: IMAGE_FORMATS.JPG,
     resolutionDpi: 300,
     imageWidthInches: 33.1,
+  });
+  const [terrainViewerFormState, setTerrainViewerFormState] = useState({
+    showLegend: false,
+    showCaptions: true,
+    userDescription: '',
+    imageFormat: IMAGE_FORMATS.JPG,
+    width: props.defaultWidth,
+    height: props.defaultHeight,
   });
 
   function updateSelectedLayers(layers) {
@@ -119,6 +129,9 @@ export function ImageDownloadForms(props) {
     if (selectedTab === TABS.PRINT) {
       props.onDownloadPrint(printFormState);
     }
+    if (selectedTab === TABS.TERRAIN_VIEWER) {
+      props.onDownload3D(terrainViewerFormState);
+    }
   }
 
   function isKMZ(imageFormat) {
@@ -177,6 +190,7 @@ export function ImageDownloadForms(props) {
     allowShowLogoAnalytical,
     areEffectsSet,
     hasAOI,
+    isUserLoggedIn,
   } = props;
 
   const isAnalyticalModeAndNothingSelected =
@@ -202,7 +216,6 @@ export function ImageDownloadForms(props) {
       {displayEffectsWarning()}
 
       <h3>{t`Image download`}</h3>
-
       {selectedTab === TABS.BASIC && (
         <BasicForm
           {...basicFormState}
@@ -210,6 +223,8 @@ export function ImageDownloadForms(props) {
           addingMapOverlaysPossible={addingMapOverlaysPossible}
           hasLegendData={hasLegendData}
           onErrorMessage={onErrorMessage}
+          isUserLoggedIn={isUserLoggedIn}
+          isBasicForm={true}
         />
       )}
       {selectedTab === TABS.ANALYTICAL && (
@@ -237,6 +252,18 @@ export function ImageDownloadForms(props) {
           hasLegendData={hasLegendData}
           onErrorMessage={onErrorMessage}
           heightToWidthRatio={defaultHeight / defaultWidth}
+          isUserLoggedIn={isUserLoggedIn}
+        />
+      )}
+      {selectedTab === TABS.TERRAIN_VIEWER && (
+        <TerrainViewerForm
+          {...terrainViewerFormState}
+          updateFormData={(field, newValue) => updateFormData(field, newValue, setTerrainViewerFormState)}
+          addingMapOverlaysPossible={addingMapOverlaysPossible}
+          hasLegendData={hasLegendData}
+          onErrorMessage={onErrorMessage}
+          heightToWidthRatio={defaultHeight / defaultWidth}
+          isUserLoggedIn={isUserLoggedIn}
         />
       )}
       <EOBButton

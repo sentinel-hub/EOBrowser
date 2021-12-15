@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { t } from 'ttag';
+import moment from 'moment';
+
 import PinPreviewImage from '../../Pins/PinPreviewImage';
 import store, { compareLayersSlice } from '../../../store';
 import Description from '../../Pins/Description';
 
 import { constructTimespanString } from '../../Pins/Pin.utils';
 import { constructEffectsFromPinOrHighlight } from '../../../utils/effectsUtils';
+import { getDataSourceHandler } from '../dataSourceHandlers/dataSourceHandlers';
 
 import './Highlight.scss';
 
@@ -31,11 +34,24 @@ class Highlight extends Component {
     e.stopPropagation();
     const effects = constructEffectsFromPinOrHighlight(this.props.pin);
     const highlight = { ...this.props.pin, ...effects };
+
+    const dsh = getDataSourceHandler(highlight.datasetId);
+    const supportsTimeRange = dsh ? dsh.supportsTimeRange() : true;
+
+    if (supportsTimeRange) {
+      // Highlights usually only have toTime, which is the date of visualization
+      // Compare expects fromTime and toTime if timerange is supported
+      if (!highlight.fromTime) {
+        highlight.fromTime = moment.utc(highlight.toTime).startOf('day').toISOString();
+        highlight.toTime = moment.utc(highlight.toTime).endOf('day').toISOString();
+      }
+    }
+
     store.dispatch(compareLayersSlice.actions.addToCompare(highlight));
   };
 
   render() {
-    const { pin, index } = this.props;
+    const { pin, index, canAddToCompare } = this.props;
     const { description, title } = pin;
     const { showDescription } = this.state;
 
@@ -49,9 +65,15 @@ class Highlight extends Component {
           <div className="highlight-info">
             <span className="highlight-info-row">
               {title}
-              <div className="add-to-compare" title={t`Add to compare`} onClick={this.addHighlightToCompare}>
-                <i className="fas fa-exchange-alt"></i>
-              </div>
+              {canAddToCompare && (
+                <div
+                  className="add-to-compare"
+                  title={t`Add to compare`}
+                  onClick={this.addHighlightToCompare}
+                >
+                  <i className="fas fa-exchange-alt"></i>
+                </div>
+              )}
             </span>
             <div>
               <label>{t`Date`}:</label> <span className="highlight-date">{constructTimespanString(pin)}</span>

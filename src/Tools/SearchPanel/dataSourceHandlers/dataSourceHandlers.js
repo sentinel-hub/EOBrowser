@@ -30,62 +30,72 @@ import DEMDataSourceHandler from './DEMDataSourceHandler';
 import { getCollectionInformation } from '../../../utils/collections';
 
 import { DATASOURCES } from '../../../const';
-
-export const S1_AWS_IW_VVVH = 'S1_AWS_IW_VVVH',
-  S1_AWS_IW_VV = 'S1_AWS_IW_VV',
-  S1_AWS_EW_HHHV = 'S1_AWS_EW_HHHV',
-  S1_AWS_EW_HH = 'S1_AWS_EW_HH',
-  S1_EW_SH = 'S1_EW_SH',
-  S1_EW = 'S1_EW',
-  S1 = 'S1',
-  S2L1C = 'S2L1C',
-  S2L2A = 'S2L2A',
-  S3SLSTR = 'S3SLSTR',
-  S3OLCI = 'S3OLCI',
-  S5_O3 = 'S5_O3',
-  S5_NO2 = 'S5_NO2',
-  S5_SO2 = 'S5_SO2',
-  S5_CO = 'S5_CO',
-  S5_HCHO = 'S5_HCHO',
-  S5_CH4 = 'S5_CH4',
-  S5_AER_AI = 'S5_AER_AI',
-  S5_CLOUD = 'S5_CLOUD',
-  S5_OTHER = 'S5_OTHER',
-  MODIS = 'MODIS',
-  PROBAV_S1 = 'PROBAV_S1',
-  PROBAV_S5 = 'PROBAV_S5',
-  PROBAV_S10 = 'PROBAV_S10',
-  ESA_L5 = 'ESA_L5',
-  ESA_L7 = 'ESA_L7',
-  ESA_L8 = 'ESA_L8',
-  AWS_L8L1C = 'AWS_L8L1C',
-  AWS_LOTL1 = 'AWS_LOTL1',
-  AWS_LOTL2 = 'AWS_LOTL2',
-  AWS_LTML1 = 'AWS_LTML1',
-  AWS_LTML2 = 'AWS_LTML2',
-  AWS_LMSSL1 = 'AWS_LMSSL1',
-  AWS_LETML1 = 'AWS_LETML1',
-  AWS_LETML2 = 'AWS_LETML2',
-  ENVISAT_MERIS = 'ENVISAT_MERIS',
-  GIBS_MODIS_TERRA = 'GIBS_MODIS_TERRA',
-  GIBS_MODIS_AQUA = 'GIBS_MODIS_AQUA',
-  GIBS_VIIRS_SNPP_CORRECTED_REFLECTANCE = 'GIBS_VIIRS_SNPP_CORRECTED_REFLECTANCE',
-  GIBS_VIIRS_SNPP_DAYNIGHTBAND_ENCC = 'GIBS_VIIRS_SNPP_DAYNIGHTBAND_ENCC',
-  GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE = 'GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE',
-  GIBS_CALIPSO_WWFC_V3_01 = 'GIBS_CALIPSO_WWFC_V3_01',
-  GIBS_CALIPSO_WWFC_V3_02 = 'GIBS_CALIPSO_WWFC_V3_02',
-  GIBS_BLUEMARBLE = 'GIBS_BLUEMARBLE',
-  GIBS_LANDSAT_WELD = 'GIBS_LANDSAT_WELD',
-  GIBS_MISR = 'GIBS_MISR',
-  GIBS_ASTER_GDEM = 'GIBS_ASTER_GDEM',
-  DEM_MAPZEN = 'DEM_MAPZEN',
-  DEM_COPERNICUS_30 = 'DEM_COPERNICUS_30',
-  DEM_COPERNICUS_90 = 'DEM_COPERNICUS_90',
-  COPERNICUS_CORINE_LAND_COVER = 'COPERNICUS_CORINE_LAND_COVER',
-  COPERNICUS_GLOBAL_LAND_COVER = 'COPERNICUS_GLOBAL_LAND_COVER',
-  COPERNICUS_WATER_BODIES = 'COPERNICUS_WATER_BODIES',
-  COPERNICUS_GLOBAL_SURFACE_WATER = 'COPERNICUS_GLOBAL_SURFACE_WATER',
-  CUSTOM = 'CUSTOM';
+import {
+  S1_AWS_IW_VVVH,
+  S1_AWS_IW_VV,
+  S1_AWS_EW_HHHV,
+  S1_AWS_EW_HH,
+  S1_EW_SH,
+  S1_EW,
+  S1,
+  S2L1C,
+  S2L2A,
+  S3SLSTR,
+  S3OLCI,
+  S5_O3,
+  S5_NO2,
+  S5_SO2,
+  S5_CO,
+  S5_HCHO,
+  S5_CH4,
+  S5_AER_AI,
+  S5_CLOUD,
+  S5_OTHER,
+  MODIS,
+  ESA_L5,
+  ESA_L7,
+  ESA_L8,
+  AWS_L8L1C,
+  ENVISAT_MERIS,
+  DEM_MAPZEN,
+  DEM_COPERNICUS_30,
+  DEM_COPERNICUS_90,
+  COPERNICUS_CORINE_LAND_COVER,
+  COPERNICUS_GLOBAL_LAND_COVER,
+  COPERNICUS_WATER_BODIES,
+  COPERNICUS_GLOBAL_SURFACE_WATER,
+  COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES,
+  COPERNICUS_HR_VPP_VEGETATION_INDICES,
+  COPERNICUS_HR_VPP_VPP_S1,
+  COPERNICUS_HR_VPP_VPP_S2,
+  COPERNICUS_CLC_ACCOUNTING,
+  COPERNICUS_WORLD_COVER,
+  AWS_LOTL1,
+  AWS_LOTL2,
+  AWS_LTML1,
+  AWS_LTML2,
+  AWS_LMSSL1,
+  AWS_LETML1,
+  AWS_LETML2,
+  GIBS_MODIS_TERRA,
+  GIBS_MODIS_AQUA,
+  GIBS_VIIRS_SNPP_CORRECTED_REFLECTANCE,
+  GIBS_VIIRS_SNPP_DAYNIGHTBAND_ENCC,
+  GIBS_CALIPSO_WWFC_V3_01,
+  GIBS_CALIPSO_WWFC_V3_02,
+  GIBS_BLUEMARBLE,
+  GIBS_LANDSAT_WELD,
+  GIBS_MISR,
+  GIBS_ASTER_GDEM,
+  GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE,
+  PROBAV_S1,
+  PROBAV_S5,
+  PROBAV_S10,
+  CUSTOM,
+  PLANET_NICFI_BIANNUAL,
+  PLANET_NICFI_MONTHLY,
+} from './dataSourceConstants';
+import PlanetBasemapDataSourceHandler from './PlanetBasemapDataSourceHandler';
 
 export let dataSourceHandlers;
 initializeDataSourceHandlers();
@@ -108,6 +118,7 @@ export function initializeDataSourceHandlers() {
     new ProbaVDataSourceHandler(),
     new GibsDataSourceHandler(),
     new BYOCDataSourceHandler(),
+    new PlanetBasemapDataSourceHandler(),
   ];
 }
 
@@ -256,7 +267,7 @@ export function datasourceForDatasetId(datasetId) {
     case ESA_L5:
     case ESA_L7:
     case ESA_L8:
-      return DATASOURCES.ESA_LANDSAT;
+      return DATASOURCES.EOCLOUD_LANDSAT;
     case AWS_L8L1C:
     case AWS_LOTL1:
     case AWS_LOTL2:
@@ -291,7 +302,16 @@ export function datasourceForDatasetId(datasetId) {
     case COPERNICUS_GLOBAL_LAND_COVER:
     case COPERNICUS_WATER_BODIES:
     case COPERNICUS_GLOBAL_SURFACE_WATER:
+    case COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES:
+    case COPERNICUS_HR_VPP_VEGETATION_INDICES:
+    case COPERNICUS_HR_VPP_VPP_S1:
+    case COPERNICUS_HR_VPP_VPP_S2:
+    case COPERNICUS_CLC_ACCOUNTING:
+    case COPERNICUS_WORLD_COVER:
       return DATASOURCES.COPERNICUS;
+    case PLANET_NICFI_MONTHLY:
+    case PLANET_NICFI_BIANNUAL:
+      return DATASOURCES.PLANET_NICFI;
     default:
       return null;
   }
@@ -307,7 +327,7 @@ export function getDataSourceHandler(datasetId) {
 }
 
 export function checkIfCustom(datasetId) {
-  const dsh = dataSourceHandlers.find((d) => d.datasource === 'CUSTOM');
+  const dsh = dataSourceHandlers.find((d) => d.datasource === DATASOURCES.CUSTOM);
   if (dsh && dsh.datasets) {
     const isCustomDataset = dsh.datasets.includes(datasetId);
     if (isCustomDataset) {
@@ -372,7 +392,15 @@ export const datasetLabels = {
   [COPERNICUS_CORINE_LAND_COVER]: 'CORINE Land Cover',
   [COPERNICUS_GLOBAL_LAND_COVER]: 'Global Land Cover',
   [COPERNICUS_GLOBAL_SURFACE_WATER]: 'Global Surface Water',
+  [COPERNICUS_WORLD_COVER]: 'ESA WorldCover',
   [COPERNICUS_WATER_BODIES]: 'Water Bodies',
+  [COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES]: 'Seasonal Trajectories',
+  [COPERNICUS_HR_VPP_VEGETATION_INDICES]: 'Vegetation Indices',
+  [COPERNICUS_HR_VPP_VPP_S1]: 'Vegetation Phenology and Productivity Season 1',
+  [COPERNICUS_HR_VPP_VPP_S2]: 'Vegetation Phenology and Productivity Season 2',
+  [COPERNICUS_CLC_ACCOUNTING]: 'CORINE Land Cover Accounting Layers',
+  [PLANET_NICFI_BIANNUAL]: 'Planet NICFI Biannual',
+  [PLANET_NICFI_MONTHLY]: 'Planet NICFI Monthly',
 };
 
 export function getDatasetLabel(datasetId) {

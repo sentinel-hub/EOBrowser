@@ -4,7 +4,7 @@ import ImageDownload from '../Controls/ImgDownload/ImageDownload';
 import FIS from '../Controls/FIS/FIS';
 import PinsStoryBuilder from '../Controls/PinsStoryBuilder/PinsStoryBuilder';
 import SharePinsLink from '../Tools/Pins/SharePinsLink';
-import TerrainViewer from '../TerrainViewer/TerrainViewer';
+// import TerrainViewer from '../TerrainViewer/TerrainViewer';
 
 export const ModalId = {
   IMG_DOWNLOAD: 'ImgDownload',
@@ -22,7 +22,6 @@ export const Modals = {
   [ModalId.FIS]: () => <FIS />,
   [ModalId.SHAREPINSLINK]: () => <SharePinsLink />,
   [ModalId.PINS_STORY_BUILDER]: () => <PinsStoryBuilder />,
-  [ModalId.TERRAIN_VIEWER]: ({ setLastAddedPin }) => <TerrainViewer setLastAddedPin={setLastAddedPin} />,
   [ModalId.PRIVATE_THEMEID_LOGIN]: () => {},
 };
 

@@ -4,7 +4,7 @@ import { DATASET_AWS_LETML1, DATASET_AWS_LETML2 } from '@sentinel-hub/sentinelhu
 
 import LandsatDataSourceHandler from './LandsatDataSourceHandler';
 import { Landsat7ETMAWSTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/LandsatTooltip';
-import { AWS_LETML1, AWS_LETML2 } from './dataSourceHandlers';
+import { AWS_LETML1, AWS_LETML2 } from './dataSourceConstants';
 import { getGroupedBands } from './datasourceAssets/landsatBands';
 import { DATASOURCES } from '../../../const';
 

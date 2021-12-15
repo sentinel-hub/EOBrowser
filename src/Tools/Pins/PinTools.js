@@ -13,6 +13,7 @@ import {
   savePinsToServer,
   isPinValid,
   formatDeprecatedPins,
+  establishCorrectDataFusionFormatInPins,
 } from './Pin.utils';
 
 class PinTools extends Component {
@@ -75,7 +76,6 @@ class PinTools extends Component {
       if (!pins || !pins.length) {
         throw new Error(t`No pins were found.`);
       }
-
       pins = pins.map((pin) => convertToNewFormat(pin));
       let allErrors = '';
       for (let pin of pins) {
@@ -89,6 +89,7 @@ class PinTools extends Component {
       }
 
       pins = formatDeprecatedPins(pins);
+      pins = establishCorrectDataFusionFormatInPins(pins);
       const existingIds = this.props.pins.map((pin) => pin._id);
       pins = pins.filter((pin) => !existingIds.includes(pin._id));
       const replaceExisting = !this.state.keepExisting;
@@ -213,7 +214,7 @@ class PinTools extends Component {
   };
 
   render() {
-    const { isUserLoggedIn, pins } = this.props;
+    const { isUserLoggedIn, pins, pinsStoryBuilderEnabled } = this.props;
     const pinsDataURI = this.getPinsDataURI(pins);
     const notLoggedInMsg = getLoggedInErrorMsg();
     const sharePinsTitle = t`Share pins` + (!isUserLoggedIn ? ` (${notLoggedInMsg})` : '');
@@ -224,14 +225,16 @@ class PinTools extends Component {
 
     return (
       <div className="pin-tools">
-        <div
-          className={`animate-pins ${isUserLoggedIn && pins.length > 0 ? '' : 'disabled'}`}
-          title={animatePinsTitle}
-          onClick={this.props.onAnimateClick}
-        >
-          <i className="fa fa-film" />
-          {t`Story`}
-        </div>
+        {pinsStoryBuilderEnabled && (
+          <div
+            className={`animate-pins ${isUserLoggedIn && pins.length > 0 ? '' : 'disabled'}`}
+            title={animatePinsTitle}
+            onClick={this.props.onAnimateClick}
+          >
+            <i className="fa fa-film" />
+            {t`Story`}
+          </div>
+        )}
 
         <div
           className={`share-pins ${isUserLoggedIn && pins.length > 0 ? '' : 'disabled'}`}

@@ -19,10 +19,8 @@ import 'leaflet/dist/leaflet.css';
 import './Map.scss';
 import L from 'leaflet';
 import moment from 'moment';
-import { AOI_SHAPE, SEARCH_PANEL_TABS } from '../const';
+import { AOI_SHAPE, SEARCH_PANEL_TABS, TABS } from '../const';
 import Controls from '../Controls/Controls';
-import SearchBox from '../SearchBox/SearchBox';
-import Tutorial from '../Tutorial/Tutorial';
 import PreviewLayer from '../Tools/Results/PreviewLayer';
 import LeafletControls from './LeafletControls/LeafletControls';
 import AboutSHLinks from './AboutSHLinks/AboutSHLinks';
@@ -34,10 +32,14 @@ import {
   getDataSourceHandler,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getAppropriateAuthToken, getGetMapAuthToken } from '../App';
-import { constructErrorMessage, validateEvalScript } from '../utils';
+import { constructErrorMessage } from '../utils';
 import TimelapseAreaPreview from '../Controls/Timelapse/TimelapseAreaPreview';
+import SearchBox from '../SearchBox/SearchBox';
 
-import { DEFAULT_ZOOM_CONFIGURATION } from '../Tools/SearchPanel/dataSourceHandlers/DataSourceHandler';
+import {
+  getTileSizeConfiguration,
+  getZoomConfiguration,
+} from '../Tools/SearchPanel/dataSourceHandlers/helper';
 import { checkUserAccount } from '../Tools/CommercialDataPanel/commercialData.utils';
 import MaptilerLogo from './maptiler-logo-adaptive.svg';
 import { SpeckleFilterType } from '@sentinel-hub/sentinelhub-js';
@@ -108,23 +110,8 @@ class Map extends React.Component {
     this.props.setSelectedTiles(selectedTiles);
   };
 
-  getZoomConfiguration = (datasetId) => {
-    try {
-      const dataSourceHandler = getDataSourceHandler(datasetId);
-      const zoomConfiguration = dataSourceHandler.getLeafletZoomConfig(datasetId);
-      return zoomConfiguration ? zoomConfiguration : DEFAULT_ZOOM_CONFIGURATION;
-    } catch (e) {
-      // this catches a race condition where datasetId is not defined when rendering the component
-      return DEFAULT_ZOOM_CONFIGURATION;
-    }
-  };
-
   onTileError = async (error) => {
-    let message = await constructErrorMessage(error);
-
-    if (message.split('\n').length <= 1 && !validateEvalScript(this.props.evalscript)) {
-      message += '\nEvalscript V3 needs to include `setup()` and `evaluatePixel()` functions.';
-    }
+    const message = await constructErrorMessage(error);
     store.dispatch(visualizationSlice.actions.setError(message));
   };
 
@@ -154,6 +141,7 @@ class Map extends React.Component {
       evalscripturl,
       dataFusion,
       dataSourcesInitialized,
+      selectedThemeId,
       selectedTabIndex,
       selectedTabSearchPanelIndex,
       displayingTileGeometries,
@@ -177,9 +165,10 @@ class Map extends React.Component {
       auth,
       displayTimelapseAreaPreview,
       googleAPI,
+      shouldAnimateControls,
     } = this.props;
 
-    const zoomConfig = this.getZoomConfiguration(datasetId);
+    const zoomConfig = getZoomConfiguration(datasetId);
 
     const shownBaseLayers =
       this.state.accountInfo.payingAccount && googleAPI
@@ -191,11 +180,10 @@ class Map extends React.Component {
     if (dsh && !dsh.canApplySpeckleFilter(datasetId, this.props.zoom)) {
       speckleFilterProp = { type: SpeckleFilterType.NONE };
     }
-
     return (
       <LeafletMap
         ref={(el) => (this.mapRef = el)}
-        minZoom={0}
+        minZoom={3}
         onViewportChanged={this.updateViewport}
         center={[this.props.lat, this.props.lng]}
         zoom={this.props.zoom}
@@ -252,14 +240,13 @@ class Map extends React.Component {
                   pane={BASE_PANE_ID}
                 />
               ) : null}
-              )
             </BaseLayer>
           ))}
 
           <Pane name={SENTINELHUB_LAYER_PANE_ID} style={{ zIndex: SENTINELHUB_LAYER_PANE_ZINDEX }} />
           {authenticated &&
             dataSourcesInitialized &&
-            selectedTabIndex === 2 &&
+            selectedTabIndex === TABS.VISUALIZE_TAB &&
             (visualizationLayerId || customSelected) &&
             datasetId &&
             visualizationUrl && (
@@ -279,6 +266,7 @@ class Map extends React.Component {
                   progress={this.progress}
                   minZoom={zoomConfig.min}
                   maxZoom={zoomConfig.max}
+                  tileSize={getTileSizeConfiguration(datasetId)}
                   allowOverZoomBy={zoomConfig.allowOverZoomBy}
                   gainEffect={gainEffect}
                   gammaEffect={gammaEffect}
@@ -293,6 +281,7 @@ class Map extends React.Component {
                   downsampling={downsampling}
                   speckleFilter={speckleFilterProp}
                   orthorectification={orthorectification}
+                  accessToken={getAppropriateAuthToken(auth, selectedThemeId)}
                   getMapAuthToken={getGetMapAuthToken(auth)}
                   onTileImageError={this.onTileError}
                   onTileImageLoad={this.onTileLoad}
@@ -301,7 +290,7 @@ class Map extends React.Component {
             )}
 
           {comparedLayers.length &&
-            selectedTabIndex === 4 &&
+            selectedTabIndex === TABS.COMPARE_TAB &&
             comparedLayers
               .slice()
               .reverse()
@@ -336,7 +325,7 @@ class Map extends React.Component {
                   min: minZoom,
                   max: maxZoom = DEFAULT_COMPARED_LAYERS_MAX_ZOOM,
                   allowOverZoomBy = DEFAULT_COMPARED_LAYERS_OVERZOOM,
-                } = this.getZoomConfiguration(datasetId);
+                } = getZoomConfiguration(datasetId);
 
                 let pinTimeFrom, pinTimeTo;
                 if (supportsTimeRange) {
@@ -355,7 +344,7 @@ class Map extends React.Component {
                   <SentinelHubLayerComponent
                     key={i}
                     datasetId={datasetId}
-                    url={evalscript || evalscripturl ? null : visualizationUrl}
+                    url={visualizationUrl}
                     layers={layerId}
                     format="PNG"
                     fromTime={pinTimeFrom}
@@ -366,6 +355,7 @@ class Map extends React.Component {
                     dataFusion={dataFusion}
                     minZoom={minZoom}
                     maxZoom={maxZoom}
+                    tileSize={getTileSizeConfiguration(datasetId)}
                     allowOverZoomBy={allowOverZoomBy}
                     opacity={comparedOpacity[index]}
                     clipping={comparedClipping[index]}
@@ -419,7 +409,7 @@ class Map extends React.Component {
         )}
         {!this.props.poiPosition ? null : <Marker id="poi-layer" position={this.props.poiPosition} />}
 
-        {this.props.query && selectedTabIndex === 0 && displayingTileGeometries ? (
+        {this.props.query && selectedTabIndex === TABS.DISCOVER_TAB && displayingTileGeometries ? (
           <FeatureGroup onClick={this.onPreviewClick}>
             {this.props.query.allResults.map((tile, i) => (
               <PreviewLayer tile={tile} key={`preview-layer-${this.props.query.queryId}-${i}`} />
@@ -430,13 +420,13 @@ class Map extends React.Component {
         {this.props.highlightedTile ? (
           <GeoJSON data={this.props.highlightedTile.geometry} style={() => highlightedTileStyle} />
         ) : null}
-        {displayTimelapseAreaPreview && selectedTabIndex === 2 && (
+        {displayTimelapseAreaPreview && selectedTabIndex === TABS.VISUALIZE_TAB && (
           <TimelapseAreaPreview lat={lat} lng={lng} zoom={zoom} mapBounds={mapBounds} />
         )}
 
         {this.props.commercialDataDisplaySearchResults &&
           !!this.props.commercialDataHighlightedResult &&
-          selectedTabIndex === 0 && (
+          selectedTabIndex === TABS.DISCOVER_TAB && (
             <GeoJSON
               id="commercialDataResult"
               data={this.props.commercialDataHighlightedResult.geometry}
@@ -446,7 +436,7 @@ class Map extends React.Component {
           )}
 
         {this.props.commercialDataDisplaySearchResults &&
-        selectedTabIndex === 0 &&
+        selectedTabIndex === TABS.DISCOVER_TAB &&
         this.props.commercialDataSearchResults &&
         this.props.commercialDataSearchResults.length > 0 ? (
           <FeatureGroup
@@ -466,7 +456,7 @@ class Map extends React.Component {
           !!this.props.commercialDataSelectedOrder.input &&
           !!this.props.commercialDataSelectedOrder.input.bounds &&
           !!this.props.commercialDataSelectedOrder.input.bounds.geometry &&
-          selectedTabIndex === 0 &&
+          selectedTabIndex === TABS.DISCOVER_TAB &&
           selectedTabSearchPanelIndex === SEARCH_PANEL_TABS.COMMERCIAL_DATA_TAB && (
             <GeoJSON
               id="commercialDataSelectedOrder"
@@ -483,11 +473,17 @@ class Map extends React.Component {
           )}
 
         <LeafletControls key={selectedLanguage} />
-        <SearchBox googleAPI={googleAPI} />
-        <Tutorial selectedLanguage={this.props.selectedLanguage} />
+        <SearchBox
+          googleAPI={googleAPI}
+          is3D={false}
+          minZoom={zoomConfig.min}
+          maxZoom={zoomConfig.max}
+          zoom={this.props.zoom}
+        />
         <Controls
           selectedLanguage={this.props.selectedLanguage}
           histogramContainer={this.props.histogramContainer}
+          shouldAnimateControls={shouldAnimateControls}
         />
 
         <AboutSHLinks />
@@ -524,6 +520,7 @@ const mapStoreToProps = (store) => {
     evalscripturl: store.visualization.evalscripturl,
     dataFusion: store.visualization.dataFusion,
     dataSourcesInitialized: store.themes.dataSourcesInitialized,
+    selectedThemeId: store.themes.selectedThemeId,
     selectedTabIndex: store.tabs.selectedTabIndex,
     selectedLanguage: store.language.selectedLanguage,
     gainEffect: store.visualization.gainEffect,

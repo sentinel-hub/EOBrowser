@@ -30,6 +30,7 @@ class TimelapseButton extends Component {
         <EOBTimelapsePanelButton
           selectedResult={this.generateSelectedResult()}
           isLoggedIn={!!this.props.user.userdata}
+          is3D={this.props.is3D}
           onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
         />
       </div>
@@ -44,6 +45,7 @@ const mapStoreToProps = (store) => ({
   customSelected: store.visualization.customSelected,
   dataSourcesInitialized: store.themes.dataSourcesInitialized,
   visualizationUrl: store.visualization.visualizationUrl,
+  is3D: store.mainMap.is3D,
 });
 
 export default connect(mapStoreToProps, null)(TimelapseButton);

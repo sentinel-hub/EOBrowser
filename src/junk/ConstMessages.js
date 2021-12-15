@@ -4,3 +4,6 @@ export const getLoggedInErrorMsg = () => t`You need to log in to use this functi
 export const getLayerNotSelectedMsg = () => t`Please select a layer.`;
 export const getCompareModeErrorMsg = () => t`Downloading image in compare mode is not possible.`;
 export const getDatasourceNotSupportedMsg = () => t`This datasource is not supported.`;
+export const getNotSupportedIn3DMsg = () => t`Not supported in 3D mode.`;
+export const getOnlyBasicImgDownloadAvailableMsg = () =>
+  t`Image download in compare mode is currently available only for basic image download.`;

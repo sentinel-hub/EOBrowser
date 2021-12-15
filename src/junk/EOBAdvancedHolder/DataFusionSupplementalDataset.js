@@ -7,10 +7,12 @@ import { TimespanPicker } from '../../components/TimespanPicker/TimespanPicker';
 function DataFusionSupplementalDataset(props) {
   const {
     alias,
+    mosaickingOrderDisabled,
     mosaickingOrder = MosaickingOrder.MOST_RECENT,
     additionalMosaickingOrders,
     additionalParametersComponent: AdditionalParametersComponent = null,
     additionalParameters = {},
+    additionalParametersSettings = {},
     minDate,
     maxDate,
     initialTimespan,
@@ -68,27 +70,30 @@ function DataFusionSupplementalDataset(props) {
             />
           </div>
 
-          <div className="mosaicking-order">
-            {t`Mosaicking order`}:
-            <select
-              className="dropdown-normal-ui"
-              value={mosaickingOrder}
-              onChange={(e) => props.updateMosaickingOrder(alias, e.target.value)}
-            >
-              <option value={MosaickingOrder.MOST_RECENT}>{t`Most recent`}</option>
-              <option value={MosaickingOrder.LEAST_RECENT}>{t`Least recent`}</option>
-              {additionalMosaickingOrders.map((mo) => (
-                <option key={mo.id} value={mo.id}>
-                  {mo.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {!mosaickingOrderDisabled && (
+            <div className="mosaicking-order">
+              {t`Mosaicking order`}:
+              <select
+                className="dropdown-normal-ui"
+                value={mosaickingOrder}
+                onChange={(e) => props.updateMosaickingOrder(alias, e.target.value)}
+              >
+                <option value={MosaickingOrder.MOST_RECENT}>{t`Most recent`}</option>
+                <option value={MosaickingOrder.LEAST_RECENT}>{t`Least recent`}</option>
+                {additionalMosaickingOrders.map((mo) => (
+                  <option key={mo.id} value={mo.id}>
+                    {mo.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {AdditionalParametersComponent && (
             <AdditionalParametersComponent
               onChange={(v) => props.updateAdditionalParameters(alias, v)}
               additionalParameters={additionalParameters}
+              additionalParametersSettings={additionalParametersSettings}
             />
           )}
 

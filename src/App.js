@@ -17,6 +17,11 @@ import { Modals, propsSufficientToRender } from './Modals/Consts';
 import { updatePath } from './utils/';
 import { importSharedPins } from './Tools/Pins/Pin.utils';
 import { EDUCATION_MODE, MODES } from './const';
+import TerrainViewerScriptProvider from './TerrainViewer/TerrainViewerScriptProvider';
+import TerrainViewer from './TerrainViewer/TerrainViewer';
+import Tutorial from './Tutorial/Tutorial';
+import SearchBox from './SearchBox/SearchBox';
+import { getZoomConfiguration } from './Tools/SearchPanel/dataSourceHandlers/helper';
 
 import './App.scss';
 
@@ -31,6 +36,7 @@ class App extends Component {
     highlightedTile: null,
     lastAddedPin: null,
     displayingTileGeometries: false,
+    hasSwitchedFrom3D: false,
   };
 
   async componentDidMount() {
@@ -78,6 +84,13 @@ class App extends Component {
     if (this.props.authToken && this.props.authToken !== prevProps.authToken) {
       setAuthToken(this.props.authToken);
     }
+
+    if (prevProps.is3D && !this.props.is3D) {
+      this.setState({ hasSwitchedFrom3D: true });
+    }
+    if (!prevProps.is3D && this.props.is3D) {
+      this.setState({ hasSwitchedFrom3D: false });
+    }
   }
 
   setQuery = (query) => {
@@ -112,19 +125,26 @@ class App extends Component {
   };
 
   render() {
-    const { modalId, authToken, selectedModeId, googleAPI } = this.props;
+    const { modalId, authToken, selectedModeId, googleAPI, is3D, terrainViewerId, datasetId } = this.props;
     const authenticated = Boolean(authToken);
+    const zoomConfig = getZoomConfiguration(datasetId);
     return (
       <div id="app">
-        <Map
-          setSelectedTiles={this.setSelectedTiles}
-          query={this.state.query}
-          highlightedTile={this.state.highlightedTile}
-          authenticated={authenticated}
-          displayingTileGeometries={this.state.displayingTileGeometries}
-          histogramContainer={this.histogramHolder}
-          googleAPI={googleAPI}
-        />
+        <TerrainViewerScriptProvider>
+          <TerrainViewer setLastAddedPin={this.setLastAddedPin} />
+        </TerrainViewerScriptProvider>
+        {!is3D && (
+          <Map
+            setSelectedTiles={this.setSelectedTiles}
+            query={this.state.query}
+            highlightedTile={this.state.highlightedTile}
+            authenticated={authenticated}
+            displayingTileGeometries={this.state.displayingTileGeometries}
+            histogramContainer={this.histogramHolder}
+            googleAPI={googleAPI}
+            shouldAnimateControls={this.state.hasSwitchedFrom3D}
+          />
+        )}
         <Tools
           selectedTiles={this.state.selectedTiles}
           setQuery={this.setQuery}
@@ -135,7 +155,7 @@ class App extends Component {
           getThemeAndSetMode={this.getThemeAndSetMode}
           shouldDisplayTileGeometries={this.shouldDisplayTileGeometries}
         />
-        {selectedModeId && (
+        {selectedModeId && !is3D && (
           <EOBModeSelection
             highlighted={this.props.selectedModeId === EDUCATION_MODE.id}
             modes={MODES}
@@ -147,6 +167,21 @@ class App extends Component {
           propsSufficientToRender(this.props) &&
           Modals[modalId]({ setLastAddedPin: this.setLastAddedPin })}
         <Notification />
+        {!is3D && !terrainViewerId && (
+          <Tutorial
+            popupDisabled={this.state.hasSwitchedFrom3D}
+            selectedLanguage={this.props.selectedLanguage}
+          />
+        )}
+        {is3D && (
+          <SearchBox
+            googleAPI={googleAPI}
+            is3D={true}
+            minZoom={zoomConfig.min}
+            maxZoom={zoomConfig.max}
+            zoom={this.props.zoom}
+          />
+        )}
         <div className="histogram-holder" ref={(e) => (this.histogramHolder = e)} />
       </div>
     );
@@ -183,6 +218,7 @@ const mapStoreToProps = (store) => ({
   currentZoom: store.mainMap.zoom,
   currentLat: store.mainMap.lat,
   currentLng: store.mainMap.lng,
+  is3D: store.mainMap.is3D,
   fromTime: store.visualization.fromTime,
   toTime: store.visualization.toTime,
   datasetId: store.visualization.datasetId,
@@ -215,6 +251,7 @@ const mapStoreToProps = (store) => ({
   selectedModeId: store.themes.selectedModeId,
   pixelBounds: store.mainMap.pixelBounds,
   terrainViewerSettings: store.terrainViewer.settings,
+  terrainViewerId: store.terrainViewer.id,
 });
 
 export default connect(mapStoreToProps, null)(App);

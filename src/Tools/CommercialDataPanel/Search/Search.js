@@ -67,7 +67,9 @@ const Search = ({
         name="fromTime"
         value={searchParams.fromTime}
         label={t`From`}
-        onChangeHandler={handleSearchParamChange}
+        onChangeHandler={(name, selectedDate) =>
+          handleSearchParamChange(name, selectedDate.clone().startOf('day'))
+        }
         min={minDateRange}
         max={searchParams.toTime}
         calendarContainerRef={fromTimeRef}
@@ -77,7 +79,9 @@ const Search = ({
         name="toTime"
         value={searchParams.toTime}
         label={t`To`}
-        onChangeHandler={handleSearchParamChange}
+        onChangeHandler={(name, selectedDate) =>
+          handleSearchParamChange(name, selectedDate.clone().endOf('day'))
+        }
         min={searchParams.fromTime}
         max={maxDateRange}
         calendarContainerRef={toTimeRef}

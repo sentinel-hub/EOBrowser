@@ -9,21 +9,43 @@ import TerrainViewerButton from '../TerrainViewer/TerrainViewerButton';
 import HistogramWrapper from './Histogram/HistogramWrapper';
 import { withLeaflet } from 'react-leaflet';
 
+import './Controls.scss';
+
 class Controls extends Component {
   render() {
+    const { is3D, shouldAnimateControls } = this.props;
+    const animatedClass = shouldAnimateControls ? 'animated' : '';
     return (
-      <div className="controlsWrapper">
-        <LeafletPMLanguage map={this.props.leaflet.map} />
-        <AOI map={this.props.leaflet.map} locale={this.props.selectedLanguage} />
-        <POI map={this.props.leaflet.map} locale={this.props.selectedLanguage} />
-        <Measure map={this.props.leaflet.map} locale={this.props.selectedLanguage} />
+      <div className="controls-wrapper">
+        {!is3D && (
+          <>
+            <LeafletPMLanguage map={this.props.leaflet.map} />
+            <AOI
+              className={animatedClass}
+              map={this.props.leaflet.map}
+              locale={this.props.selectedLanguage}
+            />
+            <POI
+              className={animatedClass}
+              map={this.props.leaflet.map}
+              locale={this.props.selectedLanguage}
+            />
+            <Measure
+              className={animatedClass}
+              map={this.props.leaflet.map}
+              locale={this.props.selectedLanguage}
+            />
+          </>
+        )}
         <ImageDownloadBtn locale={this.props.selectedLanguage} />
         <TimelapseButton locale={this.props.selectedLanguage} />
         <TerrainViewerButton locale={this.props.selectedLanguage} />
-        <HistogramWrapper
-          locale={this.props.selectedLanguage}
-          histogramContainer={this.props.histogramContainer}
-        />
+        {!is3D && (
+          <HistogramWrapper
+            locale={this.props.selectedLanguage}
+            histogramContainer={this.props.histogramContainer}
+          />
+        )}
       </div>
     );
   }

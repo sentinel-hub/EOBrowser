@@ -15,6 +15,10 @@ import {
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
   DATASET_AWS_LMSSL1,
+  DATASET_BYOC,
+  DEMInstanceType,
+  BYOCSubTypes,
+  LocationIdSHv3,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 import { connect } from 'react-redux';
@@ -23,6 +27,7 @@ import SupplementalDatasets from './SupplementalDatasets';
 import DataFusionPrimaryDataset from './DataFusionPrimaryDataset';
 import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import DataFusionAdditionalParametersS1 from './DataFusionAdditionalParametersS1';
+import DataFusionAdditionalParameters from './DataFusionAdditionalParameters';
 
 import './DataFusion.scss';
 
@@ -49,8 +54,8 @@ class DataFusion extends React.Component {
       id: dataset.id,
       alias: alias,
     };
-    if (dataset === DATASET_AWSEU_S1GRD) {
-      const datasetParams = dsh.constructor.getDatasetParams(datasetId);
+    if (dataset === DATASET_AWSEU_S1GRD || dataset === DATASET_BYOC || dataset === DATASET_AWS_DEM) {
+      const datasetParams = dsh.getDatasetParams(datasetId);
       primaryDataset['additionalParameters'] = datasetParams;
     }
     return primaryDataset;
@@ -133,7 +138,52 @@ class DataFusion extends React.Component {
       [DATASET_AWS_DEM.id]: {
         label: 'DEM',
         dataset: DATASET_AWS_DEM,
+        mosaickingOrderDisabled: true,
         additionalMosaickingOrders: [],
+        additionalParametersComponent: DataFusionAdditionalParameters,
+        additionalParameters: { demInstance: DEMInstanceType.MAPZEN },
+        additionalParametersSettings: {
+          demInstance: {
+            parameterType: 'select',
+            getName: () => t`DEM instance`,
+            options: [
+              { name: 'Mapzen', value: DEMInstanceType.MAPZEN },
+              { name: 'Copernicus 30', value: DEMInstanceType.COPERNICUS_30 },
+              { name: 'Copernicus 90', value: DEMInstanceType.COPERNICUS_90 },
+            ],
+          },
+        },
+      },
+      [DATASET_BYOC.id]: {
+        label: 'BYOC',
+        dataset: DATASET_BYOC,
+        additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
+        additionalParametersComponent: DataFusionAdditionalParameters,
+        additionalParameters: {
+          collectionId: '',
+          subType: BYOCSubTypes.BYOC,
+          locationId: LocationIdSHv3.awsEuCentral1,
+        },
+        additionalParametersSettings: {
+          collectionId: {
+            parameterType: 'text',
+            getName: () => t`Collection ID`,
+          },
+          subType: {
+            parameterType: 'select',
+            getName: () => t`Type`,
+            options: [
+              { name: 'BYOC', value: BYOCSubTypes.BYOC },
+              { name: 'BATCH', value: BYOCSubTypes.BATCH },
+            ],
+          },
+          locationId: {
+            parameterType: 'select',
+            getName: () => t`Location`,
+            options: [{ name: 'AWS EU Central', value: LocationIdSHv3.awsEuCentral1 }],
+            description: t`Only collections on services.sentinel-hub are supported.`,
+          },
+        },
       },
     };
   }
@@ -206,14 +256,25 @@ class DataFusion extends React.Component {
     return !!alias && !settings.some((d) => d.alias === alias);
   };
 
+  isDataFusionDeploymentSupported = (datasetId) => {
+    const dsh = getDataSourceHandler(datasetId);
+    const { locationId } = dsh.getDatasetParams(datasetId);
+    return locationId === LocationIdSHv3.awsEuCentral1;
+  };
+
   render() {
     const { initialTimespan, datasetId } = this.props;
     let settings = [...this.props.settings];
 
     const availableDatasets = this.getAvailableDatasets();
+
     const dataset = getDataSourceHandler(datasetId).getSentinelHubDataset(datasetId);
 
-    if (!dataset || !availableDatasets[dataset.id]) {
+    if (
+      !dataset ||
+      !availableDatasets[dataset.id] ||
+      (dataset === DATASET_BYOC && !this.isDataFusionDeploymentSupported(datasetId))
+    ) {
       return null;
     }
 

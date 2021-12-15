@@ -405,14 +405,14 @@ class FIS extends Component {
       toTime,
       minY,
       maxY,
-      dataAvailableFromDate,
+      dataAvailableFromTime,
       fetchingBatches,
       maxCCAllowed,
     } = this.state;
     // Semiotic handles data changes badly - areas get updated, but lines and points do not (always). The
     // solution is to use React's key property on elements so they are replaced whenever any constraint
     // changes. This is the key that includes all the constraints:
-    const chartDataKey = `${fromTime}-${dataAvailableFromDate}-${maxCCAllowed}`;
+    const chartDataKey = `${fromTime}-${dataAvailableFromTime}-${maxCCAllowed}`;
     const sharedProps = {
       size: [650, 320],
       xAccessor: (d) => moment(d.date),
@@ -584,13 +584,16 @@ class FIS extends Component {
             <h3 className="title">{`${getDatasetLabel(datasetId)} - ${
               customSelected ? 'Custom' : layerId
             }`}</h3>
-            {customSelected || !isCloudCoverageDataAvailable ? null : (
+            {!isCloudCoverageDataAvailable ? null : (
               <div className="ccslider">
                 <EOBCCSlider
                   onChange={this.setMaxCCAllowed}
                   cloudCoverPercentage={Math.round(maxCCAllowed * 100)}
                   sliderWidth={100}
                 />
+                {customSelected && (
+                  <div className="last-band-msg">{t`Based on the last band of the custom script.`}</div>
+                )}
               </div>
             )}
           </div>

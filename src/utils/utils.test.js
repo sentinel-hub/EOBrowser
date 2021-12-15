@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { parseDataFusion } from './index';
-import { S2L2A } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { S2L2A } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 
 const dfString1 =
   '{"enabled":true,"primaryLayerAlias":"S2L2Ajisqiw","supplementalDatasets":{"AWSEU_S1GRD":{"enabled":true,"alias":"S1GRdewD","mosaickingOrder":"leastRecent","isCustomTimespan":true,"timespan":["2020-08-25T20:00:00.000Z","2020-08-26T23:59:59.999Z"]},"AWS_S2L1C":{"enabled":true,"alias":"S2L1Cdewdewd","mosaickingOrder":"leastCC","isCustomTimespan":true,"timespan":["2020-08-05T00:00:00.000Z","2020-08-26T23:59:59.999Z"]}}}';

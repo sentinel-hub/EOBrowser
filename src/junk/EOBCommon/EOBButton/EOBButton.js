@@ -17,7 +17,7 @@ export class EOBButton extends PureComponent {
     } = this.props;
     return (
       <a
-        className={`btn ${className || ''} ${fluid ? 'full-size' : ''} ${disabled ? 'disabled' : ''}`}
+        className={`eob-btn ${className || ''} ${fluid ? 'full-size' : ''} ${disabled ? 'disabled' : ''}`}
         onClick={!disabled ? onClick : onDisabledClick}
         {...rest}
       >

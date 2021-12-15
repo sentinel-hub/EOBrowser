@@ -1,92 +1,173 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { connect } from 'react-redux';
-import Rodal from 'rodal';
-import FileSaver from 'file-saver';
-import { t } from 'ttag';
 import { BBox, CRS_EPSG3857, MimeTypes, CancelToken } from '@sentinel-hub/sentinelhub-js';
-import { v4 as uuid } from 'uuid';
-import Toggle from 'react-toggle';
+import proj4 from 'proj4';
+import { t } from 'ttag';
 
-import store, { modalSlice, terrainViewerSlice } from '../store';
-import Loader from '../Loader/Loader';
-import { getMapDimensions } from '../Controls/ImgDownload/ImageDownload.utils';
-import { addImageOverlays, getNicename, getTitle } from '../Controls/ImgDownload/ImageDownload.utils';
-import { EOBButton } from '../junk/EOBCommon/EOBButton/EOBButton';
+import store, { terrainViewerSlice, mainMapSlice, visualizationSlice } from '../store';
 import { getLayerFromParams } from '../Controls/ImgDownload/ImageDownload.utils';
 import { wgs84ToMercator } from '../junk/EOBCommon/utils/coords';
-import { getHeightFromZoom, getMapTile } from './TerrainViewer.utils';
+import {
+  getMapTile,
+  getPositionString,
+  getEyeHeightFromBounds,
+  getBoundsFrom3DPosition,
+  getZoomFromEyeHeight,
+  getEyeHeightFromZoom,
+  getHeightFromZoom,
+} from './TerrainViewer.utils';
 import {
   datasourceForDatasetId,
   getDataSourceHandler,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getGetMapAuthToken } from '../App';
-import { savePinsToServer, savePinsToSessionStorage, constructPinFromProps } from '../Tools/Pins/Pin.utils';
-import SocialShare from '../components/SocialShare/SocialShare';
 import { constructGetMapParamsEffects } from '../utils/effectsUtils';
 import { DATASOURCES, reqConfigGetMap, reqConfigMemoryCache } from '../const';
+import Controls from '../Controls/Controls';
+import { constructErrorMessage, isDataFusionEnabled } from '../utils';
+import ExternalLink from '../ExternalLink/ExternalLink';
+
+import { ReactComponent as IconSun } from './icons/icon-sun.svg';
 
 import 'rodal/lib/rodal.css';
-
-const DEFAULT_IMAGE_SIZE = 3000;
-const BACKEND_SERVICE_3D = 'https://www.geopedia.world/map3d';
-const EOB3D_SCRIPT_SRC = `${process.env.REACT_APP_ROOT_URL}eob3d/eob3d.nocache.js`;
-window.activeTerrainViewers = {};
 
 function TerrainViewer(props) {
   /*
     This component uses icons by https://fontawesome.com/, available under a Creative Commons Licence https://creativecommons.org/licenses/by/4.0/legalcode
     Icons were converted to PNG and resized.
   */
-  const [loadingViewer, setLoadingViewer] = useState(true);
-  const [downloadingImage, setDownloadingImage] = useState(false);
   const [layer, setLayer] = useState();
-  const [terrainViewerId, setTerrainViewerId] = useState();
-  const [activeTerrainViewerComponentId] = useState(uuid());
-  const [originalChildren] = useState([...document.head.children]);
-  const [showLogoAndCaptions, setShowLogoAndCaptions] = useState(true);
-  const [socialSharePanelOpen, setSocialSharePanelOpen] = useState(false);
-  const [hasPinBeenSaved, setHasPinBeenSaved] = useState(false);
+  const [shadingEnabled, setShadingEnabled] = useState(true);
+  const [sunEnabled, setSunEnabled] = useState(false);
+  const [disabled, setDisabled] = useState(!props.is3D);
+  const [cancelToken, setCancelToken] = useState(new CancelToken());
+  const [timeoutId, setTimeoutId] = useState(null);
+  const [loader, setLoader] = useState();
+  const terrainViewerContainer = useRef();
 
-  const { toTime, lat, lng, zoom, pixelBounds, datasetId, locale, auth, terrainViewerSettings } = props;
+  const {
+    toTime,
+    lat,
+    lng,
+    datasetId,
+    locale,
+    auth,
+    terrainViewerSettings,
+    is3D,
+    mapBounds,
+    dataSourcesInitialized,
+    terrainViewerId,
+  } = props;
   const isGIBS = datasourceForDatasetId(datasetId) === DATASOURCES.GIBS;
   const fromTime = isGIBS ? null : props.fromTime;
-  const { width, height } = getMapDimensions(pixelBounds);
-  const rendererWidth = Math.floor((width - 80) * 0.85);
-  const rendererHeight = Math.floor((height / width) * rendererWidth);
+
   const { x: defaultX, y: defaultY } = wgs84ToMercator({ lat: lat, lng: lng });
   const {
     x = defaultX,
     y = defaultY,
-    z = getHeightFromZoom(zoom),
+    z = getEyeHeightFromBounds(mapBounds),
     rotV = 10,
     rotH = 0,
     settings,
     sunTime,
   } = terrainViewerSettings || {};
-  const cancelToken = new CancelToken();
-  const minZoom = getDataSourceHandler(datasetId).getLeafletZoomConfig(datasetId).min || 7;
+
+  let minZoom = 7;
+  if (dataSourcesInitialized && datasetId) {
+    minZoom = getDataSourceHandler(datasetId).getLeafletZoomConfig(datasetId).min;
+  }
+
+  const onResize = useCallback(
+    () => setBounds({ x: x, y: y, z: z, rotH: rotH, rotV: rotV }),
+    // eslint-disable-next-line
+    [],
+  );
 
   useEffect(() => {
-    window.activeTerrainViewers[activeTerrainViewerComponentId] = null;
-    const script = document.createElement('script');
-    script.src = EOB3D_SCRIPT_SRC;
-    document.body.appendChild(script);
-
-    return () => {
-      delete window.activeTerrainViewers[activeTerrainViewerComponentId];
-      window.on3DInitialized = () => {};
-      window.get3DMapTileUrl = null;
-      window.on3DButtonClicked = null;
-      document.body.removeChild(script);
-    };
+    if (is3D && terrainViewerContainer.current) {
+      setBounds({ x: x, y: y, z: z, rotH: rotH, rotV: rotV });
+    }
     // eslint-disable-next-line
-  }, []);
+  }, [terrainViewerContainer]);
+
+  useEffect(() => {
+    if (props.is3D) {
+      setDisabled(false);
+      on3DInitialized();
+    } else if (terrainViewerId) {
+      animateExit().then(() => {
+        onClose();
+        setDisabled(true);
+      });
+    }
+    // eslint-disable-next-line
+  }, [props.is3D]);
+
+  useEffect(() => {
+    async function changeLayer(layer) {
+      if (
+        layer &&
+        props.dataSourcesInitialized &&
+        props.datasetId &&
+        (props.layerId || props.evalscript || props.evalscripturl)
+      ) {
+        const newLayer = await getLayerFromParams(props);
+        if (newLayer) {
+          if (!isDataFusionEnabled(props.dataFusion)) {
+            await newLayer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
+          }
+          setLayer(newLayer);
+          window.reload3DTextures(terrainViewerId);
+        }
+      }
+    }
+    changeLayer(layer);
+    // eslint-disable-next-line
+  }, [
+    props.layerId,
+    props.evalscript,
+    props.evalscripturl,
+    // eslint-disable-next-line
+    isDataFusionEnabled(props.dataFusion) && props.dataFusion,
+    props.visualizationUrl,
+    props.fromTime,
+    props.toTime,
+    props.datasetId,
+    props.customSelected,
+    props.gainEffect,
+    props.gammaEffect,
+    props.redRangeEffect,
+    props.greenRangeEffect,
+    props.blueRangeEffect,
+    props.redCurveEffect,
+    props.greenCurveEffect,
+    props.blueCurveEffect,
+    props.upsampling,
+    props.downsampling,
+    props.minQa,
+    props.speckleFilter,
+    props.orthorectification,
+    props.dataSourcesInitialized,
+  ]);
+
+  useEffect(() => {
+    if (terrainViewerId) {
+      window.set3DLocale(props.locale);
+    }
+    // eslint-disable-next-line
+  }, [props.locale]);
+
+  function set3DLocation(x, y, zoom) {
+    const z = getHeightFromZoom(zoom);
+    window.set3DPosition(terrainViewerId, x, y, z, 0, 0);
+  }
+
+  async function onTileError(error) {
+    const message = await constructErrorMessage(error);
+    store.dispatch(visualizationSlice.actions.setError(message));
+  }
 
   function get3DMapTileUrl(viewerId, minX, minY, maxX, maxY, width, height, callback) {
-    if (!layer) {
-      return;
-    }
-
     const equatorLen = 40075016.685578488;
     const zoomLevel = Math.max(
       0,
@@ -97,7 +178,7 @@ function TerrainViewer(props) {
     const tileY = numTiles - 1 - Math.floor(((minY + maxY + equatorLen) * numTiles) / (2 * equatorLen));
     const mapTilerUrl = `https://api.maptiler.com/maps/streets/256/${zoomLevel}/${tileX}/${tileY}.png?key=${process.env.REACT_APP_MAPTILER_KEY}`;
 
-    if (zoomLevel <= minZoom) {
+    if (!layer || zoomLevel <= minZoom) {
       callback(mapTilerUrl);
       return;
     }
@@ -111,6 +192,11 @@ function TerrainViewer(props) {
       toTime: toTime.toDate(),
       preview: 2,
       effects: constructGetMapParamsEffects(props),
+      tileCoord: {
+        x: tileX,
+        y: tileY,
+        z: zoomLevel,
+      },
     };
     const reqConfig = {
       cancelToken: cancelToken,
@@ -119,38 +205,61 @@ function TerrainViewer(props) {
       ...reqConfigGetMap,
     };
 
-    getMapTile(layer, getMapParams, minX, minY, maxX, maxY, width, height, callback, reqConfig);
+    function onCallback(url) {
+      if (url === null) {
+        callback(mapTilerUrl);
+      } else {
+        callback(url);
+      }
+    }
+
+    getMapTile(
+      layer,
+      getMapParams,
+      minX,
+      minY,
+      maxX,
+      maxY,
+      width,
+      height,
+      onCallback,
+      reqConfig,
+      onTileError,
+      mapTilerUrl,
+    );
   }
 
   async function on3DInitialized() {
+    if (!is3D) {
+      return;
+    }
     const layer = await getLayerFromParams(props);
-    await layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
+    if (layer && !isDataFusionEnabled(props.dataFusion)) {
+      await layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
+    }
+
+    window.addEventListener('resize', onResize);
 
     window.set3DLocale(locale);
-    if (
-      Object.keys(window.activeTerrainViewers).length === 1 &&
-      window.activeTerrainViewers[activeTerrainViewerComponentId] === null
-    ) {
-      setLayer(layer);
-
-      window.set3DServiceUrl(BACKEND_SERVICE_3D);
-      const terrainViewerId = window.create3DViewer('terrain-map-container', x, y, z, rotH, rotV);
-      window.activeTerrainViewers[activeTerrainViewerComponentId] = terrainViewerId;
-      setTerrainViewerId(terrainViewerId);
-      window.set3DSunTime(terrainViewerId, sunTime);
-      window.set3DSettings(terrainViewerId, settings);
-      setLoadingViewer(false);
-    }
-  }
-
-  function removeUnnecessaryScripts() {
-    // The 3D scripts adds some elements to document.head, which clashes with existing styles. This removes them
-    const newChildren = [...document.head.children];
-    const elementsToRemove = newChildren.filter((elem) => !originalChildren.includes(elem));
-    for (let elem of elementsToRemove) {
-      document.head.removeChild(elem);
-    }
-    return;
+    setLayer(layer);
+    setCancelToken(new CancelToken());
+    const tileSize = 64;
+    const maxZoomLevel = 18;
+    const demInstance = 'MAPZEN';
+    const terrainViewerId = window.create3DViewer(
+      'terrain-map-container',
+      x,
+      y,
+      z,
+      rotH,
+      rotV,
+      demInstance,
+      tileSize,
+      maxZoomLevel,
+    );
+    store.dispatch(terrainViewerSlice.actions.setTerrainViewerId(terrainViewerId));
+    window.set3DSunTime(terrainViewerId, sunTime);
+    window.set3DSettings(terrainViewerId, settings);
   }
 
   function on3DButtonClicked(viewerId, buttonId) {
@@ -160,20 +269,41 @@ function TerrainViewer(props) {
   }
 
   function on3DPositionChanged(viewerId, x, y, z, rotH, rotV) {
-    setHasPinBeenSaved(false);
-    store.dispatch(
-      terrainViewerSlice.actions.setTerrainViewerSettings({
-        ...terrainViewerSettings,
-        x: x,
-        y: y,
-        z: z,
-        rotH: rotH,
-        rotV: rotV,
-      }),
-    );
+    clearTimeout(timeoutId);
+    if (!is3D) {
+      return;
+    }
+
+    const newTimeoutId = setTimeout(() => {
+      const [lng, lat] = proj4('EPSG:3857', 'EPSG:4326', [x, y]);
+      const zoom = getZoomFromEyeHeight(x, y, z);
+      store.dispatch(
+        terrainViewerSlice.actions.setTerrainViewerSettings({
+          ...terrainViewerSettings,
+          x: x,
+          y: y,
+          z: z,
+          rotH: rotH,
+          rotV: rotV,
+        }),
+      );
+      store.dispatch(
+        mainMapSlice.actions.setPosition({
+          lat: lat,
+          lng: lng,
+          zoom: zoom,
+        }),
+      );
+      setBounds({ x: x, y: y, z: z, rotH: rotH, rotV: rotV });
+    }, 500);
+    setTimeoutId(newTimeoutId);
   }
 
-  function on3DLoadingStateChanged(viewerId, isLoading, type) {}
+  function on3DLoadingStateChanged(viewerId, isLoading, type) {
+    if (type === 'OVERALL') {
+      setLoader(isLoading);
+    }
+  }
 
   function on3DSettingsChanged(viewerId) {
     store.dispatch(
@@ -185,151 +315,151 @@ function TerrainViewer(props) {
     );
   }
 
-  async function savePin() {
-    const { user, setLastAddedPin } = props;
-    const pin = constructPinFromProps(props);
-
-    if (user.userdata) {
-      const { uniqueId } = await savePinsToServer([pin]);
-      setLastAddedPin(uniqueId);
-    } else {
-      const uniqueId = savePinsToSessionStorage([pin]);
-      setLastAddedPin(uniqueId);
+  function on3DShadingClick() {
+    if (shadingEnabled) {
+      setSunEnabled(false);
+      window.enable3DSun(terrainViewerId, false);
     }
-    setHasPinBeenSaved(true);
+    setShadingEnabled(!shadingEnabled);
+    window.enable3DShading(terrainViewerId, !shadingEnabled);
   }
 
-  async function downloadImage() {
-    setDownloadingImage(true);
-    const { fromTime, toTime, datasetId, layerId, customSelected } = props;
-    const mimeType = 'image/png';
-    let width, height;
-    if (rendererWidth > rendererHeight) {
-      width = DEFAULT_IMAGE_SIZE;
-      height = Math.floor((width * rendererHeight) / rendererWidth);
-    } else {
-      height = DEFAULT_IMAGE_SIZE;
-      width = Math.floor((height * rendererWidth) / rendererHeight);
+  function on3DSunClick() {
+    if (!sunEnabled) {
+      setShadingEnabled(true);
+      window.enable3DShading(terrainViewerId, true);
     }
-    const imageUrl = await window.print3D(terrainViewerId, width, height);
-    const blob = await fetch(imageUrl).then((res) => res.blob());
-    const title = showLogoAndCaptions ? getTitle(fromTime, toTime, datasetId, layerId, customSelected) : null;
+    setSunEnabled(!sunEnabled);
+    window.enable3DSun(terrainViewerId, !sunEnabled);
+    window.show3DSunTimeDialog(terrainViewerId, !sunEnabled);
+  }
 
-    const dsh = getDataSourceHandler(datasetId);
-    const drawCopernicusLogo = dsh.isCopernicus();
-    const addLogos = dsh.isSentinelHub();
-
-    const imageWithOverlays = await addImageOverlays(
-      blob,
-      width,
-      height,
-      mimeType,
-      null,
-      null,
-      null,
-      false,
-      showLogoAndCaptions,
-      false,
-      false,
-      null,
-      null,
-      null,
-      null,
-      showLogoAndCaptions ? dsh.getCopyrightText(datasetId) : null,
-      title,
-      false,
-      addLogos,
-      drawCopernicusLogo,
+  function setBounds({ x, y, z, rotH, rotV }) {
+    const containerWidth = terrainViewerContainer.current.clientWidth;
+    const containerHeight = terrainViewerContainer.current.clientHeight;
+    const { pixelBounds, bounds } = getBoundsFrom3DPosition({
+      x: x,
+      y: y,
+      z: z,
+      rotV: rotV,
+      rotH: rotH,
+      width: containerWidth,
+      height: containerHeight,
+    });
+    store.dispatch(
+      mainMapSlice.actions.setBounds({
+        bounds: bounds,
+        pixelBounds: pixelBounds,
+      }),
     );
-    const nicename = getNicename(fromTime, toTime, datasetId, layerId, customSelected, false);
-    FileSaver.saveAs(imageWithOverlays, `${nicename}.png`);
-    setDownloadingImage(false);
+  }
+
+  async function animateExit() {
+    const z2D = getEyeHeightFromZoom(props.lat, props.zoom, terrainViewerContainer.current.clientWidth);
+
+    window.on3DPositionChanged = () => {};
+    window.get3DMapTileUrl = () => {};
+    cancelToken.cancel();
+
+    return await new Promise((resolve) => {
+      const closingAnimationId = 'exit-animation';
+      window.on3DAnimationCompleted = (viewerId, animationId) =>
+        viewerId === terrainViewerId && animationId === closingAnimationId && resolve();
+      window.animate3D(terrainViewerId, closingAnimationId, {
+        isLooping: false,
+        frames: [
+          { x: x, y: y, z: z, rotH: rotH, rotV: rotV, duration: 0.8 },
+          { x: x, y: y, z: z2D, rotH: rotH > 180 ? 360 : 0, rotV: 0, duration: 0.2 },
+        ],
+      });
+    });
   }
 
   function onClose() {
-    removeUnnecessaryScripts();
-    if (terrainViewerId) {
-      window.close3DViewer(terrainViewerId);
-    }
     cancelToken.cancel();
+    window.removeEventListener('resize', onResize);
+    window.close3DViewer(terrainViewerId);
     store.dispatch(terrainViewerSlice.actions.resetTerrainViewerSettings());
-    store.dispatch(modalSlice.actions.removeModal());
+    store.dispatch(terrainViewerSlice.actions.setTerrainViewerId(null));
+  }
+  if (is3D) {
+    window.get3DMapTileUrl = get3DMapTileUrl;
+    window.on3DButtonClicked = on3DButtonClicked;
+    window.on3DPositionChanged = on3DPositionChanged;
+    window.on3DLoadingStateChanged = on3DLoadingStateChanged;
+    window.on3DSettingsChanged = on3DSettingsChanged;
+    window.set3DLocation = set3DLocation;
   }
 
-  window.get3DMapTileUrl = get3DMapTileUrl;
-  window.on3DButtonClicked = on3DButtonClicked;
-  window.on3DInitialized = on3DInitialized;
-  window.on3DPositionChanged = on3DPositionChanged;
-  window.on3DLoadingStateChanged = on3DLoadingStateChanged;
-  window.on3DSettingsChanged = on3DSettingsChanged;
+  if (disabled) {
+    return null;
+  }
 
-  const isUserLoggedIn = props.user && props.user.userdata;
+  const closingClass = !is3D ? 'closing' : '';
 
   return (
-    <Rodal
-      animation="slideUp"
-      customStyles={{
-        height: 'auto',
-        bottom: 'auto',
-        width: `${width - 80}px`,
-        maxWidth: '90vw',
-        top: '1vh',
-        overflow: 'auto',
-      }}
-      visible={true}
-      onClose={onClose}
-      closeOnEsc={true}
-    >
-      <div className="terrain-visualization">
-        <div className="title">{t`Terrain Viewer`}</div>
-        {loadingViewer && <Loader />}
-        <div id="terrain-map-container" style={{ height: rendererHeight }} />
-        {!loadingViewer && (
-          <div className="download-button-holder">
-            <EOBButton
-              fluid
-              className="download-button"
-              loading={downloadingImage}
-              disabled={false}
-              onClick={downloadImage}
-              icon="download"
-              text={t`Download`}
-            />
-            {isUserLoggedIn && (
-              <div className="toggle-captions">
-                <Toggle
-                  checked={showLogoAndCaptions}
-                  icons={false}
-                  onChange={() => setShowLogoAndCaptions(!showLogoAndCaptions)}
-                />
-                <label>{t`Show captions`}</label>
-              </div>
-            )}
-            <div className="actions">
-              <div
-                className={`action-wrapper ${hasPinBeenSaved ? ' pin-saved' : ''}`}
-                onClick={savePin}
-                title={t`Add to Pins`}
-              >
-                <i className="fa fa-thumb-tack" />
-              </div>
-              <div
-                className="action-wrapper"
-                onClick={() => setSocialSharePanelOpen(!socialSharePanelOpen)}
-                title={t`Share`}
-              >
-                <i className="fas fa-share-alt" />
-                <SocialShare
-                  displaySocialShareOptions={socialSharePanelOpen}
-                  toggleSocialSharePanel={() => setSocialSharePanelOpen(false)}
-                  datasetId={datasetId}
-                />
-              </div>
-            </div>
+    <>
+      <div id="terrain-map-container" ref={terrainViewerContainer}>
+        <div className={`loader-bar ${loader ? '' : 'hidden'}`} />
+        <div className="toolbar3d">
+          <div
+            className={`button3d help`}
+            onClick={() => {
+              window.show3DHelpDialog(terrainViewerId);
+            }}
+            title={t`Help`}
+          >
+            <i className="fa fa-info"></i>
           </div>
-        )}
+          <div
+            className={`button3d animated ${closingClass}`}
+            onClick={() => {
+              window.show3DGeneralSettingsDialog(terrainViewerId, true);
+            }}
+            title={t`Settings`}
+          >
+            <i className="fa fa-regular fa-gear"></i>
+          </div>
+          <div
+            className={`button3d animated ${shadingEnabled ? 'enabled' : ''} ${closingClass}`}
+            onClick={on3DShadingClick}
+            title={t`Shading`}
+          >
+            <i className="fa fa-regular fa-lightbulb-o"></i>
+          </div>
+          <div
+            className={`button3d animated ${sunEnabled ? 'enabled' : ''} ${closingClass}`}
+            onClick={on3DSunClick}
+            title={t`Sun`}
+          >
+            <IconSun className="icon" fill="currentColor" />
+          </div>
+        </div>
+        <div className="info3dcontainer">{getPositionString(lat, lng, z)}</div>
+        <div className="attribution">
+          <ExternalLink
+            className="attribution-link maptiler-attribution"
+            href="https://www.maptiler.com/copyright/"
+          >
+            © MapTiler
+          </ExternalLink>
+          <ExternalLink
+            className="attribution-link osm-attribution"
+            href="https://www.openstreetmap.org/copyright"
+          >
+            © OpenStreetMap contributors
+          </ExternalLink>
+          <ExternalLink
+            className="attribution-link sentinelhub-attribution"
+            href="https://www.sentinel-hub.com/"
+          >
+            © Sentinel Hub
+          </ExternalLink>
+        </div>
       </div>
-    </Rodal>
+
+      <Controls is3D={true} />
+    </>
   );
 }
 
@@ -339,6 +469,7 @@ const mapStoreToProps = (store) => ({
   zoom: store.mainMap.zoom,
   mapBounds: store.mainMap.bounds,
   pixelBounds: store.mainMap.pixelBounds,
+  is3D: store.mainMap.is3D,
   layerId: store.visualization.layerId,
   evalscript: store.visualization.evalscript,
   evalscripturl: store.visualization.evalscripturl,
@@ -364,10 +495,12 @@ const mapStoreToProps = (store) => ({
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,
   selectedThemeId: store.themes.selectedThemeId,
+  dataSourcesInitialized: store.themes.dataSourcesInitialized,
   locale: store.language.selectedLanguage,
   user: store.auth.user,
   auth: store.auth,
   terrainViewerSettings: store.terrainViewer.settings,
+  terrainViewerId: store.terrainViewer.id,
 });
 
 export default connect(mapStoreToProps, null)(TerrainViewer);

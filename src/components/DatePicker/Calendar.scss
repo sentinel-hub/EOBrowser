@@ -9,6 +9,12 @@
     display: table-caption;
     text-align: center;
     margin-bottom: 10px;
+
+    select {
+      option {
+        color: $textCol;
+      }
+    }
   }
 
   // stylelint-disable selector-class-pattern
@@ -26,6 +32,7 @@
       padding: 1px 2px;
       margin: 0 2px;
       max-width: 100px;
+      appearance: auto;
     }
   }
 

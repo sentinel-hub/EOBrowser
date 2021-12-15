@@ -85,7 +85,7 @@ class Results extends Component {
               ))}
           </div>
           {this.props.query.hasMore && !this.state.loadingMore ? (
-            <div className="btn" onClick={this.loadMore}>
+            <div className="eob-btn" onClick={this.loadMore}>
               {t`Load more`}
             </div>
           ) : null}

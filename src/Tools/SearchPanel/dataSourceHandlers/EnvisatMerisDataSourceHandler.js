@@ -7,7 +7,7 @@ import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/Gen
 import EnvisatTooltip from './DatasourceRenderingComponents/dataSourceTooltips/EnvisatTooltip';
 import { FetchingFunction } from '../search';
 import { constructBasicEvalscript } from '../../../utils';
-import { ENVISAT_MERIS } from './dataSourceHandlers';
+import { ENVISAT_MERIS } from './dataSourceConstants';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 import { DATASOURCES } from '../../../const';
 

@@ -15,6 +15,8 @@ export const VisualizationPanelHeaderActions = ({
   toggleSocialSharePanel,
   displaySocialShareOptions,
   datasetId,
+  is3D,
+  haveEffectsChanged,
 }) => {
   const showEffectText = t`Show effects and advanced options`;
   const showVisualizationText = t`Show visualization`;
@@ -25,6 +27,7 @@ export const VisualizationPanelHeaderActions = ({
       onClick: () => onSavePin(),
       icon: () => 'fa fa-thumb-tack',
       visible: () => true,
+      showBadge: () => false,
     },
     {
       id: 'showEffects',
@@ -32,13 +35,15 @@ export const VisualizationPanelHeaderActions = ({
       onClick: () => toggleValue('showEffects'),
       icon: () => `fa fa-${showEffects ? 'paint-brush' : 'sliders'}`,
       visible: () => true,
+      showBadge: () => !showEffects && haveEffectsChanged,
     },
     {
       id: 'addToCompare',
       title: () => t`Add to compare`,
       onClick: () => addVisualizationToCompare(),
       icon: () => 'fas fa-exchange-alt',
-      visible: () => true,
+      visible: () => !is3D,
+      showBadge: () => false,
     },
     {
       id: 'zoom',
@@ -46,13 +51,15 @@ export const VisualizationPanelHeaderActions = ({
       onClick: () => onZoomToTile(),
       icon: () => 'fa fa-crosshairs',
       visible: () => displayZoomToTile,
+      showBadge: () => false,
     },
     {
       id: 'showLayer',
       title: () => (isSelectedLayerVisible ? t`Hide layer` : t`Show layer`),
       onClick: () => toggleVisible(),
       icon: () => `fa fa-eye${isSelectedLayerVisible ? '-slash' : ''}`,
-      visible: () => true,
+      visible: () => !is3D,
+      showBadge: () => false,
     },
     {
       id: 'socialShare',
@@ -60,6 +67,7 @@ export const VisualizationPanelHeaderActions = ({
       onClick: () => toggleSocialSharePanel(),
       icon: () => 'fas fa-share-alt',
       visible: () => true,
+      showBadge: () => false,
     },
   ];
 
@@ -70,6 +78,7 @@ export const VisualizationPanelHeaderActions = ({
         .map((action) => (
           <div className="action-wrapper" key={action.id} onClick={action.onClick} title={action.title()}>
             <i className={action.icon()} />
+            {action.showBadge() && <div className="effects-badge" />}
           </div>
         ))}
       <SocialShare

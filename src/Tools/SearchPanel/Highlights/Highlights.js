@@ -8,6 +8,7 @@ import { getDataSourceHandler } from '../../SearchPanel/dataSourceHandlers/dataS
 import { parsePosition } from '../../../utils';
 import { NotificationPanel } from '../../../junk/NotificationPanel/NotificationPanel';
 import { constructEffectsFromPinOrHighlight } from '../../../utils/effectsUtils';
+import { setTerrainViewerFromPin } from '../../../TerrainViewer/TerrainViewer.utils';
 
 import './Highlights.scss';
 
@@ -25,6 +26,7 @@ class Highlights extends Component {
       evalscript,
       evalscripturl,
       dataFusion,
+      terrainViewerSettings,
     } = pin;
     if (comparingPins || sharePins) {
       return;
@@ -78,10 +80,19 @@ class Highlights extends Component {
     store.dispatch(visualizationSlice.actions.setVisualizationParams(visualizationParams));
     this.props.setSelectedHighlight(this.props.item);
     store.dispatch(tabsSlice.actions.setTabIndex(2));
+
+    setTerrainViewerFromPin({
+      lat: parsedLat,
+      lng: parsedLng,
+      zoom: parsedZoom,
+      terrainViewerSettings: terrainViewerSettings,
+      is3D: this.props.is3D,
+      terrainViewerId: this.props.terrainViewerId,
+    });
   };
 
   render() {
-    const { highlights, isThemeSelected } = this.props;
+    const { highlights, isThemeSelected, is3D } = this.props;
     const noHighlightsInThemeMsg = t`This theme has no highlights`;
     const noThemeSelected = t`Please select a theme`;
 
@@ -105,6 +116,7 @@ class Highlights extends Component {
               key={`${index}-${pin.title}-${pin._id}`}
               index={index}
               onSelect={() => this.onPinSelect(pin)}
+              canAddToCompare={!is3D}
             />
           ))}
         </div>

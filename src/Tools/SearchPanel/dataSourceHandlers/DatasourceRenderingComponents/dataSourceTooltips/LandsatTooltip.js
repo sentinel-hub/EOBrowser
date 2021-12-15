@@ -4,7 +4,14 @@ import { t } from 'ttag';
 import ExternalLink from '../../../../../ExternalLink/ExternalLink';
 import HelpTooltip from '../../DatasourceRenderingComponents/HelpTooltip';
 
-import { AWS_LETML1, AWS_LETML2, AWS_LOTL1, AWS_LOTL2, AWS_LTML1, AWS_LTML2 } from '../../dataSourceHandlers';
+import {
+  AWS_LETML1,
+  AWS_LETML2,
+  AWS_LOTL1,
+  AWS_LOTL2,
+  AWS_LTML1,
+  AWS_LTML2,
+} from '../../dataSourceConstants';
 
 const getLandsat_Markdown = () => t`
 The series of **Landsat** satellites of NASA/ U.S. Geological Survey are similar to Sentinel-2 (they capture visible and infrared wavelengths)

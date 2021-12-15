@@ -91,7 +91,11 @@ class PinPreviewImage extends React.Component {
       }
 
       this.setState({ fetchingPreview: true });
-      const apiType = layer.supportsApiType(ApiType.PROCESSING) ? ApiType.PROCESSING : ApiType.WMS;
+      const apiType = layer.supportsApiType(ApiType.PROCESSING)
+        ? ApiType.PROCESSING
+        : layer.supportsApiType(ApiType.WMTS)
+        ? ApiType.WMTS
+        : ApiType.WMS;
 
       const pinTimeFrom = fromTime
         ? moment.utc(fromTime).toDate()

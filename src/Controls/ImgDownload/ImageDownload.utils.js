@@ -16,9 +16,11 @@ import {
   getDataSourceHandler,
   datasetLabels,
   checkIfCustom,
+} from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import {
   CUSTOM,
   COPERNICUS_CORINE_LAND_COVER,
-} from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+} from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 import { isDataFusionEnabled } from '../../utils';
 import { overlayTileLayers } from '../../Map/Layers';
 import { createGradients } from '../../Tools/VisualizationPanel/legendUtils';
@@ -37,7 +39,7 @@ import {
 } from '../../utils/parseEvalscript';
 import { WARNINGS } from './ImageDownloadWarningPanel';
 import { refetchWithDefaultToken } from '../../utils/fetching.utils';
-import { reqConfigMemoryCache, MAX_SH_IMAGE_SIZE } from '../../const';
+import { reqConfigMemoryCache, MAX_SH_IMAGE_SIZE, DISABLED_ORTHORECTIFICATION } from '../../const';
 
 import copernicus from '../../junk/EOBCommon/assets/copernicus.png';
 import SHlogo from '../../junk/EOBCommon/assets/shLogo.png';
@@ -75,8 +77,11 @@ export function getImageDimensionFromBounds(bounds, datasetId) {
   const { width, height } = getDimensionsInMeters(bounds);
   const ratio = height / width;
   const dsh = getDataSourceHandler(datasetId);
-  const { resolution } = dsh.getResolutionLimits(datasetId);
-  const maxResolution = resolution || 10;
+  let resolution;
+  if (dsh) {
+    resolution = dsh.getResolutionLimits(datasetId).resolution;
+  }
+  const maxResolution = resolution || 0.5;
   const maxImageWidth = Math.min(width / maxResolution, MAX_SH_IMAGE_SIZE);
   const maxImageHeight = maxImageWidth * ratio;
   return { width: Math.floor(maxImageWidth), height: Math.floor(maxImageHeight) };
@@ -133,6 +138,153 @@ export async function fetchImage(layer, options) {
   } else {
     return refetchWithDefaultToken((reqConfig) => layer.getMap(getMapParams, apiType, reqConfig), reqConfig);
   }
+}
+
+export async function fetchAndPatchImagesFromParams(params, setWarnings, setError, setLoadingImages) {
+  const {
+    imageFormat,
+    width,
+    height,
+    comparedLayers,
+    comparedOpacity,
+    comparedClipping,
+    cancelToken,
+    lat,
+    lng,
+    zoom,
+    showLegend,
+    showCaptions,
+    showLogo,
+    addMapOverlays,
+    userDescription,
+    enabledOverlaysId,
+  } = params;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  let imageTitles = [];
+  let legendUrl, legendDefinition;
+  let drawCopernicusLogo = false;
+  let addLogos = false;
+  const copyrightTexts = new Set();
+
+  for (let idx = comparedLayers.length - 1; idx >= 0; idx--) {
+    let cLayer = comparedLayers[idx];
+    let image;
+    let imgObjectUrl;
+    try {
+      image = await fetchImageFromParams(
+        {
+          ...params,
+          ...cLayer,
+          showCaptions: false,
+          showLegend: false,
+          showLogo: false,
+          addMapOverlays: false,
+        },
+        setWarnings,
+      );
+
+      const dsh = getDataSourceHandler(cLayer.datasetId);
+      if (dsh) {
+        drawCopernicusLogo = dsh.isCopernicus() || drawCopernicusLogo;
+        addLogos = dsh.isSentinelHub() || addLogos;
+      }
+
+      if (showLegend) {
+        const l = await getLayerFromParams(
+          { ...params, layerId: cLayer.layerId, visualizationUrl: cLayer.visualizationUrl },
+          cancelToken,
+        );
+        legendUrl = l.legendUrl;
+        const predefinedLayerMetadata = findMatchingLayerMetadata(
+          cLayer.datasetId,
+          cLayer.layerId,
+          cLayer.themeId,
+        );
+        legendDefinition =
+          predefinedLayerMetadata && predefinedLayerMetadata.legend
+            ? predefinedLayerMetadata.legend
+            : l.legend;
+      }
+      if (showCaptions) {
+        let cText;
+        if (dsh) {
+          cText = dsh.getCopyrightText(cLayer.datasetId);
+          copyrightTexts.add(cText);
+        }
+      }
+
+      imageTitles.push(cLayer.title);
+
+      imgObjectUrl = window.URL.createObjectURL(image.blob);
+      const imgDrawn = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = imgObjectUrl;
+      });
+
+      ctx.globalAlpha = comparedOpacity[idx];
+      ctx.drawImage(
+        imgDrawn,
+        comparedClipping[idx][0] * width,
+        0,
+        (comparedClipping[idx][1] - comparedClipping[idx][0]) * width,
+        height,
+        comparedClipping[idx][0] * width,
+        0,
+        (comparedClipping[idx][1] - comparedClipping[idx][0]) * width,
+        height,
+      );
+      ctx.globalAlpha = 1;
+    } catch (err) {
+      setError(err);
+      setLoadingImages(false);
+      return;
+    } finally {
+      if (imgObjectUrl) {
+        window.URL.revokeObjectURL(imgObjectUrl);
+      }
+    }
+  }
+
+  const mimeType = IMAGE_FORMATS_INFO[imageFormat].mimeType;
+  const title = `${imageTitles.slice().reverse().join(', ')}`;
+  const copyrightText = [...copyrightTexts].join(', ');
+  const finalBlob = await addImageOverlays(
+    await canvasToBlob(canvas, mimeType),
+    width,
+    height,
+    mimeType,
+    lat,
+    lng,
+    zoom,
+    showLegend,
+    showCaptions,
+    addMapOverlays,
+    showLogo,
+    userDescription,
+    enabledOverlaysId,
+    legendDefinition,
+    legendUrl,
+    copyrightText,
+    title,
+    true,
+    addLogos,
+    drawCopernicusLogo,
+  );
+  return {
+    finalImage: finalBlob,
+    finalFileName: imageTitles
+      .map((imgTit) => imgTit.split(' ').join('_'))
+      .slice()
+      .reverse()
+      .join('_'),
+  };
 }
 
 export async function fetchImageFromParams(params, raiseWarning) {
@@ -222,8 +374,12 @@ export async function fetchImageFromParams(params, raiseWarning) {
     title = getTitle(fromTime, toTime, datasetId, layer.title, customSelected);
   }
 
-  const drawCopernicusLogo = dsh.isCopernicus();
-  const addLogos = dsh.isSentinelHub();
+  let drawCopernicusLogo = false;
+  let addLogos = false;
+  if (dsh) {
+    drawCopernicusLogo = dsh.isCopernicus();
+    addLogos = dsh.isSentinelHub();
+  }
 
   const imageWithOverlays = await addImageOverlays(
     blob,
@@ -341,7 +497,7 @@ export function getNicename(fromTime, toTime, datasetId, layerTitle, customSelec
   return `${fromTime ? fromTime.clone().utc().format(format) + '_' : ''}${toTime
     .clone()
     .utc()
-    .format(format)}_${datasetLabel.replace(/ /gi, '_')}_${layerName}`;
+    .format(format)}_${datasetLabel ? datasetLabel.replace(/ /gi, '_') : 'unknown_dataset'}_${layerName}`;
 }
 
 export async function getLayerFromParams(params, cancelToken) {
@@ -416,7 +572,7 @@ export async function getLayerFromParams(params, cancelToken) {
       layer.speckleFilter = speckleFilter;
     }
     if (orthorectification) {
-      if (orthorectification === 'DISABLED') {
+      if (orthorectification === DISABLED_ORTHORECTIFICATION) {
         layer.orthorectify = false;
       } else {
         layer.orthorectify = true;
@@ -442,7 +598,7 @@ export async function addImageOverlays(
   blob,
   width,
   height,
-  imageFormat,
+  mimeType,
   lat,
   lng,
   zoom,
@@ -495,7 +651,7 @@ export async function addImageOverlays(
     await drawLogos(ctx, logosPartitionWidth, getLowerYAxis(ctx), drawCopernicusLogo);
   }
 
-  return await canvasToBlob(canvas, imageFormat);
+  return await canvasToBlob(canvas, mimeType);
 }
 
 export function getAllBands(datasetId) {
@@ -676,18 +832,19 @@ function drawDescription(ctx, containerWidth, containerHeight, title, userDescri
   ctx.fillStyle = '#fff';
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
+  const userDescriptionWithSpace = userDescription ? userDescription + ` ` : userDescription;
   const normalFont = getFont(ctx.canvas.width, { font: 'normal', bold: false });
   const userDescriptionFont = getFont(ctx.canvas.width, { font: 'normal', bold: true });
   const titleWidth = title !== null ? getTextWidth(ctx, title, normalFont) : 0;
   const userDescriptionWidth =
-    userDescription !== null ? getTextWidth(ctx, userDescription, userDescriptionFont) : 0;
+    userDescriptionWithSpace !== null ? getTextWidth(ctx, userDescriptionWithSpace, userDescriptionFont) : 0;
   const totalTextWidth = titleWidth + userDescriptionWidth;
   const x = containerWidth / 2 - totalTextWidth / 2;
   const y = containerHeight / 2;
 
-  if (userDescription !== null) {
+  if (userDescriptionWithSpace !== null) {
     ctx.font = userDescriptionFont;
-    ctx.fillText(userDescription, x, y);
+    ctx.fillText(userDescriptionWithSpace, x, y);
   }
   if (title !== null) {
     ctx.font = normalFont;

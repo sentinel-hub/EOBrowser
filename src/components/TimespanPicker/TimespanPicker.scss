@@ -14,6 +14,10 @@
     min-width: 45px;
     font-size: 14px;
     padding-top: 6px;
+
+    @media screen and (max-width: 450px) {
+      padding-bottom: 3px;
+    }
   }
 
   .date-time-input {
@@ -25,6 +29,13 @@
     margin-left: 10px;
     margin-right: 5px;
     justify-content: space-between;
+
+    @media screen and (max-width: 450px) {
+      &.expanded {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
 
     .date-input {
       display: flex;
@@ -61,7 +72,7 @@
     display: flex;
     justify-content: flex-end;
 
-    .btn {
+    .eob-btn {
       margin: 10px 6px 6px 6px;
     }
   }

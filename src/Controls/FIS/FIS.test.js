@@ -2,12 +2,12 @@ import { constructCSVFromData } from './FIS.utils';
 
 const obj1 = {
   someBand: [
-    { date: new Date(1919, 4, 8), udi: 0 },
-    { date: new Date(2007, 11, 20), udi: 1 },
+    { date: new Date('1919-05-08T01:00:00.000+02:00'), udi: 0 },
+    { date: new Date('2007-12-20T01:00:00.000+02:00'), udi: 1 },
   ],
   anotherBand: [
-    { date: new Date(1964, 4, 13), udi: 0 },
-    { date: new Date(1979, 6, 1), udi: 1 },
+    { date: new Date('1964-05-13T01:00:00.000+02:00'), udi: 0 },
+    { date: new Date('1979-07-01T01:00:00.000+02:00'), udi: 1 },
   ],
 };
 const dropColumns1 = [];

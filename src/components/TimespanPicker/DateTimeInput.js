@@ -37,7 +37,8 @@ export class DateTimeInput extends Component {
   };
 
   render() {
-    const { id, selectedTime, label, calendarContainer, onQueryDatesForActiveMonth } = this.props;
+    const { id, selectedTime, label, calendarContainer, onQueryDatesForActiveMonth, timespanExpanded } =
+      this.props;
 
     if (!selectedTime) {
       return null;
@@ -47,7 +48,7 @@ export class DateTimeInput extends Component {
     const minutes = selectedTime.clone().utc().format('mm');
 
     return (
-      <div className="date-time-input">
+      <div className={`date-time-input ${timespanExpanded ? 'expanded' : ''}`}>
         <div className="date-time-input-label">{label}</div>
         <div className="date-input">
           <DatePicker

@@ -18,12 +18,13 @@ import {
   getDataSourceHandler,
   datasetLabels,
   checkIfCustom,
-  CUSTOM,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { CUSTOM } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 
 import HistogramModal from './HistogramModal';
 
 import './HistogramWrapper.scss';
+import { TABS } from '../../const';
 
 class HistogramWrapper extends Component {
   state = {
@@ -63,7 +64,7 @@ class HistogramWrapper extends Component {
 
     const dsHandler = getDataSourceHandler(datasetId);
     const supportsV3Evalscript = dsHandler && dsHandler.supportsV3Evalscript(datasetId);
-    const isOnVisualizationPanel = selectedTabIndex === 2;
+    const isOnVisualizationPanel = selectedTabIndex === TABS.VISUALIZE_TAB;
     const hasVisualization = !!(layerId || customSelected);
     const isIndexOutputPresent = await checkIfIndexOutputPresent(this.props, this.cancelToken);
 

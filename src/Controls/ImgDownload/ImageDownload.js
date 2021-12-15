@@ -21,6 +21,8 @@ import {
   getImageDimensionFromBounds,
   constructBasicEvalscript,
   isTiff,
+  getNicename,
+  fetchAndPatchImagesFromParams,
 } from './ImageDownload.utils';
 import { findMatchingLayerMetadata } from '../../Tools/VisualizationPanel/legendUtils';
 import { IMAGE_FORMATS_INFO } from './consts';
@@ -30,16 +32,18 @@ import {
   getDataSourceHandler,
   datasourceForDatasetId,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
-import { getLoggedInErrorMsg } from '../../junk/ConstMessages';
+import { getLoggedInErrorMsg, getOnlyBasicImgDownloadAvailableMsg } from '../../junk/ConstMessages';
 import { isDataFusionEnabled, fetchEvalscriptFromEvalscripturl } from '../../utils';
 import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
 import { getGetMapAuthToken } from '../../App';
+import { getTerrainViewerImage } from '../../TerrainViewer/TerrainViewer.utils';
 
 import './ImageDownload.scss';
-import { DATASOURCES } from '../../const';
+import { DATASOURCES, TABS as MAIN_TABS } from '../../const';
+import moment from 'moment';
 
 function ImageDownload(props) {
-  const [selectedTab, setSelectedTab] = useState(TABS.BASIC);
+  const [selectedTab, setSelectedTab] = useState(props.is3D ? TABS.TERRAIN_VIEWER : TABS.BASIC);
   const [loadingImages, setLoadingImages] = useState(false);
   const [allBands, setAllBands] = useState([]);
   const [allLayers, setAllLayers] = useState([]);
@@ -47,10 +51,17 @@ function ImageDownload(props) {
   const [error, setError] = useState(null);
   const [warnings, setWarnings] = useState(null);
 
-  const { width: defaultWidth, height: defaultHeight } = getImageDimensionFromBounds(
-    props.bounds,
-    props.datasetId,
-  );
+  let defaultWidth;
+  let defaultHeight;
+
+  if (props.is3D) {
+    ({ width: defaultWidth, height: defaultHeight } = getMapDimensions(props.pixelBounds));
+  } else {
+    ({ width: defaultWidth, height: defaultHeight } = getImageDimensionFromBounds(
+      props.bounds,
+      props.datasetId,
+    ));
+  }
   const effects = constructGetMapParamsEffects(props);
   const getMapAuthToken = getGetMapAuthToken(props.auth);
 
@@ -64,14 +75,16 @@ function ImageDownload(props) {
   }, []);
 
   useEffect(() => {
-    setAllBands(getAllBands(props.datasetId));
-    const selectedTheme = props.themesLists[props.selectedThemesListId].find(
-      (t) => t.id === props.selectedThemeId,
-    );
-    getAllLayers(props.visualizationUrl, props.datasetId, selectedTheme).then((allLayers) =>
-      setAllLayers(allLayers),
-    );
-    setSupportedImageFormats(getSupportedImageFormats(props.datasetId));
+    if (props.datasetId) {
+      setAllBands(getAllBands(props.datasetId));
+      const selectedTheme = props.themesLists[props.selectedThemesListId].find(
+        (t) => t.id === props.selectedThemeId,
+      );
+      getAllLayers(props.visualizationUrl, props.datasetId, selectedTheme).then((allLayers) =>
+        setAllLayers(allLayers),
+      );
+      setSupportedImageFormats(getSupportedImageFormats(props.datasetId));
+    }
   }, [
     props.visualizationUrl,
     props.datasetId,
@@ -88,7 +101,7 @@ function ImageDownload(props) {
   async function downloadBasic(formData) {
     setError(null);
     setWarnings(null);
-    const { pixelBounds, aoiGeometry } = props;
+    const { pixelBounds, aoiGeometry, comparedLayers, selectedTabIndex } = props;
     const { imageFormat } = formData;
 
     setLoadingImages(true);
@@ -120,7 +133,41 @@ function ImageDownload(props) {
       baseParams.effects = effects;
     }
 
+    if (selectedTabIndex === MAIN_TABS.COMPARE_TAB && comparedLayers.length > 1) {
+      await executeDownloadBasicCompared(props, formData, baseParams);
+    }
+    if (selectedTabIndex === MAIN_TABS.VISUALIZE_TAB) {
+      await executeDownloadBasicVisualization(props, formData, baseParams);
+    }
+  }
+
+  async function executeDownloadBasicCompared(props, formData, baseParams) {
+    const { imageFormat } = formData;
+    const { finalImage, finalFileName } = await fetchAndPatchImagesFromParams(
+      {
+        ...props,
+        ...formData,
+        ...baseParams,
+        comparedLayers: props.comparedLayers.map((cLayer) => {
+          let newCLayer = Object.assign({}, cLayer);
+          newCLayer.fromTime = cLayer.fromTime ? moment(cLayer.fromTime) : undefined;
+          newCLayer.toTime = cLayer.toTime ? moment(cLayer.toTime) : undefined;
+          return newCLayer;
+        }),
+      },
+      setWarnings,
+      setError,
+      setLoadingImages,
+    );
+
+    const { ext: imageExt } = IMAGE_FORMATS_INFO[imageFormat];
+    FileSaver.saveAs(finalImage, `Comparison_${finalFileName}.${imageExt}`);
+    setLoadingImages(false);
+  }
+
+  async function executeDownloadBasicVisualization(props, formData, baseParams) {
     let image;
+    const { imageFormat } = formData;
     try {
       image = await fetchImageFromParams({ ...props, ...formData, ...baseParams }, setWarnings);
     } catch (err) {
@@ -306,6 +353,23 @@ function ImageDownload(props) {
     setLoadingImages(false);
   }
 
+  async function download3D(formData) {
+    setLoadingImages(true);
+    const { fromTime, toTime, datasetId, layerId, customSelected } = props;
+    const { imageFormat } = formData;
+
+    const image = await getTerrainViewerImage({
+      ...props,
+      ...formData,
+      imageFormat: IMAGE_FORMATS_INFO[imageFormat],
+    });
+    const nicename = getNicename(fromTime, toTime, datasetId, layerId, customSelected, false);
+    const { ext: imageExt } = IMAGE_FORMATS_INFO[imageFormat];
+
+    FileSaver.saveAs(image, `${nicename}.${imageExt}`);
+    setLoadingImages(false);
+  }
+
   function checkIfCurrentLayerHasLegend() {
     const { layerId, datasetId, selectedThemeId } = props;
     if (layerId) {
@@ -325,6 +389,10 @@ function ImageDownload(props) {
 
   function displayLogInToAccessMessage() {
     store.dispatch(notificationSlice.actions.displayError(getLoggedInErrorMsg()));
+  }
+
+  function displayOnlyBasicDownloadPossibleMessage() {
+    store.dispatch(notificationSlice.actions.displayError(getOnlyBasicImgDownloadAvailableMsg()));
   }
 
   function addWarning(warningType, layerName) {
@@ -350,6 +418,7 @@ function ImageDownload(props) {
   const hasLegendData = checkIfCurrentLayerHasLegend();
   const isUserLoggedIn = props.user && props.user.userdata;
   const isGIBS = datasourceForDatasetId(props.datasetId) === DATASOURCES.GIBS;
+  const isOnCompareTab = props.selectedTabIndex === MAIN_TABS.COMPARE_TAB;
 
   return (
     <Rodal
@@ -369,27 +438,42 @@ function ImageDownload(props) {
     >
       <div className="image-download">
         <div className="image-download-mode-selection">
-          <EOBButton
-            text={t`Basic`}
-            className={selectedTab === TABS.BASIC ? 'selected' : ''}
-            onClick={() => setSelectedTab(TABS.BASIC)}
-          />
+          {!props.is3D && (
+            <>
+              <EOBButton
+                text={t`Basic`}
+                className={selectedTab === TABS.BASIC ? 'selected' : ''}
+                onClick={() => setSelectedTab(TABS.BASIC)}
+              />
 
-          <EOBButton
-            text={t`Analytical`}
-            className={selectedTab === TABS.ANALYTICAL ? 'selected' : ''}
-            onClick={() => setSelectedTab(TABS.ANALYTICAL)}
-            disabled={!isUserLoggedIn}
-            onDisabledClick={displayLogInToAccessMessage}
-          />
+              <EOBButton
+                text={t`Analytical`}
+                className={selectedTab === TABS.ANALYTICAL ? 'selected' : ''}
+                onClick={() => setSelectedTab(TABS.ANALYTICAL)}
+                disabled={!isUserLoggedIn || isOnCompareTab}
+                onDisabledClick={
+                  isOnCompareTab ? displayOnlyBasicDownloadPossibleMessage : displayLogInToAccessMessage
+                }
+              />
 
-          <EOBButton
-            text={t`High-res print`}
-            className={selectedTab === TABS.PRINT ? 'selected' : ''}
-            onClick={() => setSelectedTab(TABS.PRINT)}
-            disabled={!isUserLoggedIn}
-            onDisabledClick={displayLogInToAccessMessage}
-          />
+              <EOBButton
+                text={t`High-res print`}
+                className={selectedTab === TABS.PRINT ? 'selected' : ''}
+                onClick={() => setSelectedTab(TABS.PRINT)}
+                disabled={!isUserLoggedIn || isOnCompareTab}
+                onDisabledClick={
+                  isOnCompareTab ? displayOnlyBasicDownloadPossibleMessage : displayLogInToAccessMessage
+                }
+              />
+            </>
+          )}
+          {props.is3D && (
+            <EOBButton
+              text={t`Basic`}
+              className={selectedTab === TABS.TERRAIN_VIEWER ? 'selected' : ''}
+              onClick={() => setSelectedTab(TABS.TERRAIN_VIEWER)}
+            />
+          )}
         </div>
         <ImageDownloadWarningPanel warnings={warnings} />
         <ImageDownloadForms
@@ -398,6 +482,7 @@ function ImageDownload(props) {
           onDownloadBasic={downloadBasic}
           onDownloadAnalytical={downloadAnalytical}
           onDownloadPrint={downloadPrint}
+          onDownload3D={download3D}
           loading={loadingImages}
           allLayers={allLayers}
           allBands={allBands}
@@ -413,6 +498,8 @@ function ImageDownload(props) {
           allowShowLogoAnalytical={!isGIBS}
           areEffectsSet={!!effects}
           hasAOI={!!props.aoiGeometry}
+          is3D={props.is3D}
+          isUserLoggedIn={isUserLoggedIn}
         />
         <ImageDownloadErrorPanel error={error} />
       </div>
@@ -429,6 +516,10 @@ const mapStoreToProps = (store) => ({
   enabledOverlaysId: store.mainMap.enabledOverlaysId,
   user: store.auth.user,
   aoiGeometry: store.aoi.geometry,
+  selectedTabIndex: store.tabs.selectedTabIndex,
+  comparedLayers: store.compare.comparedLayers,
+  comparedOpacity: store.compare.comparedOpacity,
+  comparedClipping: store.compare.comparedClipping,
   layerId: store.visualization.layerId,
   evalscript: store.visualization.evalscript,
   evalscripturl: store.visualization.evalscripturl,
@@ -455,6 +546,8 @@ const mapStoreToProps = (store) => ({
   themesLists: store.themes.themesLists,
   selectedThemeId: store.themes.selectedThemeId,
   auth: store.auth,
+  is3D: store.mainMap.is3D,
+  terrainViewerId: store.terrainViewer.id,
 });
 
 export default connect(mapStoreToProps, null)(ImageDownload);

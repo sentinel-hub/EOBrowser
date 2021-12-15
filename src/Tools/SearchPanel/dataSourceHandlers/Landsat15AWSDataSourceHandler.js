@@ -6,7 +6,7 @@ import { DATASET_AWS_LMSSL1 } from '@sentinel-hub/sentinelhub-js';
 import LandsatDataSourceHandler from './LandsatDataSourceHandler';
 import { FetchingFunction } from '../search';
 import { Landsat15AWSTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/LandsatTooltip';
-import { AWS_LMSSL1 } from './dataSourceHandlers';
+import { AWS_LMSSL1 } from './dataSourceConstants';
 import { DATASOURCES } from '../../../const';
 
 export default class Landsat15AWSDataSourceHandler extends LandsatDataSourceHandler {

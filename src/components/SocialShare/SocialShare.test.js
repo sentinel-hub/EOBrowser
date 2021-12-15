@@ -2,7 +2,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
 import { sendFirebaseRequest, getAppropriateHashtags } from './SocialShare.utils';
-import { S2L1C, GIBS_MODIS_TERRA } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { S2L1C, GIBS_MODIS_TERRA } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 
 const mockNetwork = new MockAdapter(axios);
 

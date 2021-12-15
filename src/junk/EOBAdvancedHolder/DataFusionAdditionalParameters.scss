@@ -1,0 +1,17 @@
+.data-fusion-additional-parameters {
+  .additional-parameter {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 3px;
+
+    select {
+      margin-right: auto;
+    }
+
+    .additional-parameter-description {
+      font-size: 10px;
+      font-style: italic;
+    }
+  }
+}

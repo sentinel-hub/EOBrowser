@@ -17,6 +17,7 @@ import {
   DATASET_AWS_LMSSL1,
   DATASET_MODIS,
   DATASET_AWS_DEM,
+  DATASET_BYOC,
   S1GRDAWSEULayer,
   S2L1CLayer,
   S2L2ALayer,
@@ -33,6 +34,7 @@ import {
   Landsat15AWSLMSSL1Layer,
   MODISLayer,
   DEMLayer,
+  BYOCLayer,
   ProcessingDataFusionLayer,
 } from '@sentinel-hub/sentinelhub-js';
 
@@ -135,7 +137,17 @@ export function constructLayerFromDatasetId(datasetId, mosaickingOrder, addition
     case DATASET_MODIS.id:
       return new MODISLayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
     case DATASET_AWS_DEM.id:
-      return new DEMLayer({ evalscript: '//VERSION=3 ---', mosaickingOrder: mosaickingOrder });
+      return new DEMLayer({
+        evalscript: '//VERSION=3 ---',
+        mosaickingOrder: mosaickingOrder,
+        ...additionalParameters,
+      });
+    case DATASET_BYOC.id:
+      return new BYOCLayer({
+        evalscript: '//VERSION=3 ---',
+        mosaickingOrder: mosaickingOrder,
+        ...additionalParameters,
+      });
     default:
       console.error('Data fusion: unknown dataset');
       return null;

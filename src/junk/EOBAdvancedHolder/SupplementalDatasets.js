@@ -23,7 +23,14 @@ function SupplementalDatasets(props) {
             : moment.utc(availableSupplementalDatasets[dataset.id].dataset.maxDate);
 
         const label = availableSupplementalDatasets[dataset.id].label;
-        const minDate = moment.utc(availableSupplementalDatasets[dataset.id].dataset.minDate);
+        const minDate = availableSupplementalDatasets[dataset.id].dataset.minDate
+          ? moment.utc(availableSupplementalDatasets[dataset.id].dataset.minDate)
+          : moment.utc('1970-01-01');
+        const {
+          additionalParameters: initialAdditionalParameters,
+          additionalParametersSettings,
+          mosaickingOrderDisabled,
+        } = availableSupplementalDatasets[dataset.id];
         const { additionalParameters } = dataset;
 
         return (
@@ -35,8 +42,10 @@ function SupplementalDatasets(props) {
             timespan={dataset.timespan}
             initialTimespan={initialTimespan}
             additionalMosaickingOrders={additionalMosaickingOrders}
-            additionalParameters={additionalParameters}
+            additionalParameters={additionalParameters || initialAdditionalParameters}
+            additionalParametersSettings={additionalParametersSettings}
             additionalParametersComponent={additionalParametersComponent}
+            mosaickingOrderDisabled={mosaickingOrderDisabled}
             mosaickingOrder={dataset.mosaickingOrder}
             minDate={minDate}
             maxDate={maxDate}

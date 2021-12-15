@@ -6,7 +6,7 @@ import DataSourceHandler from './DataSourceHandler';
 import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/GenericSearchGroup';
 import ModisTooltip from './DatasourceRenderingComponents/dataSourceTooltips/ModisTooltip';
 import { FetchingFunction } from '../search';
-import { MODIS } from './dataSourceHandlers';
+import { MODIS } from './dataSourceConstants';
 import { DATASOURCES } from '../../../const';
 
 export default class ModisDataSourceHandler extends DataSourceHandler {

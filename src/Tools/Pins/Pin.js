@@ -41,7 +41,8 @@ export default class Pin extends Component {
   };
 
   render() {
-    const { allowRemove, arePinsSelectable, index, item, pinType, selectedForSharing } = this.props;
+    const { allowRemove, arePinsSelectable, index, item, pinType, selectedForSharing, canAddToCompare } =
+      this.props;
     const { description, title, lat, lng, zoom } = item;
     const { isValid, error } = isPinValid(item);
 
@@ -93,9 +94,11 @@ export default class Pin extends Component {
             </div>
             <div className="pin-info-row pin-date">
               <label>{t`Date`}:</label> <span className="pin-date">{constructTimespanString(item)}</span>
-              <div className="add-to-compare" title={t`Add to compare`} onClick={this.addPinToCompare}>
-                <i className="fas fa-exchange-alt"></i>
-              </div>
+              {canAddToCompare && (
+                <div className="add-to-compare" title={t`Add to compare`} onClick={this.addPinToCompare}>
+                  <i className="fas fa-exchange-alt"></i>
+                </div>
+              )}
             </div>
             <div className="pin-info-row pin-location" title={t`Zoom to pinned location`}>
               <label>{t`Lat/Lon`}:&nbsp;</label>

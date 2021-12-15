@@ -17,6 +17,27 @@ t`Date`;
 t`Terrain`;
 t`Time`;
 t`Position 3D camera based on 2D map`;
+t`Settings`;
+t`Sky / Atmosphere`;
+t`Sun`;
+t`Sun time (UTC)`;
+t`Sun projected shadows`;
+//Applies to the luminance of the terrain, regarding the angle between the terrain and the light source. This does not include the shadows casted from the other objects.
+t`Shading parameters`;
+// These are the projected shadows, where other objects cast shadows to the terrain. To render the projected shadows, it requires some hardware support whose settings are set here.
+t`Shadow parameters`;
+t`Ambient factor`;
+t`Diffuse factor`;
+t`Specular factor`;
+t`Specular power`;
+t`Shadow visibility`;
+t`Shadow rendering distance`;
+t`Shadow map size`;
+t`Parameters`;
+t`Local time on computer`;
+t`Edit`;
+t`Reset values`;
+t`Current time`;
 t`Mouse navigation`;
 t`Left button`;
 t`Click and drag using the left mouse button to move across the map at a fixed height. Use SHIFT + left button to rotate.`;
@@ -43,3 +64,13 @@ The farther you drag from the center, the faster you will change the view.`;
 t`Zoom buttons`;
 t`Clicking them will change the elevation of the camera. The plus button will move the camera
 closer to the earth, the minus button will move the camera further away.`;
+t`Double clicking with the left mouse button on the camera console resets the camera view to North and down looking position.`;
+t`Vertical terrain scaling`;
+t`Camera lens flare effect (with the sun)`;
+// Label for "pivot rotation" checkbox
+t`Rotate around the clicked point`;
+// Additional info for "pivot rotation" checkbox
+t`When checked, moving the mouse while the middle button is pressed, 
+rotates the world around the clicked point, 
+otherwise the camera rotates around itself. 
+Alt key, being pressed when starting to rotate, toggles this behavior.`;

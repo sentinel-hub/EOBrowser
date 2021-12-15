@@ -57,14 +57,19 @@ import {
   ESA_L8,
   AWS_L8L1C,
   ENVISAT_MERIS,
-  checkIfCustom,
   DEM_MAPZEN,
   DEM_COPERNICUS_30,
   DEM_COPERNICUS_90,
   COPERNICUS_CORINE_LAND_COVER,
   COPERNICUS_GLOBAL_LAND_COVER,
   COPERNICUS_WATER_BODIES,
-  getDataSourceHandler,
+  COPERNICUS_GLOBAL_SURFACE_WATER,
+  COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES,
+  COPERNICUS_HR_VPP_VEGETATION_INDICES,
+  COPERNICUS_HR_VPP_VPP_S1,
+  COPERNICUS_HR_VPP_VPP_S2,
+  COPERNICUS_CLC_ACCOUNTING,
+  COPERNICUS_WORLD_COVER,
   AWS_LOTL1,
   AWS_LOTL2,
   AWS_LTML1,
@@ -72,13 +77,17 @@ import {
   AWS_LMSSL1,
   AWS_LETML1,
   AWS_LETML2,
+} from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
+import {
+  checkIfCustom,
+  getDataSourceHandler,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import DEMDataSourceHandler from '../../Tools/SearchPanel/dataSourceHandlers/DEMDataSourceHandler';
 import { constructLayerFromDatasetId } from '../../junk/EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
 import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
 import { refetchWithDefaultToken } from '../../utils/fetching.utils';
-import { reqConfigMemoryCache, reqConfigGetMap } from '../../const';
+import { reqConfigMemoryCache, reqConfigGetMap, DISABLED_ORTHORECTIFICATION } from '../../const';
 
 class SentinelHubLayer extends L.TileLayer {
   constructor(options) {
@@ -86,7 +95,7 @@ class SentinelHubLayer extends L.TileLayer {
     const defaultOptions = {
       tileSize: 512,
       format: MimeTypes.JPEG,
-      attribution: '&copy; <a href="https://www.sentinel-hub.com" target="_blank">Sentinel Hub</a>',
+      attribution: '<a href="https://www.sentinel-hub.com" target="_blank">&copy Sentinel Hub</a>',
       preview: 2,
       transparent: true,
     };
@@ -105,6 +114,7 @@ class SentinelHubLayer extends L.TileLayer {
       downsampling,
       speckleFilter,
       orthorectification,
+      accessToken,
     } = options;
 
     this.layer = this.createLayer(url, {
@@ -121,6 +131,7 @@ class SentinelHubLayer extends L.TileLayer {
       downsampling: downsampling,
       speckleFilter: speckleFilter,
       orthorectification: orthorectification,
+      accessToken: accessToken,
     });
 
     const mergedOptions = Object.assign(defaultOptions, options);
@@ -131,8 +142,16 @@ class SentinelHubLayer extends L.TileLayer {
     this._initContainer();
     this._crs = this.options.crs || map.options.crs;
     L.TileLayer.prototype.onAdd.call(this, map);
-    map.on('move', this.updateClipping, this);
+    map.on(
+      'move',
+      () => {
+        this.updateClipping();
+        this.updateOpacity();
+      },
+      this,
+    );
     this.updateClipping();
+    this.updateOpacity();
   };
 
   updateClipping = () => {
@@ -160,6 +179,12 @@ class SentinelHubLayer extends L.TileLayer {
     }
   };
 
+  updateOpacity = () => {
+    if (!this._map || !this.opacity) return this;
+    let e = this.getContainer();
+    e.style['opacity'] = this.opacity;
+  };
+
   createTile = (coords, done) => {
     const tile = L.DomUtil.create('img', 'leaflet-tile');
     tile.width = this.options.tileSize;
@@ -167,17 +192,10 @@ class SentinelHubLayer extends L.TileLayer {
     const cancelToken = new CancelToken();
     tile.cancelToken = cancelToken;
     const tileSize = this.options.tileSize;
-    const nwPoint = coords.multiplyBy(tileSize);
-    const sePoint = nwPoint.add([tileSize, tileSize]);
-    const nw = L.CRS.EPSG3857.project(this._map.unproject(nwPoint, coords.z));
-    const se = L.CRS.EPSG3857.project(this._map.unproject(sePoint, coords.z));
-    const bbox = new BBox(CRS_EPSG3857, nw.x, se.y, se.x, nw.y);
+    const individualTileParams = { ...this.options, width: tileSize, height: tileSize, zoom: coords.z };
 
-    const individualTileParams = { ...this.options, width: tileSize, height: tileSize };
-    individualTileParams.bbox = bbox;
     const onTileImageError = this.options.onTileImageError;
     const onTileImageLoad = this.options.onTileImageLoad;
-
     this.layer.then(async (layer) => {
       let reqConfig = { cancelToken: cancelToken, ...reqConfigGetMap };
 
@@ -201,12 +219,31 @@ class SentinelHubLayer extends L.TileLayer {
           }
         }
       }
-      const apiType = layer.supportsApiType(ApiType.PROCESSING) ? ApiType.PROCESSING : ApiType.WMS;
+      const apiType = layer.supportsApiType(ApiType.PROCESSING)
+        ? ApiType.PROCESSING
+        : layer.supportsApiType(ApiType.WMTS)
+        ? ApiType.WMTS
+        : ApiType.WMS;
 
       if (this.options.getMapAuthToken) {
         reqConfig.authToken = this.options.getMapAuthToken;
       }
 
+      if (apiType === ApiType.WMTS) {
+        individualTileParams.tileCoord = {
+          x: coords.x,
+          y: coords.y,
+          z: coords.z,
+        };
+      } else {
+        const nwPoint = coords.multiplyBy(tileSize);
+        const sePoint = nwPoint.add([tileSize, tileSize]);
+        const nw = L.CRS.EPSG3857.project(this._map.unproject(nwPoint, coords.z));
+        const se = L.CRS.EPSG3857.project(this._map.unproject(sePoint, coords.z));
+        const bbox = new BBox(CRS_EPSG3857, nw.x, se.y, se.x, nw.y);
+
+        individualTileParams.bbox = bbox;
+      }
       refetchWithDefaultToken(
         (reqConfig) =>
           layer.getMap(individualTileParams, apiType, reqConfig).then((blob) => {
@@ -249,6 +286,7 @@ class SentinelHubLayer extends L.TileLayer {
       downsampling,
       speckleFilter,
       orthorectification,
+      accessToken,
     } = this.options;
     this.layer = this.createLayer(url, {
       datasetId: datasetId,
@@ -262,6 +300,7 @@ class SentinelHubLayer extends L.TileLayer {
       downsampling: downsampling,
       speckleFilter: speckleFilter,
       orthorectification: orthorectification,
+      accessToken: accessToken,
     });
 
     this.redraw();
@@ -270,6 +309,11 @@ class SentinelHubLayer extends L.TileLayer {
   setClipping = (clipping) => {
     this.clipping = clipping;
     this.updateClipping();
+  };
+
+  setOpacity = (opacity) => {
+    this.opacity = opacity;
+    this.updateOpacity();
   };
 
   createLayer = async (url, options) => {
@@ -310,7 +354,7 @@ class SentinelHubLayer extends L.TileLayer {
       layer.speckleFilter = speckleFilter;
     }
     if (orthorectification) {
-      if (orthorectification === 'DISABLED') {
+      if (orthorectification === DISABLED_ORTHORECTIFICATION) {
         layer.orthorectify = false;
       } else {
         layer.demInstanceType = orthorectification;
@@ -353,6 +397,7 @@ class SentinelHubLayer extends L.TileLayer {
       downsampling,
       speckleFilter,
       orthorectification,
+      accessToken,
     },
   ) => {
     switch (datasetId) {
@@ -372,6 +417,11 @@ class SentinelHubLayer extends L.TileLayer {
           downsampling: downsampling,
           speckleFilter: speckleFilter,
           demInstanceType: orthorectification,
+          orthorectify: orthorectification
+            ? orthorectification === DISABLED_ORTHORECTIFICATION
+              ? false
+              : true
+            : null,
         });
       case S1:
       case S1_EW:
@@ -504,21 +554,45 @@ class SentinelHubLayer extends L.TileLayer {
       case COPERNICUS_CORINE_LAND_COVER:
       case COPERNICUS_GLOBAL_LAND_COVER:
       case COPERNICUS_WATER_BODIES:
+      case COPERNICUS_GLOBAL_SURFACE_WATER:
+      case COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES:
+      case COPERNICUS_HR_VPP_VEGETATION_INDICES:
+      case COPERNICUS_HR_VPP_VPP_S1:
+      case COPERNICUS_HR_VPP_VPP_S2:
+      case COPERNICUS_CLC_ACCOUNTING:
+      case COPERNICUS_WORLD_COVER:
         const dsh = getDataSourceHandler(datasetId);
-        return await this.createBYOCLayer(url, dsh.KNOWN_COLLECTIONS[datasetId], evalscript, evalscripturl);
+        return await this.createBYOCLayer(
+          url,
+          dsh.KNOWN_COLLECTIONS[datasetId],
+          evalscript,
+          evalscripturl,
+          accessToken,
+          upsampling,
+          downsampling,
+        );
       default:
         const isBYOC = !!checkIfCustom(datasetId);
         if (isBYOC) {
-          return await this.createBYOCLayer(url, datasetId, evalscript, evalscripturl);
+          return await this.createBYOCLayer(
+            url,
+            datasetId,
+            evalscript,
+            evalscripturl,
+            accessToken,
+            upsampling,
+            downsampling,
+          );
         }
         throw new Error("Dataset doesn't support evalscript");
     }
   };
 
-  createBYOCLayer = (url, collectionId, evalscript, evalscripturl, upsampling, downsampling) => {
-    return LayersFactory.makeLayers(url, null, null, reqConfigMemoryCache).then(async (layers) => {
+  createBYOCLayer = (url, collectionId, evalscript, evalscripturl, accessToken, upsampling, downsampling) => {
+    let reqConfig = { authToken: accessToken ? accessToken : undefined, ...reqConfigMemoryCache };
+    return LayersFactory.makeLayers(url, null, null, reqConfig).then(async (layers) => {
       for (let layer of layers) {
-        await layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
+        await layer.updateLayerFromServiceIfNeeded(reqConfig);
         if (
           Array.isArray(collectionId)
             ? collectionId.includes(layer.collectionId)
@@ -526,8 +600,17 @@ class SentinelHubLayer extends L.TileLayer {
         ) {
           layer.evalscript = evalscript;
           layer.evalscripturl = evalscripturl;
-          layer.upsampling = upsampling;
-          layer.downsampling = downsampling;
+          if (upsampling) {
+            layer.upsampling = upsampling;
+          } else if (!layer.upsampling) {
+            layer.upsampling = Interpolator.NEAREST;
+          }
+          if (downsampling) {
+            layer.downsampling = downsampling;
+          } else if (!layer.downsampling) {
+            layer.downsampling = Interpolator.NEAREST;
+          }
+
           return layer;
         }
       }
@@ -543,6 +626,7 @@ class SentinelHubLayer extends L.TileLayer {
       layer.evalscripturl = evalscripturl;
       layer.upsampling = upsampling;
       layer.downsampling = downsampling;
+      layer.maxCloudCoverPercent = 100;
       return layer;
     });
   };
@@ -566,6 +650,8 @@ class SentinelHubLayerComponent extends GridLayer {
     layer.on('tileunload', function (e) {
       e.tile.cancelToken.cancel();
     });
+    layer.setClipping(params.clipping);
+    layer.setOpacity(params.opacity);
     return layer;
   }
 
@@ -630,6 +716,9 @@ class SentinelHubLayerComponent extends GridLayer {
       options.customSelected = false;
     }
 
+    if (params.tileSize) {
+      options.tileSize = params.tileSize;
+    }
     if (params.minZoom) {
       options.minZoom = params.minZoom;
     }

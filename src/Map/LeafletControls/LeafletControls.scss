@@ -14,18 +14,28 @@
 
       @media screen and (max-width: 1200px) {
         .leaflet-control-attribution {
-          max-width: 230px;
+          max-width: 340px;
         }
       }
 
-      @media screen and (max-width: 780px) {
+      @media screen and (max-width: 890px) {
         .leaflet-control-attribution {
           bottom: 25px;
+        }
+      }
+
+      @media screen and (max-width: 400px) {
+        .leaflet-control-attribution {
+          bottom: 23px;
+          font-size: 10px;
+          padding: 2px 5px;
         }
       }
     }
 
     .leaflet-bottom.leaflet-right {
+      height: 90px;
+
       .leaflet-control-zoom {
         border: none;
 
@@ -66,18 +76,19 @@
           background: $mainDark;
           color: #fff;
           border-color: #fff;
+          box-shadow: 1px 1px 4px #000;
         }
       }
 
       @media screen and (max-width: 500px) {
         .leaflet-control-scale {
-          bottom: 2px;
+          margin-right: 10px;
         }
       }
 
       @media screen and (max-width: 400px) {
         .leaflet-control-scale {
-          bottom: 62px;
+          margin-right: 5px;
         }
       }
 
@@ -103,10 +114,23 @@
         }
       }
 
-      @media screen and (max-width: 400px) {
+      @media screen and (max-width: 500px) {
         .leaflet-control-map-coordinates {
           bottom: 60px;
+          margin-right: 10px;
         }
+      }
+
+      @media screen and (max-width: 400px) {
+        .leaflet-control-map-coordinates {
+          margin-right: 5px;
+        }
+      }
+    }
+
+    @media screen and (max-width: 700px) {
+      .leaflet-bottom.leaflet-right {
+        height: 19px;
       }
     }
   }

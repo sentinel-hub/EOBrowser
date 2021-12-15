@@ -68,6 +68,7 @@ export class TimespanPicker extends Component {
           minDate={this.props.minDate}
           maxDate={toTime}
           onQueryDatesForActiveMonth={onQueryDatesForActiveMonth}
+          timespanExpanded={this.props.timespanExpanded}
         />
         <DateTimeInput
           id={`${id}-to`}
@@ -78,11 +79,12 @@ export class TimespanPicker extends Component {
           minDate={fromTime}
           maxDate={this.props.maxDate}
           onQueryDatesForActiveMonth={onQueryDatesForActiveMonth}
+          timespanExpanded={this.props.timespanExpanded}
         />
         <div className="timespan-calendar-holder" ref={(e) => (this.calendarHolder = e)} />
         {!autoApply && (
           <div className="apply-button">
-            <button className="btn" onClick={this.apply}>
+            <button className="eob-btn" onClick={this.apply}>
               {t`Apply`}
             </button>
           </div>

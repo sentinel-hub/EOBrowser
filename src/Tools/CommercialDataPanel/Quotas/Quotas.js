@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { t } from 'ttag';
 
-import { TPDI, TPDICollections } from '@sentinel-hub/sentinelhub-js';
+import { TPDICollections } from '@sentinel-hub/sentinelhub-js';
 import { EOBButton } from '../../../junk/EOBCommon/EOBButton/EOBButton';
 import { NotificationPanel } from '../../../Notification/NotificationPanel';
 import { formatNumberAsRoundedUnit } from '../commercialData.utils';
@@ -50,35 +50,7 @@ function renderQuotas(quotas) {
   );
 }
 
-const Quotas = ({ user }) => {
-  const [quotas, setQuotas] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const fetchQuotas = async (user) => {
-    if (user && !!user.access_token) {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const requestsConfig = {
-          authToken: user.access_token,
-        };
-        const result = await TPDI.getQuotas(requestsConfig);
-        setQuotas(result.sort((a, b) => a.collectionId.localeCompare(b.collectionId)));
-      } catch (err) {
-        console.error(err);
-        setError(t`Unable to get quotas: ${err.message}`);
-        setQuotas([]);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchQuotas(user);
-  }, [user]);
-
+const Quotas = ({ user, quotas, isLoading, error, fetchQuotas }) => {
   return (
     <div className="commercial-data-quotas">
       {renderQuotas(quotas)}

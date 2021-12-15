@@ -51,7 +51,7 @@ class ResultItem extends React.Component {
               <i className="fa fa-satellite" />
               {getDatasetLabel(datasetId)}
             </div>
-            {datasource !== DATASOURCES.DEM && (
+            {datasource !== DATASOURCES.DEM && datasource !== DATASOURCES.PLANET_NICFI && (
               <>
                 <div className="detail" title={t`Sensing time`}>
                   <i className="fa fa-calendar" />
@@ -63,10 +63,18 @@ class ResultItem extends React.Component {
                 </div>
               </>
             )}
+            {datasource === DATASOURCES.PLANET_NICFI && (
+              <div className="detail" title={t`Sensing time`}>
+                <i className="fa fa-calendar" />
+                {`${moment.utc(metadata.mosaicTimeRange.fromTime).format('YYYY-MM-DD')} - ${moment
+                  .utc(metadata.mosaicTimeRange.toTime)
+                  .format('YYYY-MM-DD')}`}
+              </div>
+            )}
             {metadata.cloudCoverage !== undefined && (
               <div className="detail" title={t`Cloud coverage`}>
                 <i className="fa fa-cloud" />
-                {metadata.cloudCoverage.toFixed(1)} %
+                {metadata.cloudCoverage.toFixed(1)}%
               </div>
             )}
             {metadata.sunElevation !== undefined && (

@@ -78,7 +78,7 @@ export class VisualizationTimeSelect extends Component {
 
     return (
       <>
-        <div className="visualization-time-select">
+        <div className={`visualization-time-select ${timespanExpanded ? 'expanded' : ''}`}>
           <div>
             <b className="time-select-type">{timespanExpanded ? t`Timespan:` : t`Date:`}</b>
             {!timespanExpanded &&
@@ -131,6 +131,7 @@ export class VisualizationTimeSelect extends Component {
             timespan={{ fromTime: fromTime, toTime: toTime }}
             applyTimespan={this.updateTimespan}
             onQueryDatesForActiveMonth={onQueryDatesForActiveMonth}
+            timespanExpanded={timespanExpanded}
           />
         )}
         <div className="visualization-calendar-holder" ref={(e) => (this.calendarHolder = e)} />

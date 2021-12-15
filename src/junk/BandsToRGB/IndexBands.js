@@ -44,15 +44,12 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   const equationArray = [...equation]; // split string into array
 
   React.useEffect(() => {
+    initValues();
     if (evalscript) {
       const parsed = parseIndexEvalscript(evalscript);
       if (parsed !== null) {
         initEvalFromUrl(parsed);
-      } else {
-        initValues();
       }
-    } else {
-      initValues();
     }
 
     setLoading(false);
@@ -65,11 +62,11 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
   }
 
   const initEvalFromUrl = (parsed) => {
-    setValues(parsed.positions);
+    setValues(!parsed.positions.includes(NaN) ? parsed.positions : DEFAULT_VALUES);
     setEquation(parsed.equation);
     setColorRamp(parsed.colors);
-    setMin(parsed.positions[0]); // because we don't save slider min/max use first/last values from evalscript
-    setMax(parsed.positions[parsed.positions.length - 1]);
+    setMin(parsed.positions[0] || DEFAULT_DOMAIN.min); // because we don't save slider min/max use first/last values from evalscript
+    setMax(parsed.positions[parsed.positions.length - 1] || DEFAULT_DOMAIN.max);
     onChange(layers, { equation: parsed.equation, colorRamp: parsed.colors, values: parsed.positions });
   };
 
@@ -248,7 +245,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
         </div>
         <div className="add-remove-buttons">
           <button
-            className="btn primary"
+            className="eob-btn primary"
             disabled={values.length === 2 || invalidMinMax()}
             onClick={removeHandle}
             title={t`Remove color picker`}
@@ -256,7 +253,7 @@ export const IndexBands = ({ bands, layers, onChange, evalscript }) => {
             <i className="fas fa-minus-square" />
           </button>
           <button
-            className="btn primary"
+            className="eob-btn primary"
             disabled={values.length === 8 || invalidMinMax()}
             onClick={addHandle}
             title={t`Add color picker`}

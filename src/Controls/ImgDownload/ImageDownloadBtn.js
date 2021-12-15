@@ -7,6 +7,9 @@ import { ModalId } from '../../Modals/Consts';
 
 import downloadIcon from './download-icon.svg';
 import './ImgDownloadBtn.scss';
+import { TABS } from '../../const';
+import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { getDatasourceNotSupportedMsg } from '../../junk/ConstMessages';
 
 class ImageDownloadBtn extends Component {
   onOpenImageDownloadPanel = (enabled, errorMessage) => {
@@ -17,17 +20,43 @@ class ImageDownloadBtn extends Component {
     store.dispatch(modalSlice.actions.addModal({ modal: ModalId.IMG_DOWNLOAD }));
   };
 
-  checkIfEnabled = () => {
-    const { layerId, customSelected, selectedTabIndex } = this.props;
+  checkIfSupportedByDatasetId = (datasetId) => {
+    const datasourceHandler = getDataSourceHandler(datasetId);
+    const supportsImgExport = datasourceHandler.supportsImgExport();
+    if (!supportsImgExport) {
+      return { enabled: false, errorMessage: getDatasourceNotSupportedMsg() };
+    }
+    return { enabled: true, errorMessage: null };
+  };
 
-    const isOnVisualizationPanel = selectedTabIndex === 2;
+  checkIfEnabled = () => {
+    const { layerId, customSelected, selectedTabIndex, comparedLayers, datasetId } = this.props;
+    const isOnVisualizationPanel = selectedTabIndex === TABS.VISUALIZE_TAB;
+    const isOnComparePanel = selectedTabIndex === TABS.COMPARE_TAB;
     const hasVisualization = !!(layerId || customSelected);
 
-    if (!hasVisualization) {
+    if (hasVisualization && datasetId && !isOnComparePanel) {
+      return this.checkIfSupportedByDatasetId(datasetId);
+    }
+
+    if (!hasVisualization && !isOnComparePanel) {
       return { enabled: false, errorMessage: t`please select a layer` };
     }
-    if (!isOnVisualizationPanel) {
-      return { enabled: false, errorMessage: t`you can only download image while visualizing` };
+    if (!isOnVisualizationPanel && !isOnComparePanel) {
+      return {
+        enabled: false,
+        errorMessage: t`you can only download an image while visualizing or comparing`,
+      };
+    }
+    if (isOnComparePanel && comparedLayers.length < 2) {
+      return { enabled: false, errorMessage: t`you need to compare at least 2 layers` };
+    }
+    if (isOnComparePanel && comparedLayers.length >= 2) {
+      const allLayersSupport = comparedLayers.map((l) => this.checkIfSupportedByDatasetId(l.datasetId));
+      const disabledDatasetFound = allLayersSupport.find((s) => !s.enabled);
+      if (disabledDatasetFound) {
+        return disabledDatasetFound;
+      }
     }
     return { enabled: true, errorMessage: null };
   };
@@ -59,6 +88,7 @@ const mapStoreToProps = (store) => ({
   visualizationUrl: store.visualization.visualizationUrl,
   datasetId: store.visualization.datasetId,
   selectedTabIndex: store.tabs.selectedTabIndex,
+  comparedLayers: store.compare.comparedLayers,
 });
 
 export default connect(mapStoreToProps, null)(ImageDownloadBtn);

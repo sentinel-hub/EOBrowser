@@ -12,6 +12,7 @@ import Pin from './Pin';
 import PinTools from './PinTools';
 import UpdatingStatus from './UpdatingStatus';
 import { constructEffectsFromPinOrHighlight } from '../../utils/effectsUtils';
+import { setTerrainViewerFromPin } from '../../TerrainViewer/TerrainViewer.utils';
 
 import store, {
   mainMapSlice,
@@ -20,7 +21,6 @@ import store, {
   pinsSlice,
   themesSlice,
   visualizationSlice,
-  terrainViewerSlice,
 } from '../../store';
 
 import { getDataSourceHandler } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
@@ -284,6 +284,7 @@ class PinPanel extends Component {
     }
     const pin = this.props.pinItems[index].item;
     const type = this.props.pinItems[index].type;
+
     if (type === UNSAVED_PINS) {
       let pins = getPinsFromSessionStorage();
       if (!pins.length) {
@@ -301,6 +302,12 @@ class PinPanel extends Component {
         })
         .catch(() => {});
     }
+
+    this.setState((prevState) => {
+      return {
+        selectedPins: prevState.selectedPins.filter((p) => p._id !== pin._id),
+      };
+    });
   };
 
   onRemoveAllPins = () => {
@@ -467,15 +474,19 @@ class PinPanel extends Component {
     this.props.setSelectedPin(this.props.item);
     this.props.setActiveTabIndex(2);
 
-    if (terrainViewerSettings && Object.keys(terrainViewerSettings).length > 0) {
-      store.dispatch(terrainViewerSlice.actions.setTerrainViewerSettings(terrainViewerSettings));
-      store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TERRAIN_VIEWER }));
-    }
+    setTerrainViewerFromPin({
+      lat: parsedLat,
+      lng: parsedLng,
+      zoom: parsedZoom,
+      terrainViewerSettings: terrainViewerSettings,
+      is3D: this.props.is3D,
+      terrainViewerId: this.props.terrainViewerId,
+    });
   };
 
   onTogglePinForSelection = (pinForSharing) => {
     //check if pin is already in list of pins for sharing
-    const isPinSelected = this.state.selectedPins.find((pin) => pin === pinForSharing);
+    const isPinSelected = this.state.selectedPins.find((pin) => pin._id === pinForSharing._id);
 
     //if pin is not already selected, add it to the list. Otherwise remove it from the list
     if (!isPinSelected) {
@@ -484,7 +495,7 @@ class PinPanel extends Component {
       });
     } else {
       this.setState({
-        selectedPins: [...this.state.selectedPins.filter((pin) => pin !== pinForSharing)],
+        selectedPins: [...this.state.selectedPins.filter((pin) => pin._id !== pinForSharing._id)],
       });
     }
   };
@@ -678,7 +689,7 @@ class PinPanel extends Component {
 
   render() {
     const { operation, selectedPins, updatingPins, updatingPinsError } = this.state;
-    const { pinItems } = this.props;
+    const { pinItems, is3D } = this.props;
     const arePinsSelectable = operation === OPERATION_SHARE;
     const areAllPinsSelected = pinItems && selectedPins && selectedPins.length === pinItems.length;
 
@@ -698,6 +709,7 @@ class PinPanel extends Component {
               onShareClick={this.toggleSharePins}
               cancelSharePins={this.cancelSharePins}
               onAnimateClick={this.openAnimatePanel}
+              pinsStoryBuilderEnabled={!is3D}
             />
           </div>
           {operation === OPERATION_SHARE && (
@@ -753,6 +765,7 @@ class PinPanel extends Component {
               allowRemove={true}
               onRemovePin={this.onRemovePin}
               arePinsSelectable={arePinsSelectable}
+              canAddToCompare={!is3D}
               savePinProperty={this.savePinProperty}
               setSelectedPin={this.props.setSelectedPin}
               setTimeSpanExpanded={this.props.setTimeSpanExpanded}
@@ -761,7 +774,7 @@ class PinPanel extends Component {
                   ? this.onTogglePinForSelection(pin.item)
                   : this.onPinSelect(pin.item, arePinsSelectable)
               }
-              selectedForSharing={!!selectedPins.find((sharedPin) => sharedPin === pin.item)}
+              selectedForSharing={!!selectedPins.find((sharedPin) => sharedPin._id === pin.item._id)}
             />
           ))}
           {/* no pins found and not logged in notification banner */}
@@ -809,6 +822,8 @@ const mapStoreToProps = (store) => ({
   selectedLanguage: store.language.selectedLanguage,
   currentMapLat: store.mainMap.lat,
   currentMapLng: store.mainMap.lng,
+  is3D: store.mainMap.is3D,
+  terrainViewerId: store.terrainViewer.id,
 });
 
 export default connect(mapStoreToProps, null)(PinPanel);

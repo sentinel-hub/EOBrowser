@@ -102,7 +102,7 @@ const OrderOptions = ({
   const createOrderHandler = () => {
     if (!orderOptions.collectionId) {
       setConfirmAction({
-        title: t`Creating order`,
+        title: () => t`Creating order`,
         message: t`Are you sure you want to create an order without a Collection ID?  \n When you confirm your order a new collection will be created automatically.`,
         action: () => {
           onCreateOrder();

@@ -4,6 +4,7 @@ import {
   Resolution,
   CacheTarget,
   SpeckleFilterType,
+  DEMInstanceTypeOrthorectification,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
@@ -69,12 +70,21 @@ export const SEARCH_PANEL_TABS = {
   HIGHLIGHTS_TAB: 2,
 };
 
+export const TABS = {
+  DISCOVER_TAB: 0,
+  VISUALIZE_TAB: 2,
+  COMPARE_TAB: 4,
+  PINS_TAB: 3,
+};
+
+export const DISABLED_ORTHORECTIFICATION = 'DISABLED';
+
 export const ORTHORECTIFICATION_OPTIONS = {
-  DISABLED: t`Disabled`,
-  MAPZEN: t`Yes` + ' (Mapzen DEM)',
-  COPERNICUS: t`Yes` + ' (Copernicus 10/30m DEM)',
-  COPERNICUS_30: t`Yes` + ' (Copernicus 30m DEM)',
-  COPERNICUS_90: t`Yes` + ' (Copernicus 90m DEM)',
+  [DISABLED_ORTHORECTIFICATION]: t`Disabled`,
+  [DEMInstanceTypeOrthorectification.MAPZEN]: t`Yes` + ' (Mapzen DEM)',
+  [DEMInstanceTypeOrthorectification.COPERNICUS]: t`Yes` + ' (Copernicus 10/30m DEM)',
+  [DEMInstanceTypeOrthorectification.COPERNICUS_30]: t`Yes` + ' (Copernicus 30m DEM)',
+  [DEMInstanceTypeOrthorectification.COPERNICUS_90]: t`Yes` + ' (Copernicus 90m DEM)',
 };
 
 export const DATASOURCES = {
@@ -93,5 +103,39 @@ export const DATASOURCES = {
   GIBS: 'GIBS',
   DEM: 'DEM',
   COPERNICUS: 'Copernicus Services',
+  PLANET_NICFI: 'Planet NICFI',
   CUSTOM: 'CUSTOM',
+};
+
+export const POWERED_BY_GOOGLE_LABEL = 'powered_by_google_img';
+
+export const defaultEffects = {
+  gainEffect: 1,
+  gammaEffect: 1,
+  redRangeEffect: [0, 1],
+  greenRangeEffect: [0, 1],
+  blueRangeEffect: [0, 1],
+  redCurveEffect: {
+    points: [
+      { x: 0, y: 0 },
+      { x: 1, y: 1 },
+    ],
+  },
+  greenCurveEffect: {
+    points: [
+      { x: 0, y: 0 },
+      { x: 1, y: 1 },
+    ],
+  },
+  blueCurveEffect: {
+    points: [
+      { x: 0, y: 0 },
+      { x: 1, y: 1 },
+    ],
+  },
+  minQa: 50,
+  upsampling: '',
+  downsampling: '',
+  speckleFilter: '',
+  orthorectification: '',
 };

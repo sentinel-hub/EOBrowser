@@ -178,7 +178,7 @@ class AOI extends Component {
         ref={(r) => {
           this.ref = r;
         }}
-        className="aoi-wrapper"
+        className={`aoi-wrapper ${this.props.className}`}
       >
         <EOBAOIPanelButton
           disabled={false}

@@ -39,7 +39,7 @@ class Measure extends Component {
         ref={(r) => {
           this.ref = r;
         }}
-        className="measure-wrapper"
+        className={`measure-wrapper ${this.props.className}`}
       >
         <EOBMeasurePanelButton
           isLoggedIn={this.props.user}

@@ -11,14 +11,18 @@ import {
   DATASET_S5PL2,
   DATASET_AWSEU_S1GRD,
   DATASET_AWS_DEM,
+  DATASET_AWS_LOTL1,
 } from '@sentinel-hub/sentinelhub-js';
 
 import { b64EncodeUnicode } from './base64MDN';
 import { getDataSourceHandler } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { BAND_UNIT } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
+import { TABS } from '../const';
+import { replaceDeprecatedDatasetWithNew } from './handleOldUrls';
 
 export function getUrlParams() {
-  const urlParamString = window.location.search.length > 0 ? window.location.search : window.location.hash;
+  const urlParamString =
+    window.location.search.length > 0 ? window.location.search : window.location.hash.substring(1);
   const searchParams = new URLSearchParams(urlParamString);
   return Object.fromEntries(searchParams.entries());
 }
@@ -143,7 +147,7 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
     params.layerId = layerId;
   }
 
-  if (selectedTabIndex === 2) {
+  if (selectedTabIndex === TABS.VISUALIZE_TAB) {
     // Visualize tab is selected
 
     if (handlePositions && customSelected && evalscript) {
@@ -198,10 +202,9 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
     if (isDataFusionEnabled(dataFusion)) {
       params.dataFusion = JSON.stringify(dataFusion);
     }
-  }
-
-  if (terrainViewerSettings !== null) {
-    params.terrainViewerSettings = JSON.stringify(terrainViewerSettings);
+    if (terrainViewerSettings !== null) {
+      params.terrainViewerSettings = JSON.stringify(terrainViewerSettings);
+    }
   }
 
   const escapedParams = Object.keys(params)
@@ -261,8 +264,8 @@ function evaluatePixel(samples) {
     visVal = [...viz.process(index),samples.dataMask];
   }
 
-  // The library for tiffs works well only if there is only one channel returned.
-  // So we encode the "no data" as NaN here and ignore NaNs on frontend.
+  // The library for tiffs only works well if there is one channel returned.
+  // So here we encode "no data" as NaN and ignore NaNs on the frontend.  
   const indexVal = samples.dataMask === 1 ? index : NaN;
 
   return { default: visVal, index: [indexVal] };
@@ -320,20 +323,6 @@ return colorBlend(
   return `return [${Object.values(bands)
     .map((band) => (bandUnitIsKelvin(band, bandsWithUnits) ? '' : '2.5*') + band)
     .join(',')}];`;
-}
-
-export function validateEvalScript(evalscript) {
-  try {
-    if (evalscript.startsWith('//VERSION=3')) {
-      const setupFunction = /function\s+?setup\s*?\(.*?\)\s*?\{.*?\}/s;
-      const evaluatePixelFunction = /function\s+?evaluatePixel\s*?\(.*?\)\s*?\{.*?\}/s;
-
-      return setupFunction.test(evalscript) && evaluatePixelFunction.test(evalscript);
-    }
-    return true;
-  } catch (e) {
-    return false;
-  }
 }
 
 export function parseEvalscriptBands(evalscript) {
@@ -467,50 +456,61 @@ export function readBlob(blob) {
 }
 
 export function parseDataFusion(dataFusionString, datasetId) {
-  const dataFusion = JSON.parse(dataFusionString);
-  return ensureCorrectDataFusionFormat(dataFusion, datasetId);
+  const dataFusion = ensureCorrectDataFusionFormat(JSON.parse(dataFusionString), datasetId);
+  return replaceDeprecatedDatasetWithNew(dataFusion, {
+    oldDataset: DATASET_AWS_L8L1C,
+    newDataset: DATASET_AWS_LOTL1,
+  });
 }
 
 export function ensureCorrectDataFusionFormat(dataFusion, datasetId) {
-  if (Array.isArray(dataFusion)) {
-    for (let dataset of dataFusion) {
-      if (dataset.timespan) {
-        const [fromTime, toTime] = dataset.timespan;
-        const parsedTimespan = [moment.utc(fromTime), moment.utc(toTime)];
-        dataset.timespan = parsedTimespan;
+  try {
+    if (Array.isArray(dataFusion)) {
+      for (let dataset of dataFusion) {
+        if (dataset.timespan) {
+          const [fromTime, toTime] = dataset.timespan;
+          const parsedTimespan = [moment.utc(fromTime), moment.utc(toTime)];
+          dataset.timespan = parsedTimespan;
+        }
       }
-    }
-    return dataFusion;
-  } else if (dataFusion && typeof dataFusion === 'object') {
-    /*
+      return dataFusion;
+    } else if (dataFusion && dataFusion.constructor.name === 'Object') {
+      /*
       Converts legacy data fusion format to the new format
     */
-    const dataFusionInNewFormat = [];
+      const dataFusionInNewFormat = [];
 
-    if (Object.keys(dataFusion).length === 0) {
-      return dataFusionInNewFormat;
-    }
+      if (Object.keys(dataFusion).length === 0) {
+        return dataFusionInNewFormat;
+      }
 
-    const shDataset = getDataSourceHandler(datasetId).getSentinelHubDataset(datasetId);
-    const primaryLayerAlias = dataFusion.primaryLayerAlias || shDataset.shProcessingApiDatasourceAbbreviation;
+      const shDataset = getDataSourceHandler(datasetId).getSentinelHubDataset(datasetId);
+      const primaryLayerAlias =
+        dataFusion.primaryLayerAlias || shDataset.shProcessingApiDatasourceAbbreviation;
 
-    dataFusionInNewFormat.push({
-      id: shDataset.id,
-      alias: primaryLayerAlias,
-    });
-
-    for (let [id, settings] of Object.entries(dataFusion.supplementalDatasets)) {
-      const dataset = shJSdatasetIdToDataset(id);
       dataFusionInNewFormat.push({
-        id: id,
-        alias: settings.alias || dataset.shProcessingApiDatasourceAbbreviation,
-        mosaickingOrder: settings.mosaickingOrder,
-        timespan: settings.timespan
-          ? [moment.utc(settings.timespan[0]), moment.utc(settings.timespan[1])]
-          : undefined,
+        id: shDataset.id,
+        alias: primaryLayerAlias,
       });
+
+      for (let [id, settings] of Object.entries(dataFusion.supplementalDatasets)) {
+        const dataset = shJSdatasetIdToDataset(id);
+        dataFusionInNewFormat.push({
+          id: id,
+          alias: settings.alias || dataset.shProcessingApiDatasourceAbbreviation,
+          mosaickingOrder: settings.mosaickingOrder,
+          timespan: settings.timespan
+            ? [moment.utc(settings.timespan[0]), moment.utc(settings.timespan[1])]
+            : undefined,
+        });
+      }
+      return dataFusionInNewFormat;
+    } else {
+      return [];
     }
-    return dataFusionInNewFormat;
+  } catch (err) {
+    console.error(err);
+    return [];
   }
 }
 

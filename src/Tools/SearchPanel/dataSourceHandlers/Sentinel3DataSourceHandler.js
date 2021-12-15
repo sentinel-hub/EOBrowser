@@ -12,7 +12,7 @@ import {
 import Sentinel3SLSTRFilters from './DatasourceRenderingComponents/searchGroups/Sentinel3SLSTRFilters';
 import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 import { FetchingFunction } from '../search';
-import { S3SLSTR, S3OLCI } from './dataSourceHandlers';
+import { S3SLSTR, S3OLCI } from './dataSourceConstants';
 import { BAND_UNIT } from './dataSourceConstants';
 import { DATASOURCES } from '../../../const';
 

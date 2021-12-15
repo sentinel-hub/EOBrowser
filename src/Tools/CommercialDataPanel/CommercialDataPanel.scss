@@ -9,4 +9,22 @@
     font-weight: 500;
     font-size: 16px;
   }
+
+  .accordion-content {
+    p {
+      font-size: 1em;
+
+      a {
+        color: $primaryCol;
+      }
+    }
+
+    ul {
+      li {
+        a {
+          color: $primaryCol;
+        }
+      }
+    }
+  }
 }

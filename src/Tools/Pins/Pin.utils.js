@@ -191,6 +191,12 @@ export function convertToNewFormat(pin) {
       redCurve,
       greenCurve,
       blueCurve,
+      minQa,
+      upsampling,
+      downsampling,
+      speckleFilter,
+      orthorectification,
+      terrainViewerSettings,
     } = pin;
     let newPin = {
       _id: _id,
@@ -216,6 +222,12 @@ export function convertToNewFormat(pin) {
       redCurve: redCurve,
       greenCurve: greenCurve,
       blueCurve: blueCurve,
+      minQa: minQa,
+      upsampling: upsampling,
+      downsampling: downsampling,
+      speckleFilter: speckleFilter,
+      orthorectification: orthorectification,
+      terrainViewerSettings: terrainViewerSettings,
     };
     // convert pin data
     newPin = convertTitle(pin, newPin);
@@ -232,8 +244,7 @@ export function convertToNewFormat(pin) {
   return pin;
 }
 
-export function getPinsFromServer() {
-  const access_token = store.getState().auth.user.access_token;
+function getPinsFromUserData(access_token) {
   return new Promise((resolve, reject) => {
     const url = `${process.env.REACT_APP_AUTH_BASEURL}userdata/`;
     const requestParams = {
@@ -246,23 +257,30 @@ export function getPinsFromServer() {
       .get(url, requestParams)
       .then(async (res) => {
         try {
+          const shouldSaveToBackend = !res.data.pins_already_saved_to_backend;
           if (res.data.pins_eob3) {
-            resolve(res.data.pins_eob3);
+            resolve({
+              pins: establishCorrectDataFusionFormatInPins(res.data.pins_eob3),
+              shouldSaveToBackend: shouldSaveToBackend,
+            });
           } else {
             // If pins_eob3 don't exist, create them
             const convertedPins = res.data.pins.map((pin) => convertToNewFormat(pin));
             res.data.pins_eob3 = convertedPins;
             await axios.put(url, res.data, requestParams);
-            resolve(preparePins(convertedPins));
+            resolve({
+              pins: establishCorrectDataFusionFormatInPins(convertedPins),
+              shouldSaveToBackend: shouldSaveToBackend,
+            });
           }
         } catch (e) {
           console.warn(e);
-          resolve([]);
+          resolve({ pins: [], shouldSaveToBackend: false });
         }
       })
       .catch((e) => {
         if (e && e.response && e.response.status === 404) {
-          resolve([]);
+          resolve({ pins: [], shouldSaveToBackend: false });
           return;
         }
         reject(e);
@@ -270,7 +288,31 @@ export function getPinsFromServer() {
   });
 }
 
-export function removePinsFromServer(ids) {
+async function getPinsFromBackend(access_token) {
+  const url = `${process.env.REACT_APP_EOB_BACKEND}userpins`;
+  const requestParams = {
+    responseType: 'json',
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  };
+  const res = await axios.get(url, requestParams);
+  return establishCorrectDataFusionFormatInPins(res.data);
+}
+
+export async function getPinsFromServer() {
+  const access_token = store.getState().auth.user.access_token;
+  const { pins: userDataPins, shouldSaveToBackend } = await getPinsFromUserData(access_token);
+
+  if (shouldSaveToBackend) {
+    await savePinsToBackend(userDataPins, true);
+    await savePinsToUserData(userDataPins, true);
+  }
+  const backendPins = await getPinsFromBackend(access_token);
+  return backendPins;
+}
+
+function removePinsFromUserData(ids) {
   const access_token = store.getState().auth.user.access_token;
   return new Promise((resolve, reject) => {
     const url = `${process.env.REACT_APP_AUTH_BASEURL}userdata/`;
@@ -309,7 +351,28 @@ export function removePinsFromServer(ids) {
   });
 }
 
-export function savePinsToServer(pins, replace = false) {
+async function removePinsFromBackend(ids) {
+  const access_token = store.getState().auth.user.access_token;
+  const url = `${process.env.REACT_APP_EOB_BACKEND}userpins`;
+  const requestParams = {
+    responseType: 'json',
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  };
+  let userPins = await getPinsFromServer();
+  userPins = userPins.filter((p) => !ids.includes(p._id));
+  await axios.put(url, { items: userPins }, requestParams);
+  return userPins;
+}
+
+export async function removePinsFromServer(ids) {
+  const pins = await removePinsFromBackend(ids);
+  await removePinsFromUserData(ids);
+  return pins;
+}
+
+function savePinsToUserData(pins, replace = false) {
   const access_token = store.getState().auth.user.access_token;
   let lastUniqueId;
   pins = pins.map((p) => {
@@ -353,6 +416,8 @@ export function savePinsToServer(pins, replace = false) {
           userData.pins_eob3 = [...pins, ...userData.pins_eob3];
         }
 
+        userData.pins_already_saved_to_backend = true;
+
         axios
           .put(url, userData, requestParams)
           .then(() => {
@@ -368,6 +433,48 @@ export function savePinsToServer(pins, replace = false) {
         reject(e);
       });
   });
+}
+
+async function savePinsToBackend(pins, replace = false) {
+  const access_token = store.getState().auth.user.access_token;
+  let lastUniqueId;
+  pins = pins.map((p) => {
+    if (!p._id) {
+      const uniqueId = `${uuid()}-pin`;
+      p._id = uniqueId;
+    }
+    lastUniqueId = p._id;
+    return p;
+  });
+
+  const url = `${process.env.REACT_APP_EOB_BACKEND}userpins`;
+  const requestParams = {
+    responseType: 'json',
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  };
+
+  let newPins;
+  if (replace) {
+    newPins = [...pins];
+  } else {
+    const currentPins = await getPinsFromServer();
+    newPins = [...pins, ...currentPins];
+  }
+  try {
+    await axios.put(url, { items: newPins }, requestParams);
+    return { uniqueId: lastUniqueId, pins: newPins };
+  } catch (err) {
+    console.error('Unable to save pins!', err);
+    throw err;
+  }
+}
+
+export async function savePinsToServer(pins, replace = false) {
+  const { uniqueId, pins: newPins } = await savePinsToBackend(pins, replace);
+  await savePinsToUserData(pins, replace);
+  return { uniqueId: uniqueId, pins: newPins };
 }
 
 export function savePinsToSessionStorage(newPins, replace = false) {
@@ -411,7 +518,7 @@ export function getPinsFromSessionStorage() {
     };
   });
 
-  return preparePins(formattedPins);
+  return establishCorrectDataFusionFormatInPins(formattedPins);
 }
 
 export async function createShareLink(pins) {
@@ -476,6 +583,7 @@ export async function importSharedPins(sharedPinsListId) {
 
   //merge sharedPins with pins
   const newPins = [];
+  sharedPins.itmes = establishCorrectDataFusionFormatInPins(sharedPins.items);
   sharedPins.items.forEach((sharedPin) => {
     //for each shared pin check if it already exists in existing pins list
     const existingPin = existingPins.find((pin) =>
@@ -553,9 +661,9 @@ export const constructTimespanString = ({ fromTime, toTime } = {}) => {
   return `${moment.utc(fromTime).format('YYYY-MM-DD')} - ${moment.utc(toTime).format('YYYY-MM-DD')}`;
 };
 
-function preparePins(pins) {
+export function establishCorrectDataFusionFormatInPins(pins) {
   return pins.map((pin) => {
-    if (pin.dataFusion) {
+    if (pin.dataFusion !== undefined) {
       const dataFusionInCorrectFormat = ensureCorrectDataFusionFormat(pin.dataFusion, pin.datasetId);
       pin.dataFusion = dataFusionInCorrectFormat;
     }

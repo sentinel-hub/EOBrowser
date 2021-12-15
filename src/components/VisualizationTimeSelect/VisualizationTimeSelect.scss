@@ -10,6 +10,13 @@
   text-align: center;
   margin-top: 25px;
 
+  @media screen and (max-width: 450px) {
+    &.expanded {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
   .time-select-type {
     text-transform: none;
     font-weight: normal;

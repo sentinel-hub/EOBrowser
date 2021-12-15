@@ -11,7 +11,7 @@ import {
   AWS_LMSSL1,
   AWS_LETML1,
   AWS_LETML2,
-} from '../dataSourceHandlers';
+} from '../dataSourceConstants';
 
 import { BAND_UNIT } from '../dataSourceConstants';
 

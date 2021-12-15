@@ -39,7 +39,7 @@ import {
   GIBS_ASTER_GDEM,
   CUSTOM,
   AWS_LOTL1,
-} from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+} from '../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 
 import {
   LayersFactory,
@@ -474,4 +474,23 @@ export const getNewDatasetPropertiesIfDeprecatedDatasetId = (datasetId, visualiz
   }
 
   return newProperties;
+};
+
+export const replaceDeprecatedDatasetWithNew = (dataFusion, { oldDataset, newDataset }) => {
+  return dataFusion.map((d) => {
+    if (d.id === oldDataset.id) {
+      d.id = newDataset.id;
+      return d;
+    }
+    return d;
+  });
+};
+
+export const presetToLayerId = (preset) => {
+  switch (preset) {
+    case 'SCENE-CLASSIFICATION-MAP':
+      return 'SCENE-CLASSIFICATION';
+    default:
+      return preset;
+  }
 };

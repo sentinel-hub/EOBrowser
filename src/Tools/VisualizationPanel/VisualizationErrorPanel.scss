@@ -1,8 +1,7 @@
 @import '../../variables';
 
 .visualization-error-panel {
-  margin: 10px 0 10px auto;
-  padding: 0 10px;
+  padding: 10px 10px;
   text-align: center;
   font-size: 14px;
 
@@ -25,5 +24,9 @@
       max-height: 150px;
       overflow-y: auto;
     }
+  }
+
+  pre {
+    margin: 0;
   }
 }

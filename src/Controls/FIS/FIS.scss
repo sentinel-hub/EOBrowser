@@ -19,11 +19,18 @@
 
     div.ccslider {
       margin: 15px 70px 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+
+      .last-band-msg {
+        font-size: 12px;
+      }
     }
   }
 
   div.fis-content {
-    margin-top: 30px;
+    margin-top: 20px;
   }
 
   div.fetching {
@@ -44,12 +51,12 @@
     display: flex;
     justify-content: space-around;
 
-    a.btn {
+    a.eob-btn {
       border-radius: 0;
       border-bottom: 3px solid transparent;
     }
 
-    a.btn.selected {
+    a.eob-btn.selected {
       border-bottom: 3px solid #b6bf00;
     }
   }

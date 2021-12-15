@@ -111,19 +111,16 @@ test.each([
   expect(actualNewSampleType).toEqual(newSampleType);
 });
 
-const getNewEvaluatePixel = (hasDataMask, scaleFactor) =>
-  `
-function evaluatePixel(sample, scene, inputMetadata, customData, outputMetadata) {
-  return __noScaleFactor__evaluatePixel(sample, scene, inputMetadata, customData, outputMetadata).map(
-    (v, i, arr) => {
-      if (${hasDataMask}) {
-        if (i + 1 === arr.length) {
-          return v;
-        }
-      }
-      return v * ${scaleFactor};
+const getNewEvaluatePixel = (scaleFactor) =>
+  `function evaluatePixel(sample, scene, inputMetadata, customData, outputMetadata) {
+  let output = __noScaleFactor__evaluatePixel(sample, scene, inputMetadata, customData, outputMetadata);
+  if (!Array.isArray(output)) {
+    for (let key in output) {
+      output[key] = output[key].map(v => v * ${scaleFactor});
     }
-  );
+    return output;
+  }
+  return output.map(v => v * ${scaleFactor});
 }
 `.replace(/\s/g, '');
 
@@ -132,8 +129,8 @@ test.each([
   [inputEvalscript2, 2 ** 16, true],
   [inputEvalscript3, 42, false],
 ])('Test setEvalscriptOutputScale method', (evalscript, scaleFactor, hasDataMask) => {
-  const newEvalscript = setEvalscriptOutputScale(evalscript, scaleFactor, hasDataMask).replace(/\s/g, '');
-  const newEvaluatePixel = getNewEvaluatePixel(hasDataMask, scaleFactor);
+  const newEvalscript = setEvalscriptOutputScale(evalscript, scaleFactor).replace(/\s/g, '');
+  const newEvaluatePixel = getNewEvaluatePixel(scaleFactor);
   expect(newEvalscript.endsWith(newEvaluatePixel)).toEqual(true);
 });
 

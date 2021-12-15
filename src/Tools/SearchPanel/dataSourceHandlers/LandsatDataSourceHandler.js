@@ -33,7 +33,7 @@ import {
   AWS_LMSSL1,
   AWS_LETML1,
   AWS_LETML2,
-} from './dataSourceHandlers';
+} from './dataSourceConstants';
 import { getLandsatBandForDataset, getGroupedBands } from './datasourceAssets/landsatBands';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 
@@ -223,19 +223,21 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
   }
 
   convertToStandardTiles = (data, datasetId) => {
-    const tiles = data.map((t) => ({
-      sensingTime: t.sensingTime,
-      geometry: t.geometry,
-      datasource: this.datasource,
-      datasetId,
-      metadata: {
-        previewUrl: this.getUrl(t.links, 'preview'),
-        AWSPath: this.getUrl(t.links, 'aws'),
-        EOCloudPath: this.getUrl(t.links, 'eocloud'),
-        sunElevation: t.meta.sunElevation,
-        cloudCoverage: t.meta.cloudCoverPercent,
-      },
-    }));
+    const tiles = data
+      .filter((t) => (t.meta.projEpsg ? t.meta.projEpsg !== 3031 : true))
+      .map((t) => ({
+        sensingTime: t.sensingTime,
+        geometry: t.geometry,
+        datasource: this.datasource,
+        datasetId,
+        metadata: {
+          previewUrl: this.getUrl(t.links, 'preview'),
+          AWSPath: this.getUrl(t.links, 'aws'),
+          EOCloudPath: this.getUrl(t.links, 'eocloud'),
+          sunElevation: t.meta.sunElevation,
+          cloudCoverage: t.meta.cloudCoverPercent,
+        },
+      }));
     return tiles;
   };
 

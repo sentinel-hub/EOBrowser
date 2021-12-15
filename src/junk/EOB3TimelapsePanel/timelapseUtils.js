@@ -16,6 +16,7 @@ import { getMapDataFusion } from '../EOBCommon/utils/dataFusion';
 import { isDataFusionEnabled } from '../../utils';
 import { b64EncodeUnicode } from '../../utils/base64MDN';
 import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
+import { DISABLED_ORTHORECTIFICATION } from '../../const';
 
 const PADDING = 80;
 const REQUEST_RETRY_LIMIT = 2;
@@ -310,7 +311,7 @@ export async function fetchBlobObj(
       overrideLayerConstructorParams.speckleFilter = effects.speckleFilter;
     }
     if (effects.demInstanceType !== undefined) {
-      if (effects.demInstanceType === 'DISABLED') {
+      if (effects.demInstanceType === DISABLED_ORTHORECTIFICATION) {
         overrideLayerConstructorParams.orthorectify = false;
       } else {
         overrideLayerConstructorParams.orthorectify = true;
@@ -479,7 +480,7 @@ function sqr(x) {
   return x * x;
 }
 
-function toRad(degree) {
+export function toRad(degree) {
   return (degree * Math.PI) / 180;
 }
 

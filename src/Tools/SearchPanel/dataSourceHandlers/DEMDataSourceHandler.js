@@ -11,7 +11,7 @@ import {
 } from './DatasourceRenderingComponents/dataSourceTooltips/DEMTooltip';
 import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 import { FetchingFunction } from '../search';
-import { DEM_MAPZEN, DEM_COPERNICUS_30, DEM_COPERNICUS_90 } from './dataSourceHandlers';
+import { DEM_MAPZEN, DEM_COPERNICUS_30, DEM_COPERNICUS_90 } from './dataSourceConstants';
 import { filterLayers } from './filter';
 import { DATASOURCES } from '../../../const';
 
@@ -225,6 +225,10 @@ export default class DEMDataSourceHandler extends DataSourceHandler {
       default:
         return { demInstance: DEMInstanceType.MAPZEN };
     }
+  };
+
+  getDatasetParams = (datasetId) => {
+    return DEMDataSourceHandler.getDatasetParams(datasetId);
   };
 
   supportsIndex = () => {

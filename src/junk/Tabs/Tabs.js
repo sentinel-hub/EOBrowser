@@ -9,10 +9,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './Tabs.scss';
 import { t } from 'ttag';
+import { TABS } from '../../const';
 
 export class Tabs extends Component {
   handleSelect = (renderKey) => {
-    if (renderKey !== 2) {
+    if (renderKey !== TABS.VISUALIZE_TAB) {
       // clear hash routes, except for 2 = Visualization tab
       window.location.hash = '';
     }
@@ -20,6 +21,7 @@ export class Tabs extends Component {
   };
 
   renderTabButtons = () => {
+    const defaultErrorMsg = t`Search for data first.`;
     return (
       <ul className="tab-list">
         {this.props.children.map(
@@ -55,7 +57,7 @@ export class Tabs extends Component {
                 onClick={() =>
                   tab.props.enabled
                     ? this.handleSelect(tab.props.renderKey)
-                    : this.props.onErrorMessage(t`Search for data first.`)
+                    : this.props.onErrorMessage(tab.props.errorMsg || defaultErrorMsg)
                 }
                 className={this.props.activeIndex === tab.props.renderKey ? 'tab-selected' : ''}
                 disabled={!tab.props.enabled}

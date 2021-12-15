@@ -179,7 +179,7 @@ export class EvalScriptInput extends React.Component {
         <div className="scriptBtnPanel">
           <button
             onClick={this.handleRefreshClick}
-            className="btn"
+            className="eob-btn"
             disabled={this.refreshEvalscriptDisabled()}
           >
             <i className="fa fa-refresh" />

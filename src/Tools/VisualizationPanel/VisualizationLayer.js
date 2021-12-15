@@ -20,7 +20,8 @@ const EMPTY_IMAGE_DATA_URI = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEA
 export default class VisualizationLayer extends Component {
   state = { detailsOpen: false };
 
-  toggleDetails = () => {
+  toggleDetails = (e) => {
+    e.stopPropagation();
     this.setState((prevState) => ({ detailsOpen: !prevState.detailsOpen }));
   };
 

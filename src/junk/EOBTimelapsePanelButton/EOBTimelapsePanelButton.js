@@ -6,6 +6,7 @@ import {
   getLayerNotSelectedMsg,
   getCompareModeErrorMsg,
   getDatasourceNotSupportedMsg,
+  getNotSupportedIn3DMsg,
 } from '../ConstMessages';
 import store, { timelapseSlice } from '../../store';
 
@@ -19,9 +20,14 @@ export class EOBTimelapsePanelButton extends React.Component {
   render() {
     const isLayerSelected = !!this.props.selectedResult;
     const isTimelapseSupported =
-      isLayerSelected && this.props.selectedResult.getDates && this.props.selectedResult.baseUrls.WMS;
+      isLayerSelected &&
+      this.props.selectedResult.getDates &&
+      this.props.selectedResult.baseUrls.WMS &&
+      !this.props.is3D;
 
-    const errMsg = this.props.isCompareMode
+    const errMsg = this.props.is3D
+      ? getNotSupportedIn3DMsg()
+      : this.props.isCompareMode
       ? getCompareModeErrorMsg()
       : !this.props.isLoggedIn
       ? getLoggedInErrorMsg()

@@ -7,20 +7,19 @@ import {
   dataSourceToThemeId,
   getDatasetIdFromInstanceId,
   getNewDatasetPropertiesIfDeprecatedDatasetId,
+  presetToLayerId,
 } from '../utils/handleOldUrls';
 import store, {
   mainMapSlice,
   visualizationSlice,
   themesSlice,
   indexSlice,
-  modalSlice,
   terrainViewerSlice,
 } from '../store';
 import { b64DecodeUnicode } from '../utils/base64MDN';
 
 import { computeNewValuesFromPoints } from '../junk/EOBEffectsPanel/AdvancedRgbEffects/CurveEditor/CurveEditor.utils';
 import { DEFAULT_LAT_LNG } from '../const';
-import { ModalId } from '../Modals/Consts';
 
 class URLParamsParser extends React.Component {
   state = {
@@ -101,7 +100,7 @@ class URLParamsParser extends React.Component {
       let dataset = datasourceToDatasetId[datasource];
       if (dataset) {
         EOB3Params.datasetId = dataset;
-        EOB3Params.layerId = preset;
+        EOB3Params.layerId = presetToLayerId(preset);
       }
       const themeId = dataSourceToThemeId[datasource];
       if (themeId) {
@@ -113,7 +112,7 @@ class URLParamsParser extends React.Component {
       const dataset = await getDatasetIdFromInstanceId(instanceId, preset);
       if (dataset) {
         EOB3Params.datasetId = dataset;
-        EOB3Params.layerId = preset;
+        EOB3Params.layerId = presetToLayerId(preset);
       }
     }
 
@@ -223,8 +222,18 @@ class URLParamsParser extends React.Component {
     }
 
     if (terrainViewerSettings) {
-      store.dispatch(terrainViewerSlice.actions.setTerrainViewerSettings(JSON.parse(terrainViewerSettings)));
-      store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TERRAIN_VIEWER }));
+      let parsedTerrainViewerSettings;
+      try {
+        parsedTerrainViewerSettings = JSON.parse(terrainViewerSettings);
+        if (Object.keys(parsedTerrainViewerSettings).length > 0) {
+          store.dispatch(
+            terrainViewerSlice.actions.setTerrainViewerSettings(JSON.parse(terrainViewerSettings)),
+          );
+          store.dispatch(mainMapSlice.actions.setIs3D(true));
+        }
+      } catch (err) {
+        console.error('Parsing terrain viewer settings failed:', err);
+      }
     }
   };
 

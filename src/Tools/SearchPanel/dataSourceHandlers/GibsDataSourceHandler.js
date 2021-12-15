@@ -18,7 +18,7 @@ import {
   GIBS_MISR,
   GIBS_ASTER_GDEM,
   GIBS_VIIRS_NOAA20_CORRECTED_REFLECTANCE,
-} from './dataSourceHandlers';
+} from './dataSourceConstants';
 import { filterLayers } from './filter';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 import { DATASOURCES } from '../../../const';
@@ -285,8 +285,8 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
           period: intervalPeriod,
         } = parseISO8601TimeIntervalFormat(interval);
 
-        let safeStart = intervalStart.isAfter(fromMoment) ? intervalStart : fromMoment;
-        let safeEnd = intervalEnd.isBefore(toMoment) ? intervalEnd : toMoment;
+        let safeStart = intervalStart.isAfter(fromMoment) ? intervalStart : fromMoment.clone();
+        let safeEnd = intervalEnd.isBefore(toMoment) ? intervalEnd : toMoment.clone();
 
         if (!(fromMoment.isAfter(intervalEnd) || toMoment.isBefore(intervalStart))) {
           let currDate = safeEnd.startOf('day');

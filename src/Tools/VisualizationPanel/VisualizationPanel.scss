@@ -74,6 +74,17 @@
       display: inline-block;
       text-align: center;
       cursor: pointer;
+      position: relative;
+
+      .effects-badge {
+        width: 8px;
+        height: 8px;
+        background: $textCol;
+        position: absolute;
+        top: 0;
+        right: 0;
+        border-radius: 4px;
+      }
     }
   }
 

@@ -116,7 +116,7 @@ export const createSelectOptions = (items) =>
 
 export const formatNumberAsRoundedUnit = (value, precision = 2, unit = '%') => {
   return !isNaN(value)
-    ? `${Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision)} ${!!unit ? unit : ''}`
+    ? `${Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision)}${!!unit ? unit : ''}`
     : '';
 };
 

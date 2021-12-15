@@ -1,5 +1,12 @@
 import { t } from 'ttag';
 import { EDUCATION_MODE } from '../const';
+import {
+  COPERNICUS_WORLD_COVER,
+  COPERNICUS_HR_VPP_VEGETATION_INDICES,
+  COPERNICUS_HR_VPP_VPP_S1,
+  COPERNICUS_HR_VPP_VPP_S2,
+  COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES,
+} from '../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 
 export const PREDEFINED_LAYERS_METADATA = [
   {
@@ -1840,6 +1847,198 @@ export const PREDEFINED_LAYERS_METADATA = [
     description: () =>
       t`# Corine Land Cover (CLC) - Water Bodies\n\n\n\nIn this Corine Land Cover layer, only the 6 Water body classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
   },
+
+  {
+    match: [{ datasourceId: 'COPERNICUS_CLC_ACCOUNTING', layerId: 'ACCOUNTING-LAYERS-VISUALIZATION' }],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#e6004d',
+          label: 'Continuous\nurban fabric',
+        },
+        {
+          color: '#ff0000',
+          label: 'Discontinuous\nurban fabric',
+        },
+        {
+          color: '#cc4df2',
+          label: 'Industrial or\ncommercial units',
+        },
+        {
+          color: '#cc0000',
+          label: 'Road and rail\nnetworks',
+        },
+        {
+          color: '#e6cccc',
+          label: 'Port areas',
+        },
+        {
+          color: '#e6cce6',
+          label: 'Airports',
+        },
+        {
+          color: '#a600cc',
+          label: 'Mineral\nextraction sites',
+        },
+        {
+          color: '#a64d00',
+          label: 'Dump sites',
+        },
+        {
+          color: '#ff4dff',
+          label: 'Construction\nsites',
+        },
+        {
+          color: '#ffa6ff',
+          label: 'Green urban\nareas',
+        },
+        {
+          color: '#ffe6ff',
+          label: 'Sport and leisure\nfacilities',
+        },
+        {
+          color: '#ffffa8',
+          label: 'Non-irrigated\narable land',
+        },
+        {
+          color: '#ffff00',
+          label: 'Permanently\nirrigated land',
+        },
+        {
+          color: '#e6e600',
+          label: 'Rice fields',
+        },
+        {
+          color: '#e68000',
+          label: 'Vineyards',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Fruit trees and\nberry plantations',
+        },
+        {
+          color: '#e6a600',
+          label: 'Olive groves',
+        },
+        {
+          color: '#e6e64d',
+          label: 'Pastures',
+        },
+        {
+          color: '#ffe6a6',
+          label: 'Annual crops\nassociated with\npermanent crops',
+        },
+        {
+          color: '#ffe64d',
+          label: 'Complex cultivation\npatterns',
+        },
+        {
+          color: '#e6cc4d',
+          label: 'Land principally\noccupied by\nagriculture with\n significant areas\nof natural vegetation',
+        },
+        {
+          color: '#f2cca6',
+          label: 'Agro-forestry\nareas',
+        },
+        {
+          color: '#80ff00',
+          label: 'Broad-leaved\nforest',
+        },
+        {
+          color: '#00a600',
+          label: 'Coniferous\nforest',
+        },
+        {
+          color: '#4dff00',
+          label: 'Mixed forest',
+        },
+        {
+          color: '#ccf24d',
+          label: 'Natural\ngrasslands',
+        },
+        {
+          color: '#a6ff80',
+          label: 'Moors and\nheathland',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Sclerophyllous\nvegetation',
+        },
+        {
+          color: '#a6f200',
+          label: 'Transitional\nwoodland-shrub',
+        },
+        {
+          color: '#e6e6e6',
+          label: 'Beaches, dunes\nand sands',
+        },
+        {
+          color: '#cccccc',
+          label: 'Bare rocks',
+        },
+        {
+          color: '#ccffcc',
+          label: 'Sparsely\nvegetated areas',
+        },
+        {
+          color: '#000000',
+          label: 'Burnt areas',
+        },
+        {
+          color: '#a6e6cc',
+          label: 'Glaciers and\nperpetual snow',
+        },
+        {
+          color: '#a6a6ff',
+          label: 'Inland marshes',
+        },
+        {
+          color: '#4d4dff',
+          label: 'Peat bogs',
+        },
+        {
+          color: '#ccccff',
+          label: 'Salt marshes',
+        },
+        {
+          color: '#e6e6ff',
+          label: 'Salines',
+        },
+        {
+          color: '#a6a6e6',
+          label: 'Intertidal\nflats',
+        },
+        {
+          color: '#00ccf2',
+          label: 'Water courses',
+        },
+        {
+          color: '#80f2e6',
+          label: 'Water bodies',
+        },
+        {
+          color: '#00ffa6',
+          label: 'Coastal lagoons',
+        },
+        {
+          color: '#a6ffe6',
+          label: 'Estuaries',
+        },
+        {
+          color: '#e6f2ff',
+          label: 'Sea and ocean',
+        },
+        {
+          color: '#ffffff',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`#  Corine Land Cover - Accounting\n\n\n\nThis script visualises CORINE Land Cover (CLC) Accounting Layers according to the official CORINE Land Cover color scheme. CLC Accounting Layers are CLC status layers modified for the purpose of consistent statistical analysis in the land cover change accounting system at EEA. For more information about the layer, visit [this website](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover_accounting_layer/).`,
+  },
   {
     match: [{ datasourceId: 'COPERNICUS_WATER_BODIES', layerId: 'WATER-BODIES-OCCURENCE' }],
 
@@ -2622,5 +2821,404 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: '255', color: 'rgb(255,255,255)', label: '255' },
       ],
     },
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_WORLD_COVER, layerId: 'WORLDCOVER-MAP' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#006400',
+          label: 'Tree cover',
+        },
+        {
+          color: '#ffbb22',
+          label: 'Shrubland',
+        },
+        {
+          color: '#ffff4c',
+          label: 'Grassland',
+        },
+        {
+          color: '#f096ff',
+          label: 'Cropland',
+        },
+        {
+          color: '#fa0000',
+          label: 'Built-up areas',
+        },
+        {
+          color: '#b4b4b4',
+          label: 'Bare / sparse vegetation',
+        },
+        {
+          color: '#f0f0f0',
+          label: 'Snow and ice',
+        },
+        {
+          color: '#0064c8',
+          label: 'Permanent water bodies',
+        },
+        {
+          color: '#0096a0',
+          label: 'Herbaceous wetland',
+        },
+        {
+          color: '#00cf75',
+          label: 'Mangroves',
+        },
+        {
+          color: '#fae6a0',
+          label: 'Moss and lichen',
+        },
+      ],
+    },
+    description: () =>
+      t`# ESA WorldCover Map\n\n\n\nThe WorldCover product displays a global land cover map with 11 different land cover classes produced at 10m resolution based on combination of both Sentinel-1 and Sentinel-2 data. In areas where Sentinel-2 images are covered by clouds for an extended period of time, Sentinel-1 data provides complimentary information on the structural characteristics of the observed land cover. Therefore, the combination of Sentinel-1 and Sentinel-2 data makes it possible to update the land cover map almost in real time. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/worldcover/).`,
+  },
+
+  {
+    match: [{ datasourceId: COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES, layerId: 'PPI-VISUALIZATION' }],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 3,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 0.357, color: '#F7FCB9' },
+        { position: 0.75, color: '#D9F0A3' },
+        { position: 1.125, color: '#ADDD8E' },
+        { position: 1.5, color: '#78C679', label: '1.5' },
+        { position: 1.875, color: '#41AB5D' },
+        { position: 2.25, color: '#238443' },
+        { position: 2.625, color: '#006837' },
+        { position: 3.0, color: '#004529', label: '3' },
+      ],
+    },
+    description: () =>
+      t`# Yearly Time-Series of the Plant Phenology Index\n\n\n\nPPI (Plant Phenology Index) is a physically-based vegetation index derived from radiative transfer equation and is calculated from red and Near-Infrared (NIR) spectral bands. It is linearly related to the green leaf area index, and can be used to track canopy green foliage dynamics and therefore provides an efficient approach to retrieving plant phenology. Seasonal Trajectories PPI product is a filtered yearly time series of PPI, providing the vegetation status for each pixel on a regular 10-day time step. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/st-ppi/).`,
+  },
+  {
+    match: [
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S1, layerId: '1_AMPL-VISUALIZATION' },
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S2, layerId: '1_AMPL-VISUALIZATION' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 3,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 0.375, color: '#F7FCB9' },
+        { position: 0.75, color: '#D9F0A3' },
+        { position: 1.125, color: '#ADDD8E' },
+        { position: 1.5, color: '#78C679', label: '1.5' },
+        { position: 1.875, color: '#41AB5D' },
+        { position: 2.25, color: '#238443' },
+        { position: 2.625, color: '#006837' },
+        { position: 3.0, color: '#004529', label: '3 (PPI)' },
+      ],
+    },
+    description: () =>
+      t`# Amplitude Parameter\n\n\n\nThis layer visualizes the seasonal amplitude parameter of the VPP (Vegetation Phenology and Productivity) parameter. It is calculated as a difference between the MAXV (season maximum value) and MINV (season minimum value) parameters. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-amplitude-ampl/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+  },
+  {
+    match: [
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S1, layerId: '2_SOSV-VISUALIZATION' },
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S2, layerId: '2_SOSV-VISUALIZATION' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 3,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 0.375, color: '#F7FCB9' },
+        { position: 0.75, color: '#D9F0A3' },
+        { position: 1.125, color: '#ADDD8E' },
+        { position: 1.5, color: '#78C679', label: '1.5' },
+        { position: 1.875, color: '#41AB5D' },
+        { position: 2.25, color: '#238443' },
+        { position: 2.625, color: '#006837' },
+        { position: 3.0, color: '#004529', label: '3 (PPI)' },
+      ],
+    },
+    description: () =>
+      t`# Start of Season Values\n\n\n\nThis layer visualizes the SOSV parameter of the VPP (Vegetation Phenology and Productivity) parameter. SOSV represents the PPI (plant phenology index) value of the start-of-season day. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-start-of-season-value-sosv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+  },
+  {
+    match: [
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S1, layerId: '3_EOSV-VISUALIZATION' },
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S2, layerId: '3_EOSV-VISUALIZATION' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 3,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 0.375, color: '#F7FCB9' },
+        { position: 0.75, color: '#D9F0A3' },
+        { position: 1.125, color: '#ADDD8E' },
+        { position: 1.5, color: '#78C679', label: '1.5' },
+        { position: 1.875, color: '#41AB5D' },
+        { position: 2.25, color: '#238443' },
+        { position: 2.625, color: '#006837' },
+        { position: 3.0, color: '#004529', label: '3 (PPI)' },
+      ],
+    },
+    description: () =>
+      t`# End of Season Values\n\n\n\nThis layer visualizes the EOSV parameter of the VPP (Vegetation Phenology and Productivity) parameter. EOSV is a PPI (plant phenology index) value of the end-of-season day. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-end-of-season-value-eosv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+  },
+  {
+    match: [
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S1, layerId: '4_MINV-VISUALIZATION' },
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S2, layerId: '4_MINV-VISUALIZATION' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 3,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 0.375, color: '#F7FCB9' },
+        { position: 0.75, color: '#D9F0A3' },
+        { position: 1.125, color: '#ADDD8E' },
+        { position: 1.5, color: '#78C679', label: '1.5' },
+        { position: 1.875, color: '#41AB5D' },
+        { position: 2.25, color: '#238443' },
+        { position: 2.625, color: '#006837' },
+        { position: 3.0, color: '#004529', label: '3 (PPI)' },
+      ],
+    },
+    description: () =>
+      t`# Season Minimum Value\n\n\n\nThis layer visualizes the MINV parameter of the VPP (Vegetation Phenology and Productivity) parameter. MINV represents the average PPI (plant phenology index) value of the minima on the left and right sides of each season. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-season-minimum-value-minv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+  },
+  {
+    match: [
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S1, layerId: '5_MAXV-VISUALIZATION' },
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S2, layerId: '5_MAXV-VISUALIZATION' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 3,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 0.375, color: '#F7FCB9' },
+        { position: 0.75, color: '#D9F0A3' },
+        { position: 1.125, color: '#ADDD8E' },
+        { position: 1.5, color: '#78C679', label: '1.5' },
+        { position: 1.875, color: '#41AB5D' },
+        { position: 2.25, color: '#238443' },
+        { position: 2.625, color: '#006837' },
+        { position: 3.0, color: '#004529', label: '3 (PPI)' },
+      ],
+    },
+    description: () =>
+      t`# Season Maximum Value\n\n\n\nThis layer visualizes the MAXV parameter of the VPP (Vegetation Phenology and Productivity) parameter. MAXV represents the PPI (plant phenology index) value at the day of the season maximum. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-season-maximum-value-maxv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+  },
+  {
+    match: [
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S1, layerId: '6_LSLOPE-VISUALIZATION' },
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S2, layerId: '6_LSLOPE-VISUALIZATION' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 0.09,
+      gradients: [
+        { position: 0.0, color: '#440154', label: '0' },
+        { position: 0.005, color: '#481668' },
+        { position: 0.01, color: '#482878' },
+        { position: 0.015, color: '#443983' },
+        { position: 0.02, color: '#3E4A89' },
+        { position: 0.025, color: '#375A8C' },
+        { position: 0.03, color: '#31688E' },
+        { position: 0.035, color: '#2B758E' },
+        { position: 0.04, color: '#26828E' },
+        { position: 0.045, color: '#21918C', label: '0.045' },
+        { position: 0.05, color: '#1F9E89' },
+        { position: 0.055, color: '#25AB82' },
+        { position: 0.06, color: '#35B779' },
+        { position: 0.065, color: '#4EC36B' },
+        { position: 0.07, color: '#6CCD5A' },
+        { position: 0.075, color: '#8ED645' },
+        { position: 0.08, color: '#B5DE2B' },
+        { position: 0.085, color: '#DAE319' },
+        { position: 0.09, color: '#FDE725', label: '0.09  (PPI × day^(-1))' },
+      ],
+    },
+    description: () =>
+      t`# Slope of the Greening Period\n\n\n\nThis layer visualizes the LSLOPE parameter of the VPP (Vegetation Phenology and Productivity) parameter. LSLOPE represents the slope of the PPI (plant phenology index) of the greening-up period. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-slope-of-greening-up-period-lslope/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+  },
+  {
+    match: [
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S1, layerId: '7_RSLOPE-VISUALIZATION' },
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S2, layerId: '7_RSLOPE-VISUALIZATION' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 0.09,
+      gradients: [
+        { position: 0.0, color: '#440154', label: '0' },
+        { position: 0.005, color: '#481668' },
+        { position: 0.01, color: '#482878' },
+        { position: 0.015, color: '#443983' },
+        { position: 0.02, color: '#3E4A89' },
+        { position: 0.025, color: '#375A8C' },
+        { position: 0.03, color: '#31688E' },
+        { position: 0.035, color: '#2B758E' },
+        { position: 0.04, color: '#26828E' },
+        { position: 0.045, color: '#21918C', label: '0.045' },
+        { position: 0.05, color: '#1F9E89' },
+        { position: 0.055, color: '#25AB82' },
+        { position: 0.06, color: '#35B779' },
+        { position: 0.065, color: '#4EC36B' },
+        { position: 0.07, color: '#6CCD5A' },
+        { position: 0.075, color: '#8ED645' },
+        { position: 0.08, color: '#B5DE2B' },
+        { position: 0.085, color: '#DAE319' },
+        { position: 0.09, color: '#FDE725', label: '0.09 (PPI × day^(-1))' },
+      ],
+    },
+    description: () =>
+      t`# Slope of the Senescent Period\n\n\n\nThis layer visualizes the RSLOPE parameter of the VPP (Vegetation Phenology and Productivity) parameter. RSLOPE represents the slope of the PPI (plant phenology index) of the senescent period. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-slope-of-senescent-period-rslope/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+  },
+  {
+    match: [
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S1, layerId: '8_SPROD-VISUALIZATION' },
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S2, layerId: '8_SPROD-VISUALIZATION' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 660,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 82.5, color: '#FFF7BC' },
+        { position: 165, color: '#FEE391' },
+        { position: 247.5, color: '#FEC44F' },
+        { position: 330, color: '#FE9929', label: '330' },
+        { position: 412.5, color: '#EC7014' },
+        { position: 495, color: '#CC4C02' },
+        { position: 577.5, color: '#993404' },
+        { position: 660, color: '#662506', label: '660 (PPI × day)' },
+      ],
+    },
+    description: () =>
+      t`# Seasonal Productivity Parameter\n\n\n\nThis layer visualizes the SPROD parameter of the VPP (Vegetation Phenology and Productivity) parameter. SPROD represents seasonal productivity. It is calculated as the sum of all daily PPI (plant phenology index) values between SOSD (start-of-season day) and EOSD (end-of-season day). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-seasonal-productivity-sprod/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+  },
+  {
+    match: [
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S1, layerId: '9_TPROD-VISUALIZATION' },
+      { datasourceId: COPERNICUS_HR_VPP_VPP_S2, layerId: '9_TPROD-VISUALIZATION' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 660,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 82.5, color: '#FFF7BC' },
+        { position: 165, color: '#FEE391' },
+        { position: 247.5, color: '#FEC44F' },
+        { position: 330, color: '#FE9929', label: '330' },
+        { position: 412.5, color: '#EC7014' },
+        { position: 495, color: '#CC4C02' },
+        { position: 577.5, color: '#993404' },
+        { position: 660, color: '#662506', label: '660 (PPI × day)' },
+      ],
+    },
+    description: () =>
+      t`# Total Productivity Parameter\n\n\n\nThis layer visualizes the TPROD parameter of the VPP (Vegetation Phenology and Productivity) parameter. TPROD represents total productivity. It is calculated as a sum of all daily PPI (plant phenology index) values, minus their base level value. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-total-productivity-tprod/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HR_VPP_VEGETATION_INDICES, layerId: 'FAPAR-VISUALIZATION' }],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 1,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 0.125, color: '#F7FCB9' },
+        { position: 0.25, color: '#D9F0A3' },
+        { position: 0.375, color: '#ADDD8E' },
+        { position: 0.5, color: '#78C679', label: '0.5' },
+        { position: 0.625, color: '#41AB5D' },
+        { position: 0.75, color: '#238443' },
+        { position: 0.875, color: '#006837' },
+        { position: 1.0, color: '#004529', label: '1' },
+      ],
+    },
+    description: () =>
+      t`# Fraction of Absorbed Photosynthetically Active Radiation
+      \n\n\n\nFAPAR corresponds to the fraction of photosynthetically active radiation absorbed by the canopy. The index describes only the green parts of the canopy and is very useful for assessing the primary productivity of canopies. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vi-fapar/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HR_VPP_VEGETATION_INDICES, layerId: 'LAI-VISUALIZATION' }],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 8.0,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 1.0, color: '#F7FCB9' },
+        { position: 2.0, color: '#D9F0A3' },
+        { position: 3.0, color: '#ADDD8E' },
+        { position: 4.0, color: '#78C679', label: '4' },
+        { position: 5.0, color: '#41AB5D' },
+        { position: 6.0, color: '#238443' },
+        { position: 7.0, color: '#006837' },
+        { position: 8.0, color: '#004529', label: '8' },
+      ],
+    },
+    description: () =>
+      t`# Leaf Area Index\n\n\n\LAI is defined as one half of the total area of photosynthetically active elements of the canopy per unit horizontal ground area. The LAI provided by HRVPP corresponds to actual LAI of all the canopy layers, including all green contributors. Practically, the LAI quantifies the thickness of the vegetation cover. Deeper green colors indicate thicker vegetation cover. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vi-lai/#).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HR_VPP_VEGETATION_INDICES, layerId: 'NDVI-VISUALIZATION' }],
+    legend: {
+      type: 'continuous',
+      minPosition: -1,
+      maxPosition: 1,
+      gradients: [
+        { position: -1, color: '#797977', label: '-1' },
+        { position: -0.5, color: '#d2d2bf', label: '-0.5' },
+        { position: 0, color: '#FFFFE5', label: '0' },
+        { position: 0.1, color: '#F7FCB9' },
+        { position: 0.2, color: '#D9F0A3' },
+        { position: 0.35, color: '#ADDD8E' },
+        { position: 0.5, color: '#78C679', label: '0.5' },
+        { position: 0.65, color: '#41AB5D' },
+        { position: 0.8, color: '#238443' },
+        { position: 0.9, color: '#006837' },
+        { position: 1, color: '#004529', label: '1' },
+      ],
+    },
+    description: () =>
+      t`# Normalized Difference Vegetation Index\n\n\n\nNDVI quantifies vegetation photosynthetic capacity by measuring the difference between the Near-Infrared (NIR) (which vegetation strongly reflects) and red spectral bands (which vegetation absorbs). It is commonly used to monitor vegetation cover and density. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vi-ndvi/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HR_VPP_VEGETATION_INDICES, layerId: 'PPI-VISUALIZATION' }],
+    legend: {
+      type: 'continuous',
+      minPosition: 0,
+      maxPosition: 3,
+      gradients: [
+        { position: 0.0, color: '#FFFFE5', label: '0' },
+        { position: 0.375, color: '#F7FCB9' },
+        { position: 0.75, color: '#D9F0A3' },
+        { position: 1.125, color: '#ADDD8E' },
+        { position: 1.5, color: '#78C679', label: '1.5' },
+        { position: 1.875, color: '#41AB5D' },
+        { position: 2.25, color: '#238443' },
+        { position: 2.625, color: '#006837' },
+        { position: 3.0, color: '#004529', label: '3' },
+      ],
+    },
+    description: () =>
+      t`# Plant Phenology Index\n\n\n\nPPI (Plant Phenology Index) is a physically-based vegetation index derived from radiative transfer equation and is calculated from red and Near-Infrared (NIR) spectral bands. PPI is linearly related to the green leaf area index, and can be used to track canopy green foliage dynamics and therefore provides an efficient approach to retrieving plant phenology. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vi-ppi/#) and [here](https://land.copernicus.eu/user-corner/technical-library/product-user-manual-of-vegetation-indices/).`,
   },
 ];

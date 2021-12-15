@@ -6,7 +6,6 @@
     bottom: 0;
     left: calc(50%);
     transform: translateX(-50%);
-    padding: 1px;
     z-index: 1001;
     background: $mainDark;
     color: $primaryCol;
@@ -27,7 +26,13 @@
     }
   }
 
-  @media screen and (max-width: 780px) {
+  @media screen and (max-width: 940px) {
+    #about-sh-links {
+      font-size: 10px;
+    }
+  }
+
+  @media screen and (max-width: 890px) {
     #about-sh-links {
       transform: translateX(0);
       left: 0;

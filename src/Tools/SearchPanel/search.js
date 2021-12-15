@@ -226,7 +226,10 @@ export class FetchingFunction {
     if (this.offset >= this.allResults.length && !this.hasMore) {
       return -Infinity;
     }
-    return new Date(this.allResults[this.offset].sensingTime).getTime();
+
+    return this.allResults[this.offset]
+      ? new Date(this.allResults[this.offset].sensingTime).getTime()
+      : -Infinity;
   }
 
   nextTile() {

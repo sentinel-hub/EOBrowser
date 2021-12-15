@@ -15,21 +15,23 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/dracula.css';
 import { withRouter } from 'react-router-dom';
+import proj4 from 'proj4';
 
 import store, { mainMapSlice, visualizationSlice, tabsSlice, compareLayersSlice } from '../../store';
 import Visualizations from './Visualizations';
 import Loader from '../../Loader/Loader';
 import './VisualizationPanel.scss';
-import { sortLayers } from './VisualizationPanel.utils';
+import { sortLayers, haveEffectsChangedFromDefault } from './VisualizationPanel.utils';
 import { getDataSourceHandler, getDatasetLabel } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { VisualizationPanelHeaderActions } from './VisualizationPanelHeaderActions';
-import { parseEvalscriptBands, parseIndexEvalscript } from '../../utils';
+import { constructErrorMessage, parseEvalscriptBands, parseIndexEvalscript } from '../../utils';
 import ZoomInNotification from './ZoomInNotification';
 import { getAppropriateAuthToken } from '../../App';
-import { EDUCATION_MODE, reqConfigMemoryCache } from '../../const';
+import { DATASOURCES, EDUCATION_MODE, reqConfigMemoryCache } from '../../const';
 import { VisualizationTimeSelect } from '../../components/VisualizationTimeSelect/VisualizationTimeSelect';
 
 import VisualizationErrorPanel from './VisualizationErrorPanel';
+import { YYYY_MM_REGEX } from '../SearchPanel/dataSourceHandlers/PlanetBasemapDataSourceHandler';
 
 class VisualizationPanel extends Component {
   defaultState = {
@@ -37,7 +39,7 @@ class VisualizationPanel extends Component {
     visualizations: null,
     bands: null,
     selectedLayer: undefined,
-    supportsCustom: true,
+    supportsCustom: false,
     sibling: {},
     noSiblingDataModal: false,
     dataFusion: this.props.dataFusion,
@@ -79,12 +81,19 @@ class VisualizationPanel extends Component {
     if (this.props.selectedVisualizationId && this.props.customSelected) {
       store.dispatch(visualizationSlice.actions.setVisualizationParams({ customSelected: false }));
     }
+
+    if (
+      this.props.datasetId &&
+      getDataSourceHandler(this.props.datasetId).datasource === DATASOURCES.PLANET_NICFI &&
+      this.props.selectedDate !== prevProps.selectedDate
+    ) {
+      this.createPlanetNicfiLayers();
+    }
   }
 
   async getLayersAndBands() {
     const { datasetId, selectedThemeId, selectedThemesListId, themesLists } = this.props;
     const selectedTheme = themesLists[selectedThemesListId].find((t) => t.id === selectedThemeId);
-
     const datasourceHandler = getDataSourceHandler(datasetId);
     const urls = datasourceHandler.getUrlsForDataset(datasetId);
     const allBands = datasourceHandler.getBands(datasetId);
@@ -113,7 +122,14 @@ class VisualizationPanel extends Component {
           }),
         );
       }
-      let layers = datasourceHandler.getLayers(shjsLayers, datasetId, url, layersExclude, layersInclude);
+      let layers = datasourceHandler.getLayers(
+        shjsLayers,
+        datasetId,
+        url,
+        layersExclude,
+        layersInclude,
+        this.props.selectedDate,
+      );
       for (let layer of layers) {
         if (allLayers.find((l) => l.layerId === layer.layerId)) {
           layer.description += ` (${name})`;
@@ -207,7 +223,11 @@ class VisualizationPanel extends Component {
   };
 
   onZoomToTile = () => {
-    const { zoomToTileConfig } = this.props;
+    const { zoomToTileConfig, is3D } = this.props;
+    if (is3D) {
+      const [x, y] = proj4('EPSG:4326', 'EPSG:3857', [zoomToTileConfig.lng, zoomToTileConfig.lat]);
+      window.set3DLocation(x, y);
+    }
     store.dispatch(
       mainMapSlice.actions.setPosition({
         lat: zoomToTileConfig.lat,
@@ -229,6 +249,10 @@ class VisualizationPanel extends Component {
     });
     store.dispatch(tabsSlice.actions.setTabIndex(2));
 
+    if (getDataSourceHandler(this.props.datasetId).datasource === DATASOURCES.PLANET_NICFI) {
+      this.createPlanetNicfiLayers();
+      return;
+    }
     const { allLayers, allBands, supportsCustom, supportsTimeRange } = await this.getLayersAndBands();
 
     if (allLayers.length === 0) {
@@ -309,7 +333,7 @@ class VisualizationPanel extends Component {
     if (
       (this.props.location.hash &&
         CUSTOM_VISUALIZATION_URL_ROUTES.indexOf(this.props.location.hash) !== -1) ||
-      (supportsCustom && this.props.evalscript)
+      (supportsCustom && (this.props.evalscript || this.props.evalscripturl))
     ) {
       this.setCustomVisualization();
     } else {
@@ -317,6 +341,51 @@ class VisualizationPanel extends Component {
         ? allLayers.find((l) => l.layerId === selectedVisualizationId)
         : allLayers[0];
       this.setSelectedVisualization(selectedLayer || allLayers[0]);
+    }
+  };
+
+  // Layers and dates work differently for Planet NICFI than other datasets
+  // We do not change the date on a layer, as a layer only has one date(sensing timeTange) for the mosaic
+  // If the selected date changes, we need to get all layers that has data for that date
+  createPlanetNicfiLayers = async () => {
+    const { allLayers } = await this.getLayersAndBands();
+    if (allLayers.length === 0) {
+      const params = {
+        layerId: null,
+        visibleOnMap: false,
+        visualizationUrl: null,
+      };
+      const message = await constructErrorMessage(t`No layers found for date`);
+      store.dispatch(visualizationSlice.actions.setError(message));
+      store.dispatch(visualizationSlice.actions.setVisualizationParams(params));
+      this.setState({ visualizations: [] });
+    }
+
+    if (allLayers.length > 0) {
+      const { selectedLayer } = this.state;
+      let newSelectedLayer = allLayers[0];
+
+      if (selectedLayer) {
+        const selectedLayerDateArr = selectedLayer.match(YYYY_MM_REGEX);
+        // If NDVI layer is currently selected and date changes, we will get a new list of layers
+        // Find the NDVI from the new list and select this layer as the selected layer
+        newSelectedLayer = allLayers.find((l) => {
+          const currentLayerDateArr = l.layerId.match(YYYY_MM_REGEX);
+          return (
+            l.layerId.replace(currentLayerDateArr.join('_'), '_DATE_') ===
+            selectedLayer.replace(selectedLayerDateArr.join('_'), '_DATE_')
+          );
+        });
+      }
+
+      this.setState(
+        {
+          visualizations: allLayers,
+        },
+        () => {
+          this.setSelectedVisualization(newSelectedLayer);
+        },
+      );
     }
   };
 
@@ -450,14 +519,24 @@ class VisualizationPanel extends Component {
     const monthStart = moment(day).clone().startOf('month');
     const monthEnd = moment(day).clone().endOf('month');
     const { bbox, layer } = this.getLayerAndBBoxSetup();
-
-    return await layer.findFlyovers(bbox, monthStart, monthEnd);
+    let flyovers = [];
+    try {
+      flyovers = await layer.findFlyovers(bbox, monthStart, monthEnd);
+    } catch (err) {
+      console.error('Unable to fetch available flyovers!\n', err);
+    }
+    return flyovers;
   };
 
   onQueryDatesForActiveMonth = async (day) => {
     const monthStart = day.clone().startOf('month');
     const monthEnd = day.clone().endOf('month');
-    const dates = await this.onFetchAvailableDates(monthStart, monthEnd);
+    let dates = [];
+    try {
+      dates = await this.onFetchAvailableDates(monthStart, monthEnd);
+    } catch (err) {
+      console.error('Unable to fetch available dates!\n', err);
+    }
     return dates;
   };
 
@@ -753,7 +832,7 @@ class VisualizationPanel extends Component {
   };
 
   renderHeader = () => {
-    const { datasetId, selectedModeId, fromTime, toTime } = this.props;
+    const { datasetId, selectedModeId, fromTime, toTime, zoom } = this.props;
     const { siblingShortName, siblingId, isSiblingDataAvailable } = this.state.sibling;
     const { minDate, maxDate } = this.getMinMaxDates(true);
     let timespanSupported = false;
@@ -761,7 +840,9 @@ class VisualizationPanel extends Component {
 
     const dsh = getDataSourceHandler(datasetId);
     if (dsh) {
-      hasCloudCoverage = dsh.tilesHaveCloudCoverage();
+      const zoomConfiguration = dsh.getLeafletZoomConfig(datasetId);
+      const isZoomLevelOk = zoomConfiguration && zoomConfiguration.min && zoom >= zoomConfiguration.min;
+      hasCloudCoverage = dsh.tilesHaveCloudCoverage() && isZoomLevelOk;
       timespanSupported = dsh.supportsTimeRange() && selectedModeId !== EDUCATION_MODE.id;
     }
     return (
@@ -832,6 +913,7 @@ class VisualizationPanel extends Component {
       orthorectification,
       datasetId,
       zoomToTileConfig,
+      is3D,
     } = this.props;
     const legacyActiveLayer = {
       ...this._getLegacyActiveLayer(this.props.datasetId),
@@ -847,6 +929,21 @@ class VisualizationPanel extends Component {
     const supportsIndex = dsh && dsh.supportsIndex(datasetId);
     const supportedSpeckleFilters = dsh && dsh.getSupportedSpeckleFilters(datasetId);
     const canApplySpeckleFilter = dsh && dsh.canApplySpeckleFilter(datasetId, this.props.zoom);
+    const newEffects = {
+      gainEffect: this.props.gainEffect,
+      gammaEffect: this.props.gammaEffect,
+      redRangeEffect: this.props.redRangeEffect,
+      greenRangeEffect: this.props.greenRangeEffect,
+      blueRangeEffect: this.props.blueRangeEffect,
+      redCurveEffect: this.props.redCurveEffect,
+      greenCurveEffect: this.props.greenCurveEffect,
+      blueCurveEffect: this.props.blueCurveEffect,
+      minQa: this.props.minQa,
+      upsampling: this.props.upsampling,
+      downsampling: this.props.downsampling,
+      speckleFilter: this.props.speckleFilter,
+      orthorectification: this.props.orthorectification,
+    };
 
     return (
       <div key={this.props.datasetId} className="visualization-panel">
@@ -863,6 +960,8 @@ class VisualizationPanel extends Component {
           toggleSocialSharePanel={this.toggleSocialSharePanel}
           displaySocialShareOptions={this.state.displaySocialShareOptions}
           datasetId={datasetId}
+          is3D={is3D}
+          haveEffectsChanged={haveEffectsChangedFromDefault(newEffects)}
         />
         {showEffects ? (
           <EOBEffectsPanel
@@ -968,6 +1067,7 @@ const mapStoreToProps = (store) => ({
   toTime: store.visualization.toTime,
   dataSourcesInitialized: store.themes.dataSourcesInitialized,
   mapBounds: store.mainMap.bounds,
+  is3D: store.mainMap.is3D,
   selectedModeId: store.themes.selectedModeId,
   authToken: getAppropriateAuthToken(store.auth, store.themes.selectedThemeId),
   gainEffect: store.visualization.gainEffect,

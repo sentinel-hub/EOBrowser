@@ -10,6 +10,9 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 import './LocationSearchBox.scss';
 
+import poweredByGoogleImg from './powered_by_google_on_non_white.png';
+import { POWERED_BY_GOOGLE_LABEL } from '../../const';
+
 class LocationSearchBoxControlled extends React.PureComponent {
   static defaultProps = {
     value: '',
@@ -191,6 +194,10 @@ class LocationSearchBoxControlled extends React.PureComponent {
         location: null,
       }));
 
+      if (locations.length > 0) {
+        locations.push({ label: POWERED_BY_GOOGLE_LABEL, src: poweredByGoogleImg, alt: 'Powered by Google' });
+      }
+
       this.setState({
         locationResults: locations,
       });
@@ -213,6 +220,10 @@ class LocationSearchBoxControlled extends React.PureComponent {
           return;
         }
         item.location = [results[0].geometry.location.lng(), results[0].geometry.location.lat()];
+        const { viewport } = results[0].geometry;
+        const { south, north, east, west } = viewport.toJSON();
+        item.bounds = L.latLngBounds(L.latLng(south, west), L.latLng(north, east));
+
         this.props.onSelect(item);
       });
     } else {
@@ -238,15 +249,27 @@ class LocationSearchBoxControlled extends React.PureComponent {
         onSelect={this.onSelectHandle}
         onChange={this.handleInputChange}
         inputProps={{ placeholder: placeholder, style: inputStyle }}
-        renderItem={(item, isHighlighted) => (
-          <div
-            className="search-item"
-            key={item.placeId}
-            style={{ backgroundColor: isHighlighted ? highlightedBgColor : '' }}
-          >
-            {item.label}
-          </div>
-        )}
+        isItemSelectable={(it) => {
+          if (it.label === POWERED_BY_GOOGLE_LABEL) {
+            return false;
+          }
+          return true;
+        }}
+        renderItem={(item, isHighlighted) =>
+          item.label === POWERED_BY_GOOGLE_LABEL ? (
+            <div id="powered_by_google_img" key={item.label}>
+              <img alt={item.alt} src={item.src} />
+            </div>
+          ) : (
+            <div
+              className="search-item"
+              key={item.placeId}
+              style={{ backgroundColor: isHighlighted ? highlightedBgColor : '' }}
+            >
+              {item.label}
+            </div>
+          )
+        }
         wrapperStyle={inputWrapperStyle}
         menuStyle={this.props.menuStyle}
       />

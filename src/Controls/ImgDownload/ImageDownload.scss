@@ -7,7 +7,7 @@
   padding: 15px;
 
   .image-download-mode-selection {
-    .btn {
+    .eob-btn {
       margin-right: 20px;
       background-color: $mainDark;
       border-radius: 0;
@@ -26,6 +26,25 @@
       &.disabled {
         opacity: 0.5;
         cursor: pointer;
+      }
+    }
+  }
+
+  .image-download-warning-panel {
+    margin: 10px 0 10px auto;
+    padding: 0 10px;
+    text-align: center;
+    font-size: 14px;
+    color: orange;
+
+    .fa-warning {
+      margin-right: 6px;
+    }
+
+    div {
+      ul {
+        display: inline-block;
+        text-align: left;
       }
     }
   }
@@ -55,6 +74,8 @@
       line-height: 30px;
 
       label {
+        display: flex;
+        align-items: center;
         flex: 0 0 33%;
         max-width: 33%;
 
@@ -64,13 +85,21 @@
           cursor: pointer;
         }
       }
-    }
 
-    .form-input {
-      flex: 0 0 67%;
-      max-width: 67%;
-      display: flex;
-      justify-content: flex-end;
+      .form-input {
+        flex: 0 0 67%;
+        max-width: 67%;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      &.disabled {
+        label > div:first-of-type,
+        .form-input {
+          pointer-events: none;
+          opacity: 0.5;
+        }
+      }
     }
 
     input.full-width {
@@ -159,25 +188,6 @@
         white-space: pre-wrap;
         max-height: 150px;
         overflow-y: auto;
-      }
-    }
-  }
-
-  .image-download-warning-panel {
-    margin: 10px 0 10px auto;
-    padding: 0 10px;
-    text-align: center;
-    font-size: 14px;
-    color: orange;
-
-    .fa-warning {
-      margin-right: 6px;
-    }
-
-    div {
-      ul {
-        display: inline-block;
-        text-align: left;
       }
     }
   }
