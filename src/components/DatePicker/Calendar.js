@@ -75,7 +75,7 @@ function Calendar(props) {
         firstDayOfWeek={getFirstDayOfWeek(locale)}
       />
     </div>,
-    calendarContainer,
+    calendarContainer.current ? calendarContainer.current : calendarContainer, // Works with both direct DOM element or react ref object,
   );
 }
 

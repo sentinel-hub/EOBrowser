@@ -9,7 +9,7 @@
   .add-dataset {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: flex-end;
 
     i {
       font-size: 15px;
@@ -65,9 +65,10 @@
       .supplemental-dataset-alias-input {
         display: flex;
         align-items: center;
+        justify-content: space-between;
 
         input[type="text"] {
-          flex-grow: 1;
+          width: calc(50% - 8px);
           margin-left: 5px;
         }
 
@@ -80,10 +81,11 @@
         display: flex;
         align-items: center;
         padding-top: 3px;
+        justify-content: space-between;
 
         select {
           margin-left: 5px;
-          flex-grow: 1;
+          width: 50%;
         }
       }
 

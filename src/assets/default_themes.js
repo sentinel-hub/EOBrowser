@@ -2966,7 +2966,7 @@ export const DEFAULT_THEMES = [
       {
         name: 'Planet NICFI',
         service: 'WMTS',
-        url: 'https://api.planet.com/basemaps/v1/mosaics/wmts?api_key=8fe044edc78c46ba904bb62e550493a3',
+        url: `https://api.planet.com/basemaps/v1/mosaics/wmts?api_key=${process.env.REACT_APP_PLANET_API_KEY}`,
       },
       {
         name: 'ESA WorldCover',

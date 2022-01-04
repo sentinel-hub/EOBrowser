@@ -2,11 +2,20 @@
   .additional-parameter {
     width: 100%;
     display: flex;
-    flex-direction: column;
     padding-top: 3px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
 
     select {
-      margin-right: auto;
+      width: 50%;
+      margin-left: 5px;
+    }
+
+    input[type="text"] {
+      flex-grow: 1;
+      margin-left: 5px;
+      margin-top: 2px;
     }
 
     .additional-parameter-description {

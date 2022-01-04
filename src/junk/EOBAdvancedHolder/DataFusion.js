@@ -181,7 +181,7 @@ class DataFusion extends React.Component {
             parameterType: 'select',
             getName: () => t`Location`,
             options: [{ name: 'AWS EU Central', value: LocationIdSHv3.awsEuCentral1 }],
-            description: t`Only collections on services.sentinel-hub are supported.`,
+            description: t`Currently only collections on services.sentinel-hub are supported.`,
           },
         },
       },

@@ -22,8 +22,16 @@ class SocialShare extends Component {
     }
   };
 
-  shortenUrl = async () => {
-    const currentUrl = window.location.href;
+  shortenUrl = async (extraParams) => {
+    let currentUrl = window.location.href;
+
+    if (extraParams) {
+      currentUrl +=
+        '&' +
+        Object.keys(extraParams)
+          .map((k) => `${k}=${encodeURIComponent(extraParams[k])}`)
+          .join('&');
+    }
 
     if (
       this.state.lastShortenedUrl === currentUrl &&
@@ -56,12 +64,12 @@ class SocialShare extends Component {
   };
 
   render() {
-    const { displaySocialShareOptions, datasetId } = this.props;
+    const { displaySocialShareOptions, datasetId, extraParams } = this.props;
     const { shortUrl } = this.state;
     if (!displaySocialShareOptions) {
       return null;
     }
-    this.shortenUrl();
+    this.shortenUrl(extraParams);
     const hashtags = getAppropriateHashtags(datasetId);
     return (
       <div className="social-networks">

@@ -14,6 +14,7 @@ import {
 
 import md5 from '../../utils/md5';
 import previews from '../../previews.json';
+import { PLANET_NICFI } from '../SearchPanel/dataSourceHandlers/dataSourceConstants';
 
 const EMPTY_IMAGE_DATA_URI = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
@@ -26,10 +27,14 @@ export default class VisualizationLayer extends Component {
   };
 
   getIconSrc(viz) {
-    const { selectedThemeId } = this.props;
+    const { selectedThemeId, datasetId } = this.props;
     const { instanceId, url } = viz;
     const urlHash = instanceId ? instanceId.substr(0, 6) : md5(url).substr(0, 8);
-    const filename = `${selectedThemeId}-${urlHash}-${viz.layerId}.png`;
+    let layerId = viz.layerId;
+    if (datasetId === PLANET_NICFI) {
+      layerId = layerId.replace(/_\d{4}-\d{2}/g, '');
+    }
+    const filename = `${selectedThemeId}-${urlHash}-${layerId}.png`;
     if (!previews.includes(filename)) {
       return EMPTY_IMAGE_DATA_URI;
     }
@@ -61,7 +66,7 @@ export default class VisualizationLayer extends Component {
     const iconSrc = this.getIconSrc(viz);
     const vizId = viz.duplicateLayerId ? viz.duplicateLayerId : viz.layerId;
     const isActive = selectedVisualizationId === vizId && !customSelected;
-    const hasEvalScript = viz.evalscript !== null;
+    const hasEvalScript = !!viz.evalscript;
 
     const layerMetadata = findMatchingLayerMetadata(datasetId, viz.layerId, selectedThemeId);
     const longDescription = getDescriptionFromMetadata(layerMetadata);

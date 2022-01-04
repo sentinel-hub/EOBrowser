@@ -82,9 +82,11 @@ class VisualizationPanel extends Component {
       store.dispatch(visualizationSlice.actions.setVisualizationParams({ customSelected: false }));
     }
 
+    const dsh = getDataSourceHandler(this.props.datasetId);
     if (
       this.props.datasetId &&
-      getDataSourceHandler(this.props.datasetId).datasource === DATASOURCES.PLANET_NICFI &&
+      dsh &&
+      dsh.datasource === DATASOURCES.PLANET_NICFI &&
       this.props.selectedDate !== prevProps.selectedDate
     ) {
       this.createPlanetNicfiLayers();

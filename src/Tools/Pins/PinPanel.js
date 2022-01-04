@@ -44,7 +44,7 @@ import {
   URL_THEMES_LIST,
   USER_INSTANCES_THEMES_LIST,
 } from '../../const';
-import { ModalId } from '../../Modals/Consts';
+import { ModalId } from '../../const';
 
 const PINS_LC_NAME = 'eob-pins';
 const UNSAVED_PINS = 'unsaved-pins';

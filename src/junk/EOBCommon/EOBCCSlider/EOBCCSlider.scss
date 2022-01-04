@@ -17,20 +17,13 @@
     margin-bottom: 1px;
   }
 
-  i.fa-sun-o {
-    color: #ff0;
-    font-size: 10px;
+  i.fa,
+  i.far,
+  i.fas {
+    width: 20px;
   }
 
-  i.fa-cloud {
-    color: #c0fbff;
-    font-size: 10px;
-    margin-left: 4px;
-    margin-right: 2px;
-  }
-
-  span.percentage {
-    margin-left: 5px;
-    width: 30px;
+  .percentage {
+    margin-left: 3px;
   }
 }

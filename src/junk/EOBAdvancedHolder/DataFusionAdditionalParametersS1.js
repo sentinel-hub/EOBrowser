@@ -36,66 +36,76 @@ function DataFusionAdditionalParametersS1(props) {
 
   return (
     <div className="data-fusion-additional-parameters-s1">
-      {t`Orthorectification`}:
-      <select
-        className="dropdown-normal-ui"
-        value={orthorectification}
-        onChange={(e) => handleChange(e, 'orthorectification')}
-      >
-        {Object.keys(ORTHORECTIFICATION_OPTIONS).map((o) => (
-          <option key={o} value={o}>
-            {ORTHORECTIFICATION_OPTIONS[o]}
-          </option>
-        ))}
-      </select>
-      {t`Polarization`}:
-      <select
-        className="dropdown-normal-ui"
-        value={polarization}
-        onChange={(e) => handleChange(e, 'polarization')}
-      >
-        {Object.keys(Polarization).map((o) => (
-          <option key={o} value={o}>
-            {Polarization[o]}
-          </option>
-        ))}
-      </select>
-      {t`Acquisition mode`}:
-      <select
-        className="dropdown-normal-ui"
-        value={acquisitionMode}
-        onChange={(e) => handleChange(e, 'acquisitionMode')}
-      >
-        {Object.keys(AcquisitionMode).map((o) => (
-          <option key={o} value={o}>
-            {AcquisitionMode[o]}
-          </option>
-        ))}
-      </select>
-      {t`Resolution`}:
-      <select
-        className="dropdown-normal-ui"
-        value={resolution}
-        onChange={(e) => handleChange(e, 'resolution')}
-      >
-        {Object.keys(Resolution).map((o) => (
-          <option key={o} value={o}>
-            {Resolution[o]}
-          </option>
-        ))}
-      </select>
-      {t`Speckle Filter`}:
-      <select
-        className="dropdown-normal-ui"
-        value={speckleFilterIndex}
-        onChange={(e) => handleSpeckleFilterChange(e, 'speckleFilter')}
-      >
-        {S1_SUPPORTED_SPECKLE_FILTERS.map((speckleFilter, index) => (
-          <option key={index} value={index}>
-            {speckleFilter.label}
-          </option>
-        ))}
-      </select>
+      <div className="additional-parameter">
+        {t`Orthorectification`}:
+        <select
+          className="dropdown-normal-ui"
+          value={orthorectification}
+          onChange={(e) => handleChange(e, 'orthorectification')}
+        >
+          {Object.keys(ORTHORECTIFICATION_OPTIONS).map((o) => (
+            <option key={o} value={o}>
+              {ORTHORECTIFICATION_OPTIONS[o]}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="additional-parameter">
+        {t`Polarization`}:
+        <select
+          className="dropdown-normal-ui"
+          value={polarization}
+          onChange={(e) => handleChange(e, 'polarization')}
+        >
+          {Object.keys(Polarization).map((o) => (
+            <option key={o} value={o}>
+              {Polarization[o]}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="additional-parameter">
+        {t`Acquisition mode`}:
+        <select
+          className="dropdown-normal-ui"
+          value={acquisitionMode}
+          onChange={(e) => handleChange(e, 'acquisitionMode')}
+        >
+          {Object.keys(AcquisitionMode).map((o) => (
+            <option key={o} value={o}>
+              {AcquisitionMode[o]}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="additional-parameter">
+        {t`Resolution`}:
+        <select
+          className="dropdown-normal-ui"
+          value={resolution}
+          onChange={(e) => handleChange(e, 'resolution')}
+        >
+          {Object.keys(Resolution).map((o) => (
+            <option key={o} value={o}>
+              {Resolution[o]}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="additional-parameter">
+        {t`Speckle Filter`}:
+        <select
+          className="dropdown-normal-ui"
+          value={speckleFilterIndex}
+          onChange={(e) => handleSpeckleFilterChange(e, 'speckleFilter')}
+        >
+          {S1_SUPPORTED_SPECKLE_FILTERS.map((speckleFilter, index) => (
+            <option key={index} value={index}>
+              {speckleFilter.label}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 }

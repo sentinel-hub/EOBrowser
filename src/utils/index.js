@@ -18,6 +18,7 @@ import { b64EncodeUnicode } from './base64MDN';
 import { getDataSourceHandler } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { BAND_UNIT } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 import { TABS } from '../const';
+import { ModalId } from '../const';
 import { replaceDeprecatedDatasetWithNew } from './handleOldUrls';
 
 export function getUrlParams() {
@@ -108,6 +109,8 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
     handlePositions,
     gradient,
     terrainViewerSettings,
+    modalId,
+    timelapse,
   } = props;
   currentLat = Math.round(100000 * currentLat) / 100000;
   currentLng = Math.round(100000 * currentLng) / 100000;
@@ -205,6 +208,10 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
     if (terrainViewerSettings !== null) {
       params.terrainViewerSettings = JSON.stringify(terrainViewerSettings);
     }
+  }
+
+  if (modalId === ModalId.TIMELAPSE) {
+    params.timelapse = JSON.stringify(timelapse);
   }
 
   const escapedParams = Object.keys(params)

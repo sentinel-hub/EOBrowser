@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import { t } from 'ttag';
 import AlertProvider, { confirm } from 'react-alert-async';
-import { ModalId } from '../Modals/Consts';
+import { ModalId } from '../const';
 
 import store, { notificationSlice, themesSlice, visualizationSlice, authSlice, modalSlice } from '../store';
 import {

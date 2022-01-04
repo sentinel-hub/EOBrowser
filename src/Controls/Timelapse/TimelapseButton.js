@@ -3,10 +3,16 @@ import { connect } from 'react-redux';
 import { EOBTimelapsePanelButton } from '../../junk/EOBTimelapsePanelButton/EOBTimelapsePanelButton';
 import 'rodal/lib/rodal.css';
 
-import store, { notificationSlice } from '../../store';
+import store, { notificationSlice, timelapseSlice } from '../../store';
 import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
 class TimelapseButton extends Component {
+  componentDidUpdate = (prevProps) => {
+    if (prevProps.datasetId !== this.props.datasetId) {
+      store.dispatch(timelapseSlice.actions.reset());
+    }
+  };
+
   generateSelectedResult = () => {
     const { dataSourcesInitialized, layerId, customSelected, datasetId, visualizationUrl } = this.props;
     const isVisualizationSet =
@@ -30,6 +36,7 @@ class TimelapseButton extends Component {
         <EOBTimelapsePanelButton
           selectedResult={this.generateSelectedResult()}
           isLoggedIn={!!this.props.user.userdata}
+          selectedTabIndex={this.props.selectedTabIndex}
           is3D={this.props.is3D}
           onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
         />
@@ -45,6 +52,7 @@ const mapStoreToProps = (store) => ({
   customSelected: store.visualization.customSelected,
   dataSourcesInitialized: store.themes.dataSourcesInitialized,
   visualizationUrl: store.visualization.visualizationUrl,
+  selectedTabIndex: store.tabs.selectedTabIndex,
   is3D: store.mainMap.is3D,
 });
 

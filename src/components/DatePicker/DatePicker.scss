@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import '../../variables.scss';
 
 .date-picker {
@@ -44,7 +46,7 @@
     i.fa.cal-icon-left,
     i.fa.cal-icon-right,
     i.fa.cal-icon-cal {
-      width: $controlsHeight/2;
+      width: math.div($controlsHeight, 2);
     }
 
     i.fa.cal-icon-left.disabled,

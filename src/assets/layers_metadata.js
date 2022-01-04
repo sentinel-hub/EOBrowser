@@ -984,6 +984,12 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: '3_TONEMAPPED-NATURAL-COLOR' },
       { datasourceId: 'S2L1C', layerId: '2_HIGHLIGHT-OPTIMIZED-NATURAL-COLOR' },
       { datasourceId: 'S2L2A', layerId: '2_HIGHLIGHT-OPTIMIZED-NATURAL-COLOR' },
+      { datasourceId: 'S2L1C', layerId: '2_TONEMAPPED_NATURAL_COLOR' },
+      { datasourceId: 'S2L2A', layerId: '2_TONEMAPPED_NATURAL_COLOR' },
+      { datasourceId: 'AWS_LETML1', layerId: '2_TONEMAPPED_NATURAL_COLOR' },
+      { datasourceId: 'AWS_LETML2', layerId: '2_TONEMAPPED_NATURAL_COLOR' },
+      { datasourceId: 'AWS_LOTL1', layerId: '2_TONEMAPPED_NATURAL_COLOR' },
+      { datasourceId: 'AWS_LOTL2', layerId: '2_TONEMAPPED_NATURAL_COLOR' },
     ],
 
     description: () =>

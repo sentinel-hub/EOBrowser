@@ -1073,12 +1073,6 @@ msgstr "Timelaps"
 msgid "Select All"
 msgstr "Vælg alt"
 
-msgid "An error occured:"
-msgstr "En fejl er opstået:"
-
-msgid "No images selected"
-msgstr "Ingen billeder er valgt"
-
 msgid "Speed:"
 msgstr "Frt:"
 
@@ -6184,22 +6178,47 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-msgid "Only collections on services.sentinel-hub are supported."
-msgstr ""
-
 msgid "No layers found for date"
 msgstr ""
 
-msgid "Biannual"
+msgid "Creating and editing a timelapse is not supported on mobile."
 msgstr ""
 
-msgid "Monthly"
+msgid "Add layers from pins"
+msgstr ""
+
+msgid "Visualisations"
+msgstr ""
+
+msgid "Min. tile coverage"
+msgstr ""
+
+msgid "Edit timelapse"
+msgstr ""
+
+msgid "fps"
+msgstr ""
+
+msgid "Transition:"
+msgstr ""
+
+msgid "Fade"
+msgstr ""
+
+msgid "None"
 msgstr ""
 
 msgid ""
 "Through Norway’s International Climate & Forests Initiative, anyone can now "
-"access Planet’s high-resolution, analysis-ready mosaics of the world’s "
-"tropics in order to help reduce and reverse the loss of tropical forests, "
+"access Planet’s high-resolution, \n"
+"analysis-ready mosaics of the world’s tropics in order to help reduce and "
+"reverse the loss of tropical forests, \n"
 "combat climate change, conserve biodiversity, and facilitate sustainable "
-"development"
+"development.  \n"
+"\n"
+"**Data availability:** world's tropics, September 2015 - August 2020 "
+"biannually, from September 2020 monthly."
+msgstr ""
+
+msgid "Currently only collections on services.sentinel-hub are supported."
 msgstr ""

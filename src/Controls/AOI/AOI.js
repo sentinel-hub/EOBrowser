@@ -9,7 +9,7 @@ import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
 
 import { removeAoiWithEmptyCoords } from '../../utils/coords';
 import store, { aoiSlice, notificationSlice, modalSlice } from '../../store';
-import { ModalId } from '../../Modals/Consts';
+import { ModalId } from '../../const';
 import {
   supportsFIS,
   datasetHasAnyFISLayer,

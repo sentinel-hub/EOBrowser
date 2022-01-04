@@ -13,7 +13,7 @@ import store, { themesSlice, visualizationSlice } from './store';
 import Map from './Map/Map';
 import Notification from './Notification/Notification';
 import Tools from './Tools/Tools';
-import { Modals, propsSufficientToRender } from './Modals/Consts';
+import { Modals, propsSufficientToRender } from './Modals/Utils';
 import { updatePath } from './utils/';
 import { importSharedPins } from './Tools/Pins/Pin.utils';
 import { EDUCATION_MODE, MODES } from './const';
@@ -169,7 +169,7 @@ class App extends Component {
         <Notification />
         {!is3D && !terrainViewerId && (
           <Tutorial
-            popupDisabled={this.state.hasSwitchedFrom3D}
+            popupDisabled={this.state.hasSwitchedFrom3D || this.props.timelapseSharePreviewMode}
             selectedLanguage={this.props.selectedLanguage}
           />
         )}
@@ -251,7 +251,9 @@ const mapStoreToProps = (store) => ({
   selectedModeId: store.themes.selectedModeId,
   pixelBounds: store.mainMap.pixelBounds,
   terrainViewerSettings: store.terrainViewer.settings,
+  timelapse: store.timelapse,
   terrainViewerId: store.terrainViewer.id,
+  timelapseSharePreviewMode: store.timelapse.timelapseSharePreviewMode,
 });
 
 export default connect(mapStoreToProps, null)(App);

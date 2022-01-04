@@ -11,7 +11,7 @@ import {
   datasetHasAnyFISLayer,
   getDatasetLabel,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
-import { ModalId } from '../../Modals/Consts';
+import { ModalId } from '../../const';
 import pin from './pin.png';
 
 class POI extends Component {

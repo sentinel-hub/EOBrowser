@@ -11,6 +11,7 @@ import {
 import store, { timelapseSlice } from '../../store';
 
 import '../EOBPanel.scss';
+import { TABS } from '../../const';
 
 export class EOBTimelapsePanelButton extends React.Component {
   toggleAreaPreview = () => {
@@ -31,7 +32,7 @@ export class EOBTimelapsePanelButton extends React.Component {
       ? getCompareModeErrorMsg()
       : !this.props.isLoggedIn
       ? getLoggedInErrorMsg()
-      : !isLayerSelected
+      : !isLayerSelected || this.props.selectedTabIndex !== TABS.VISUALIZE_TAB
       ? getLayerNotSelectedMsg()
       : !isTimelapseSupported
       ? getDatasourceNotSupportedMsg()

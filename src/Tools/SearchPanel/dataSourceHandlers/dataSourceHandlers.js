@@ -92,8 +92,7 @@ import {
   PROBAV_S5,
   PROBAV_S10,
   CUSTOM,
-  PLANET_NICFI_BIANNUAL,
-  PLANET_NICFI_MONTHLY,
+  PLANET_NICFI,
 } from './dataSourceConstants';
 import PlanetBasemapDataSourceHandler from './PlanetBasemapDataSourceHandler';
 
@@ -309,8 +308,7 @@ export function datasourceForDatasetId(datasetId) {
     case COPERNICUS_CLC_ACCOUNTING:
     case COPERNICUS_WORLD_COVER:
       return DATASOURCES.COPERNICUS;
-    case PLANET_NICFI_MONTHLY:
-    case PLANET_NICFI_BIANNUAL:
+    case PLANET_NICFI:
       return DATASOURCES.PLANET_NICFI;
     default:
       return null;
@@ -399,8 +397,7 @@ export const datasetLabels = {
   [COPERNICUS_HR_VPP_VPP_S1]: 'Vegetation Phenology and Productivity Season 1',
   [COPERNICUS_HR_VPP_VPP_S2]: 'Vegetation Phenology and Productivity Season 2',
   [COPERNICUS_CLC_ACCOUNTING]: 'CORINE Land Cover Accounting Layers',
-  [PLANET_NICFI_BIANNUAL]: 'Planet NICFI Biannual',
-  [PLANET_NICFI_MONTHLY]: 'Planet NICFI Monthly',
+  [PLANET_NICFI]: 'Planet NICFI Basemaps',
 };
 
 export function getDatasetLabel(datasetId) {

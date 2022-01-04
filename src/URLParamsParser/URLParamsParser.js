@@ -15,11 +15,14 @@ import store, {
   themesSlice,
   indexSlice,
   terrainViewerSlice,
+  timelapseSlice,
+  modalSlice,
 } from '../store';
 import { b64DecodeUnicode } from '../utils/base64MDN';
 
 import { computeNewValuesFromPoints } from '../junk/EOBEffectsPanel/AdvancedRgbEffects/CurveEditor/CurveEditor.utils';
 import { DEFAULT_LAT_LNG } from '../const';
+import { ModalId } from '../const';
 
 class URLParamsParser extends React.Component {
   state = {
@@ -165,6 +168,9 @@ class URLParamsParser extends React.Component {
       handlePositions,
       gradient,
       terrainViewerSettings,
+      timelapse,
+      timelapseSharePreviewMode,
+      previewFileUrl,
     } = params;
 
     let { lat: parsedLat, lng: parsedLng, zoom: parsedZoom } = parsePosition(lat, lng, zoom);
@@ -233,6 +239,21 @@ class URLParamsParser extends React.Component {
         }
       } catch (err) {
         console.error('Parsing terrain viewer settings failed:', err);
+      }
+    }
+
+    if (timelapse) {
+      store.dispatch(timelapseSlice.actions.set(JSON.parse(timelapse)));
+      store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TIMELAPSE }));
+
+      if (timelapseSharePreviewMode) {
+        store.dispatch(
+          timelapseSlice.actions.setTimelapseSharePreviewMode(JSON.parse(timelapseSharePreviewMode)),
+        );
+      }
+
+      if (previewFileUrl) {
+        store.dispatch(timelapseSlice.actions.setPreviewFileUrl(previewFileUrl));
       }
     }
   };

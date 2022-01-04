@@ -1,13 +1,12 @@
 import React from 'react';
 import moment from 'moment';
-import { t } from 'ttag';
 import bboxPolygon from '@turf/bbox-polygon';
 import intersect from '@turf/intersect';
 
 import DataSourceHandler from './DataSourceHandler';
 import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/GenericSearchGroup';
 import PlanetBasemapTooltip from './DatasourceRenderingComponents/dataSourceTooltips/PlanetBasemapTooltip';
-import { PLANET_NICFI_BIANNUAL, PLANET_NICFI_MONTHLY } from './dataSourceConstants';
+import { PLANET_NICFI } from './dataSourceConstants';
 import { FetchingFunction } from '../search';
 import { DATASOURCES } from '../../../const';
 import { filterLayers } from './filter';
@@ -17,41 +16,26 @@ const DATA_BOUNDS = [-179.9, -30.009514, 179.9, 30.102505];
 
 export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
   urls = [];
-  datasets = [PLANET_NICFI_BIANNUAL, PLANET_NICFI_MONTHLY];
-  preselectedDatasets = new Set([PLANET_NICFI_BIANNUAL]);
-  datasetSearchLabels = {
-    [PLANET_NICFI_BIANNUAL]: t`Biannual`,
-    [PLANET_NICFI_MONTHLY]: t`Monthly`,
-  };
-  datasetSearchIds = {
-    [PLANET_NICFI_BIANNUAL]: 'PLANET_NICFI_BIANNUAL',
-    [PLANET_NICFI_MONTHLY]: 'PLANET_NICFI_MONTHLY',
-  };
+  searchGroupLabel = 'Planet-NICFI';
+  searchGroupKey = 'planet-nicfi';
+  preselectedDatasets = new Set();
   searchFilters = {};
   isChecked = false;
-  KNOWN_URL = 'https://api.planet.com/basemaps/v1/mosaics/wmts?api_key=8fe044edc78c46ba904bb62e550493a3';
+  KNOWN_URL = `https://api.planet.com/basemaps/v1/mosaics/wmts?api_key=${process.env.REACT_APP_PLANET_API_KEY}`;
   allResults = null;
   datasource = DATASOURCES.PLANET_NICFI;
   availableLayersFromSearch = [];
 
   leafletZoomConfig = {
-    [PLANET_NICFI_BIANNUAL]: {
-      min: 1,
-      max: 18,
-    },
-    [PLANET_NICFI_MONTHLY]: {
+    [PLANET_NICFI]: {
       min: 1,
       max: 18,
     },
   };
   leafletTileSizeConfig = {
-    [PLANET_NICFI_BIANNUAL]: 256,
-    [PLANET_NICFI_MONTHLY]: 256,
+    [PLANET_NICFI]: 256,
   };
-  mosaicDateRanges = {
-    [PLANET_NICFI_BIANNUAL]: {},
-    [PLANET_NICFI_MONTHLY]: {},
-  };
+  mosaicDateRanges = {};
 
   willHandle(service, url, name, configs, preselected) {
     if (url !== this.KNOWN_URL) {
@@ -71,16 +55,14 @@ export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
     if (!this.isHandlingAnyUrl()) {
       return null;
     }
-    const preselected = false;
     return (
       <GenericSearchGroup
         key={`planet-nicfi`}
         label="Planet-NICFI"
-        preselected={preselected}
         saveCheckedState={this.saveCheckedState}
         dataSourceTooltip={<PlanetBasemapTooltip />}
         saveFiltersValues={this.saveSearchFilters}
-        options={this.datasets}
+        options={[]}
         optionsLabels={this.datasetSearchLabels}
         preselectedOptions={Array.from(this.preselectedDatasets)}
         hasMaxCCFilter={false}
@@ -94,25 +76,21 @@ export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
     }
 
     let fetchingFunctions = [];
-    const selectedDatasets = this.searchFilters.selectedOptions;
-
-    selectedDatasets.forEach((selectedDataset) => {
-      const func = this.getResultsFromPlanet;
-      const ff = new FetchingFunction(
-        selectedDataset,
-        null,
-        fromMoment,
-        toMoment,
-        queryArea,
-        this.convertToStandardTiles,
-        {
-          url: this.KNOWN_URL,
-          searchFunction: func,
-          searchParams: { datasetId: this.datasetSearchIds[selectedDataset] },
-        },
-      );
-      fetchingFunctions.push(ff);
-    });
+    const func = this.getResultsFromPlanet;
+    const ff = new FetchingFunction(
+      PLANET_NICFI,
+      null,
+      fromMoment,
+      toMoment,
+      queryArea,
+      this.convertToStandardTiles,
+      {
+        url: this.KNOWN_URL,
+        searchFunction: func,
+        searchParams: { datasetId: PLANET_NICFI },
+      },
+    );
+    fetchingFunctions.push(ff);
 
     return fetchingFunctions;
   }
@@ -143,12 +121,12 @@ export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
     const sensingTimeRanges = [];
     // Get biannual or monthly mosaics
     // monthly mosaics only have 1 YYYY-MM date, and Biannual have a from and to datestamp
-    Object.keys(this.mosaicDateRanges[datasetId]).forEach((key) => {
+    Object.keys(this.mosaicDateRanges).forEach((key) => {
       if (
-        this.mosaicDateRanges[datasetId][key].fromTime.isBetween(fromMoment, toMoment) ||
-        this.mosaicDateRanges[datasetId][key].toTime.isBetween(fromMoment, toMoment)
+        this.mosaicDateRanges[key].fromTime.isBetween(fromMoment, toMoment) ||
+        this.mosaicDateRanges[key].toTime.isBetween(fromMoment, toMoment)
       ) {
-        sensingTimeRanges.push(this.mosaicDateRanges[datasetId][key]);
+        sensingTimeRanges.push(this.mosaicDateRanges[key]);
       }
     });
 
@@ -168,7 +146,6 @@ export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
     this.allLayers.forEach((l) => {
       const timeRangeArray = l.layerId.match(YYYY_MM_REGEX);
       if (timeRangeArray) {
-        const datasetId = timeRangeArray.length === 1 ? PLANET_NICFI_MONTHLY : PLANET_NICFI_BIANNUAL;
         const fromToTimeObj = {
           fromTime: moment(timeRangeArray[0]).startOf('month'),
           toTime: timeRangeArray[1]
@@ -177,31 +154,32 @@ export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
           layerIds: [l.layerId],
         };
 
-        const foundMosiacsKey = `${fromToTimeObj.fromTime.format('YYYY-MM')}-${fromToTimeObj.toTime.format(
+        const foundMosaicKey = `${fromToTimeObj.fromTime.format('YYYY-MM')}-${fromToTimeObj.toTime.format(
           'YYYY-MM',
         )}`;
-        if (!this.mosaicDateRanges[datasetId][foundMosiacsKey]) {
-          this.mosaicDateRanges[datasetId][foundMosiacsKey] = fromToTimeObj;
+        if (!this.mosaicDateRanges[foundMosaicKey]) {
+          this.mosaicDateRanges[foundMosaicKey] = fromToTimeObj;
         } else {
-          this.mosaicDateRanges[datasetId][foundMosiacsKey].layerIds.push(l.layerId);
+          this.mosaicDateRanges[foundMosaicKey].layerIds.push(l.layerId);
         }
       }
     });
   };
 
   getLayers = (data, datasetId, url, layersExclude, layersInclude, selectedDate) => {
-    const foundMosiacKey = Object.keys(this.mosaicDateRanges[datasetId]).find((key) => {
-      const mosaic = this.mosaicDateRanges[datasetId][key];
+    const foundMosaicKey = Object.keys(this.mosaicDateRanges).find((key) => {
+      const mosaic = this.mosaicDateRanges[key];
       return selectedDate.isBetween(mosaic.fromTime, mosaic.toTime);
     });
     let layers = data.filter(
       (layer) =>
         filterLayers(layer.layerId, layersExclude, layersInclude) &&
-        foundMosiacKey &&
-        this.mosaicDateRanges[datasetId][foundMosiacKey].layerIds.includes(layer.layerId),
+        foundMosaicKey &&
+        this.mosaicDateRanges[foundMosaicKey].layerIds.includes(layer.layerId),
     );
     layers.forEach((l) => {
       l.url = url;
+      l.title = l.title.replace('Planet Medres', 'PS Tropical');
     });
     return layers;
   };
@@ -221,19 +199,21 @@ export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
     }));
   };
 
-  getMinMaxDates(datasetId) {
-    const datsetIdDateRangeObj = this.mosaicDateRanges[datasetId];
-    const datsetIdDateRangeKeys = Object.keys(datsetIdDateRangeObj);
+  getMinMaxDates() {
+    const mosaicDateRangeKeys = Object.keys(this.mosaicDateRanges);
 
-    if (datsetIdDateRangeKeys.length === 0) {
+    if (mosaicDateRangeKeys.length === 0) {
       return { minDate: null, maxDate: null };
     }
+    const fromDates = mosaicDateRangeKeys.map((dateRangeKey) =>
+      moment(this.mosaicDateRanges[dateRangeKey].fromTime).startOf('month'),
+    );
+    const toDates = mosaicDateRangeKeys.map((dateRangeKey) =>
+      moment(this.mosaicDateRanges[dateRangeKey].toTime).endOf('month'),
+    );
 
-    const minDate = moment(datsetIdDateRangeObj[datsetIdDateRangeKeys[0]].toTime).endOf('month');
-    const maxDate = moment(
-      datsetIdDateRangeObj[datsetIdDateRangeKeys[datsetIdDateRangeKeys.length - 1]].toTime,
-    ).endOf('month');
-
+    const minDate = moment.min(fromDates);
+    const maxDate = moment.max(toDates);
     return { minDate, maxDate };
   }
 

@@ -1104,12 +1104,6 @@ msgstr "Animación"
 msgid "Select All"
 msgstr "Seleccionar todo"
 
-msgid "An error occured:"
-msgstr "Se ha producido un error:"
-
-msgid "No images selected"
-msgstr "Ninguna imagen seleccionada"
-
 msgid "Speed:"
 msgstr "Velocidad:"
 
@@ -7124,20 +7118,6 @@ msgid ""
 "establish a subscription and purchase commercial data plans."
 msgstr ""
 
-msgid ""
-"Through Norway’s International Climate & Forests Initiative, anyone can now "
-"access Planet’s high-resolution, analysis-ready mosaics of the world’s "
-"tropics in order to help reduce and reverse the loss of tropical forests, "
-"combat climate change, conserve biodiversity, and facilitate sustainable "
-"development"
-msgstr ""
-
-msgid "Biannual"
-msgstr ""
-
-msgid "Monthly"
-msgstr ""
-
 msgid "No layers found for date"
 msgstr ""
 
@@ -7147,5 +7127,44 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-msgid "Only collections on services.sentinel-hub are supported."
+msgid "Creating and editing a timelapse is not supported on mobile."
+msgstr ""
+
+msgid "Add layers from pins"
+msgstr ""
+
+msgid "Visualisations"
+msgstr ""
+
+msgid "Min. tile coverage"
+msgstr ""
+
+msgid "Edit timelapse"
+msgstr ""
+
+msgid "fps"
+msgstr ""
+
+msgid "Transition:"
+msgstr ""
+
+msgid "Fade"
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid ""
+"Through Norway’s International Climate & Forests Initiative, anyone can now "
+"access Planet’s high-resolution, \n"
+"analysis-ready mosaics of the world’s tropics in order to help reduce and "
+"reverse the loss of tropical forests, \n"
+"combat climate change, conserve biodiversity, and facilitate sustainable "
+"development.  \n"
+"\n"
+"**Data availability:** world's tropics, September 2015 - August 2020 "
+"biannually, from September 2020 monthly."
+msgstr ""
+
+msgid "Currently only collections on services.sentinel-hub are supported."
 msgstr ""

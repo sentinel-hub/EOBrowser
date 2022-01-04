@@ -4,7 +4,11 @@ import { t } from 'ttag';
 import ExternalLink from '../../../../../ExternalLink/ExternalLink';
 
 const getMarkdown = () => t`
-Through Norway’s International Climate & Forests Initiative, anyone can now access Planet’s high-resolution, analysis-ready mosaics of the world’s tropics in order to help reduce and reverse the loss of tropical forests, combat climate change, conserve biodiversity, and facilitate sustainable development
+Through Norway’s International Climate & Forests Initiative, anyone can now access Planet’s high-resolution, 
+analysis-ready mosaics of the world’s tropics in order to help reduce and reverse the loss of tropical forests, 
+combat climate change, conserve biodiversity, and facilitate sustainable development.  
+
+**Data availability:** world's tropics, September 2015 - August 2020 biannually, from September 2020 monthly.
 `;
 
 const PlanetBasemapTooltip = () => {

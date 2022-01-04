@@ -24,15 +24,3 @@ body,
 .fa-exclamation-circle {
   padding: 0 5px !important;
 }
-
-@media screen and (max-width: 768px) {
-  .rodal-dialog {
-    width: 400px !important;
-  }
-}
-
-@media screen and (max-width: 500px) {
-  .rodal-dialog {
-    width: 300px !important;
-  }
-}

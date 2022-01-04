@@ -449,7 +449,7 @@ async function overrideEvalscriptIfNeeded(
   }
 }
 
-async function getAppropriateApiType(layer, imageFormat, isRawBand, cancelToken) {
+export async function getAppropriateApiType(layer, imageFormat, isRawBand, cancelToken) {
   if (layer instanceof ProcessingDataFusionLayer) {
     return ApiType.PROCESSING;
   }
@@ -500,13 +500,12 @@ export function getNicename(fromTime, toTime, datasetId, layerTitle, customSelec
     .format(format)}_${datasetLabel ? datasetLabel.replace(/ /gi, '_') : 'unknown_dataset'}_${layerName}`;
 }
 
-export async function getLayerFromParams(params, cancelToken) {
+export async function getLayerFromParams(params, cancelToken, authToken) {
   /// Check if BYOC works!!!!!!!
   const {
     visualizationUrl,
     layerId,
     datasetId,
-    customSelected,
     dataFusion,
     evalscript,
     evalscripturl,
@@ -523,6 +522,7 @@ export async function getLayerFromParams(params, cancelToken) {
   const reqConfig = {
     cancelToken: cancelToken,
     ...reqConfigMemoryCache,
+    ...(authToken ? { authToken } : {}),
   };
 
   if (layerId) {
@@ -530,7 +530,7 @@ export async function getLayerFromParams(params, cancelToken) {
     await layer.updateLayerFromServiceIfNeeded(reqConfig);
   } else if (isDataFusionEnabled(dataFusion)) {
     layer = await constructDataFusionLayer(dataFusion, evalscript, evalscripturl, fromTime, toTime);
-  } else if (customSelected) {
+  } else {
     const dsh = getDataSourceHandler(datasetId);
     const shJsDataset = dsh ? dsh.getSentinelHubDataset(datasetId) : null;
     let layers = await LayersFactory.makeLayers(

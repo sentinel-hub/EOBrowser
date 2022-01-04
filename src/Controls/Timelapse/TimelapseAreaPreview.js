@@ -5,7 +5,7 @@ import { t } from 'ttag';
 
 import { createTimelapseBbox } from '../../junk/EOB3TimelapsePanel/timelapseUtils';
 import store, { modalSlice, timelapseSlice } from '../../store';
-import { ModalId } from '../../Modals/Consts';
+import { ModalId } from '../../const';
 
 import './TimelapseAreaPreview.scss';
 

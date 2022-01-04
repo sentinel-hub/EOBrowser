@@ -7,3 +7,4 @@ export const getDatasourceNotSupportedMsg = () => t`This datasource is not suppo
 export const getNotSupportedIn3DMsg = () => t`Not supported in 3D mode.`;
 export const getOnlyBasicImgDownloadAvailableMsg = () =>
   t`Image download in compare mode is currently available only for basic image download.`;
+export const getMobileNotSupportedMsg = () => t`Creating and editing a timelapse is not supported on mobile.`;

@@ -12,13 +12,14 @@ export class EOBCCSlider extends React.Component {
     min: 0,
     max: 100,
     showIcons: true,
+    icon: 'fas fa-cloud-sun',
     unit: '%',
   };
 
   render() {
     return (
       <div className="cc-slider">
-        {this.props.showIcons && <i className="fa fa-sun-o">&nbsp;</i>}
+        {this.props.showIcons && <i className={this.props.icon}>&nbsp;</i>}
         <div className="rcStyler" style={{ width: this.props.sliderWidth }}>
           <RCSlider
             min={this.props.min}
@@ -28,7 +29,6 @@ export class EOBCCSlider extends React.Component {
             onChange={this.props.onChange}
           />
         </div>
-        {this.props.showIcons && <i className="fa fa-cloud">&nbsp;</i>}
         <div className="percentage">
           {this.props.cloudCoverPercentage}
           {this.props.unit ? this.props.unit : ''}

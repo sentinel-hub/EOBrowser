@@ -11,6 +11,16 @@ import { t } from 'ttag';
 import { DEFAULT_THEMES } from './assets/default_themes.js';
 import { EDUCATION_THEMES } from './assets/education_themes.js';
 
+export const ModalId = {
+  IMG_DOWNLOAD: 'ImgDownload',
+  TIMELAPSE: 'Timelapse',
+  FIS: 'FIS',
+  SHAREPINSLINK: 'SharePinsLink',
+  PINS_STORY_BUILDER: 'PinsStoryBuilder',
+  TERRAIN_VIEWER: 'TerrainViewer',
+  PRIVATE_THEMEID_LOGIN: 'PrivateThemeIdLogin',
+};
+
 export const MODE_THEMES_LIST = 'mode';
 export const URL_THEMES_LIST = 'url';
 export const USER_INSTANCES_THEMES_LIST = 'user_instances';

@@ -1,5 +1,6 @@
 import { configureStore, combineReducers, createSlice, getDefaultMiddleware } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
+import moment from 'moment';
 
 import {
   MODES,
@@ -723,13 +724,96 @@ export const timelapseSlice = createSlice({
   name: 'timelapse',
   initialState: {
     displayTimelapseAreaPreview: false,
+    fromTime: null,
+    toTime: null,
+    filterMonths: null,
+    selectedPeriod: 'day',
+    minCoverageAllowed: 0,
+    maxCCPercentAllowed: 100,
+    isSelectAllChecked: true,
+    showBorders: false,
+    timelapseFPS: 1,
+    transition: 'none',
+    pins: [],
+    timelapseSharePreviewMode: false,
+    previewFileUrl: null,
   },
   reducers: {
+    set: (state, action) => {
+      Object.keys(action.payload).forEach((key) => {
+        state[key] = ['fromTime', 'toTime'].includes(key)
+          ? moment.utc(action.payload[key])
+          : action.payload[key];
+      });
+    },
+    reset: (state) => {
+      state.displayTimelapseAreaPreview = false;
+      state.fromTime = null;
+      state.toTime = null;
+      state.filterMonths = null;
+      state.selectedPeriod = 'day';
+      state.minCoverageAllowed = 0;
+      state.maxCCPercentAllowed = 100;
+      state.isSelectAllChecked = true;
+      state.showBorders = false;
+      state.timelapseFPS = 1;
+      state.transition = 'none';
+      state.pins = [];
+      state.timelapseSharePreviewMode = false;
+    },
     toggleTimelapseAreaPreview: (state) => {
       state.displayTimelapseAreaPreview = !state.displayTimelapseAreaPreview;
     },
     setTimelapseAreaPreview: (state, action) => {
       state.displayTimelapseAreaPreview = action.payload;
+    },
+    setInitialTime: (state, action) => {
+      state.fromTime = action.payload.clone().subtract(1, 'month');
+      state.toTime = action.payload.clone();
+    },
+    setFromTime: (state, action) => {
+      state.fromTime = action.payload;
+    },
+    setToTime: (state, action) => {
+      state.toTime = action.payload;
+    },
+    setFilterMonths: (state, action) => {
+      state.filterMonths = action.payload;
+    },
+    setSelectedPeriod: (state, action) => {
+      state.selectedPeriod = action.payload;
+    },
+    setMinCoverageAllowed: (state, action) => {
+      state.minCoverageAllowed = action.payload;
+    },
+    setMaxCCPercentAllowed: (state, action) => {
+      state.maxCCPercentAllowed = action.payload;
+    },
+    setIsSelectAllChecked: (state, action) => {
+      state.isSelectAllChecked = action.payload;
+    },
+    setShowBorders: (state, action) => {
+      state.showBorders = action.payload;
+    },
+    setTimelapseSharePreviewMode: (state, action) => {
+      state.timelapseSharePreviewMode = action.payload;
+    },
+    setPreviewFileUrl: (state, action) => {
+      state.previewFileUrl = action.payload;
+    },
+    setTimelapseFPS: (state, action) => {
+      state.timelapseFPS = action.payload;
+    },
+    setTransition: (state, action) => {
+      state.transition = action.payload;
+    },
+    addPin: (state, action) => {
+      state.pins = [...state.pins, action.payload];
+    },
+    removePin: (state, action) => {
+      if (action.payload > -1) {
+        state.pins = state.pins.filter((p, i) => i !== action.payload);
+      }
     },
   },
 });

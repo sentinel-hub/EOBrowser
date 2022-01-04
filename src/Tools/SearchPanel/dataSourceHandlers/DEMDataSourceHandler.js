@@ -203,8 +203,6 @@ export default class DEMDataSourceHandler extends DataSourceHandler {
     return this.KNOWN_BANDS;
   };
 
-  supportsTimelapse = () => false;
-
   supportsInterpolation = () => true;
 
   static getDatasetParams = (datasetId) => {

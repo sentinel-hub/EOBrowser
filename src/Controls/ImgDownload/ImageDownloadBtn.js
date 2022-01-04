@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { t } from 'ttag';
 
 import store, { modalSlice, notificationSlice } from '../../store';
-import { ModalId } from '../../Modals/Consts';
+import { ModalId } from '../../const';
 
 import downloadIcon from './download-icon.svg';
 import './ImgDownloadBtn.scss';
@@ -22,7 +22,7 @@ class ImageDownloadBtn extends Component {
 
   checkIfSupportedByDatasetId = (datasetId) => {
     const datasourceHandler = getDataSourceHandler(datasetId);
-    const supportsImgExport = datasourceHandler.supportsImgExport();
+    const supportsImgExport = datasourceHandler && datasourceHandler.supportsImgExport();
     if (!supportsImgExport) {
       return { enabled: false, errorMessage: getDatasourceNotSupportedMsg() };
     }
