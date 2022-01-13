@@ -116,18 +116,6 @@ The **Corine Land Cover Accounting Layers** are status layers modified for the p
 
 **Common Usage**: Land use and land cover monitoring, analysis and change prediction for various applications, including environment, agriculture, transport and spatial planning.`;
 
-const WorldCoverMarkdown = () => t`
-The **ESA WorldCover** product is the first global land cover map at 10 m resolution based on both Sentinel-1 and Sentinel-2 data. More information [here](https://esa-worldcover.org/).
-
-**Coverage**: Global coverage.
-
-**Data Availability**: 2020.
-
-**Spatial resolution**: 10 meters.
-
-**Common Usage**: Development of novel services to help with preserving biodiversity, food security, carbon assessment and climate modelling.
-`;
-
 const Tooltip = (getMarkdown, url) => {
   return (
     <div>
@@ -188,8 +176,6 @@ const CLCAccountingTooltip = () =>
     'https://land.copernicus.eu/user-corner/technical-library/clc-product-user-manual',
   );
 
-const WorldCoverTooltip = () => Tooltip(WorldCoverMarkdown, 'https://esa-worldcover.org/');
-
 export {
   CorineLandCoverTooltip,
   GlobalLandCoverTooltip,
@@ -200,5 +186,4 @@ export {
   HRVPPVPPS1Tooltip,
   HRVPPVPPS2Tooltip,
   CLCAccountingTooltip,
-  WorldCoverTooltip,
 };

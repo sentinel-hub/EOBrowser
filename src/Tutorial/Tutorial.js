@@ -29,7 +29,7 @@ class Tutorial extends Component {
   }) => (
     <div className="tutorial-wrap">
       <div className="tutorial-body">
-        <button type="button" title={t`Close`} className="close-cross" {...closeProps}>
+        <button type="button" className="close-cross" {...closeProps} title={t`Close`}>
           <span className="rodal-close" />
         </button>
 

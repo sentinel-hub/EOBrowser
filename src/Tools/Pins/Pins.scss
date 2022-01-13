@@ -29,7 +29,6 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  height: 15px;
   font-size: 12px;
   border-bottom: 1px solid $primaryCol;
   padding: 2px 0;
@@ -40,7 +39,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    margin: 5px;
+    margin: 0 3px;
     padding-left: 3px;
     cursor: pointer;
     transition: all ease 0.2s;
@@ -233,6 +232,7 @@
 
   .pin-title-text {
     width: 100%;
+    word-wrap: anywhere;
   }
 
   input {
@@ -329,7 +329,7 @@
     .pin-info-row {
       line-height: 16px;
       font-size: 14px;
-      height: 16px;
+      height: auto;
 
       label {
         height: 16px;

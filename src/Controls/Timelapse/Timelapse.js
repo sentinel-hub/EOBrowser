@@ -30,6 +30,7 @@ import {
 
 import './Timelapse.scss';
 import { applyFilterMonthsToDateRange } from '../../junk/EOBCommon/utils/filterDates';
+import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
 const IMAGE_WIDTH = 512;
 const IMAGE_HEIGHT = 512;
@@ -136,11 +137,16 @@ class Timelapse extends Component {
   };
 
   getVisualizations = async () => {
-    const { datasetId, pins, auth } = this.props;
+    const { datasetId, pins, auth, customSelected } = this.props;
 
     // always include base layer visualization
     const visualizations = [
-      { layer: this.layer, datasetId: datasetId, effects: constructGetMapParamsEffects(this.props) },
+      {
+        layer: this.layer,
+        datasetId: datasetId,
+        effects: constructGetMapParamsEffects(this.props),
+        customSelected: customSelected,
+      },
     ];
 
     // add visualizations from pins
@@ -153,6 +159,7 @@ class Timelapse extends Component {
         ),
         datasetId: pin.datasetId,
         effects: constructGetMapParamsEffects(pin),
+        pin: pin,
       });
     }
     return visualizations;
@@ -304,6 +311,8 @@ class Timelapse extends Component {
             ...image,
             layer: flyover.visualization.layer,
             datasetId: flyover.visualization.datasetId,
+            customSelected: flyover.visualization.customSelected,
+            pin: flyover.visualization.pin,
             fromTime: flyover.fromTime,
             toTime: flyover.toTime,
             isSelected: isSelectAllChecked,
@@ -751,6 +760,7 @@ class Timelapse extends Component {
       pinsItems,
       fromTime,
       toTime,
+      filterMonths,
       selectedPeriod,
       maxCCPercentAllowed,
       minCoverageAllowed,
@@ -761,6 +771,7 @@ class Timelapse extends Component {
       timelapseFPS,
       transition,
       pins,
+      customSelected,
     } = this.props;
 
     let { minDate, maxDate } = getMinMaxDates(datasetId);
@@ -773,6 +784,11 @@ class Timelapse extends Component {
       if (pinMaxDate.isAfter(maxDate)) {
         maxDate = pinMaxDate;
       }
+    });
+
+    const sidebarPins = pinsItems.filter((pin) => {
+      const dsh = getDataSourceHandler(pin.item.datasetId);
+      return dsh && dsh.supportsTimelapse();
     });
 
     const screenCoverage = timelapseSharePreviewMode ? (isMobile ? 80 : 90) : 100;
@@ -799,6 +815,7 @@ class Timelapse extends Component {
                     toTime={toTime}
                     minDate={minDate}
                     maxDate={maxDate}
+                    filterMonths={filterMonths}
                     selectedPeriod={selectedPeriod}
                     supportsOrbitPeriod={supportsOrbitPeriod}
                     updateDate={this.updateDate}
@@ -807,6 +824,7 @@ class Timelapse extends Component {
                     setSelectedPeriod={this.setSelectedPeriod}
                     pins={pins}
                     layer={this.layer}
+                    customSelected={customSelected}
                     datasetId={datasetId}
                     onRemovePin={this.onRemovePin}
                     onSidebarPopupToggle={this.onSidebarPopupToggle}
@@ -837,7 +855,7 @@ class Timelapse extends Component {
                   />
                   {sidebarPopup === 'pins' ? (
                     <TimelapseSidebarPins
-                      pins={pinsItems}
+                      pins={sidebarPins}
                       onAddPin={this.onAddPin}
                       onSidebarPopupToggle={this.onSidebarPopupToggle}
                     />

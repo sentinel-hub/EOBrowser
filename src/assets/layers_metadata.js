@@ -1,7 +1,7 @@
 import { t } from 'ttag';
 import { EDUCATION_MODE } from '../const';
 import {
-  COPERNICUS_WORLD_COVER,
+  ESA_WORLD_COVER,
   COPERNICUS_HR_VPP_VEGETATION_INDICES,
   COPERNICUS_HR_VPP_VPP_S1,
   COPERNICUS_HR_VPP_VPP_S2,
@@ -2829,7 +2829,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     },
   },
   {
-    match: [{ datasourceId: COPERNICUS_WORLD_COVER, layerId: 'WORLDCOVER-MAP' }],
+    match: [{ datasourceId: ESA_WORLD_COVER, layerId: 'WORLDCOVER-MAP' }],
     legend: {
       type: 'discrete',
       items: [

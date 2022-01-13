@@ -115,6 +115,7 @@ export const DATASOURCES = {
   COPERNICUS: 'Copernicus Services',
   PLANET_NICFI: 'Planet NICFI',
   CUSTOM: 'CUSTOM',
+  OTHER: 'OTHER',
 };
 
 export const POWERED_BY_GOOGLE_LABEL = 'powered_by_google_img';

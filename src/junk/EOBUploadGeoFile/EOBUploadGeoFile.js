@@ -21,7 +21,7 @@ export class EOBUploadGeoFile extends Component {
       this.setState({ allowedFiles: ok }, () => {
         const file = ok[0];
         const format = this.getFileExtension(file.name);
-        const supportedFormats = ['kmz', 'kml', 'gpx', 'geojson'];
+        const supportedFormats = ['kmz', 'kml', 'gpx', 'geojson', 'json'];
         try {
           if (!supportedFormats.includes(format)) {
             throw new Error('File type not supported');
@@ -61,6 +61,7 @@ export class EOBUploadGeoFile extends Component {
           }
           break;
         case 'geojson':
+        case 'json':
           area = JSON.parse(fileContents);
           break;
         default:
@@ -123,15 +124,21 @@ export class EOBUploadGeoFile extends Component {
 
   render() {
     const fileUploadTitle = t`File upload`;
-    const fileUploadText = t`Upload a KML/KMZ, GPX or GEOJSON file to create area of interest. Area will be used for clipping when exporting an image.`;
-    const dropAFileString = t`Drop KML/KMZ, GPX, GEOJSON file or search your computer`;
+    const fileUploadText = t`Upload a KML/KMZ, GPX or GEOJSON/JSON file to create area of interest. Area will be used for clipping when exporting an image.`;
+    const dropAFileString = t`Drop KML/KMZ, GPX, GEOJSON/JSON file or search your computer`;
 
     return ReactDOM.createPortal(
       <Rodal
         animation="slideUp"
         visible={true}
-        width={400}
-        height={280}
+        customStyles={{
+          width: 'auto',
+          maxWidth: 400,
+          height: 'auto',
+          bottom: 'auto',
+          top: '40%',
+          transform: 'translateY(-50%)',
+        }}
         onClose={this.props.onClose}
         closeOnEsc={true}
       >

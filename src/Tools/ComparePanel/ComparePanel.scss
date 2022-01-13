@@ -179,6 +179,7 @@
   .compare-layer-info {
     display: flex;
     flex-direction: column;
+    word-wrap: anywhere;
   }
 
   .compare-layer-actions {

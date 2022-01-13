@@ -134,7 +134,7 @@ class Tools extends Component {
     ) {
       return null;
     }
-    let pin = constructPinFromProps(this.props);
+    let pin = await constructPinFromProps(this.props);
     if (this.props.user) {
       const { uniqueId } = await savePinsToServer([pin]);
       this.setLastAddedPin(uniqueId);

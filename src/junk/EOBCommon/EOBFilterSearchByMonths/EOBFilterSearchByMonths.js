@@ -8,14 +8,18 @@ import './EOBFilterSearchByMonths.scss';
 
 export default class EOBFilterSearchByMonths extends React.Component {
   state = {
-    doFiltering: false,
-    selectedMonths: new Set(range(12)),
+    doFiltering: this.props.selectedMonths !== null && this.props.selectedMonths !== undefined,
+    selectedMonths: new Set(this.props.selectedMonths),
   };
 
   handleFilterCheckboxChange = () => {
     this.setState(
       (prevState) => ({
         doFiltering: !prevState.doFiltering,
+        selectedMonths:
+          !prevState.doFiltering && prevState.selectedMonths.size === 0
+            ? new Set(range(12))
+            : prevState.selectedMonths,
       }),
       this.publishChange,
     );

@@ -382,12 +382,19 @@ export const isImageApplicable = (
   minCoverageAllowed,
 ) => {
   return (
-    image &&
-    image.isSelected &&
-    (canWeFilterByClouds ? image.averageCloudCoverPercent <= maxCCPercentAllowed : true) &&
-    (canWeFilterByCoverage ? image.coveragePercent >= minCoverageAllowed : true)
+    isImageSelected(image) &&
+    isImageClearEnough(image, canWeFilterByClouds, maxCCPercentAllowed) &&
+    isImageCoverageEnough(image, canWeFilterByCoverage, minCoverageAllowed)
   );
 };
+
+export const isImageSelected = (image) => image && image.isSelected;
+
+export const isImageClearEnough = (image, canWeFilterByClouds, maxCCPercentAllowed) =>
+  image && (canWeFilterByClouds ? Math.round(image.averageCloudCoverPercent) <= maxCCPercentAllowed : true);
+
+export const isImageCoverageEnough = (image, canWeFilterByCoverage, minCoverageAllowed) =>
+  image && (canWeFilterByCoverage ? Math.round(image.coveragePercent) >= minCoverageAllowed : true);
 
 export const generateS3PreSignedPost = async (access_token, filename) => {
   try {

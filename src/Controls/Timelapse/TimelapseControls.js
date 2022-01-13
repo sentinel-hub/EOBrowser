@@ -26,10 +26,12 @@ export class TimelapseControls extends Component {
       maxDate,
       loadingLayer,
       loadingImages,
+      filterMonths,
       selectedPeriod,
       supportsOrbitPeriod,
       pins,
       layer,
+      customSelected,
       datasetId,
       onRemovePin,
       onSidebarPopupToggle,
@@ -64,7 +66,7 @@ export class TimelapseControls extends Component {
         <div className="timelapse-calendar-holder" ref={this.calendarHolder} />
 
         <div className="filter-months">
-          <EOBFilterSearchByMonths onChange={this.props.setFilterMonths} />
+          <EOBFilterSearchByMonths selectedMonths={filterMonths} onChange={this.props.setFilterMonths} />
         </div>
 
         <div className="select-period-container">
@@ -89,7 +91,7 @@ export class TimelapseControls extends Component {
 
         <div className="visualisations">
           <div className="layer">
-            {getDatasetLabel(datasetId)}: {layer?.title}
+            {getDatasetLabel(datasetId)}: {customSelected ? 'Custom' : layer?.title}
           </div>
 
           {pins.map((pin, index) => (

@@ -26,6 +26,7 @@ import {
   isEffectValueSetAndNotDefault,
   isEffectRangeSetAndNotDefault,
 } from '../../utils/effectsUtils';
+import { getLayerFromParams } from '../../Controls/ImgDownload/ImageDownload.utils';
 
 const PINS_LC_NAME = 'eob-pins';
 
@@ -685,7 +686,7 @@ export function isPinValid(pin) {
   return { isValid: true, error: null };
 }
 
-export function constructPinFromProps(props) {
+export async function constructPinFromProps(props) {
   const {
     lat,
     lng,
@@ -719,8 +720,9 @@ export function constructPinFromProps(props) {
   } = props;
   const isGIBS = !fromTime; //GIBS only has toTime
   const themeName = getThemeName(themesLists[selectedThemesListId].find((t) => t.id === selectedThemeId));
+  const layer = await getLayerFromParams(props);
   return {
-    title: `${getDatasetLabel(datasetId)}: ${customSelected ? 'Custom' : layerId} (${themeName})`,
+    title: `${getDatasetLabel(datasetId)}: ${customSelected ? 'Custom' : layer.title} (${themeName})`,
     lat: lat,
     lng: lng,
     zoom: zoom,

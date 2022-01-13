@@ -185,7 +185,7 @@ All layers that return a single value (such as NDVI, Moisture index, NDWI,…) s
  index for the selected area over time. Clicking the chart icon  <i class="fa fa-bar-chart" /> will
  display the charts. You can remove the polygon by clicking the remove icon <i class="fa fa-close" />.
 
- You can also upload a KML/KMZ, GPX or GEOJSON file with a polygon geometry.
+ You can also upload a KML/KMZ, GPX or GEOJSON/JSON file with a polygon geometry.
  
 The two sheets icon <i class="far fa-copy" /> lets you copy the polygon coordinates as a GEOJSON, the crosshair <i className="fa fa-crosshairs" />
  centres the map to the drawn polygon.

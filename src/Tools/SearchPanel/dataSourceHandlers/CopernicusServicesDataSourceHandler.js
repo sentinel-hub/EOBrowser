@@ -13,7 +13,6 @@ import {
   HRVPPVPPS1Tooltip,
   HRVPPVPPS2Tooltip,
   CLCAccountingTooltip,
-  WorldCoverTooltip,
 } from './DatasourceRenderingComponents/dataSourceTooltips/CopernicusServicesTooltips';
 import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 
@@ -28,7 +27,6 @@ import {
   COPERNICUS_HR_VPP_VPP_S1,
   COPERNICUS_HR_VPP_VPP_S2,
   COPERNICUS_CLC_ACCOUNTING,
-  COPERNICUS_WORLD_COVER,
 } from './dataSourceConstants';
 import { CORINE_LAND_COVER_BANDS } from './datasourceAssets/copernicusCorineLandCoverBands';
 import { GLOBAL_LAND_COVER_BANDS } from './datasourceAssets/copernicusGlobalLandCoverBands';
@@ -38,7 +36,6 @@ import { HR_VPP_SEASONAL_TRAJECTORIES_BANDS } from './datasourceAssets/HRVPPSeas
 import { HR_VPP_VEGETATION_INDICES_BANDS } from './datasourceAssets/HRVPPVegetationIndicesBands';
 import { HR_VPP_VPP_BANDS } from './datasourceAssets/HRVPPVPPBands';
 import { CLC_ACCOUNTING_BANDS } from './datasourceAssets/copernicusCLCAccountingBands';
-import { COPERNICUS_WORLD_COVER_BANDS } from './datasourceAssets/copernicusWorldCoverBands';
 import { convertGeoJSONToEPSG4326 } from '../../../utils/coords';
 import { DATASOURCES } from '../../../const';
 
@@ -53,8 +50,6 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
     [COPERNICUS_HR_VPP_VPP_S1]: 'Vegetation Phenology and Productivity Season 1',
     [COPERNICUS_HR_VPP_VPP_S2]: 'Vegetation Phenology and Productivity Season 2',
     [COPERNICUS_CLC_ACCOUNTING]: 'CORINE Land Cover Accounting Layers',
-    [COPERNICUS_WORLD_COVER]: 'WorldCover',
-    [COPERNICUS_WORLD_COVER]: 'ESA WorldCover',
   });
 
   urls = {
@@ -67,7 +62,6 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
     [COPERNICUS_HR_VPP_VPP_S1]: [],
     [COPERNICUS_HR_VPP_VPP_S2]: [],
     [COPERNICUS_CLC_ACCOUNTING]: [],
-    [COPERNICUS_WORLD_COVER]: [],
   };
   datasets = [];
   allLayers = [];
@@ -110,10 +104,6 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
       min: 0,
       max: 25,
     },
-    [COPERNICUS_WORLD_COVER]: {
-      min: 8,
-      max: 20,
-    },
   };
 
   KNOWN_COLLECTIONS = {
@@ -126,7 +116,6 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
     [COPERNICUS_HR_VPP_VPP_S1]: ['67c731-YOUR-INSTANCEID-HERE'],
     [COPERNICUS_HR_VPP_VPP_S2]: ['8c2bc9-YOUR-INSTANCEID-HERE'],
     [COPERNICUS_CLC_ACCOUNTING]: ['4c5441-YOUR-INSTANCEID-HERE'],
-    [COPERNICUS_WORLD_COVER]: ['0b940c-YOUR-INSTANCEID-HERE'],
   };
 
   KNOWN_COLLECTIONS_LOCATIONS = {
@@ -139,7 +128,6 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
     [COPERNICUS_HR_VPP_VPP_S1]: LocationIdSHv3.creo,
     [COPERNICUS_HR_VPP_VPP_S2]: LocationIdSHv3.creo,
     [COPERNICUS_CLC_ACCOUNTING]: LocationIdSHv3.creo,
-    [COPERNICUS_WORLD_COVER]: LocationIdSHv3.awsEuCentral1,
   };
 
   willHandle(service, url, name, layers, preselected) {
@@ -244,12 +232,6 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
             <CLCAccountingTooltip />
           </HelpTooltip>
         );
-      case COPERNICUS_WORLD_COVER:
-        return (
-          <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
-            <WorldCoverTooltip />
-          </HelpTooltip>
-        );
       default:
         return null;
     }
@@ -325,8 +307,6 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
         return HR_VPP_VPP_BANDS;
       case COPERNICUS_CLC_ACCOUNTING:
         return CLC_ACCOUNTING_BANDS;
-      case COPERNICUS_WORLD_COVER:
-        return COPERNICUS_WORLD_COVER_BANDS;
       default:
         return [];
     }

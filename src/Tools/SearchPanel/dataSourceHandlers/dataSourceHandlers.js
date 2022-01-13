@@ -26,6 +26,8 @@ import ProbaVDataSourceHandler from './ProbaVDataSourceHandler';
 import GibsDataSourceHandler from './GibsDataSourceHandler';
 import BYOCDataSourceHandler from './BYOCDataSourceHandler';
 import DEMDataSourceHandler from './DEMDataSourceHandler';
+import PlanetBasemapDataSourceHandler from './PlanetBasemapDataSourceHandler';
+import OthersDataSourceHandler from './OthersDataSourceHandler';
 
 import { getCollectionInformation } from '../../../utils/collections';
 
@@ -69,7 +71,7 @@ import {
   COPERNICUS_HR_VPP_VPP_S1,
   COPERNICUS_HR_VPP_VPP_S2,
   COPERNICUS_CLC_ACCOUNTING,
-  COPERNICUS_WORLD_COVER,
+  ESA_WORLD_COVER,
   AWS_LOTL1,
   AWS_LOTL2,
   AWS_LTML1,
@@ -94,7 +96,6 @@ import {
   CUSTOM,
   PLANET_NICFI,
 } from './dataSourceConstants';
-import PlanetBasemapDataSourceHandler from './PlanetBasemapDataSourceHandler';
 
 export let dataSourceHandlers;
 initializeDataSourceHandlers();
@@ -118,6 +119,7 @@ export function initializeDataSourceHandlers() {
     new GibsDataSourceHandler(),
     new BYOCDataSourceHandler(),
     new PlanetBasemapDataSourceHandler(),
+    new OthersDataSourceHandler(),
   ];
 }
 
@@ -306,10 +308,11 @@ export function datasourceForDatasetId(datasetId) {
     case COPERNICUS_HR_VPP_VPP_S1:
     case COPERNICUS_HR_VPP_VPP_S2:
     case COPERNICUS_CLC_ACCOUNTING:
-    case COPERNICUS_WORLD_COVER:
       return DATASOURCES.COPERNICUS;
     case PLANET_NICFI:
       return DATASOURCES.PLANET_NICFI;
+    case ESA_WORLD_COVER:
+      return DATASOURCES.OTHER;
     default:
       return null;
   }
@@ -390,7 +393,7 @@ export const datasetLabels = {
   [COPERNICUS_CORINE_LAND_COVER]: 'CORINE Land Cover',
   [COPERNICUS_GLOBAL_LAND_COVER]: 'Global Land Cover',
   [COPERNICUS_GLOBAL_SURFACE_WATER]: 'Global Surface Water',
-  [COPERNICUS_WORLD_COVER]: 'ESA WorldCover',
+  [ESA_WORLD_COVER]: 'ESA WorldCover',
   [COPERNICUS_WATER_BODIES]: 'Water Bodies',
   [COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES]: 'Seasonal Trajectories',
   [COPERNICUS_HR_VPP_VEGETATION_INDICES]: 'Vegetation Indices',

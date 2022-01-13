@@ -4,6 +4,7 @@ import { t } from 'ttag';
 
 import DataSourceHandler from './DataSourceHandler';
 import CopernicusServicesDataSourceHandler from './CopernicusServicesDataSourceHandler';
+import OthersDataSourceHandler from './OthersDataSourceHandler';
 import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/GenericSearchGroup';
 import { FetchingFunction } from '../search';
 import { convertGeoJSONToEPSG4326 } from '../../../utils/coords';
@@ -31,6 +32,7 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
   };
 
   COPERNICUS_SERVICES_KNOWN_COLLECTIONS = new CopernicusServicesDataSourceHandler().getKnownCollectionsList();
+  OTHER_KNOWN_COLLECTIONS = new OthersDataSourceHandler().getKnownCollectionsList();
 
   willHandle(service, url, name, layers, preselected) {
     name = isFunction(name) ? name() : name;
@@ -38,7 +40,8 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
       (l) =>
         l instanceof BYOCLayer &&
         l.collectionId &&
-        !this.COPERNICUS_SERVICES_KNOWN_COLLECTIONS.includes(l.collectionId),
+        !this.COPERNICUS_SERVICES_KNOWN_COLLECTIONS.includes(l.collectionId) &&
+        !this.OTHER_KNOWN_COLLECTIONS.includes(l.collectionId),
     );
     if (customLayers.length === 0) {
       return false;
