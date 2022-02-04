@@ -38,6 +38,7 @@ class TimelapseButton extends Component {
           isLoggedIn={!!this.props.user.userdata}
           selectedTabIndex={this.props.selectedTabIndex}
           is3D={this.props.is3D}
+          aoi={this.props.aoi}
           onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
         />
       </div>
@@ -54,6 +55,7 @@ const mapStoreToProps = (store) => ({
   visualizationUrl: store.visualization.visualizationUrl,
   selectedTabIndex: store.tabs.selectedTabIndex,
   is3D: store.mainMap.is3D,
+  aoi: store.aoi,
 });
 
 export default connect(mapStoreToProps, null)(TimelapseButton);

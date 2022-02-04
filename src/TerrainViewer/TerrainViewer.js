@@ -74,7 +74,10 @@ function TerrainViewer(props) {
 
   let minZoom = 7;
   if (dataSourcesInitialized && datasetId) {
-    minZoom = getDataSourceHandler(datasetId).getLeafletZoomConfig(datasetId).min;
+    const dsh = getDataSourceHandler(datasetId);
+    if (dsh) {
+      minZoom = getDataSourceHandler(datasetId).getLeafletZoomConfig(datasetId).min;
+    }
   }
 
   const onResize = useCallback(

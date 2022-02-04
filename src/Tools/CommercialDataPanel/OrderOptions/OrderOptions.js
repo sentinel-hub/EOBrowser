@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import geo_area from '@mapbox/geojson-area';
-import Toggle from 'react-toggle';
-import { PlanetProductBundle, TPDICollections } from '@sentinel-hub/sentinelhub-js';
+import { TPDICollections } from '@sentinel-hub/sentinelhub-js';
 import { EOBButton } from '../../../junk/EOBCommon/EOBButton/EOBButton';
 import { NotificationPanel } from '../../../Notification/NotificationPanel';
 import { CollectionSelection } from './CollectionSelection';
@@ -11,6 +10,7 @@ import { t } from 'ttag';
 
 import 'react-toggle/style.css';
 import './OrderOptions.scss';
+import { renderProviderSpecificOrderParams } from './renderProviderSpecificOrderParams';
 
 export const OrderType = {
   PRODUCTS: 'PRODUCTS',
@@ -172,7 +172,6 @@ const OrderOptions = ({
           <OrderInputTooltip inputId="size" />
         </div>
       </div>
-
       <div className="row">
         <label title={t`Order limit`}>{t`Order limit (km2)`}</label>
         <div>
@@ -186,42 +185,15 @@ const OrderOptions = ({
           <OrderInputTooltip inputId="limit" />
         </div>
       </div>
-      {searchParams && searchParams.dataProvider === TPDICollections.PLANET_SCOPE && (
-        <>
-          <div className="row">
-            <label title={t`Harmonize data`}>{t`Harmonize data`}</label>
-            <div>
-              <Toggle
-                defaultChecked={orderOptions.harmonizeData}
-                disabled={
-                  !!actionInProgress ||
-                  searchParams.productBundle === PlanetProductBundle.ANALYTIC_SR_UDM2 ||
-                  searchParams.productBundle === PlanetProductBundle.ANALYTIC_SR
-                }
-                icons={false}
-                onChange={() =>
-                  setOrderOptions({ ...orderOptions, harmonizeData: !orderOptions.harmonizeData })
-                }
-              />
-              <OrderInputTooltip inputId="harmonizeData" />
-            </div>
-          </div>
+      {searchParams &&
+        searchParams.dataProvider &&
+        renderProviderSpecificOrderParams(searchParams.dataProvider, {
+          actionInProgress: actionInProgress,
+          orderOptions: orderOptions,
+          searchParams: searchParams,
+          setOrderOptions: setOrderOptions,
+        })}
 
-          <div className="row">
-            <label title={t`Planet API Key`}>{t`Planet API Key`}</label>
-            <div>
-              <input
-                type="text"
-                disabled={!!actionInProgress}
-                defaultValue={orderOptions.planetApiKey}
-                onChange={(e) => setOrderOptions({ ...orderOptions, planetApiKey: e.target.value })}
-                placeholder={t`Your Planet API key`}
-              ></input>
-              <OrderInputTooltip inputId="planetApiKey" />
-            </div>
-          </div>
-        </>
-      )}
       <div className="order-actions">
         <EOBButton
           className="commercial-data-button"
@@ -233,7 +205,6 @@ const OrderOptions = ({
         />
         <OrderInputTooltip inputId="createOrder" />
       </div>
-
       {actionError && <NotificationPanel type="error" msg={actionError} />}
     </div>
   );

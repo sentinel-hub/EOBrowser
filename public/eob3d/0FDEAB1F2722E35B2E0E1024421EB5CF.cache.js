@@ -23831,7 +23831,7 @@ var Lcom_sinergise_common_util_web_MimeType$MimeParamValue_2_classLit = createFo
 function $clinit_EOBrowser3D(){
   $clinit_EOBrowser3D = emptyMethod;
   WEBMERC_TO_WGS84 = find_0(($clinit_WorldTransforms() , POPULAR_WEB_WGS84), ($clinit_CRS() , WGS84));
-  NASA_ASTER_GDEM_PROVIDER = create_4('https://gpcl01.geopedia.world/v1/AUTH_f92818-YOUR-INSTANCEID-HERE/nasa.dem.aster-gdem-v2.2011.epsg:3857');
+  NASA_ASTER_GDEM_PROVIDER = create_4('https://gpcl01.geopedia.world/v1/AUTH_f928186f-c813-4503-9c9d-223bea02b5f0/nasa.dem.aster-gdem-v2.2011.epsg:3857');
   MAPZEN_PROVIDER = new MapzenTileProvider(($clinit_MapzenTileProvider$MapzenFormat() , TERRARIUM));
   viewers = new HashMap;
   theme3DProvider = new EOBrowser3DThemeProvider;

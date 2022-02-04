@@ -3,8 +3,6 @@ import { connect } from 'react-redux';
 import Rodal from 'rodal';
 import { t } from 'ttag';
 import moment from 'moment';
-import gifshot from 'gifshot';
-import FileSaver from 'file-saver';
 import { isMobile } from 'react-device-detect';
 
 import { CancelToken, MimeTypes, ProcessingDataFusionLayer } from '@sentinel-hub/sentinelhub-js';
@@ -15,30 +13,27 @@ import { TimelapseControls } from './TimelapseControls';
 import { TimelapseSidebarPins } from './TimelapseSidebarPins';
 import { TimelapseImages } from './TimelapseImages';
 import { TimelapsePreview } from './TimelapsePreview';
-import { getLayerFromParams } from '../ImgDownload/ImageDownload.utils';
+import { constructBBoxFromBounds, getLayerFromParams } from '../ImgDownload/ImageDownload.utils';
 import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
 
 import {
   getFlyoversToFetch,
-  fetchImage,
   getMinMaxDates,
-  getTimelapseBBox,
   findDefaultActiveImageIndex,
   isImageApplicable,
   findNextActiveImageIndex,
+  generateTimelapseWithGifshot,
+  fetchTimelapseImage,
+  getTimelapseBounds,
+  determineDefaultImageSize,
+  generateTimelapseWithFFMPEG,
+  DEFAULT_IMAGE_WIDTH,
 } from './Timelapse.utils';
 
 import './Timelapse.scss';
 import { applyFilterMonthsToDateRange } from '../../junk/EOBCommon/utils/filterDates';
 import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
-
-const IMAGE_WIDTH = 512;
-const IMAGE_HEIGHT = 512;
-
-export const TRANSITION = {
-  none: 'none',
-  fade: 'fade',
-};
+import { EXPORT_FORMAT, TRANSITION } from '../../const';
 
 class Timelapse extends Component {
   state = {
@@ -75,6 +70,13 @@ class Timelapse extends Component {
     }
 
     this.setState({ loadingLayer: false });
+
+    // update size on first load or if the ratio changes
+    const size = determineDefaultImageSize(this.props.pixelBounds, this.props.zoom, this.props.aoi);
+    if (!this.props.size || this.props.size.ratio.toFixed(3) !== size.ratio.toFixed(3)) {
+      store.dispatch(timelapseSlice.actions.setSize(size));
+    }
+
     this.searchDatesAndFetchImages();
   }
 
@@ -119,8 +121,8 @@ class Timelapse extends Component {
     if (!this.layer) {
       return [];
     }
-    const { pixelBounds, zoom } = this.props;
-    const { bbox } = getTimelapseBBox(pixelBounds, zoom);
+    const { pixelBounds, zoom, aoi } = this.props;
+    const bbox = constructBBoxFromBounds(getTimelapseBounds(pixelBounds, zoom, aoi));
     const dates = await this.layer.findDatesUTC(bbox, fromMoment.toDate(), toMoment.toDate());
     return dates;
   };
@@ -215,7 +217,7 @@ class Timelapse extends Component {
       canWeFilterByCoverage,
     });
 
-    this.fetchImages(flyoversToFetch.sort((a, b) => a.toTime - b.toTime));
+    await this.fetchImages(flyoversToFetch.sort((a, b) => a.toTime - b.toTime));
   };
 
   searchDates = async (layer) => {
@@ -225,9 +227,9 @@ class Timelapse extends Component {
       images: null,
       activeImageIndex: null,
     });
-    const { pixelBounds, zoom, fromTime, toTime, filterMonths, selectedPeriod } = this.props;
+    const { pixelBounds, zoom, fromTime, toTime, filterMonths, selectedPeriod, aoi } = this.props;
 
-    const { bbox } = getTimelapseBBox(pixelBounds, zoom);
+    const bbox = constructBBoxFromBounds(getTimelapseBounds(pixelBounds, zoom, aoi));
     const intervals = applyFilterMonthsToDateRange(fromTime, toTime, filterMonths);
 
     const reqConfig = {
@@ -282,39 +284,51 @@ class Timelapse extends Component {
   };
 
   fetchImages = async (flyoversToFetch) => {
-    const { auth, maxCCPercentAllowed, minCoverageAllowed, showBorders, isSelectAllChecked } = this.props;
+    const {
+      auth,
+      maxCCPercentAllowed,
+      minCoverageAllowed,
+      showBorders,
+      isSelectAllChecked,
+      pixelBounds,
+      zoom,
+      aoi,
+    } = this.props;
     const { canWeFilterByClouds, canWeFilterByCoverage } = this.state;
 
+    const size = determineDefaultImageSize(pixelBounds, zoom, aoi);
     let images = [];
 
     await Promise.all(
       flyoversToFetch.map((flyover) =>
-        fetchImage({
-          ...this.props,
+        fetchTimelapseImage({
           layer: flyover.visualization.layer,
           datasetId: flyover.visualization.datasetId,
-          effects: flyover.visualization.effects,
+          bounds: getTimelapseBounds(pixelBounds, zoom, aoi),
           fromTime: flyover.fromTime,
           toTime: flyover.toTime,
-          width: IMAGE_WIDTH,
-          height: IMAGE_HEIGHT,
+          width: size.width,
+          height: size.height,
           imageFormat: MimeTypes.JPEG,
-          showBorders: showBorders,
-          getMapAuthToken: getGetMapAuthToken(auth),
           cancelToken: this.cancelToken,
+          geometry: aoi.geometry,
+          effects: flyover.visualization.effects,
+          getMapAuthToken: getGetMapAuthToken(auth),
+          showBorders: showBorders && !(aoi && aoi.bounds),
         }).then((image) => {
           if (image === undefined) {
             return;
           }
 
           const augmentedImage = {
-            ...image,
+            url: image.url,
             layer: flyover.visualization.layer,
             datasetId: flyover.visualization.datasetId,
-            customSelected: flyover.visualization.customSelected,
-            pin: flyover.visualization.pin,
             fromTime: flyover.fromTime,
             toTime: flyover.toTime,
+            effects: flyover.visualization.effects,
+            customSelected: flyover.visualization.customSelected,
+            pin: flyover.visualization.pin,
             isSelected: isSelectAllChecked,
             averageCloudCoverPercent: flyover.meta && flyover.meta.averageCloudCoverPercent,
             coveragePercent: flyover.coveragePercent,
@@ -476,7 +490,7 @@ class Timelapse extends Component {
 
     this.setState((prevState) => {
       const { images, canWeFilterByClouds, canWeFilterByCoverage, activeImageIndex } = prevState;
-      const newActiveImage = findNextActiveImageIndex(
+      const nextActiveImageIndex = findNextActiveImageIndex(
         images,
         canWeFilterByClouds,
         canWeFilterByCoverage,
@@ -485,7 +499,7 @@ class Timelapse extends Component {
         activeImageIndex,
       );
       return {
-        activeImageIndex: newActiveImage,
+        activeImageIndex: nextActiveImageIndex,
       };
     });
   };
@@ -498,12 +512,33 @@ class Timelapse extends Component {
     store.dispatch(timelapseSlice.actions.setTransition(transition));
   };
 
-  generateTimelapse = () => {
-    const { maxCCPercentAllowed, minCoverageAllowed, transition } = this.props;
+  generateTimelapse = async () => {
+    const {
+      maxCCPercentAllowed,
+      minCoverageAllowed,
+      transition,
+      datasetId,
+      timelapseFPS,
+      size,
+      format,
+      pixelBounds,
+      zoom,
+      aoi,
+      auth,
+      showBorders,
+    } = this.props;
     const { images, canWeFilterByClouds, canWeFilterByCoverage } = this.state;
 
-    return new Promise((resolve, reject) => {
-      const applicableImageUrls = images
+    // Cancel any previous requests
+    this.cancelToken.cancel();
+    this.cancelToken = new CancelToken();
+
+    this.setState({
+      generatingTimelapse: true,
+    });
+
+    const applicableImageUrls = await Promise.all(
+      images
         .filter((image) =>
           isImageApplicable(
             image,
@@ -513,188 +548,52 @@ class Timelapse extends Component {
             minCoverageAllowed,
           ),
         )
-        .map((image) => image.url);
+        .map(async (image) => {
+          if (size.width === DEFAULT_IMAGE_WIDTH) {
+            return image.url;
+          }
 
-      if (applicableImageUrls.length === 0) {
-        reject();
-      }
-
-      if (transition === TRANSITION.none) {
-        this.generateTimelapseWithoutTransition(applicableImageUrls, resolve, reject);
-      } else {
-        this.generateTimelapseWithTransition(applicableImageUrls, resolve, reject);
-      }
-    });
-  };
-
-  generateTimelapseWithoutTransition = (applicableImageUrls, resolve, reject) => {
-    const { timelapseFPS } = this.props;
-
-    this.setState({
-      generatingTimelapse: true,
-      generatingTimelapseProgress: null,
-    });
-
-    gifshot.createGIF(
-      {
-        images: applicableImageUrls,
-        gifWidth: 512,
-        interval: 1 / timelapseFPS,
-        gifHeight: 512,
-        numWorkers: 4,
-        progressCallback: (progress) => {
-          this.setState({ generatingTimelapseProgress: progress });
-        },
-      },
-      (obj) => {
-        if (obj.error) {
-          this.setState({ generatingTimelapse: false });
-          reject();
-        } else {
-          this.setState({
-            generatingTimelapse: false,
-            generatingTimelapseProgress: null,
+          // refetch images with custom size
+          let response = await fetchTimelapseImage({
+            layer: image.layer,
+            datasetId: image.datasetId,
+            bounds: getTimelapseBounds(pixelBounds, zoom, aoi),
+            fromTime: image.fromTime,
+            toTime: image.toTime,
+            width: size.width,
+            height: size.height,
+            imageFormat: MimeTypes.JPEG,
+            cancelToken: this.cancelToken,
+            geometry: aoi.geometry,
+            effects: image.effects,
+            getMapAuthToken: getGetMapAuthToken(auth),
+            showBorders: showBorders && !(aoi && aoi.bounds),
           });
-
-          const file = new File([obj.image], this.generateTimelapseFilename() + '.gif', {
-            type: obj.image.type,
-          });
-          resolve(file);
-        }
-      },
+          return response && response.url;
+        }),
     );
-  };
 
-  generateTimelapseWithTransition = (applicableImageUrls, resolve, reject) => {
-    this.setState({
-      generatingTimelapse: true,
-      generatingTimelapseProgress: null,
-    });
-
-    const worker = new Worker('ffmpeg.js/ffmpeg-worker-mp4.js');
-    worker.onmessage = (e) => {
-      const msg = e.data;
-      switch (msg.type) {
-        default:
-          break;
-        case 'ready':
-          runFFmpegProcess();
-          break;
-        case 'stdout':
-          console.log(msg.data);
-          break;
-        case 'stderr':
-          console.log(msg.data);
-          updateProgress(msg.data, applicableImageUrls.length);
-          break;
-        case 'done':
-          console.log(msg.data);
-          doneFFmpegProcess(msg);
-          break;
-      }
-    };
-
-    const runFFmpegProcess = () => {
-      const { timelapseFPS } = this.props;
-
-      worker.postMessage({
-        type: 'run',
-        MEMFS: applicableImageUrls.map((url, index) => ({
-          name: `img${`00${index}`.slice(-3)}.png`,
-          data: convertDataURIToBinary(url),
-        })),
-        // https://superuser.com/questions/833232/create-video-with-5-images-with-fadein-out-effect-in-ffmpeg/
-        arguments: [
-          ...applicableImageUrls.flatMap((url, index) => [
-            '-loop',
-            '1',
-            '-t',
-            (1 / timelapseFPS).toString(),
-            '-i',
-            `img${`00${index}`.slice(-3)}.png`,
-          ]),
-          ...(applicableImageUrls.length > 1
-            ? [
-                '-filter_complex',
-                [
-                  ...applicableImageUrls
-                    .slice(0, -1)
-                    .map(
-                      (url, index) =>
-                        `[${index + 1}]fade=d=${0.5 / timelapseFPS}:t=in:alpha=1,setpts=PTS-STARTPTS+${
-                          (index + 1) / timelapseFPS
-                        }/TB[fade${index + 1}]`,
-                    ),
-                  ...applicableImageUrls
-                    .slice(0, -1)
-                    .map(
-                      (url, index) =>
-                        `[${index > 0 ? 'slice' : ''}${index}][fade${index + 1}]overlay[slice${index + 1}]`,
-                    ),
-                ].join(';'),
-                '-map',
-                `[slice${applicableImageUrls.length - 1}]`,
-              ]
-            : []),
-          '-pix_fmt',
-          'yuv420p',
-          'out.mp4',
-        ],
+    if (format === EXPORT_FORMAT.gif && transition === TRANSITION.none) {
+      return generateTimelapseWithGifshot({
+        applicableImageUrls,
+        datasetId,
+        timelapseFPS,
+        size,
+        progress: (options) => {
+          this.setState(options);
+        },
       });
-    };
-
-    const updateProgress = (data, totalImages) => {
-      const { timelapseFPS } = this.props;
-
-      const progress = data.match(/frame=\s*(\d+)\sfps/);
-      if (progress) {
-        const outputFPS = 25;
-        const totalFrames = (totalImages * outputFPS) / timelapseFPS;
-        this.setState({ generatingTimelapseProgress: Math.min(progress[1] / totalFrames, 1) });
-      }
-    };
-
-    const doneFFmpegProcess = (msg) => {
-      this.setState({
-        generatingTimelapse: false,
-        generatingTimelapseProgress: null,
-      });
-
-      if (msg.data?.MEMFS[0]?.data?.length > 0) {
-        const file = new File([msg.data.MEMFS[0].data], this.generateTimelapseFilename() + '.mp4', {
-          type: 'video/mp4',
-        });
-        resolve(file);
-      } else {
-        reject();
-      }
-    };
-
-    const convertDataURIToBinary = (dataURI) => {
-      const base64 = dataURI.split(',')[1];
-      const raw = window.atob(base64);
-
-      const array = new Uint8Array(new ArrayBuffer(raw.length));
-      for (let i = 0; i < raw.length; i++) {
-        array[i] = raw.charCodeAt(i);
-      }
-      return array;
-    };
-  };
-
-  generateTimelapseFilename = () => {
-    const random = Math.round(Date.now() * Math.random() * 1000);
-    return `${this.props.datasetId.replace(' ', '_')}-${random}-timelapse`;
-  };
-
-  downloadTimelapse = async () => {
-    if (this.props.previewFileUrl) {
-      const link = document.createElement('a');
-      link.href = this.props.previewFileUrl;
-      link.click();
     } else {
-      const file = await this.generateTimelapse();
-      FileSaver.saveAs(file, file.name);
+      return generateTimelapseWithFFMPEG({
+        applicableImageUrls,
+        datasetId,
+        timelapseFPS,
+        transition,
+        size,
+        progress: (options) => {
+          this.setState(options);
+        },
+      });
     }
   };
 
@@ -739,6 +638,20 @@ class Timelapse extends Component {
     });
   };
 
+  updateSize = (size) => {
+    store.dispatch(
+      timelapseSlice.actions.setSize({
+        width: size.width,
+        height: size.height,
+        ratio: this.props.size.ratio, // always keep initial ratio
+      }),
+    );
+  };
+
+  updateFormat = (format) => {
+    store.dispatch(timelapseSlice.actions.setFormat(format));
+  };
+
   render() {
     const {
       images,
@@ -772,6 +685,9 @@ class Timelapse extends Component {
       transition,
       pins,
       customSelected,
+      aoi,
+      size,
+      format,
     } = this.props;
 
     let { minDate, maxDate } = getMinMaxDates(datasetId);
@@ -845,7 +761,8 @@ class Timelapse extends Component {
                     minCoverageAllowed={minCoverageAllowed}
                     isSelectAllChecked={isSelectAllChecked}
                     activeImageIndex={activeImageIndex}
-                    showBorders={showBorders}
+                    enableBorders={!(aoi && aoi.bounds)}
+                    showBorders={showBorders && !(aoi && aoi.bounds)}
                     setMaxCCPercentAllowed={this.setMaxCCPercentAllowed}
                     setMinCoverageAllowed={this.setMinCoverageAllowed}
                     toggleImageSelected={this.toggleImageSelected}
@@ -866,9 +783,10 @@ class Timelapse extends Component {
 
             <TimelapsePreview
               images={images}
+              size={size}
+              format={format}
               activeImageIndex={activeImageIndex}
               access_token={this.props.auth.user.access_token}
-              timelapseSharePreviewMode={timelapseSharePreviewMode}
               shouldDisplayPreviewFile={this.shouldDisplayPreviewFile}
               previewFileUrl={previewFileUrl}
               isPreviewPlaying={isPreviewPlaying}
@@ -888,8 +806,10 @@ class Timelapse extends Component {
               setImageToActive={this.setImageToActive}
               generateTimelapse={this.generateTimelapse}
               updateUploadingTimelapseProgress={this.updateUploadingTimelapseProgress}
-              downloadTimelapse={this.downloadTimelapse}
               timelapseSharePreviewModeDisable={this.timelapseSharePreviewModeDisable}
+              updateSize={this.updateSize}
+              updateFormat={this.updateFormat}
+              searchDatesAndFetchImages={this.searchDatesAndFetchImages}
             />
           </div>
         </div>
@@ -902,6 +822,7 @@ const mapStoreToProps = (store) => ({
   zoom: store.mainMap.zoom,
   visualizationToTime: store.visualization.toTime,
   pixelBounds: store.mainMap.pixelBounds,
+  aoi: store.aoi,
   datasetId: store.visualization.datasetId,
   layerId: store.visualization.layerId,
   customSelected: store.visualization.customSelected,
@@ -936,6 +857,8 @@ const mapStoreToProps = (store) => ({
   timelapseFPS: store.timelapse.timelapseFPS,
   transition: store.timelapse.transition,
   pins: store.timelapse.pins,
+  size: store.timelapse.size,
+  format: store.timelapse.format,
 });
 
 export default connect(mapStoreToProps, null)(Timelapse);

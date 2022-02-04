@@ -71,6 +71,7 @@ import {
   COPERNICUS_HR_VPP_VPP_S1,
   COPERNICUS_HR_VPP_VPP_S2,
   COPERNICUS_CLC_ACCOUNTING,
+  GLOBAL_HUMAN_SETTLEMENT,
   ESA_WORLD_COVER,
   AWS_LOTL1,
   AWS_LOTL2,
@@ -141,11 +142,12 @@ BYOCLayer is an exception where lazy loading of service parameters is not suffic
 hardcoding collectionIds or without assuming there will always be only one different collection per instance, we need to have
 collectionId and only way to get it is to query service.
 */
+const collectionTitles = {};
+
 async function updateLayersFromServiceIfNeeded(layers) {
   const updateLayersFromService = layers.filter(
     (l) => l instanceof BYOCLayer || l instanceof S1GRDAWSEULayer || l instanceof DEMLayer,
   );
-  const collectionTitles = {};
 
   await Promise.all(
     updateLayersFromService.map(async (l) => {
@@ -158,18 +160,6 @@ async function updateLayersFromServiceIfNeeded(layers) {
           },
         });
         if (l instanceof BYOCLayer) {
-          if (collectionTitles[l.collectionId]) {
-            l.collectionTitle = collectionTitles[l.collectionId];
-          } else {
-            const collectionInfo = await getCollectionInformation(
-              l.collectionId,
-              l.locationId,
-              l.subType,
-            ).then((r) => r.data);
-            collectionTitles[l.collectionId] = collectionInfo.title;
-            l.collectionTitle = collectionInfo.title;
-          }
-
           const availableBands = await l.getAvailableBands({
             timeout: 30000,
             cache: {
@@ -185,7 +175,81 @@ async function updateLayersFromServiceIfNeeded(layers) {
       }
     }),
   );
+  // update collection titles
+  await updateCollectionsFromServiceIfNeeded(updateLayersFromService);
 }
+
+const updateLayersWithCollectionTitle = (layers, collectionId, collectionTitle) =>
+  layers.filter((l) => l.collectionId === collectionId).forEach((l) => (l.collectionTitle = collectionTitle));
+
+async function updateCollectionsFromServiceIfNeeded(layers) {
+  const uniqueCollections = {};
+
+  const byocLayers = layers.filter((l) => l instanceof BYOCLayer);
+
+  // create dict of collections to avoid repeating request
+  byocLayers.forEach((l) => {
+    uniqueCollections[l.collectionId] = {
+      collectionId: l.collectionId,
+      locationId: l.locationId,
+      subType: l.subType,
+    };
+  });
+
+  await Promise.all(
+    Object.keys(uniqueCollections).map(async (collectionId) => {
+      const collection = uniqueCollections[collectionId];
+      try {
+        //check "cache"
+        if (collectionTitles[collection.collectionId]) {
+          updateLayersWithCollectionTitle(
+            byocLayers,
+            collectionId,
+            collectionTitles[collection.collectionId],
+          );
+        } else {
+          //check known collections
+          const knownCollectionTitle = checkKnownCollections(collectionId);
+          if (knownCollectionTitle) {
+            updateLayersWithCollectionTitle(byocLayers, collectionId, knownCollectionTitle);
+          } else {
+            //get collection title from catalog
+            const collectionInfo = await getCollectionInformation(
+              collection.collectionId,
+              collection.locationId,
+              collection.subType,
+            ).then((r) => r.data);
+            collectionTitles[collection.collectionId] = collectionInfo.title;
+            updateLayersWithCollectionTitle(byocLayers, collectionId, collectionInfo.title);
+          }
+        }
+      } catch (e) {
+        console.error(`Error retrieving additional data for collection ${collection.collectionId} `);
+        throw e;
+      }
+    }),
+  );
+}
+
+// try to get collection name from datasource handler for known collections (Copernicus&friends)
+const checkKnownCollections = (collectionId) => {
+  const datasourceHandlers = [new CopernicusServicesDataSourceHandler(), new OthersDataSourceHandler()];
+
+  let collectionTitle;
+
+  for (let dsh of datasourceHandlers) {
+    const knownCollections = dsh.KNOWN_COLLECTIONS;
+    const datasetId = Object.keys(knownCollections).find(
+      (c) => knownCollections[c] && knownCollections[c].indexOf(collectionId) > -1,
+    );
+    if (datasetId && dsh.getDatasetSearchLabels) {
+      collectionTitle = dsh.getDatasetSearchLabels()[datasetId];
+      break;
+    }
+  }
+
+  return collectionTitle;
+};
 
 export async function prepareDataSourceHandlers(theme) {
   initializeDataSourceHandlers();
@@ -312,6 +376,7 @@ export function datasourceForDatasetId(datasetId) {
     case PLANET_NICFI:
       return DATASOURCES.PLANET_NICFI;
     case ESA_WORLD_COVER:
+    case GLOBAL_HUMAN_SETTLEMENT:
       return DATASOURCES.OTHER;
     default:
       return null;
@@ -400,6 +465,7 @@ export const datasetLabels = {
   [COPERNICUS_HR_VPP_VPP_S1]: 'Vegetation Phenology and Productivity Season 1',
   [COPERNICUS_HR_VPP_VPP_S2]: 'Vegetation Phenology and Productivity Season 2',
   [COPERNICUS_CLC_ACCOUNTING]: 'CORINE Land Cover Accounting Layers',
+  [GLOBAL_HUMAN_SETTLEMENT]: 'Global Human Settlement',
   [PLANET_NICFI]: 'Planet NICFI Basemaps',
 };
 

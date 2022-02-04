@@ -5,21 +5,26 @@ import { t } from 'ttag';
 import DataSourceHandler from './DataSourceHandler';
 import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/GenericSearchGroup';
 import { WorldCoverTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/ESAWorldCoverTooltip';
+import { GHSTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/GlobalHumanSettlementTooltip';
+
 import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 
 import { FetchingFunction } from '../search';
-import { ESA_WORLD_COVER } from './dataSourceConstants';
+import { ESA_WORLD_COVER, GLOBAL_HUMAN_SETTLEMENT } from './dataSourceConstants';
 import { ESA_WORLD_COVER_BANDS } from './datasourceAssets/copernicusWorldCoverBands';
+import { GHS_BANDS } from './datasourceAssets/GHSBands';
 import { convertGeoJSONToEPSG4326 } from '../../../utils/coords';
 import { DATASOURCES } from '../../../const';
 
 export default class OthersDataSourceHandler extends DataSourceHandler {
   getDatasetSearchLabels = () => ({
     [ESA_WORLD_COVER]: 'ESA WorldCover',
+    [GLOBAL_HUMAN_SETTLEMENT]: 'Global Human Settlement',
   });
 
   urls = {
     [ESA_WORLD_COVER]: [],
+    [GLOBAL_HUMAN_SETTLEMENT]: [],
   };
   datasets = [];
   allLayers = [];
@@ -30,14 +35,20 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
       min: 8,
       max: 20,
     },
+    [GLOBAL_HUMAN_SETTLEMENT]: {
+      min: 5,
+      max: 18,
+    },
   };
 
   KNOWN_COLLECTIONS = {
     [ESA_WORLD_COVER]: ['0b940c-YOUR-INSTANCEID-HERE'],
+    [GLOBAL_HUMAN_SETTLEMENT]: ['3dbeea-YOUR-INSTANCEID-HERE'],
   };
 
   KNOWN_COLLECTIONS_LOCATIONS = {
     [ESA_WORLD_COVER]: LocationIdSHv3.awsEuCentral1,
+    [GLOBAL_HUMAN_SETTLEMENT]: LocationIdSHv3.creo,
   };
 
   willHandle(service, url, name, layers, preselected) {
@@ -92,6 +103,12 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
         return (
           <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
             <WorldCoverTooltip />
+          </HelpTooltip>
+        );
+      case GLOBAL_HUMAN_SETTLEMENT:
+        return (
+          <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+            <GHSTooltip />
           </HelpTooltip>
         );
       default:
@@ -154,6 +171,8 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
     switch (datasetId) {
       case ESA_WORLD_COVER:
         return ESA_WORLD_COVER_BANDS;
+      case GLOBAL_HUMAN_SETTLEMENT:
+        return GHS_BANDS;
       default:
         return [];
     }

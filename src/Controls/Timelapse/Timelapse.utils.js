@@ -1,12 +1,14 @@
 import moment from 'moment';
-import { BBox, CRS_EPSG4326 } from '@sentinel-hub/sentinelhub-js';
 import L, { LatLngBounds } from 'leaflet';
 import axios from 'axios';
+import gifshot from 'gifshot';
 
 import {
-  fetchImage as fetchImageDownloadUtils,
+  fetchImage,
   getMapDimensions,
   getAppropriateApiType,
+  constructBBoxFromBounds,
+  getDimensionsInMeters,
 } from '../ImgDownload/ImageDownload.utils';
 import {
   getDataSourceHandler,
@@ -16,8 +18,15 @@ import {
 import SHlogo from '../../junk/EOBCommon/assets/shLogo.png';
 import copernicus from '../../junk/EOBCommon/assets/copernicus.png';
 import { addOverlays } from '../../junk/EOB3TimelapsePanel/imageOverlays';
+import { TRANSITION } from '../../const';
 
-export function getTimelapseBBox(pixelBounds, zoom) {
+export const DEFAULT_IMAGE_WIDTH = 512;
+
+export function getTimelapseBounds(pixelBounds, zoom, aoi) {
+  if (aoi && aoi.bounds) {
+    return aoi.bounds;
+  }
+
   const { width: mapWidth, height: mapHeight } = getMapDimensions(pixelBounds);
   const selectedMapDimension = Math.min(mapWidth, mapHeight);
 
@@ -33,12 +42,18 @@ export function getTimelapseBBox(pixelBounds, zoom) {
     zoom,
   );
 
-  const imageWidthMeters = L.CRS.EPSG3857.distance(L.latLng(south, west), L.latLng(south, east));
+  return new LatLngBounds({ lat: south, lng: west }, { lat: north, lng: east });
+}
+
+export function determineDefaultImageSize(pixelBounds, zoom, aoi) {
+  const bounds = getTimelapseBounds(pixelBounds, zoom, aoi);
+  const dimenstions = getDimensionsInMeters(bounds);
+  const ratio = dimenstions.width / dimenstions.height;
+
   return {
-    bbox: new BBox(CRS_EPSG4326, west, south, east, north),
-    bounds: new LatLngBounds({ lat: south, lng: west }, { lat: north, lng: east }),
-    selectedMapDimension: selectedMapDimension,
-    imageWidthMeters: imageWidthMeters,
+    width: DEFAULT_IMAGE_WIDTH,
+    height: Math.round(DEFAULT_IMAGE_WIDTH / ratio),
+    ratio,
   };
 }
 
@@ -110,40 +125,29 @@ function sortByBestCoverage(a, b) {
   return bCoverage * bClearSkyCoverage - aCoverage * aClearSkyCoverage;
 }
 
-export async function fetchImage(params) {
-  const {
-    layer,
-    toTime,
-    selectedPeriod,
-    datasetId,
-    width,
-    height,
-    pixelBounds,
-    zoom,
-    showBorders,
-    imageFormat,
-  } = params;
+export async function fetchTimelapseImage(params) {
+  const { layer, toTime, selectedPeriod, datasetId, width, height, showBorders, imageFormat, bounds } =
+    params;
 
-  const { bbox, bounds, selectedMapDimension, imageWidthMeters } = getTimelapseBBox(pixelBounds, zoom);
   const apiType = await getAppropriateApiType(layer, imageFormat);
   const options = {
     ...params,
-    bounds,
     apiType,
   };
 
-  let blob = await fetchImageDownloadUtils(layer, options).catch((err) => {
+  let blob = await fetchImage(layer, options).catch((err) => {
     console.warn(err);
   });
   if (!blob) return;
 
   if (showBorders) {
-    const bboxArr = [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY];
+    const bbox = constructBBoxFromBounds(bounds);
+    const maxSupportedDimension = 2048;
     blob = await addOverlays(
       blob,
-      selectedMapDimension,
-      selectedMapDimension,
-      bboxArr,
+      maxSupportedDimension,
+      maxSupportedDimension,
+      [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
       [timelapseBorders],
       width,
       height,
@@ -157,7 +161,10 @@ export async function fetchImage(params) {
     blob,
     width,
     height,
-    imageWidthMeters,
+    L.CRS.EPSG3857.distance(
+      L.latLng(bounds.getSouth(), bounds.getWest()),
+      L.latLng(bounds.getSouth(), bounds.getEast()),
+    ),
     showLogos,
   );
 
@@ -428,4 +435,212 @@ export const uploadFileToS3 = async (preSignedPost, file) => {
 
 export const getS3FileUrl = (res) => {
   return res.url + res.fields.key;
+};
+
+export const generateTimelapseWithGifshot = ({
+  applicableImageUrls,
+  datasetId,
+  timelapseFPS,
+  size,
+  progress,
+}) => {
+  return new Promise((resolve, reject) => {
+    progress({
+      generatingTimelapse: true,
+      generatingTimelapseProgress: null,
+    });
+
+    if (applicableImageUrls.length === 0) {
+      reject();
+    }
+
+    gifshot.createGIF(
+      {
+        images: applicableImageUrls,
+        gifWidth: size && size.width,
+        gifHeight: size && size.height,
+        interval: 1 / timelapseFPS,
+        numWorkers: 4,
+        progressCallback: (percent) => {
+          progress({ generatingTimelapseProgress: percent });
+        },
+      },
+      (obj) => {
+        if (obj.error) {
+          progress({ generatingTimelapse: false });
+          reject();
+        } else {
+          progress({
+            generatingTimelapse: false,
+            generatingTimelapseProgress: null,
+          });
+
+          const file = new File([obj.image], generateTimelapseFilename(datasetId) + '.gif', {
+            type: obj.image.type,
+          });
+          resolve(file);
+        }
+      },
+    );
+  });
+};
+
+export const generateTimelapseWithFFMPEG = ({
+  applicableImageUrls,
+  datasetId,
+  timelapseFPS,
+  transition,
+  size,
+  progress,
+}) => {
+  return new Promise((resolve, reject) => {
+    progress({
+      generatingTimelapse: true,
+      generatingTimelapseProgress: null,
+    });
+
+    const worker = new Worker('ffmpeg.js/ffmpeg-worker-mp4.js');
+    worker.onmessage = (e) => {
+      const msg = e.data;
+      switch (msg.type) {
+        default:
+          break;
+        case 'ready':
+          runFFmpegProcess();
+          break;
+        case 'stdout':
+          console.log(msg.data);
+          break;
+        case 'stderr':
+          console.log(msg.data);
+          updateProgress(msg.data, applicableImageUrls.length);
+          break;
+        case 'done':
+          console.log(msg.data);
+          doneFFmpegProcess(msg);
+          break;
+      }
+    };
+
+    // ffmpeg requires even numbers for width and height
+    const width = floorToEven(size.width);
+    const height = floorToEven(size.height);
+
+    const runFFmpegProcess = () => {
+      worker.postMessage({
+        type: 'run',
+        MEMFS: applicableImageUrls.map((url, index) => ({
+          name: `img${`00${index}`.slice(-3)}.png`,
+          data: convertDataURIToBinary(url),
+        })),
+        arguments:
+          transition === TRANSITION.none ? ffmpegArgumentsTransitionNone() : ffmpegArgumentsTransitionFade(),
+      });
+    };
+
+    const ffmpegArgumentsTransitionNone = () => {
+      // https://superuser.com/questions/624567/how-to-create-a-video-from-images-using-ffmpeg
+      return [
+        '-r',
+        (1 / timelapseFPS).toString(),
+        '-i',
+        'img%03d.png',
+        '-vf',
+        'crop=trunc(iw/2)*2:trunc(ih/2)*2',
+        '-pix_fmt',
+        'yuv420p',
+        'out.mp4',
+      ];
+    };
+
+    const ffmpegArgumentsTransitionFade = () => {
+      // https://superuser.com/questions/833232/create-video-with-5-images-with-fadein-out-effect-in-ffmpeg/
+      return [
+        ...applicableImageUrls.flatMap((url, index) => [
+          '-loop',
+          '1',
+          '-t',
+          (1 / timelapseFPS).toString(),
+          '-i',
+          `img${`00${index}`.slice(-3)}.png`,
+        ]),
+        ...(applicableImageUrls.length > 1
+          ? [
+              '-filter_complex',
+              [
+                ...applicableImageUrls.map(
+                  (url, index) => `[${index}]crop=${width}:${height}[cropped${index}]`,
+                ),
+                ...applicableImageUrls
+                  .slice(0, -1)
+                  .map(
+                    (url, index) =>
+                      `[cropped${index + 1}]fade=d=${0.5 / timelapseFPS}:t=in:alpha=1,setpts=PTS-STARTPTS+${
+                        (index + 1) / timelapseFPS
+                      }/TB[fade${index + 1}]`,
+                  ),
+                ...applicableImageUrls
+                  .slice(0, -1)
+                  .map(
+                    (url, index) =>
+                      `[${index === 0 ? 'cropped0' : `slice${index}`}][fade${index + 1}]overlay[slice${
+                        index + 1
+                      }]`,
+                  ),
+              ].join(';'),
+              '-map',
+              `[slice${applicableImageUrls.length - 1}]`,
+            ]
+          : []),
+        '-pix_fmt',
+        'yuv420p',
+        'out.mp4',
+      ];
+    };
+
+    const updateProgress = (data, totalImages) => {
+      const parsedProgress = data.match(/frame=\s*(\d+)\sfps/);
+      if (parsedProgress) {
+        const outputFPS = transition === TRANSITION.none ? 1 : 25;
+        const totalFrames = (totalImages * outputFPS) / timelapseFPS;
+        progress({ generatingTimelapseProgress: Math.min(parsedProgress[1] / totalFrames, 1) });
+      }
+    };
+
+    const doneFFmpegProcess = (msg) => {
+      progress({
+        generatingTimelapse: false,
+        generatingTimelapseProgress: null,
+      });
+
+      if (msg.data?.MEMFS[0]?.data?.length > 0) {
+        const file = new File([msg.data.MEMFS[0].data], generateTimelapseFilename(datasetId) + '.mp4', {
+          type: 'video/mp4',
+        });
+        resolve(file);
+      } else {
+        reject();
+      }
+    };
+
+    const convertDataURIToBinary = (dataURI) => {
+      const base64 = dataURI.split(',')[1];
+      const raw = window.atob(base64);
+
+      const array = new Uint8Array(new ArrayBuffer(raw.length));
+      for (let i = 0; i < raw.length; i++) {
+        array[i] = raw.charCodeAt(i);
+      }
+      return array;
+    };
+  });
+};
+
+export const generateTimelapseFilename = (datasetId) => {
+  const random = Math.round(Date.now() * Math.random() * 1000);
+  return `${datasetId.replace(' ', '_')}-${random}-timelapse`;
+};
+
+const floorToEven = (value) => {
+  return Math.floor(value / 2) * 2;
 };

@@ -3008,6 +3008,10 @@ export const DEFAULT_THEMES = [
         name: 'HR-VPP Vegetation Phenology and Productivity Parameters Season 2',
         url: 'https://creodias.sentinel-hub.com/ogc/wms/b851e1-YOUR-INSTANCEID-HERE',
       },
+      {
+        name: 'Global Human Settlement',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/dae04f-YOUR-INSTANCEID-HERE',
+      },
     ],
   },
 

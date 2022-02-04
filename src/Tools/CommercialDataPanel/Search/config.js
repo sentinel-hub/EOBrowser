@@ -16,7 +16,7 @@ import { createSelectOptions } from '../commercialData.utils';
 export const minDateRange = moment.utc('1982-01-01');
 export const maxDateRange = moment.utc().endOf('day');
 
-export const providerSpecificParameters = {
+export const providerSpecificSearchParameters = {
   [TPDICollections.PLANET_SCOPE]: [
     {
       id: 'productBundle',

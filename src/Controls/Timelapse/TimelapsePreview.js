@@ -7,11 +7,14 @@ import { CSSTransitionGroup } from 'react-transition-group';
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
 import { generateS3PreSignedPost, getS3FileUrl, isImageApplicable, uploadFileToS3 } from './Timelapse.utils';
 import SocialShare from '../../components/SocialShare/SocialShare';
-import { TRANSITION } from './Timelapse';
+import FileSaver from 'file-saver';
+import { TRANSITION } from '../../const';
+import TimelapseSettings from './TimelapseSettings';
 
 export class TimelapsePreview extends Component {
   state = {
     displaySocialShareOptions: false,
+    displayDownloadPanel: false,
     previewFileUrlPassThrough: null,
   };
 
@@ -29,8 +32,36 @@ export class TimelapsePreview extends Component {
     this.setState({ displaySocialShareOptions });
   };
 
+  toggleDownloadPanel = (displayDownloadPanel) => {
+    this.setState({
+      displayDownloadPanel: !!displayDownloadPanel ?? !this.state.displayDownloadPanel,
+    });
+  };
+
+  downloadTimelapse = async () => {
+    this.toggleDownloadPanel(false);
+
+    if (this.props.previewFileUrl) {
+      const link = document.createElement('a');
+      link.href = this.props.previewFileUrl;
+      link.click();
+    } else {
+      const file = await this.props.generateTimelapse().catch(() => {});
+      if (file) {
+        FileSaver.saveAs(file, file.name);
+      } else {
+        alert(t`Could not generate timelapse animation file. Try using lower resolution or fewer frames.`);
+      }
+    }
+  };
+
   generatePreviewFile = async () => {
-    const file = await this.props.generateTimelapse();
+    const file = await this.props.generateTimelapse().catch(() => {});
+    if (!file) {
+      alert(t`Could not generate timelapse animation file. Try using lower resolution or fewer frames.`);
+      return null;
+    }
+
     this.props.updateUploadingTimelapseProgress(true);
     const preSignedPost = await generateS3PreSignedPost(this.props.access_token, file.name);
 
@@ -43,11 +74,44 @@ export class TimelapsePreview extends Component {
     this.props.updateUploadingTimelapseProgress(false);
   };
 
+  shouldDisplayPreviewFile = () => {
+    return this.props.shouldDisplayPreviewFile && this.props.shouldDisplayPreviewFile();
+  };
+
+  onUpdateWidth = (event) => {
+    const width = parseInt(event.target.value, 10);
+    if (width) {
+      this.heightInput.value = Math.round(width / this.props.size.ratio);
+    }
+  };
+
+  onUpdateHeight = (event) => {
+    const height = parseInt(event.target.value, 10);
+    if (height) {
+      this.widthInput.value = Math.round(height * this.props.size.ratio);
+    }
+  };
+
+  onSaveButtonClick = () => {
+    const width = parseInt(this.widthInput.value, 10);
+    const height = parseInt(this.heightInput.value, 10);
+
+    if (width && height) {
+      this.props.updateSize({ width, height });
+
+      if (width !== this.props.size.width || height !== this.props.size.height) {
+        this.props.searchDatesAndFetchImages();
+      }
+    }
+
+    this.props.updateFormat(this.formatInput.value);
+    this.toggleDownloadPanel(false);
+  };
+
   render() {
     const {
       images,
       activeImageIndex,
-      timelapseSharePreviewMode,
       previewFileUrl,
       isPreviewPlaying,
       timelapseFPS,
@@ -59,13 +123,15 @@ export class TimelapsePreview extends Component {
       generatingTimelapse,
       generatingTimelapseProgress,
       loadingImages,
+      size,
+      format,
     } = this.props;
 
-    const { previewFileUrlPassThrough } = this.state;
+    const { previewFileUrlPassThrough, displayDownloadPanel } = this.state;
 
     let image, applicableImageIndexes, applicableImageActiveIndex;
 
-    if (this.props.shouldDisplayPreviewFile()) {
+    if (this.shouldDisplayPreviewFile()) {
       image = { url: previewFileUrl };
     } else {
       if (!images) {
@@ -96,7 +162,7 @@ export class TimelapsePreview extends Component {
       return null;
     }
 
-    const isVideoElement = image.url.endsWith('mp4');
+    const isVideoElement = image.url && image.url.endsWith('mp4');
 
     return (
       <div className="preview-panel">
@@ -140,7 +206,7 @@ export class TimelapsePreview extends Component {
         />
 
         <div className="preview-controls">
-          {timelapseSharePreviewMode && this.props.shouldDisplayPreviewFile() ? (
+          {this.shouldDisplayPreviewFile() ? (
             !isMobile && (
               <div
                 className="edit-timelapse"
@@ -200,15 +266,41 @@ export class TimelapsePreview extends Component {
             </>
           )}
 
+          {!this.shouldDisplayPreviewFile() ? (
+            <>
+              <div
+                className={'settings-button' + (generatingTimelapse || loadingImages ? ' disabled' : '')}
+                onClick={() => this.toggleDownloadPanel(true)}
+                title={t`Settings`}
+              >
+                <i className="fas fa-cogs"></i>
+              </div>
+
+              {displayDownloadPanel ? (
+                <TimelapseSettings
+                  size={size}
+                  format={format}
+                  updateSize={this.props.updateSize}
+                  updateFormat={this.props.updateFormat}
+                  toggleDownloadPanel={this.toggleDownloadPanel}
+                  searchDatesAndFetchImages={this.props.searchDatesAndFetchImages}
+                />
+              ) : null}
+            </>
+          ) : null}
+
           <EOBButton
             disabled={generatingTimelapse || loadingImages}
             loading={generatingTimelapse}
-            onClick={this.props.downloadTimelapse}
+            onClick={this.downloadTimelapse}
             text={generatingTimelapse ? t`Preparing...` : t`Download`}
             className="timelapse-download-btn"
           />
 
-          <div className="share" onClick={this.toggleSocialSharePanel}>
+          <div
+            className={'share' + (generatingTimelapse || loadingImages ? ' disabled' : '')}
+            onClick={this.toggleSocialSharePanel}
+          >
             Share
           </div>
         </div>

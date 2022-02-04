@@ -2045,6 +2045,19 @@ export const PREDEFINED_LAYERS_METADATA = [
     description: () =>
       t`#  Corine Land Cover - Accounting\n\n\n\nThis script visualises CORINE Land Cover (CLC) Accounting Layers according to the official CORINE Land Cover color scheme. CLC Accounting Layers are CLC status layers modified for the purpose of consistent statistical analysis in the land cover change accounting system at EEA. For more information about the layer, visit [this website](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover_accounting_layer/).`,
   },
+
+  {
+    match: [{ datasourceId: 'GLOBAL_HUMAN_SETTLEMENT', layerId: 'GHS-BUILT-S2' }],
+
+    description: () =>
+      t`#  The Global Human Settlement Layer GHS-BUILT-S2 \n\n\n\n
+      
+      The Global Human Settlement Layer GHS-BUILT-S2 is a global map of built-up areas (expressed as probabilities from 0 to 100 %) at 10 m spatial resolution. It was derived from a Sentinel-2 global image composite for the reference year 2018 using Convolutional Neural Networks.
+
+      This script visualises the built-up probabilities stretched to 0-255.
+
+      For more information about the layer, visit [this website](https://custom-scripts.sentinel-hub.com/copernicus_services/global-human-settlement-layer-ghs-built-s2/).`,
+  },
   {
     match: [{ datasourceId: 'COPERNICUS_WATER_BODIES', layerId: 'WATER-BODIES-OCCURENCE' }],
 

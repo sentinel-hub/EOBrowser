@@ -69,6 +69,7 @@ import {
   COPERNICUS_HR_VPP_VPP_S1,
   COPERNICUS_HR_VPP_VPP_S2,
   COPERNICUS_CLC_ACCOUNTING,
+  GLOBAL_HUMAN_SETTLEMENT,
   ESA_WORLD_COVER,
   AWS_LOTL1,
   AWS_LOTL2,
@@ -561,6 +562,7 @@ class SentinelHubLayer extends L.TileLayer {
       case COPERNICUS_HR_VPP_VPP_S2:
       case COPERNICUS_CLC_ACCOUNTING:
       case ESA_WORLD_COVER:
+      case GLOBAL_HUMAN_SETTLEMENT:
         const dsh = getDataSourceHandler(datasetId);
         return await this.createBYOCLayer(
           url,

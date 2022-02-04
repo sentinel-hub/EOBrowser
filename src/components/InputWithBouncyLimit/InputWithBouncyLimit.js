@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-function InputWithBouncyLimit({ value, setValue, min, max, step, type = 'float', timeoutDuration = 500 }) {
+function InputWithBouncyLimit({
+  className,
+  value,
+  setValue,
+  min,
+  max,
+  step,
+  type = 'float',
+  timeoutDuration = 500,
+}) {
   /*
     Implements types "integer" and "float"
   */
   const [inputTimeoutId, setInputTimeoutId] = useState(null);
   const [temporaryValue, setTemporaryValue] = useState(value);
+
+  useEffect(() => {
+    setTemporaryValue(value);
+  }, [value]);
 
   function handleInput(e) {
     clearTimeout(inputTimeoutId);
@@ -34,6 +47,7 @@ function InputWithBouncyLimit({ value, setValue, min, max, step, type = 'float',
 
   return (
     <input
+      className={className}
       type="number"
       value={temporaryValue === undefined ? '' : temporaryValue}
       onInput={handleInput}

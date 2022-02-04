@@ -9,6 +9,7 @@ import {
   URL_THEMES_LIST,
   EDUCATION_MODE,
   DEFAULT_LAT_LNG,
+  EXPORT_FORMAT,
   SEARCH_PANEL_TABS,
 } from './const';
 
@@ -737,6 +738,8 @@ export const timelapseSlice = createSlice({
     pins: [],
     timelapseSharePreviewMode: false,
     previewFileUrl: null,
+    size: null,
+    format: EXPORT_FORMAT.gif,
   },
   reducers: {
     set: (state, action) => {
@@ -814,6 +817,12 @@ export const timelapseSlice = createSlice({
       if (action.payload > -1) {
         state.pins = state.pins.filter((p, i) => i !== action.payload);
       }
+    },
+    setSize: (state, action) => {
+      state.size = action.payload;
+    },
+    setFormat: (state, action) => {
+      state.format = action.payload;
     },
   },
 });

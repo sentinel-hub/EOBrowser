@@ -7,18 +7,20 @@
     padding: 0;
 
     button {
-      padding: 0 6px;
+      padding: 0 12px 0 4px;
       color: white;
       text-transform: uppercase;
+      border: none;
 
       span {
-        font-size: 10px;
+        font-size: 12px;
       }
     }
 
     ul {
       width: 140px;
       min-height: 200px;
+      max-height: none;
       background-color: #525e73;
       text-transform: uppercase;
     }
@@ -26,65 +28,15 @@
     li {
       font-size: 12px;
     }
-  }
 
-  .flag-select {
-    padding: 2px;
-  }
-  /* stylelint-disable selector-class-pattern  */
-  .flag-select__options {
-    background: #525e73;
-    max-height: none;
-  }
-
-  .flag-select__option--placeholder {
-    vertical-align: inherit;
-  }
-
-  .flag-select__btn {
-    color: white;
-    border: none;
-    background: transparent;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .flag-select__option {
-    margin: 0;
-  }
-
-  .flag-select__option__icon {
-    top: 0.2em;
-  }
-
-  .flag-select__option.flag-select__option--placeholder {
-    padding: 1px 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    .flag-select__option__icon {
-      top: auto;
+    /* stylelint-disable selector-class-pattern  */
+    .ReactFlagsSelect-module_selectBtn__19wW7[aria-expanded='false']::after {
+      border-top: 5px solid white;
     }
-  }
 
-  .flag-select__option__label {
-    font-size: 0.8em;
-    text-transform: uppercase;
+    .ReactFlagsSelect-module_selectBtn__19wW7[aria-expanded='true']::after {
+      border-bottom: 5px solid white;
+    }
+    /* stylelint-enable */
   }
-
-  .flag-select__btn::after {
-    margin-right: 8px;
-  }
-
-  .flag-select__btn[aria-expanded='false']::after {
-    border-top: 5px solid white;
-  }
-
-  .flag-select__btn[aria-expanded='true']::after {
-    border-bottom: 5px solid white;
-  }
-  /* stylelint-enable */
 }

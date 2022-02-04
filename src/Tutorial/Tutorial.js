@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import Joyride from 'react-joyride';
-import { ACTIONS, EVENTS } from 'react-joyride/es/constants';
+import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
 import { TUTORIAL_STEPS, TUTORIAL_STEPS_MOBILE } from './TutorialContent';
 import './Tutorial.scss';
 import { t } from 'ttag';
@@ -13,34 +12,30 @@ class Tutorial extends Component {
   };
 
   TutorialComponent = ({
-    content,
-    continuous,
+    tooltipProps,
     backProps,
     closeProps,
     index,
     isLastStep,
-    locale,
     primaryProps,
-    setTooltipRef,
     size,
     skipProps,
-    title,
-    popupDisabled,
+    step,
   }) => (
-    <div className="tutorial-wrap">
+    <div className="tutorial-wrap" {...tooltipProps}>
       <div className="tutorial-body">
         <button type="button" className="close-cross" {...closeProps} title={t`Close`}>
           <span className="rodal-close" />
         </button>
 
-        <h4 className="tutorial-title">{title}</h4>
-        <div className="content-wrapper">{content}</div>
+        <h4 className="tutorial-title">{step.title}</h4>
+        <div className="content-wrapper">{step.content}</div>
 
         {(index > 0 || size === 1) && (
           <div className="tutorial-footer">
             <div>
               <button type="button" className="tutorial-button" {...skipProps} title={t`Close`}>
-                {locale.skip()}
+                {step.locale.skip()}
               </button>
               <button
                 type="button"
@@ -48,7 +43,7 @@ class Tutorial extends Component {
                 {...closeProps}
                 title={t`Close and don't show again`}
               >
-                {locale.close()}
+                {step.locale.close()}
               </button>
             </div>
 
@@ -61,7 +56,7 @@ class Tutorial extends Component {
                   disabled={index <= 0 ? 'disabled' : ''}
                   title={t`Previous`}
                 >
-                  {locale.back()}
+                  {step.locale.back()}
                 </button>
 
                 <span>
@@ -71,11 +66,11 @@ class Tutorial extends Component {
 
                 {isLastStep ? (
                   <button type="button" className="tutorial-button" {...primaryProps} title={t`End tutorial`}>
-                    {locale.last()}
+                    {step.locale.last()}
                   </button>
                 ) : (
                   <button type="button" className="tutorial-button" {...primaryProps} title={t`Next`}>
-                    {locale.next()}
+                    {step.locale.next()}
                   </button>
                 )}
               </div>

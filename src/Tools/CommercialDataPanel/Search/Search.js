@@ -10,7 +10,7 @@ import { AOISelection } from './AOISelection';
 import DateInput from './DateInput';
 import { SelectInput } from './SelectInput';
 
-import { providerSpecificParameters, minDateRange, maxDateRange } from './config';
+import { providerSpecificSearchParameters, minDateRange, maxDateRange } from './config';
 
 import './Search.scss';
 
@@ -35,7 +35,7 @@ const Search = ({
   const toTimeRef = useRef(null);
 
   const renderDataProviderParameters = (dataProvider, params, onChangeHandler) => {
-    let providerParameters = providerSpecificParameters[dataProvider];
+    let providerParameters = providerSpecificSearchParameters[dataProvider];
     if (!!providerParameters && !params.advancedOptions) {
       providerParameters = providerParameters.filter(
         (input) => input.advanced === undefined || !input.advanced,

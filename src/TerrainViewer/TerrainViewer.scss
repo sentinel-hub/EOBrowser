@@ -1,7 +1,10 @@
 @import '../variables';
 
 /* stylelint-disable */
-.gwt-DialogBox { z-index: 500; }
+.gwt-DialogBox,
+.sgDatePicker-calendarPopup {
+  z-index: 500;
+}
 /* stylelint-enable */
 
 .terrain-viewer-button {

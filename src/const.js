@@ -51,6 +51,16 @@ export const AOI_SHAPE = {
   rectangle: 'Rectangle',
 };
 
+export const TRANSITION = {
+  none: 'none',
+  fade: 'fade',
+};
+
+export const EXPORT_FORMAT = {
+  gif: 'GIF',
+  mpeg4: 'MPEG4',
+};
+
 export const S1_DEFAULT_PARAMS = {
   polarization: Polarization.DV,
   acquisitionMode: AcquisitionMode.IW,

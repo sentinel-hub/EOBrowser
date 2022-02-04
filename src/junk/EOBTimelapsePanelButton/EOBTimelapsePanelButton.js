@@ -8,14 +8,19 @@ import {
   getDatasourceNotSupportedMsg,
   getNotSupportedIn3DMsg,
 } from '../ConstMessages';
-import store, { timelapseSlice } from '../../store';
+import store, { modalSlice, timelapseSlice } from '../../store';
 
 import '../EOBPanel.scss';
-import { TABS } from '../../const';
+import { ModalId, TABS } from '../../const';
 
 export class EOBTimelapsePanelButton extends React.Component {
   toggleAreaPreview = () => {
-    store.dispatch(timelapseSlice.actions.toggleTimelapseAreaPreview());
+    const { aoi } = this.props;
+    if (aoi && aoi.bounds) {
+      store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TIMELAPSE }));
+    } else {
+      store.dispatch(timelapseSlice.actions.toggleTimelapseAreaPreview());
+    }
   };
 
   render() {
