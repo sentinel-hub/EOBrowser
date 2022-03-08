@@ -82,7 +82,7 @@
     "three": "^0.120.1",
     "ttag": "^1.7.22",
     "turf-inside": "^3.0.12",
-    "urijs": "^1.18.1"
+    "urijs": "^1.19.10"
   },
   "scripts": {
     "start": "react-scripts start",
