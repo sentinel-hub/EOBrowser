@@ -4,7 +4,15 @@ import geo_area from '@mapbox/geojson-area';
 import intersect from '@turf/intersect';
 import moment from 'moment';
 import inside from 'turf-inside';
-import { TPDProvider, TPDI, BYOCLayer, BYOCSubTypes } from '@sentinel-hub/sentinelhub-js';
+import {
+  TPDICollections,
+  TPDProvider,
+  TPDI,
+  BYOCLayer,
+  BYOCSubTypes,
+  CRS_EPSG4326,
+  AirbusConstellation,
+} from '@sentinel-hub/sentinelhub-js';
 import { constructBBoxFromBounds } from '../../Controls/ImgDownload/ImageDownload.utils.js';
 import store, { mainMapSlice, visualizationSlice, tabsSlice, themesSlice } from '../../store';
 import { USER_INSTANCES_THEMES_LIST } from '../../const';
@@ -114,7 +122,11 @@ export const filterSearchResults = (results, provider, location) => {
 export const createSelectOptions = (items) =>
   Object.keys(items).map((item) => ({ value: items[item], label: items[item] }));
 
-export const formatNumberAsRoundedUnit = (value, precision = 2, unit = '%') => {
+export const formatNumberAsRoundedUnit = (value, precision = 2, unit = '%', nullValueLabel = '') => {
+  if (value === null || value === undefined) {
+    return nullValueLabel;
+  }
+
   return !isNaN(value)
     ? `${Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision)}${!!unit ? unit : ''}`
     : '';
@@ -326,4 +338,34 @@ export async function showDataOnMap(order, layer) {
     const { lat, lng, zoom } = getBoundsAndLatLng(order.input.bounds.geometry);
     store.dispatch(mainMapSlice.actions.setPosition({ lat: lat, lng: lng, zoom: zoom }));
   }
+}
+
+export const getProvider = (dataProvider) => {
+  let provider;
+  if (dataProvider === TPDICollections.AIRBUS_SPOT || dataProvider === TPDICollections.AIRBUS_PLEIADES) {
+    provider = TPDProvider.AIRBUS;
+  } else if (dataProvider === TPDICollections.MAXAR_WORLDVIEW) {
+    provider = TPDProvider.MAXAR;
+  } else if (dataProvider === TPDICollections.PLANET_SCOPE) {
+    provider = TPDProvider.PLANET;
+  }
+  return provider;
+};
+
+export function createSearchParams(searchParams, aoiGeometry) {
+  const params = { ...searchParams };
+  if (aoiGeometry) {
+    // only CRS_EPSG4326 is supported atm
+    params.geometry = aoiGeometry;
+    params.crs = CRS_EPSG4326;
+  }
+
+  if (params.dataProvider === TPDICollections.AIRBUS_SPOT) {
+    params.constellation = AirbusConstellation.SPOT;
+  }
+
+  if (params.dataProvider === TPDICollections.AIRBUS_PLEIADES) {
+    params.constellation = AirbusConstellation.PHR;
+  }
+  return params;
 }

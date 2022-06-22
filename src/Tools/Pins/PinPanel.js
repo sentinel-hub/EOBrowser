@@ -362,6 +362,8 @@ class PinPanel extends Component {
       downsampling,
       speckleFilter,
       orthorectification,
+      backscatterCoeff,
+      demSource3D,
       terrainViewerSettings,
     } = pin;
 
@@ -468,6 +470,12 @@ class PinPanel extends Component {
     }
     if (orthorectification) {
       visualizationParams.orthorectification = orthorectification;
+    }
+    if (backscatterCoeff) {
+      visualizationParams.backscatterCoeff = backscatterCoeff;
+    }
+    if (demSource3D) {
+      visualizationParams.demSource3D = demSource3D;
     }
 
     store.dispatch(visualizationSlice.actions.setVisualizationParams(visualizationParams));

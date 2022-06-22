@@ -158,6 +158,7 @@ export async function fetchAndPatchImagesFromParams(params, setWarnings, setErro
     addMapOverlays,
     userDescription,
     enabledOverlaysId,
+    toTime,
   } = params;
 
   const canvas = document.createElement('canvas');
@@ -204,6 +205,7 @@ export async function fetchAndPatchImagesFromParams(params, setWarnings, setErro
           cLayer.datasetId,
           cLayer.layerId,
           cLayer.themeId,
+          toTime,
         );
         legendDefinition =
           predefinedLayerMetadata && predefinedLayerMetadata.legend
@@ -360,7 +362,7 @@ export async function fetchImageFromParams(params, raiseWarning) {
 
   if (showLegend) {
     legendUrl = layer.legendUrl;
-    const predefinedLayerMetadata = findMatchingLayerMetadata(datasetId, layerId, selectedThemeId);
+    const predefinedLayerMetadata = findMatchingLayerMetadata(datasetId, layerId, selectedThemeId, toTime);
     legendDefinition =
       predefinedLayerMetadata && predefinedLayerMetadata.legend
         ? predefinedLayerMetadata.legend
@@ -468,6 +470,9 @@ export async function getAppropriateApiType(layer, imageFormat, isRawBand, cance
       return layer.supportsApiType(ApiType.PROCESSING) ? ApiType.PROCESSING : ApiType.WMS;
     }
   }
+  if (layer.supportsApiType(ApiType.WMTS)) {
+    return ApiType.WMTS;
+  }
   return ApiType.WMS;
 }
 
@@ -516,6 +521,7 @@ export async function getLayerFromParams(params, cancelToken, authToken) {
     downsampling,
     speckleFilter,
     orthorectification,
+    backscatterCoeff,
   } = params;
   let layer;
 
@@ -578,6 +584,9 @@ export async function getLayerFromParams(params, cancelToken, authToken) {
         layer.orthorectify = true;
         layer.demInstanceType = orthorectification;
       }
+    }
+    if (backscatterCoeff) {
+      layer.backscatterCoeff = backscatterCoeff;
     }
   }
   return layer;
@@ -659,7 +668,7 @@ export function getAllBands(datasetId) {
   return dsh ? dsh.getBands(datasetId) : [];
 }
 
-export async function getAllLayers(url, datasetId, selectedTheme) {
+export async function getAllLayers(url, datasetId, selectedTheme, selectedDate) {
   const dsh = getDataSourceHandler(datasetId);
   const shJsDataset = dsh ? dsh.getSentinelHubDataset(datasetId) : null;
   const { layersExclude, layersInclude } = selectedTheme.content.find((t) => t.url === url);
@@ -674,21 +683,25 @@ export async function getAllLayers(url, datasetId, selectedTheme) {
       await l.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
     }),
   );
-  return dsh.getLayers(allLayers, datasetId, url, layersExclude, layersInclude);
+  return dsh.getLayers(allLayers, datasetId, url, layersExclude, layersInclude, selectedDate);
 }
 
 export function getSupportedImageFormats(datasetId) {
   return getDataSourceHandler(datasetId).getSupportedImageFormats(datasetId);
 }
 
-export function constructV3Evalscript(layer, datasetId, imageFormat, bands, addDataMask = false) {
-  const sampleType = IMAGE_FORMATS_INFO[imageFormat].sampleType;
+export function getRawBandsScalingFactor({ datasetId, imageSampleType, bandsInfo }) {
+  if (imageSampleType === 'FLOAT32') {
+    // Scaling is not needed as FLOAT32 can handle any number
+    return;
+  }
+
   let factor;
-  if (sampleType) {
-    if (sampleType === 'UINT8') {
+  if (imageSampleType) {
+    if (imageSampleType === 'UINT8') {
       factor = 255;
     }
-    if (sampleType === 'UINT16') {
+    if (imageSampleType === 'UINT16') {
       factor = 65535;
     }
   }
@@ -697,7 +710,7 @@ export function constructV3Evalscript(layer, datasetId, imageFormat, bands, addD
     // This is a hack to make raw bands for BYOC layers display anything
     // Service stretches values from 0-1 to 0-255, but if our BYOC bands can be UINT8 or UINT16
     // https://docs.sentinel-hub.com/api/latest/#/Evalscript/V3/README?id=sampletype
-    const sampleType = bands[0].sampleType;
+    const sampleType = bandsInfo[0].sampleType;
     const orig = factor ? factor : 1.0;
     if (sampleType === 'UINT8') {
       factor = orig / 255;
@@ -706,7 +719,17 @@ export function constructV3Evalscript(layer, datasetId, imageFormat, bands, addD
       factor = orig / 65535;
     }
   }
+  return factor;
+}
 
+export function constructV3Evalscript(layer, datasetId, imageFormat, bands, addDataMask = false) {
+  const sampleType = IMAGE_FORMATS_INFO[imageFormat].sampleType;
+
+  let factor = getRawBandsScalingFactor({
+    datasetId: datasetId,
+    imageSampleType: sampleType,
+    bandsInfo: bands,
+  });
   factor = factor ? `${factor} *` : '';
 
   if (datasetId === COPERNICUS_CORINE_LAND_COVER) {

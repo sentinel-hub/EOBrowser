@@ -53,7 +53,7 @@ class ResultItem extends React.Component {
             </div>
             {datasource !== DATASOURCES.DEM && datasource !== DATASOURCES.PLANET_NICFI && (
               <>
-                <div className="detail" title={t`Sensing time`}>
+                <div className="detail" title={t`Sensing date`}>
                   <i className="fa fa-calendar" />
                   {moment.utc(sensingTime).format('YYYY-MM-DD')}
                 </div>
@@ -64,7 +64,7 @@ class ResultItem extends React.Component {
               </>
             )}
             {datasource === DATASOURCES.PLANET_NICFI && (
-              <div className="detail" title={t`Sensing time`}>
+              <div className="detail" title={t`Sensing date`}>
                 <i className="fa fa-calendar" />
                 {`${moment.utc(metadata.mosaicTimeRange.fromTime).format('YYYY-MM-DD')} - ${moment
                   .utc(metadata.mosaicTimeRange.toTime)

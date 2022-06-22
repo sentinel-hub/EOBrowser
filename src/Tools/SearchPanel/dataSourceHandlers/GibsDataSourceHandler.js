@@ -369,4 +369,6 @@ export default class GibsDataSourceHandler extends DataSourceHandler {
   isCopernicus = () => false;
 
   isSentinelHub = () => false;
+
+  supportsAnalyticalImgExport = () => false;
 }

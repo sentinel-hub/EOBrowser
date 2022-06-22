@@ -4,6 +4,7 @@ import {
   MimeTypes,
   drawBlobOnCanvas,
   canvasToBlob,
+  DEMInstanceType,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 import L from 'leaflet';
@@ -16,6 +17,7 @@ import store, { mainMapSlice, terrainViewerSlice } from '../store';
 import { wgs84ToMercator } from '../junk/EOBCommon/utils/coords';
 import { toRad } from '../junk/EOB3TimelapsePanel/timelapseUtils';
 import { getBoundsZoomLevel } from '../utils/coords';
+import { EQUATOR_LENGTH } from '../const';
 
 let mapTileRequestDelay = 1;
 const mapTileRequestList = [];
@@ -179,7 +181,7 @@ export async function getTerrainViewerImage({
   let legendDefinition;
 
   if (showLegend) {
-    const predefinedLayerMetadata = findMatchingLayerMetadata(datasetId, layerId, selectedThemeId);
+    const predefinedLayerMetadata = findMatchingLayerMetadata(datasetId, layerId, selectedThemeId, toTime);
     if (predefinedLayerMetadata && predefinedLayerMetadata.legend) {
       legendDefinition = predefinedLayerMetadata.legend;
     }
@@ -329,4 +331,16 @@ export function getEyeHeightFromZoom(lat, zoom, width) {
   const circumference = getEarthCircumferenceAtLat((Math.PI * lat) / 180);
   const widthMeters = (circumference * width) / fullPixelWidth;
   return widthMeters / 2;
+}
+
+export function getTileXAndTileY(zoomLevel, minX, minY, maxX, maxY) {
+  const numTiles = 1 << zoomLevel;
+  const tileX = Math.floor(((minX + maxX + EQUATOR_LENGTH) * numTiles) / (2 * EQUATOR_LENGTH));
+  const tileY = numTiles - 1 - Math.floor(((minY + maxY + EQUATOR_LENGTH) * numTiles) / (2 * EQUATOR_LENGTH));
+
+  return { tileX: tileX, tileY: tileY };
+}
+
+export function is3DDemSourceCustom(demSource3D) {
+  return demSource3D === DEMInstanceType.COPERNICUS_30 || demSource3D === DEMInstanceType.COPERNICUS_90;
 }

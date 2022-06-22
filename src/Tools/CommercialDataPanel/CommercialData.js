@@ -23,7 +23,7 @@ What you need:
 - Pre-purchased quota for any of the constellations. Go to [Dashboard](https://apps.sentinel-hub.com/dashboard/#/account/billing) to establish a subscription and purchase commercial data plans. 
 `;
 
-const CommercialData = ({ user }) => {
+const CommercialData = ({ user, displayVideo }) => {
   const [userAccountInfo, setUserAccountInfo] = useState({});
   useEffect(() => {
     const fetchUserAccountInfo = async () => {
@@ -54,14 +54,16 @@ const CommercialData = ({ user }) => {
   if (!user || !user.access_token || !(payingAccount || quotasEnabled)) {
     return (
       <div className="commercial-data-description">
-        <iframe
-          className="commercial-video-player"
-          src={commercialVideoUrl}
-          title="Commercial video"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
+        {displayVideo && (
+          <iframe
+            className="commercial-video-player"
+            src={commercialVideoUrl}
+            title="Commercial video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        )}
         <ReactMarkdown source={getCommercialDataDescription()} />
       </div>
     );

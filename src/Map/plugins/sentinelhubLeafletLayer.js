@@ -69,6 +69,7 @@ import {
   COPERNICUS_HR_VPP_VPP_S1,
   COPERNICUS_HR_VPP_VPP_S2,
   COPERNICUS_CLC_ACCOUNTING,
+  CNES_LAND_COVER,
   GLOBAL_HUMAN_SETTLEMENT,
   ESA_WORLD_COVER,
   AWS_LOTL1,
@@ -115,6 +116,7 @@ class SentinelHubLayer extends L.TileLayer {
       downsampling,
       speckleFilter,
       orthorectification,
+      backscatterCoeff,
       accessToken,
     } = options;
 
@@ -132,6 +134,7 @@ class SentinelHubLayer extends L.TileLayer {
       downsampling: downsampling,
       speckleFilter: speckleFilter,
       orthorectification: orthorectification,
+      backscatterCoeff: backscatterCoeff,
       accessToken: accessToken,
     });
 
@@ -287,6 +290,7 @@ class SentinelHubLayer extends L.TileLayer {
       downsampling,
       speckleFilter,
       orthorectification,
+      backscatterCoeff,
       accessToken,
     } = this.options;
     this.layer = this.createLayer(url, {
@@ -301,6 +305,7 @@ class SentinelHubLayer extends L.TileLayer {
       downsampling: downsampling,
       speckleFilter: speckleFilter,
       orthorectification: orthorectification,
+      backscatterCoeff: backscatterCoeff,
       accessToken: accessToken,
     });
 
@@ -331,7 +336,15 @@ class SentinelHubLayer extends L.TileLayer {
   };
 
   createLayerFromService = async (url, options) => {
-    const { layer: layerId, minQa, upsampling, downsampling, speckleFilter, orthorectification } = options;
+    const {
+      layer: layerId,
+      minQa,
+      upsampling,
+      downsampling,
+      speckleFilter,
+      orthorectification,
+      backscatterCoeff,
+    } = options;
     let layer = await LayersFactory.makeLayer(url, layerId, null, reqConfigMemoryCache);
     await layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
 
@@ -361,6 +374,9 @@ class SentinelHubLayer extends L.TileLayer {
         layer.demInstanceType = orthorectification;
         layer.orthorectify = true;
       }
+    }
+    if (backscatterCoeff) {
+      layer.backscatterCoeff = backscatterCoeff;
     }
     return layer;
   };
@@ -398,6 +414,7 @@ class SentinelHubLayer extends L.TileLayer {
       downsampling,
       speckleFilter,
       orthorectification,
+      backscatterCoeff,
       accessToken,
     },
   ) => {
@@ -423,6 +440,7 @@ class SentinelHubLayer extends L.TileLayer {
               ? false
               : true
             : null,
+          backscatterCoeff: backscatterCoeff,
         });
       case S1:
       case S1_EW:
@@ -561,6 +579,7 @@ class SentinelHubLayer extends L.TileLayer {
       case COPERNICUS_HR_VPP_VPP_S1:
       case COPERNICUS_HR_VPP_VPP_S2:
       case COPERNICUS_CLC_ACCOUNTING:
+      case CNES_LAND_COVER:
       case ESA_WORLD_COVER:
       case GLOBAL_HUMAN_SETTLEMENT:
         const dsh = getDataSourceHandler(datasetId);
@@ -771,6 +790,12 @@ class SentinelHubLayerComponent extends GridLayer {
       options.orthorectification = params.orthorectification;
     } else {
       options.orthorectification = null;
+    }
+
+    if (params.backscatterCoeff) {
+      options.backscatterCoeff = params.backscatterCoeff;
+    } else {
+      options.backscatterCoeff = null;
     }
 
     if (params.showlogo !== undefined) {

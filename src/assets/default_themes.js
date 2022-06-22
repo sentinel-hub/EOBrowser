@@ -2969,6 +2969,10 @@ export const DEFAULT_THEMES = [
         url: `https://api.planet.com/basemaps/v1/mosaics/wmts?api_key=${process.env.REACT_APP_PLANET_API_KEY}`,
       },
       {
+        name: 'CNES Land Cover Map',
+        url: 'https://services.sentinel-hub.com/ogc/wms/cbb61b-YOUR-INSTANCEID-HERE',
+      },
+      {
         name: 'ESA WorldCover',
         url: 'https://services.sentinel-hub.com/ogc/wms/8a1d53-YOUR-INSTANCEID-HERE',
       },

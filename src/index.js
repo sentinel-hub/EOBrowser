@@ -9,6 +9,7 @@ import { BrowserRouter } from 'react-router-dom';
 import store from './store';
 import App from './App';
 import LanguageProvider from './LanguageSelector/LanguageProvider';
+import EnsureTermsPrivacy from './TermsAndPrivacyConsent/EnsureTermsPrivacy';
 import AuthProvider from './Auth/AuthProvider';
 import URLParamsParser from './URLParamsParser/URLParamsParser';
 import ThemesProvider from './ThemesProvider/ThemesProvider';
@@ -22,17 +23,19 @@ ReactDOM.render(
       <LanguageProvider>
         <DndProvider options={HTML5toTouch}>
           <AuthProvider>
-            <URLParamsParser>
-              {(themeId, sharedPinsListId) => (
-                <ThemesProvider themeIdFromUrlParams={themeId}>
-                  <GoogleAPIProvider>
-                    {({ googleAPI }) => (
-                      <App sharedPinsListIdFromUrlParams={sharedPinsListId} googleAPI={googleAPI} />
-                    )}
-                  </GoogleAPIProvider>
-                </ThemesProvider>
-              )}
-            </URLParamsParser>
+            <EnsureTermsPrivacy>
+              <URLParamsParser>
+                {(themeId, sharedPinsListId) => (
+                  <ThemesProvider themeIdFromUrlParams={themeId}>
+                    <GoogleAPIProvider>
+                      {({ googleAPI }) => (
+                        <App sharedPinsListIdFromUrlParams={sharedPinsListId} googleAPI={googleAPI} />
+                      )}
+                    </GoogleAPIProvider>
+                  </ThemesProvider>
+                )}
+              </URLParamsParser>
+            </EnsureTermsPrivacy>
           </AuthProvider>
         </DndProvider>
       </LanguageProvider>

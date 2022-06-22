@@ -341,6 +341,11 @@ $searchBorderColour: #6d7300;
     padding: 2px;
     text-align: left;
   }
+
+  option:disabled {
+    background: #ccc;
+    color: #3b3d4d;
+  }
 }
 
 .search-loader {

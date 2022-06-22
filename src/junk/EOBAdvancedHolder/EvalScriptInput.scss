@@ -1,69 +1,14 @@
 @import '../../variables.scss';
 
-.code-mirror-wrapper {
+.code-editor-wrap {
   height: 300px;
-
-  .cm-s-readonly {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-
-  /* stylelint-disable-next-line */
-  .cm-s-readonly .CodeMirror-lines {
-    cursor: not-allowed;
-  }
-
-  .react-code-mirror-not-resizable {
-    width: 100% !important;
-
-    .fas.fa-times {
-      display: none;
-    }
-  }
-
-  .react-code-mirror-resizable {
-    position: absolute;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: 2px solid $mainMedium;
-    width: 500px;
-    min-width: 350px;
-    height: 300px;
-    resize: horizontal;
-    overflow: auto;
-
-    @media screen and (max-width: 400px) {
-      & {
-        left: 0;
-        min-width: unset;
-        width: 100%;
-      }
-    }
-
-    .fas.fa-times {
-      position: absolute;
-      top: 7px;
-      right: 7px;
-      color: $mainMedium;
-      font-size: 18px;
-      z-index: 50;
-      cursor: pointer;
-    }
-  }
-}
-
-/* stylelint-disable-next-line */
-.cm-s-default.CodeMirror-lint-tooltip {
-  z-index: 1000;
+  display: flex;
 }
 
 .info-uncheck-url {
-  font-size: 12px;
-  margin-top: 5px;
+  margin-top: 8px;
 
-  i {
-    padding-right: 5px;
-    padding-left: 5px;
+  .fa-info {
+    margin-right: 8px;
   }
 }

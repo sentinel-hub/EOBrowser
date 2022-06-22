@@ -3,6 +3,7 @@ import ImageDownload from '../Controls/ImgDownload/ImageDownload';
 import FIS from '../Controls/FIS/FIS';
 import PinsStoryBuilder from '../Controls/PinsStoryBuilder/PinsStoryBuilder';
 import SharePinsLink from '../Tools/Pins/SharePinsLink';
+import TermsAndPrivacyConsentForm from '../TermsAndPrivacyConsent/TermsAndPrivacyConsentForm';
 import { ModalId } from '../const';
 
 export const Modals = {
@@ -12,6 +13,7 @@ export const Modals = {
   [ModalId.SHAREPINSLINK]: () => <SharePinsLink />,
   [ModalId.PINS_STORY_BUILDER]: () => <PinsStoryBuilder />,
   [ModalId.PRIVATE_THEMEID_LOGIN]: () => {},
+  [ModalId.TERMS_AND_PRIVACY_CONSENT]: () => <TermsAndPrivacyConsentForm />,
 };
 
 export function propsSufficientToRender(props) {

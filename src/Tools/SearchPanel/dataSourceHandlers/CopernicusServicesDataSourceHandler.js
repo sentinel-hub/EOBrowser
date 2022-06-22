@@ -144,6 +144,7 @@ export default class CopernicusServicesDataSourceHandler extends DataSourceHandl
         this.allLayers.push(...layersWithDataset);
       }
     }
+    this.saveFISLayers(url, layers);
     return handlesAny;
   }
 

@@ -132,6 +132,10 @@ export default class DataSourceHandler {
     return false;
   };
 
+  supportsBackscatterCoeff = () => {
+    return false;
+  };
+
   saveFISLayers(url, layers) {
     this.FISLayers[url] = {};
     for (let datasetId of this.datasets) {
@@ -221,4 +225,5 @@ export default class DataSourceHandler {
 
   isSentinelHub = () => true;
   supportsImgExport = () => true;
+  supportsAnalyticalImgExport = () => true;
 }

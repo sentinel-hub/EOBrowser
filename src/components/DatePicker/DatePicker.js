@@ -4,7 +4,8 @@ import moment from 'moment';
 
 import DatePickerInput from './DatePickerInput';
 import Calendar from './Calendar';
-import { convertDateToUTC } from './Datepicker.utils';
+
+import { getNextBestDate } from './Datepicker.utils';
 
 import './DatePicker.scss';
 
@@ -13,8 +14,7 @@ const STANDARD_STRING_DATE_FORMAT = 'YYYY-MM-DD';
 class DatePicker extends Component {
   state = {
     displayCalendar: false,
-    availableDays: [],
-    maxCloudCover: 100,
+    availableDays: null,
     loading: false,
   };
 
@@ -30,11 +30,22 @@ class DatePicker extends Component {
   }
 
   async fetchDates() {
-    const { selectedDay } = this.props;
+    const { selectedDay, maxDate, setSelectedDay } = this.props;
     const { displayCalendar } = this.state;
 
     if (!!displayCalendar) {
       const days = await this.fetchAvailableDaysInMonth(selectedDay);
+      if (!selectedDay) {
+        if (days.length > 0) {
+          setSelectedDay(moment.utc(days[0].date));
+        } else {
+          let latestDate;
+          if (this.props.getLatestAvailableDate) {
+            latestDate = await this.props.getLatestAvailableDate();
+          }
+          setSelectedDay(latestDate ? moment.utc(latestDate) : maxDate.clone().utc());
+        }
+      }
       this.setState({ availableDays: days });
     }
   }
@@ -101,11 +112,11 @@ class DatePicker extends Component {
       dateArray = await this.props.onQueryDatesForActiveMonth(date);
       if (hasCloudCoverFilter) {
         dateArray = dateArray.map((date) => ({
-          date: convertDateToUTC(date.fromTime),
+          date: moment.utc(date.fromTime),
           cloudCoverPercent: date.meta.averageCloudCoverPercent,
         }));
       } else {
-        dateArray = dateArray.map((date) => ({ date: convertDateToUTC(date), cloudCoverPercent: 100 }));
+        dateArray = dateArray.map((date) => ({ date: moment.utc(date), cloudCoverPercent: 100 }));
       }
     } catch (err) {
       console.error('Unable to fetch available days in month!\n', err);
@@ -126,188 +137,47 @@ class DatePicker extends Component {
     return newSelectedDay;
   };
 
-  isMinOrMaxDate = (date) => {
-    const selectedDate = moment(date).clone();
-    const maxDate = moment(this.props.maxDate).clone();
-    const minDate = moment(this.props.minDate).clone();
-    if (selectedDate.isSameOrBefore(minDate, 'date') || selectedDate.isSameOrAfter(maxDate, 'date')) {
-      return true;
-    }
-    return false;
-  };
-
-  getLowestCloudCoverDate(dates) {
-    let lowest = dates[0];
-
-    dates.forEach((date) => {
-      if (date.cloudCoverPercent < lowest.cloudCoverPercent) {
-        lowest = date;
-      }
-    });
-
-    return lowest.date;
-  }
-
-  getAllDatesWithinMonth(dates, selectedDate) {
-    let datesWithinMonth = [];
-
-    dates.forEach((date) => {
-      if (moment(date.date).clone().isSame(selectedDate, 'month')) {
-        datesWithinMonth.push(date);
-      }
-    });
-
-    return datesWithinMonth;
-  }
-
   handleGetAndSetNextPrevDate = async (direction) => {
-    const { availableDays, loading } = this.state;
-    const { selectedDay, setSelectedDay } = this.props;
+    let { loading } = this.state;
+    let { selectedDay, setSelectedDay, minDate, maxDate, maxCloudCover, limitMonthsSearch = 3 } = this.props;
 
     if (loading) {
       return;
     }
 
-    if (direction === 'prev') {
-      const prevDate = this.getPreviousDateBelowCloudCover(selectedDay, availableDays);
-      if (prevDate) {
-        setSelectedDay(moment(prevDate).utc().clone());
-        return;
-      }
-
-      const lastDayInPrevMonth = moment(selectedDay).subtract(1, 'month').endOf('month').clone();
-
-      const newValidDate = this.checkAndSetWithinAvailableRange(lastDayInPrevMonth);
-      let allDates = [];
-      let monthOffset = 0;
-      let firstDateBelowCloudCover = null;
-      let currentMonth;
-      let newDates;
-      let searchedInvalidMonth = false;
-      while (!firstDateBelowCloudCover && monthOffset < 12) {
-        currentMonth = moment(newValidDate).clone().clone().subtract(monthOffset, 'month');
-
-        if (this.isMinOrMaxDate(currentMonth)) {
-          searchedInvalidMonth = true;
-          break;
+    if (!selectedDay) {
+      selectedDay = maxDate.clone().utc();
+      if (this.props.getLatestAvailableDate) {
+        const latestDate = await this.props.getLatestAvailableDate();
+        if (latestDate) {
+          if (direction === 'prev') {
+            // No selectedDay is set and best date in the direction towards earlier dates was requested.
+            // We set selectedDay to one day after latest available date, so that latest available date is considered.
+            selectedDay = latestDate.clone().add(1, 'day');
+          }
+          if (direction === 'next') {
+            // Same as other direction.
+            selectedDay = latestDate.clone().subtract(1, 'day');
+          }
         }
-
-        newDates = await this.fetchAvailableDaysInMonth(currentMonth);
-        firstDateBelowCloudCover = this.getPreviousDateBelowCloudCover(
-          moment(newValidDate).clone().add(1, 'day'),
-          newDates,
-        );
-        monthOffset = monthOffset + 1;
-        allDates = [...allDates, ...newDates];
-      }
-
-      if (searchedInvalidMonth) {
-        const lowestCCDate = moment(this.getLowestCloudCoverDate(allDates)).clone();
-        const allDatesWithinMonth = this.getAllDatesWithinMonth(allDates, lowestCCDate);
-        this.setState({ availableDays: allDatesWithinMonth });
-        setSelectedDay(lowestCCDate.clone().utc());
-        throw new Error('Lowest cloud cover date available before going over min date');
-      }
-
-      if (allDates.length === 0) {
-        setSelectedDay(moment(currentMonth).clone());
-      }
-      if (firstDateBelowCloudCover) {
-        setSelectedDay(moment(firstDateBelowCloudCover).utc().clone());
-        this.setState({ availableDays: newDates });
-        return;
-      } else {
-        const lowestCCDate = moment(this.getLowestCloudCoverDate(allDates)).clone();
-        const allDatesWithinMonth = this.getAllDatesWithinMonth(allDates, lowestCCDate);
-        this.setState({ availableDays: allDatesWithinMonth });
-        setSelectedDay(lowestCCDate.clone().utc());
-        return;
       }
     }
 
-    if (direction === 'next') {
-      const nextDate = this.getNextDateBelowCloudCover(selectedDay, availableDays);
+    let newSelectedDay;
 
-      if (nextDate) {
-        setSelectedDay(moment(nextDate).utc().clone());
-        return;
-      }
-      const firstDayInNextMonth = moment(selectedDay).clone().add(1, 'month').startOf('month');
-      const newValidDate = this.checkAndSetWithinAvailableRange(firstDayInNextMonth);
-
-      let monthOffset = 0;
-      let firstDateBelowCloudCover = null;
-      let currentMonth;
-      let newDates;
-      let allDates = [];
-      let searchedInvalidMonth = false;
-      while (!firstDateBelowCloudCover && monthOffset < 12) {
-        currentMonth = moment(newValidDate).clone().clone().add(monthOffset, 'month');
-
-        if (this.isMinOrMaxDate(currentMonth)) {
-          searchedInvalidMonth = true;
-          break;
-        }
-        newDates = await this.fetchAvailableDaysInMonth(currentMonth);
-        firstDateBelowCloudCover = this.getNextDateBelowCloudCover(
-          moment(newValidDate).clone().subtract(1, 'day'),
-          newDates,
-        );
-        monthOffset = monthOffset + 1;
-        allDates = [...allDates, ...newDates];
-      }
-
-      if (searchedInvalidMonth) {
-        const lowestCCDate = moment(this.getLowestCloudCoverDate(allDates)).clone();
-        const allDatesWithinMonth = this.getAllDatesWithinMonth(allDates, lowestCCDate);
-        this.setState({ availableDays: allDatesWithinMonth });
-        setSelectedDay(lowestCCDate);
-        throw new Error('Lowest cloud cover date available before going over max date');
-      }
-
-      if (allDates.length === 0) {
-        setSelectedDay(moment(currentMonth).clone());
-      }
-
-      if (firstDateBelowCloudCover) {
-        setSelectedDay(moment(firstDateBelowCloudCover).utc().clone());
-        this.setState({ availableDays: newDates });
-      } else {
-        const lowestCCDate = moment(this.getLowestCloudCoverDate(allDates)).clone();
-        const allDatesWithinMonth = this.getAllDatesWithinMonth(allDates, lowestCCDate);
-        this.setState({ availableDays: allDatesWithinMonth });
-        setSelectedDay(lowestCCDate.clone().utc());
-      }
+    newSelectedDay = await getNextBestDate({
+      selectedDay: selectedDay,
+      direction: direction,
+      maxCC: maxCloudCover,
+      fetchDates: this.fetchAvailableDaysInMonth,
+      minDate: minDate,
+      maxDate: maxDate,
+      limitMonthsSearch: limitMonthsSearch,
+    });
+    setSelectedDay(newSelectedDay.clone().utc());
+    if (newSelectedDay.get('month') !== selectedDay.get('month')) {
+      this.fetchDates();
     }
-  };
-
-  getPreviousDateBelowCloudCover = (selectedDay, availableDays) => {
-    const { maxCloudCover } = this.state;
-
-    const nextDay = availableDays.find(
-      ({ date, cloudCoverPercent }) =>
-        moment(date).clone().isBefore(selectedDay, 'date') && cloudCoverPercent <= maxCloudCover,
-    );
-
-    if (!nextDay) {
-      return null;
-    }
-    return nextDay.date;
-  };
-
-  getNextDateBelowCloudCover = (selectedDay, availableDays) => {
-    const { maxCloudCover } = this.state;
-    const nextDay = availableDays
-      .slice()
-      .reverse()
-      .find(
-        ({ date, cloudCoverPercent }) =>
-          moment(date).clone().isAfter(selectedDay, 'date') && cloudCoverPercent <= maxCloudCover,
-      );
-    if (!nextDay) {
-      return null;
-    }
-    return nextDay.date;
   };
 
   render() {
@@ -321,8 +191,16 @@ class DatePicker extends Component {
       id,
       showNextPrevDateArrows,
       hasCloudCoverFilter,
+      setMaxCloudCover,
+      maxCloudCover,
+      additionalClassNameForDatePicker,
     } = this.props;
-    const { displayCalendar, availableDays, maxCloudCover, loading } = this.state;
+    const { displayCalendar, availableDays, loading } = this.state;
+    const highlightedDays = (availableDays || [])
+      .filter(({ cloudCoverPercent }) =>
+        maxCloudCover !== null && maxCloudCover !== undefined ? cloudCoverPercent <= maxCloudCover : true,
+      )
+      .map(({ date }) => date);
     return (
       <>
         <div className={`date-picker ${displayCalendar ? id : ''}`}>
@@ -336,6 +214,7 @@ class DatePicker extends Component {
             getAndSetNextPrevDate={this.handleGetAndSetNextPrevDate}
             minDate={minDate}
             maxDate={maxDate}
+            additionalClassNameForDatePicker={additionalClassNameForDatePicker}
           />
         </div>
         {loading && (
@@ -347,7 +226,7 @@ class DatePicker extends Component {
           <Calendar
             hasCloudCoverFilter={hasCloudCoverFilter}
             cloudCoverPercentage={maxCloudCover}
-            setMaxCloudCover={(value) => this.setState({ maxCloudCover: value })}
+            setMaxCloudCover={setMaxCloudCover}
             selectedDay={selectedDay}
             minDate={minDate}
             handleMonthChange={this.handleMonthChange}
@@ -358,9 +237,7 @@ class DatePicker extends Component {
             onMonthOrYearDropdownChange={this.onMonthOrYearDropdownChange}
             handleClickOutside={this.handleClickOutside}
             outsideClickIgnoreClass={id}
-            highlightedDays={availableDays
-              .filter(({ cloudCoverPercent }) => cloudCoverPercent <= maxCloudCover)
-              .map(({ date }) => date)}
+            highlightedDays={highlightedDays}
             eventTypes="click"
           />
         )}

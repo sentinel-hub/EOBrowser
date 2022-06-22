@@ -5,6 +5,7 @@ import {
   BYOCLayer,
   S1GRDAWSEULayer,
   DEMLayer,
+  BYOCSubTypes,
 } from '@sentinel-hub/sentinelhub-js';
 
 import store, { themesSlice } from '../../../store';
@@ -71,6 +72,7 @@ import {
   COPERNICUS_HR_VPP_VPP_S1,
   COPERNICUS_HR_VPP_VPP_S2,
   COPERNICUS_CLC_ACCOUNTING,
+  CNES_LAND_COVER,
   GLOBAL_HUMAN_SETTLEMENT,
   ESA_WORLD_COVER,
   AWS_LOTL1,
@@ -160,13 +162,18 @@ async function updateLayersFromServiceIfNeeded(layers) {
           },
         });
         if (l instanceof BYOCLayer) {
-          const availableBands = await l.getAvailableBands({
-            timeout: 30000,
-            cache: {
-              expiresIn: Number.POSITIVE_INFINITY,
-              targets: [CacheTarget.MEMORY],
-            },
-          });
+          let availableBands = [];
+          try {
+            availableBands = await l.getAvailableBands({
+              timeout: 30000,
+              cache: {
+                expiresIn: Number.POSITIVE_INFINITY,
+                targets: [CacheTarget.MEMORY],
+              },
+            });
+          } catch (err) {
+            console.error(err);
+          }
           l.availableBands = availableBands;
         }
       } catch (e) {
@@ -214,13 +221,15 @@ async function updateCollectionsFromServiceIfNeeded(layers) {
             updateLayersWithCollectionTitle(byocLayers, collectionId, knownCollectionTitle);
           } else {
             //get collection title from catalog
-            const collectionInfo = await getCollectionInformation(
-              collection.collectionId,
-              collection.locationId,
-              collection.subType,
-            ).then((r) => r.data);
-            collectionTitles[collection.collectionId] = collectionInfo.title;
-            updateLayersWithCollectionTitle(byocLayers, collectionId, collectionInfo.title);
+            if (collection.subType !== BYOCSubTypes.ZARR) {
+              const collectionInfo = await getCollectionInformation(
+                collection.collectionId,
+                collection.locationId,
+                collection.subType,
+              ).then((r) => r.data);
+              collectionTitles[collection.collectionId] = collectionInfo.title;
+              updateLayersWithCollectionTitle(byocLayers, collectionId, collectionInfo.title);
+            }
           }
         }
       } catch (e) {
@@ -375,6 +384,7 @@ export function datasourceForDatasetId(datasetId) {
       return DATASOURCES.COPERNICUS;
     case PLANET_NICFI:
       return DATASOURCES.PLANET_NICFI;
+    case CNES_LAND_COVER:
     case ESA_WORLD_COVER:
     case GLOBAL_HUMAN_SETTLEMENT:
       return DATASOURCES.OTHER;
@@ -415,15 +425,15 @@ export const datasetLabels = {
   [S2L2A]: 'Sentinel-2 L2A',
   [S3SLSTR]: 'Sentinel-3 SLSTR',
   [S3OLCI]: 'Sentinel-3 OLCI',
-  [S5_O3]: 'Sentinel-5 O3',
-  [S5_NO2]: 'Sentinel-5 NO2',
-  [S5_SO2]: 'Sentinel-5 SO2',
-  [S5_CO]: 'Sentinel-5 CO',
-  [S5_HCHO]: 'Sentinel-5 HCHO',
-  [S5_CH4]: 'Sentinel-5 CH4',
-  [S5_AER_AI]: 'Sentinel-5 AER_AI',
-  [S5_CLOUD]: 'Sentinel-5 CLOUD',
-  [S5_OTHER]: 'Sentinel-5 Other',
+  [S5_O3]: 'Sentinel-5P O3',
+  [S5_NO2]: 'Sentinel-5P NO2',
+  [S5_SO2]: 'Sentinel-5P SO2',
+  [S5_CO]: 'Sentinel-5P CO',
+  [S5_HCHO]: 'Sentinel-5P HCHO',
+  [S5_CH4]: 'Sentinel-5P CH4',
+  [S5_AER_AI]: 'Sentinel-5P AER_AI',
+  [S5_CLOUD]: 'Sentinel-5P CLOUD',
+  [S5_OTHER]: 'Sentinel-5P Other',
   [MODIS]: 'MODIS',
   [PROBAV_S1]: 'Proba-V 1 day (S1)',
   [PROBAV_S5]: 'Proba-V 5 day (S5)',
@@ -432,8 +442,8 @@ export const datasetLabels = {
   [ESA_L7]: 'Landsat 7 (ESA archive)',
   [ESA_L8]: 'Landsat 8 (ESA archive)',
   [AWS_L8L1C]: 'Landsat 8 (USGS archive)',
-  [AWS_LOTL1]: 'Landsat 8 L1',
-  [AWS_LOTL2]: 'Landsat 8 L2',
+  [AWS_LOTL1]: 'Landsat 8-9 L1',
+  [AWS_LOTL2]: 'Landsat 8-9 L2',
   [AWS_LTML1]: 'Landsat 4-5 TM L1',
   [AWS_LTML2]: 'Landsat 4-5 TM L2',
   [AWS_LMSSL1]: 'Landsat 1-5 MSS L1',
@@ -458,6 +468,7 @@ export const datasetLabels = {
   [COPERNICUS_CORINE_LAND_COVER]: 'CORINE Land Cover',
   [COPERNICUS_GLOBAL_LAND_COVER]: 'Global Land Cover',
   [COPERNICUS_GLOBAL_SURFACE_WATER]: 'Global Surface Water',
+  [CNES_LAND_COVER]: 'CNES Land Cover',
   [ESA_WORLD_COVER]: 'ESA WorldCover',
   [COPERNICUS_WATER_BODIES]: 'Water Bodies',
   [COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES]: 'Seasonal Trajectories',
@@ -566,7 +577,7 @@ export function getDataSourceHashtags(datasetId) {
     case S5_AER_AI:
     case S5_CLOUD:
     case S5_OTHER:
-      return 'Sentinel-5,Copernicus';
+      return 'Sentinel-5P,Copernicus';
     case MODIS:
       return 'MODIS,NASA';
     case PROBAV_S1:

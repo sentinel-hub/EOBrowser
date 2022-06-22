@@ -181,6 +181,7 @@ class SearchPanel extends Component {
 
   renderThemeSelect = (isEducationModeSelected = false) => {
     let {
+      anonToken,
       user,
       modeThemesList,
       userInstancesThemesList,
@@ -196,7 +197,9 @@ class SearchPanel extends Component {
     }));
     modeThemesList = modeThemesList.map((t) => ({ ...t, list: MODE_THEMES_LIST }));
 
-    if (isEducationModeSelected) {
+    if (!anonToken) {
+      themes = userInstancesThemesList;
+    } else if (isEducationModeSelected) {
       themes = [...modeThemesList, ...userInstancesThemesList];
     } else if (urlThemesList.length) {
       themes = [...urlThemesList, ...userInstancesThemesList];
@@ -253,6 +256,7 @@ class SearchPanel extends Component {
       selectedTab,
       is3D,
       terrainViewerId,
+      termsPrivacyAccepted,
     } = this.props;
     const minDateRange = minDate ? minDate : moment.utc('1972-07-01');
     const maxDateRange = maxDate ? maxDate : moment.utc();
@@ -320,7 +324,7 @@ class SearchPanel extends Component {
                 <div className="checkbox-group">
                   <div className="column" key={selectedThemeId || ''}>
                     {selectedThemeId === null ? (
-                      <div className="no-theme-selected">{t`Please select a theme`}</div>
+                      <div className="no-theme-selected">{t`Please select a theme.`}</div>
                     ) : (
                       renderDataSourcesInputs()
                     )}
@@ -372,7 +376,7 @@ class SearchPanel extends Component {
             />
           </div>
           <div className={`discover-tab ${isCommercialDataSelected ? '' : 'hidden'}`}>
-            <CommercialData />
+            <CommercialData displayVideo={termsPrivacyAccepted} />
           </div>
 
           {error ? (
@@ -420,6 +424,8 @@ class SearchPanel extends Component {
 }
 
 const mapStoreToProps = (store) => ({
+  anonToken: store.auth.anonToken,
+  termsPrivacyAccepted: store.auth.terms_privacy_accepted,
   dataSourcesInitialized: store.themes.dataSourcesInitialized,
   mapBounds: store.mainMap.bounds,
   is3D: store.mainMap.is3D,

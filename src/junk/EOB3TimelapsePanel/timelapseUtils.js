@@ -318,6 +318,9 @@ export async function fetchBlobObj(
         overrideLayerConstructorParams.demInstanceType = effects.demInstanceType;
       }
     }
+    if (effects.backscatterCoeff !== undefined) {
+      overrideLayerConstructorParams.backscatterCoeff = effects.backscatterCoeff;
+    }
 
     let blob;
 

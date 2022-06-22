@@ -60,7 +60,7 @@ class EOBAdvancedHolder extends React.Component {
       onUpdateScript,
       onDataFusionChange,
       onBack,
-      onCodeMirrorRefresh,
+      onEvalscriptRefresh,
       onCompositeChange,
       onIndexScriptChange,
       areBandsClasses,
@@ -129,10 +129,10 @@ class EOBAdvancedHolder extends React.Component {
             />
           )}
           <EvalScriptInput
+            onRefreshEvalscript={onEvalscriptRefresh}
             evalscript={evalscript}
             evalscripturl={window.decodeURIComponent(evalscripturl || '')}
             isEvalUrl={isEvalUrl}
-            onRefresh={onCodeMirrorRefresh}
             onChange={onUpdateScript}
           />
         </Accordion>

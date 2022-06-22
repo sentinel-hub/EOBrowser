@@ -223,3 +223,37 @@ export function checkIfIndexOutputInEvalscript(evalscript) {
 
   return isIndexOutputPresent;
 }
+
+export function getOutputIds(evalscript) {
+  if (!evalscript) {
+    return null;
+  }
+  try {
+    const parsed = parseScript(evalscript, { jsx: true, tolerant: true });
+    const setupFunction = parsed.body.find((d) => d.id && d.id.name === 'setup');
+    const output = setupFunction.body.body[0].argument.properties.find((p) => p.key.name === 'output');
+    const outputArr = output.value.elements
+      ? output.value.elements.map((e) => e.properties)
+      : [output.value.properties];
+
+    return outputArr.map((outputElement) => {
+      const idObj = outputElement.find((p) => p.key.name === 'id');
+      return idObj ? idObj.value.value : undefined;
+    });
+  } catch (err) {
+    return null;
+  }
+}
+
+export function checkAllMandatoryOutputsExist(evalscript, outputIds) {
+  if (!evalscript || !outputIds || outputIds.length === 0) {
+    return false;
+  }
+  try {
+    const outputArr = getOutputIds(evalscript);
+
+    return outputIds.every((outputId) => outputArr.indexOf(outputId) > -1);
+  } catch (err) {
+    return false;
+  }
+}

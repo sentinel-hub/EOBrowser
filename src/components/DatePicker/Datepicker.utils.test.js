@@ -1,6 +1,11 @@
 import moment from 'moment';
 
-import { getAvailableYears, isNextMonthAvailable, isPreviousMonthAvailable } from './Datepicker.utils';
+import {
+  getAvailableYears,
+  isNextMonthAvailable,
+  isPreviousMonthAvailable,
+  getNextBestDate,
+} from './Datepicker.utils';
 
 describe('isNextMonthAvailable', () => {
   it('should return true when the last available month is after the currently selected month', () => {
@@ -72,4 +77,103 @@ describe('getAvailableYears', () => {
     const availableYears = getAvailableYears(fromDate, toDate);
     expect(availableYears).toEqual([]);
   });
+});
+
+const selectedDayMock = moment.utc('2021-09-18');
+
+function fetchDatesMock(date) {
+  const month = date.get('month');
+  if (month === 8) {
+    return [
+      {
+        date: moment.utc('2021-09-29'),
+        cloudCoverPercent: 78,
+      },
+      {
+        date: moment.utc('2021-09-25'),
+        cloudCoverPercent: 66,
+      },
+      {
+        date: moment.utc('2021-09-11'),
+        cloudCoverPercent: 33,
+      },
+      {
+        date: moment.utc('2021-09-02'),
+        cloudCoverPercent: 32,
+      },
+    ];
+  } else if (month === 7) {
+    return [
+      {
+        date: moment.utc('2021-08-22'),
+        cloudCoverPercent: 100,
+      },
+      {
+        date: moment.utc('2021-08-14'),
+        cloudCoverPercent: 99,
+      },
+      {
+        date: moment.utc('2021-08-13'),
+        cloudCoverPercent: 100,
+      },
+    ];
+  } else if (month === 6) {
+    return [
+      {
+        date: moment.utc('2021-07-29'),
+        cloudCoverPercent: 42,
+      },
+      {
+        date: moment.utc('2021-07-27'),
+        cloudCoverPercent: 1,
+      },
+      {
+        date: moment.utc('2021-07-16'),
+        cloudCoverPercent: 0,
+      },
+      {
+        date: moment.utc('2021-07-06'),
+        cloudCoverPercent: 18,
+      },
+    ];
+  } else if (month === 9) {
+    return [
+      {
+        date: moment.utc('2021-10-05'),
+        cloudCoverPercent: 90,
+      },
+      {
+        date: moment.utc('2021-10-17'),
+        cloudCoverPercent: 3,
+      },
+      {
+        date: moment.utc('2021-10-26'),
+        cloudCoverPercent: 89,
+      },
+    ];
+  } else if (month === 10) {
+    return [];
+  }
+}
+
+test.each([
+  ['next', 100, 2, moment.utc('2021-09-25')],
+  ['prev', 100, 2, moment.utc('2021-09-11')],
+  ['next', 5, 2, moment.utc('2021-10-17')],
+  ['next', 70, 2, moment.utc('2021-09-25')],
+  ['next', 0, 2, moment.utc('2021-10-17')],
+  ['prev', 5, 2, moment.utc('2021-07-27')],
+  ['prev', 70, 2, moment.utc('2021-09-11')],
+  ['prev', 0, 2, moment.utc('2021-07-16')],
+  ['prev', 0, 1, moment.utc('2021-09-02')],
+])('Test getNextBestDate method', async (direction, maxCC, limitMonths, expectedDate) => {
+  const newDate = await getNextBestDate({
+    selectedDay: selectedDayMock,
+    direction: direction,
+    maxCC: maxCC,
+    fetchDates: fetchDatesMock,
+    limitMonths: limitMonths,
+  });
+  const datesEqual = newDate.isSame(expectedDate);
+  expect(datesEqual).toBe(true);
 });

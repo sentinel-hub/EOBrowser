@@ -52,41 +52,23 @@ export function isEffectRangeSetAndNotDefault(val, defaultVal) {
   return !(val[0] === defaultVal[0] && val[1] === defaultVal[1]);
 }
 
-export function constructGetMapParamsEffects(effects) {
-  const {
-    gainEffect,
-    gammaEffect,
-    redRangeEffect,
-    greenRangeEffect,
-    blueRangeEffect,
-    redCurveEffect,
-    greenCurveEffect,
-    blueCurveEffect,
-  } = effects;
+const customEffectsFunctionCache = new Map();
 
-  const getMapParamsEffects = {};
-  if (isEffectValueSetAndNotDefault(gainEffect, defaultGain)) {
-    getMapParamsEffects.gain = gainEffect;
-  }
-  if (isEffectValueSetAndNotDefault(gammaEffect, defaultGamma)) {
-    getMapParamsEffects.gamma = gammaEffect;
-  }
-  if (isEffectRangeSetAndNotDefault(redRangeEffect, defaultRange)) {
-    getMapParamsEffects.redRange = { from: redRangeEffect[0], to: redRangeEffect[1] };
-  }
-  if (isEffectRangeSetAndNotDefault(greenRangeEffect, defaultRange)) {
-    getMapParamsEffects.greenRange = { from: greenRangeEffect[0], to: greenRangeEffect[1] };
-  }
-  if (isEffectRangeSetAndNotDefault(blueRangeEffect, defaultRange)) {
-    getMapParamsEffects.blueRange = { from: blueRangeEffect[0], to: blueRangeEffect[1] };
-  }
+const getCustomEffectsFunctionCacheKey = ({ redCurveEffect, blueCurveEffect, greenCurveEffect }) =>
+  JSON.stringify({
+    redCurveEffect: redCurveEffect,
+    blueCurveEffect: blueCurveEffect,
+    greenCurveEffect: greenCurveEffect,
+  });
 
+export const createCustomEffectFunction = ({ redCurveEffect, greenCurveEffect, blueCurveEffect }) => {
+  let customEffectsFunction;
   if (
     (redCurveEffect && redCurveEffect.values) ||
     (greenCurveEffect && greenCurveEffect.values) ||
     (blueCurveEffect && blueCurveEffect.values)
   ) {
-    const customEffect = ({ r, g, b, a }) => {
+    customEffectsFunction = ({ r, g, b, a }) => {
       let newR = r;
       let newG = g;
       let newB = b;
@@ -107,8 +89,37 @@ export function constructGetMapParamsEffects(effects) {
       }
       return { r: newR, g: newG, b: newB, a: a };
     };
+  }
+  return customEffectsFunction;
+};
 
-    getMapParamsEffects.customEffect = customEffect;
+export function constructGetMapParamsEffects(effects) {
+  const { gainEffect, gammaEffect, redRangeEffect, greenRangeEffect, blueRangeEffect } = effects;
+
+  const getMapParamsEffects = {};
+  if (isEffectValueSetAndNotDefault(gainEffect, defaultGain)) {
+    getMapParamsEffects.gain = gainEffect;
+  }
+  if (isEffectValueSetAndNotDefault(gammaEffect, defaultGamma)) {
+    getMapParamsEffects.gamma = gammaEffect;
+  }
+  if (isEffectRangeSetAndNotDefault(redRangeEffect, defaultRange)) {
+    getMapParamsEffects.redRange = { from: redRangeEffect[0], to: redRangeEffect[1] };
+  }
+  if (isEffectRangeSetAndNotDefault(greenRangeEffect, defaultRange)) {
+    getMapParamsEffects.greenRange = { from: greenRangeEffect[0], to: greenRangeEffect[1] };
+  }
+  if (isEffectRangeSetAndNotDefault(blueRangeEffect, defaultRange)) {
+    getMapParamsEffects.blueRange = { from: blueRangeEffect[0], to: blueRangeEffect[1] };
+  }
+
+  const customEffectsFunctionCacheKey = getCustomEffectsFunctionCacheKey(effects);
+  if (!customEffectsFunctionCache.has(customEffectsFunctionCacheKey)) {
+    customEffectsFunctionCache.set(customEffectsFunctionCacheKey, createCustomEffectFunction(effects));
+  }
+  const customEffectsFunction = customEffectsFunctionCache.get(customEffectsFunctionCacheKey);
+  if (customEffectsFunction) {
+    getMapParamsEffects.customEffect = customEffectsFunction;
   }
 
   if (Object.keys(getMapParamsEffects).length === 0) {
@@ -135,7 +146,7 @@ function isPinEffectRangeSetAndNotDefault(val, defaultVal) {
 }
 
 export function constructEffectsFromPinOrHighlight(item) {
-  const { gain, gamma, redRange, greenRange, blueRange, redCurve, greenCurve, blueCurve } = item;
+  const { gain, gamma, redRange, greenRange, blueRange, redCurve, greenCurve, blueCurve, demSource3D } = item;
 
   const effects = {};
 
@@ -163,6 +174,9 @@ export function constructEffectsFromPinOrHighlight(item) {
   }
   if (blueCurve) {
     effects.blueCurveEffect = { points: blueCurve, values: computeNewValuesFromPoints(blueCurve) };
+  }
+  if (demSource3D) {
+    effects.demSource3D = demSource3D;
   }
 
   return effects;

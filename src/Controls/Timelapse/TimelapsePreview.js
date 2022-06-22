@@ -46,32 +46,36 @@ export class TimelapsePreview extends Component {
       link.href = this.props.previewFileUrl;
       link.click();
     } else {
-      const file = await this.props.generateTimelapse().catch(() => {});
+      const file = await this.props.generateTimelapse();
+
       if (file) {
         FileSaver.saveAs(file, file.name);
-      } else {
-        alert(t`Could not generate timelapse animation file. Try using lower resolution or fewer frames.`);
       }
     }
   };
 
   generatePreviewFile = async () => {
-    const file = await this.props.generateTimelapse().catch(() => {});
+    const file = await this.props.generateTimelapse();
     if (!file) {
-      alert(t`Could not generate timelapse animation file. Try using lower resolution or fewer frames.`);
       return null;
     }
 
-    this.props.updateUploadingTimelapseProgress(true);
-    const preSignedPost = await generateS3PreSignedPost(this.props.access_token, file.name);
+    try {
+      this.props.updateUploadingTimelapseProgress(true);
+      const preSignedPost = await generateS3PreSignedPost(this.props.access_token, file.name);
 
-    if (preSignedPost && file) {
-      await uploadFileToS3(preSignedPost, file);
+      if (preSignedPost && file) {
+        await uploadFileToS3(preSignedPost, file);
+        return getS3FileUrl(preSignedPost);
+      }
+    } catch (err) {
+      console.warn('Error uploading timelapse preview file', err);
+      this.props.showErrorMessage(
+        t`Error uploading timelapse preview file. Make sure you are logged in and try again.`,
+      );
+    } finally {
       this.props.updateUploadingTimelapseProgress(false);
-      return getS3FileUrl(preSignedPost);
     }
-
-    this.props.updateUploadingTimelapseProgress(false);
   };
 
   shouldDisplayPreviewFile = () => {
@@ -125,6 +129,7 @@ export class TimelapsePreview extends Component {
       loadingImages,
       size,
       format,
+      fadeDuration,
     } = this.props;
 
     const { previewFileUrlPassThrough, displayDownloadPanel } = this.state;
@@ -179,15 +184,15 @@ export class TimelapsePreview extends Component {
             <CSSTransitionGroup
               className="transition-group"
               transitionName="example"
-              transitionEnterTimeout={500 / timelapseFPS}
-              transitionLeaveTimeout={500 / timelapseFPS}
+              transitionEnterTimeout={(fadeDuration / timelapseFPS) * 1000}
+              transitionLeaveTimeout={(fadeDuration / timelapseFPS) * 1000}
             >
               <img
                 key={image.url}
                 className="preview-image-transition"
                 src={image.url}
                 alt=""
-                style={{ transitionDuration: 500 / timelapseFPS + 'ms' }}
+                style={{ transitionDuration: (fadeDuration / timelapseFPS) * 1000 + 'ms' }}
               />
             </CSSTransitionGroup>
           ) : (
@@ -280,8 +285,10 @@ export class TimelapsePreview extends Component {
                 <TimelapseSettings
                   size={size}
                   format={format}
+                  fadeDuration={fadeDuration}
                   updateSize={this.props.updateSize}
                   updateFormat={this.props.updateFormat}
+                  updateFadeDuration={this.props.updateFadeDuration}
                   toggleDownloadPanel={this.toggleDownloadPanel}
                   searchDatesAndFetchImages={this.props.searchDatesAndFetchImages}
                 />

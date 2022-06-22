@@ -302,6 +302,8 @@ const mapStoreToProps = (store) => ({
   downsampling: store.visualization.downsampling,
   speckleFilter: store.visualization.speckleFilter,
   orthorectification: store.visualization.orthorectification,
+  backscatterCoeff: store.visualization.backscatterCoeff,
+  demSource3D: store.visualization.demSource3D,
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,
   selectedThemeId: store.themes.selectedThemeId,

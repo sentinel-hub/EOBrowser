@@ -1,6 +1,8 @@
+import moment from 'moment';
 import { t } from 'ttag';
 import { EDUCATION_MODE } from '../const';
 import {
+  CNES_LAND_COVER,
   ESA_WORLD_COVER,
   COPERNICUS_HR_VPP_VEGETATION_INDICES,
   COPERNICUS_HR_VPP_VPP_S1,
@@ -826,7 +828,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 8 has 11 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 8-9 has 11 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/landsat-8/composites/) and [here.](https://landsat.gsfc.nasa.gov/landsat-8/landsat-8-bands/)`,
   },
   {
     match: [
@@ -1102,7 +1104,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     ],
 
     description: () =>
-      t`# Atmospheric penetration\n\nThis composite uses different bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) in the non-visible part of the electromagnetic spectrum to reduce the influence of the atmosphere in the image. Short wave infrared bands 11 and 12 are highly reflected by the heated areas, making them useful for fire and burned area mapping. Short wave infrared band 8, is on contrary, highly reflected by vegetation, which signifies absence of fire. Vegetation appears blue, displaying details related to the vegetation vigor. Healthy vegetation is shown in light blue while the stressed, sparse or/and arid vegetation appears in dull blue. Urban features are white, grey, cyan or purple.\n\n\n\nMore info [here.](https://eos.com/atmospheric-penetration/)`,
+      t`# Atmospheric penetration\n\nThis composite uses different bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) in the non-visible part of the electromagnetic spectrum to reduce the influence of the atmosphere in the image. Short wave infrared bands 11 and 12 are highly reflected by the heated areas, making them useful for fire and burned area mapping. Near infrared band 8, is on contrary, highly reflected by vegetation, which signifies absence of fire. Vegetation appears blue, displaying details related to the vegetation vigor. Healthy vegetation is shown in light blue while the stressed, sparse or/and arid vegetation appears in dull blue. Urban features are white, grey, cyan or purple.\n\n\n\nMore info [here.](https://eos.com/atmospheric-penetration/)`,
   },
 
   {
@@ -1138,7 +1140,79 @@ export const PREDEFINED_LAYERS_METADATA = [
   },
 
   {
-    match: [{ datasourceId: 'S2L2A', layerId: 'SCENE-CLASSIFICATION' }],
+    match: [
+      {
+        datasourceId: 'S2L2A',
+        layerId: 'SCENE-CLASSIFICATION',
+        timeFrom: moment('2022-01-25').utc().startOf('day'),
+      },
+    ],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#000000',
+          label: 'No Data (Missing data)',
+        },
+        {
+          color: '#ff0000',
+          label: 'Saturated or defective pixel',
+        },
+        {
+          color: '#2f2f2f',
+          label: 'Topographic casted shadows',
+        },
+        {
+          color: '#643200',
+          label: 'Cloud shadows',
+        },
+        {
+          color: '#00a000',
+          label: 'Vegetation',
+        },
+        {
+          color: '#ffe65a',
+          label: 'Not-vegetated',
+        },
+        {
+          color: '#0000ff',
+          label: 'Water',
+        },
+        {
+          color: '#808080',
+          label: 'Unclassified',
+        },
+        {
+          color: '#c0c0c0',
+          label: 'Cloud medium probability',
+        },
+        {
+          color: '#ffffff',
+          label: 'Cloud high probability',
+        },
+        {
+          color: '#64c8ff',
+          label: 'Thin cirrus',
+        },
+        {
+          color: '#ff96ff',
+          label: 'Snow or ice',
+        },
+      ],
+    },
+    description: () =>
+      t`# Scene classification\n\n\n\nScene classification was developed to distinguish between cloudy pixels, clear pixels and water pixels of Sentinel-2 data and is a result of ESA's Scene classification algorithm. Twelve different classifications are provided including classes of clouds, vegetation, soils/desert, water and snow. It does not constitute a land cover classification map in a strict sense.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/scene-classification/).`,
+  },
+
+  {
+    match: [
+      {
+        datasourceId: 'S2L2A',
+        layerId: 'SCENE-CLASSIFICATION',
+        timeTo: moment('2022-01-24').utc().endOf('day'),
+      },
+    ],
 
     legend: {
       type: 'discrete',
@@ -2840,6 +2914,144 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: '255', color: 'rgb(255,255,255)', label: '255' },
       ],
     },
+  },
+  {
+    match: [{ datasourceId: CNES_LAND_COVER, layerId: 'CNES-LAND-COVER-CLASSIFICATION' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#ff00ff',
+          label: 'Dense built-up area',
+        },
+        {
+          color: '#ff55ff',
+          label: 'Diffuse built-up area',
+        },
+        {
+          color: '#ffaaff',
+          label: 'Industrial and commercial areas',
+        },
+        {
+          color: '#00ffff',
+          label: 'Roads',
+        },
+        {
+          color: '#ffff00',
+          label: 'Oilseeds (Rapeseed)',
+        },
+        {
+          color: '#d0ff00',
+          label: 'Straw cereals (Wheat, Triticale, Barley)',
+        },
+        {
+          color: '#a1d600',
+          label: 'Protein crops (Beans / Peas)',
+        },
+        {
+          color: '#ffab44',
+          label: 'Soy',
+        },
+        {
+          color: '#d6d600',
+          label: 'Sunflower',
+        },
+        {
+          color: '#ff5500',
+          label: 'Corn',
+        },
+        {
+          color: '#c5ffff',
+          label: 'Rice',
+        },
+        {
+          color: '#aaaa61',
+          label: 'Tubers/roots',
+        },
+        {
+          color: '#aaaa00',
+          label: 'Grasslands',
+        },
+        {
+          color: '#aaaaff',
+          label: 'Orchards and fruit growing',
+        },
+        {
+          color: '#550000',
+          label: 'Vineyards',
+        },
+        {
+          color: '#009c00',
+          label: 'Hardwood forest',
+        },
+        {
+          color: '#003200',
+          label: 'Softwood forest',
+        },
+        {
+          color: '#aaff00',
+          label: 'Natural grasslands and pastures',
+        },
+        {
+          color: '#55aa7f',
+          label: 'Woody moorlands',
+        },
+        {
+          color: '#ff0000',
+          label: 'Natural mineral surfaces',
+        },
+        {
+          color: '#ffb802',
+          label: 'Beaches and dunes',
+        },
+        {
+          color: '#bebebe',
+          label: 'Glaciers and eternal snows',
+        },
+        {
+          color: '#0000ff',
+          label: 'Water',
+        },
+      ],
+    },
+    description: () =>
+      t`# CNES Land cover map\n\n\n\nThe CNES Land Cover Map (Occupation des Sols, OSO) produces land classification for Metropolitan France at 10 m spatial resolution based on Sentinel-2 L2A data within the Theia Land Cover CES framework. Maps for 2020, 2019, and 2018 use a 23-categories nomenclature. For earlier maps in 2017 and 2016, a fully compatible 17-classes nomenclature is employed.\n\n\n\nFind more information [here](https://custom-scripts.sentinel-hub.com/other_collections/cnes_land_cover_classification/).`,
+  },
+  {
+    match: [{ datasourceId: CNES_LAND_COVER, layerId: 'CNES-LAND-COVER-CLASSIFIER-CONFIDENCE' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#000000',
+          label: '1% confidence',
+        },
+        {
+          color: '#00c800',
+          label: '100% confidence',
+        },
+      ],
+    },
+    description: () =>
+      t`# CNES land cover classifier confidence visualisation\n\n\n\nThe script visualises the information on the classifier confidence with values ranging from 1 to 100.\n\n\n\nFind more information [here](https://custom-scripts.sentinel-hub.com/other_collections/cnes_land_cover_confidence/).`,
+  },
+  {
+    match: [{ datasourceId: CNES_LAND_COVER, layerId: 'CNES-LAND-COVER-VALIDITY' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#000000',
+          label: '1 cloudless image',
+        },
+        {
+          color: '#e60000',
+          label: '45 cloudless images',
+        },
+      ],
+    },
+    description: () =>
+      t`# CNES land cover validity visualisation\n\n\n\nThe script visualises the information on the number of cloudless images for validity.\n\n\n\nFind more information [here](https://custom-scripts.sentinel-hub.com/other_collections/cnes_land_cover_validity/).`,
   },
   {
     match: [{ datasourceId: ESA_WORLD_COVER, layerId: 'WORLDCOVER-MAP' }],

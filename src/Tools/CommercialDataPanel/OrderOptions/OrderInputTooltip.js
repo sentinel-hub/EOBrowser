@@ -19,7 +19,10 @@ const orderInputHelp = {
   size: () => t`Ordered products will be clipped to the selected area.`,
   limit: () => t`Set an approximate order limit to prevent undesired large area requests.`,
   harmonizeData: () =>
-    t`Harmonization is not yet supported for surface reflectance products, thus this field must be explicitly set to NONE if productBundle is analytic_sr or analytic_sr_udm2.`,
+    t`Sensing instrument whose values the data should be harmonized to. Supported values:
+    - NONE to disable harmonization,
+    - Sentinel-2 only for PSScene item type and surface reflectance product bundles,
+    - PS2 only for PSScene4Band item type and top-of-atmosphere product bundles.`,
   planetApiKey: () =>
     t`Enter a Planet API key, that you received via email after purchasing a Planet PlanetScope Sentinel Hub Package`,
   createOrder: () =>

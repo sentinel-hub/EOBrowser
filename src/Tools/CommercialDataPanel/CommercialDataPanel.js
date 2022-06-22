@@ -3,14 +3,13 @@ import { connect } from 'react-redux';
 import { t } from 'ttag';
 
 import {
-  AirbusConstellation,
   PlanetProductBundle,
   PlanetScopeHarmonization,
+  PlanetSupportedProductBundles,
   TPDI,
-  TPDProvider,
   TPDICollections,
-  CRS_EPSG4326,
   ResamplingKernel,
+  PlanetItemType,
 } from '@sentinel-hub/sentinelhub-js';
 
 import './CommercialDataPanel.scss';
@@ -23,7 +22,12 @@ import Search from './Search/Search';
 import { providerSpecificSearchParameters } from './Search/config';
 import { CollectionSelectionType } from './OrderOptions/CollectionSelection';
 import { ConfirmationDialog } from './Orders/ConfirmationDialog';
-import { calculateAOICoverage, extractErrorMessage } from './commercialData.utils';
+import {
+  calculateAOICoverage,
+  getProvider,
+  extractErrorMessage,
+  createSearchParams,
+} from './commercialData.utils';
 import store, { commercialDataSlice } from '../../store';
 
 import moment from 'moment';
@@ -38,11 +42,40 @@ const Tabs = {
   HELP: 5,
 };
 
+const defaultPlanetProductBundle = {
+  [PlanetItemType.PSScene]: PlanetProductBundle.ANALYTIC_UDM2,
+  [PlanetItemType.PSScene4Band]: PlanetProductBundle.ANALYTIC_UDM2,
+};
+
+export const defaultPlanetHarmonizeTo = {
+  [PlanetItemType.PSScene]: PlanetScopeHarmonization.SENTINEL2,
+  [PlanetItemType.PSScene4Band]: PlanetScopeHarmonization.PS2,
+};
+
+export const isPlanetHarmonizationSupported = (itemType, productBundle) => {
+  if (!PlanetSupportedProductBundles[itemType].includes(productBundle)) {
+    return false;
+  }
+
+  //PSScene4Band item type and top-of-atmosphere product bundles
+  if (itemType === PlanetItemType.PSScene4Band) {
+    return !/_sr/i.test(productBundle);
+  }
+
+  // PSScene item type and surface reflectance product bundles
+  if (itemType === PlanetItemType.PSScene) {
+    return /_sr/i.test(productBundle);
+  }
+
+  return false;
+};
+
 const defaultSearchParamsForProvider = (dataProvider) => {
   switch (dataProvider) {
     case TPDICollections.PLANET_SCOPE:
       return {
-        productBundle: PlanetProductBundle.ANALYTIC_UDM2,
+        itemType: PlanetItemType.PSScene,
+        productBundle: defaultPlanetProductBundle[PlanetItemType.PSScene],
       };
     default:
       return {};
@@ -64,8 +97,8 @@ const defaultOrderOptions = {
   collectionId: null,
   manualCollection: false,
   planetApiKey: null,
-  harmonizeData: true,
   productKernel: ResamplingKernel.CC,
+  harmonizeTo: undefined,
 };
 
 const pageSize = {
@@ -143,7 +176,12 @@ const CommercialDataPanel = ({
 
         //reset order params on data provider change
         if (prevState[name] !== value) {
-          setOrderOptions({ ...defaultOrderOptions });
+          setOrderOptions({
+            ...defaultOrderOptions,
+            ...(value === TPDICollections.PLANET_SCOPE && {
+              harmonizeTo: PlanetScopeHarmonization.NONE,
+            }),
+          });
         }
       }
 
@@ -159,11 +197,23 @@ const CommercialDataPanel = ({
         }
       }
 
+      if (name === 'itemType') {
+        newParams.productBundle = defaultPlanetProductBundle[value];
+
+        setOrderOptions({
+          ...orderOptions,
+          harmonizeTo: isPlanetHarmonizationSupported(value, newParams.productBundle)
+            ? defaultPlanetHarmonizeTo[value]
+            : PlanetScopeHarmonization.NONE,
+        });
+      }
+
       if (name === 'productBundle') {
         setOrderOptions({
           ...orderOptions,
-          harmonizeData:
-            value !== PlanetProductBundle.ANALYTIC_SR_UDM2 && value !== PlanetProductBundle.ANALYTIC_SR,
+          harmonizeTo: isPlanetHarmonizationSupported(newParams.itemType, value)
+            ? defaultPlanetHarmonizeTo[newParams.itemType]
+            : PlanetScopeHarmonization.NONE,
         });
       }
 
@@ -178,20 +228,7 @@ const CommercialDataPanel = ({
     setActionInProgress(true);
     setActionError(null);
     try {
-      const params = { ...searchParams };
-      if (aoiGeometry) {
-        // only CRS_EPSG4326 is supported atm
-        params.geometry = aoiGeometry;
-        params.crs = CRS_EPSG4326;
-      }
-
-      if (params.dataProvider === TPDICollections.AIRBUS_SPOT) {
-        params.constellation = AirbusConstellation.SPOT;
-      }
-
-      if (params.dataProvider === TPDICollections.AIRBUS_PLEIADES) {
-        params.constellation = AirbusConstellation.PHR;
-      }
+      const params = createSearchParams(searchParams, aoiGeometry);
 
       let provider = getProvider(params.dataProvider);
 
@@ -236,27 +273,7 @@ const CommercialDataPanel = ({
     setActionInProgress(true);
     setActionError(null);
     try {
-      const params = { ...searchParams };
-      if (aoiGeometry) {
-        // only CRS_EPSG4326 is supported atm
-        params.geometry = aoiGeometry;
-        params.crs = CRS_EPSG4326;
-      }
-
-      if (params.dataProvider === TPDICollections.AIRBUS_SPOT) {
-        params.constellation = AirbusConstellation.SPOT;
-      }
-
-      if (params.dataProvider === TPDICollections.AIRBUS_PLEIADES) {
-        params.constellation = AirbusConstellation.PHR;
-      }
-
-      const orderParams = { ...orderOptions };
-      if (params.dataProvider === TPDICollections.PLANET_SCOPE) {
-        orderParams.harmonizeTo = orderOptions.harmonizeData
-          ? PlanetScopeHarmonization.PS2
-          : PlanetScopeHarmonization.NONE;
-      }
+      const params = createSearchParams(searchParams, aoiGeometry);
 
       const requestsConfig = {
         authToken: user.access_token,
@@ -268,7 +285,7 @@ const CommercialDataPanel = ({
         orderOptions.collectionId,
         orderOptions.type === OrderType.PRODUCTS ? selectedProducts : null,
         params,
-        orderParams,
+        orderOptions,
         requestsConfig,
       );
 
@@ -440,15 +457,3 @@ const mapStoreToProps = (store) => ({
 });
 
 export default connect(mapStoreToProps, null)(CommercialDataPanel);
-
-const getProvider = (dataProvider) => {
-  let provider;
-  if (dataProvider === TPDICollections.AIRBUS_SPOT || dataProvider === TPDICollections.AIRBUS_PLEIADES) {
-    provider = TPDProvider.AIRBUS;
-  } else if (dataProvider === TPDICollections.MAXAR_WORLDVIEW) {
-    provider = TPDProvider.MAXAR;
-  } else if (dataProvider === TPDICollections.PLANET_SCOPE) {
-    provider = TPDProvider.PLANET;
-  }
-  return provider;
-};

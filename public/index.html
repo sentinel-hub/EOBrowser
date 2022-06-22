@@ -28,6 +28,11 @@
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <script type="text/javascript" src="%PUBLIC_URL%/fflate.js" ></script>
+    <!--
+      https://water-knowing.sentinel-hub.com/script.js is a script for fathom analytics, which should collect analytics only in production.
+      It's correct that it fails with error 403 on test / stage and when running the app locally.
+    -->
+    <script src="https://water-knowing.sentinel-hub.com/script.js" data-site="NFVVXLFP" defer></script>
     <title>Sentinel Hub EO Browser</title>
   </head>
   <body>

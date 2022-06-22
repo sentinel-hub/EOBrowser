@@ -39,12 +39,12 @@ class AuthProvider extends React.Component {
   };
 
   render() {
-    const { anonToken } = this.props;
+    const { anonToken, termsPrivacyAccepted } = this.props;
     const { userAuthCompleted } = this.state;
     return (
       <>
-        <AnonymousAuth setAnonToken={this.setAnonToken} />
-        {anonToken && userAuthCompleted ? (
+        {termsPrivacyAccepted && <AnonymousAuth setAnonToken={this.setAnonToken} />}
+        {userAuthCompleted && (termsPrivacyAccepted ? anonToken : true) ? (
           this.props.children
         ) : (
           <div className="initial-loader">
@@ -58,5 +58,6 @@ class AuthProvider extends React.Component {
 
 const mapStoreToProps = (store) => ({
   anonToken: store.auth.anonToken,
+  termsPrivacyAccepted: store.auth.terms_privacy_accepted,
 });
 export default connect(mapStoreToProps)(AuthProvider);

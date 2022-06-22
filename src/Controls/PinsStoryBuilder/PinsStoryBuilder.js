@@ -258,7 +258,12 @@ class PinsStoryBuilder extends React.Component {
         }
 
         // if there is a predefined layer legend, find it:
-        const predefinedLayerMetadata = findMatchingLayerMetadata(pin.datasetId, pin.layerId, pin.themeId);
+        const predefinedLayerMetadata = findMatchingLayerMetadata(
+          pin.datasetId,
+          pin.layerId,
+          pin.themeId,
+          pinToTime,
+        );
         const legendDefinition =
           predefinedLayerMetadata && predefinedLayerMetadata.legend
             ? predefinedLayerMetadata.legend

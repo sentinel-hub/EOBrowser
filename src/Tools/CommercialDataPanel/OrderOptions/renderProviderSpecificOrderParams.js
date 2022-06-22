@@ -1,8 +1,8 @@
 import React from 'react';
-import Toggle from 'react-toggle';
-import { PlanetProductBundle, TPDICollections, ResamplingKernel } from '@sentinel-hub/sentinelhub-js';
+import { PlanetScopeHarmonization, TPDICollections, ResamplingKernel } from '@sentinel-hub/sentinelhub-js';
 import { OrderInputTooltip } from './OrderInputTooltip';
 import { t } from 'ttag';
+import { isPlanetHarmonizationSupported, defaultPlanetHarmonizeTo } from '../CommercialDataPanel';
 
 const getResamplingKernelLabel = (productKernel) => {
   const ResamplingKernelLabel = {
@@ -43,18 +43,30 @@ const renderPlanetScopeOrderParams = (actionInProgress, searchParams, orderOptio
   return (
     <>
       <div className="row">
-        <label title={t`Harmonize data`}>{t`Harmonize data`}</label>
+        <label title={t`Harmonize to`}>{t`Harmonize to`}</label>
         <div>
-          <Toggle
-            defaultChecked={orderOptions.harmonizeData}
+          <select
+            className="dropdown"
             disabled={
               !!actionInProgress ||
-              searchParams.productBundle === PlanetProductBundle.ANALYTIC_SR_UDM2 ||
-              searchParams.productBundle === PlanetProductBundle.ANALYTIC_SR
+              !isPlanetHarmonizationSupported(searchParams.itemType, searchParams.productBundle)
             }
-            icons={false}
-            onChange={() => setOrderOptions({ ...orderOptions, harmonizeData: !orderOptions.harmonizeData })}
-          />
+            value={orderOptions.harmonizeTo}
+            onChange={(e) => {
+              setOrderOptions({ ...orderOptions, harmonizeTo: e.target.value });
+            }}
+          >
+            <option key={PlanetScopeHarmonization.NONE} value={PlanetScopeHarmonization.NONE}>
+              {PlanetScopeHarmonization.NONE}
+            </option>
+
+            <option
+              key={defaultPlanetHarmonizeTo[searchParams.itemType]}
+              value={defaultPlanetHarmonizeTo[searchParams.itemType]}
+            >
+              {defaultPlanetHarmonizeTo[searchParams.itemType]}
+            </option>
+          </select>
           <OrderInputTooltip inputId="harmonizeData" />
         </div>
       </div>

@@ -6,8 +6,6 @@ div.layer-details {
 
   div.layer-legend {
     padding: 5px 0 5px 0;
-    flex-grow: 0;
-    flex-shrink: 0;
 
     img {
       max-width: 300px;
@@ -28,8 +26,8 @@ div.layer-details {
       }
 
       div.color {
-        width: 25px;
-        height: 25px;
+        min-width: 25px;
+        min-height: 25px;
         border: 2px solid #777;
         border-radius: 50%;
       }
@@ -108,9 +106,13 @@ div.layer-details {
   }
 
   div.layer-description {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
     padding-left: 15px;
     padding-right: 30px;
     color: #d0d5dd;
+    min-width: 50%;
 
     h1,
     h2,

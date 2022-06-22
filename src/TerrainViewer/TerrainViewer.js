@@ -1,12 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { connect } from 'react-redux';
-import { BBox, CRS_EPSG3857, MimeTypes, CancelToken } from '@sentinel-hub/sentinelhub-js';
+import {
+  BBox,
+  CRS_EPSG3857,
+  MimeTypes,
+  CancelToken,
+  DEMLayer,
+  DEMInstanceType,
+} from '@sentinel-hub/sentinelhub-js';
 import proj4 from 'proj4';
 import { t } from 'ttag';
+import L from 'leaflet';
 
 import store, { terrainViewerSlice, mainMapSlice, visualizationSlice } from '../store';
 import { getLayerFromParams } from '../Controls/ImgDownload/ImageDownload.utils';
-import { wgs84ToMercator } from '../junk/EOBCommon/utils/coords';
+import { convertToWgs84, wgs84ToMercator } from '../junk/EOBCommon/utils/coords';
 import {
   getMapTile,
   getPositionString,
@@ -15,6 +23,8 @@ import {
   getZoomFromEyeHeight,
   getEyeHeightFromZoom,
   getHeightFromZoom,
+  getTileXAndTileY,
+  is3DDemSourceCustom,
 } from './TerrainViewer.utils';
 import {
   datasourceForDatasetId,
@@ -22,7 +32,13 @@ import {
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getGetMapAuthToken } from '../App';
 import { constructGetMapParamsEffects } from '../utils/effectsUtils';
-import { DATASOURCES, reqConfigGetMap, reqConfigMemoryCache } from '../const';
+import {
+  DATASOURCES,
+  DEM_3D_CUSTOM_TO_DATASOURCE,
+  EQUATOR_LENGTH,
+  reqConfigGetMap,
+  reqConfigMemoryCache,
+} from '../const';
 import Controls from '../Controls/Controls';
 import { constructErrorMessage, isDataFusionEnabled } from '../utils';
 import ExternalLink from '../ExternalLink/ExternalLink';
@@ -30,6 +46,7 @@ import ExternalLink from '../ExternalLink/ExternalLink';
 import { ReactComponent as IconSun } from './icons/icon-sun.svg';
 
 import 'rodal/lib/rodal.css';
+import { getBoundsZoomLevel } from '../utils/coords';
 
 function TerrainViewer(props) {
   /*
@@ -71,6 +88,10 @@ function TerrainViewer(props) {
     settings,
     sunTime,
   } = terrainViewerSettings || {};
+  const DEFAULT_TILE_SIZE = 512;
+  const DEFAULT_DEM_TILE_SIZE = 64;
+  const DEFAULT_DEM_MAX_ZOOM = 18;
+  const DEFAULT_DEM_SOURCE = DEMInstanceType.MAPZEN;
 
   let minZoom = 7;
   if (dataSourcesInitialized && datasetId) {
@@ -150,6 +171,7 @@ function TerrainViewer(props) {
     props.minQa,
     props.speckleFilter,
     props.orthorectification,
+    props.backscatterCoeff,
     props.dataSourcesInitialized,
   ]);
 
@@ -159,6 +181,22 @@ function TerrainViewer(props) {
     }
     // eslint-disable-next-line
   }, [props.locale]);
+
+  useEffect(() => {
+    if (terrainViewerId) {
+      const tileSize = DEFAULT_DEM_TILE_SIZE;
+      const maxZoomLevel = DEFAULT_DEM_MAX_ZOOM;
+      const demSource3D = props.demSource3D
+        ? is3DDemSourceCustom(props.demSource3D)
+          ? 'CUSTOM'
+          : props.demSource3D
+        : DEFAULT_DEM_SOURCE;
+
+      window.set3DDemProvider(terrainViewerId, demSource3D, tileSize, maxZoomLevel);
+      window.set3DPosition(terrainViewerId, x, y, z, rotH, rotV);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.demSource3D]);
 
   function set3DLocation(x, y, zoom) {
     const z = getHeightFromZoom(zoom);
@@ -171,14 +209,11 @@ function TerrainViewer(props) {
   }
 
   function get3DMapTileUrl(viewerId, minX, minY, maxX, maxY, width, height, callback) {
-    const equatorLen = 40075016.685578488;
     const zoomLevel = Math.max(
       0,
-      Math.min(19, 1 + Math.floor(Math.log(equatorLen / ((maxX - minX) * 1.001)) / Math.log(2))),
+      Math.min(19, 1 + Math.floor(Math.log(EQUATOR_LENGTH / ((maxX - minX) * 1.001)) / Math.log(2))),
     );
-    const numTiles = 1 << zoomLevel;
-    const tileX = Math.floor(((minX + maxX + equatorLen) * numTiles) / (2 * equatorLen));
-    const tileY = numTiles - 1 - Math.floor(((minY + maxY + equatorLen) * numTiles) / (2 * equatorLen));
+    const { tileX, tileY } = getTileXAndTileY(zoomLevel, minX, minY, maxX, maxY);
     const mapTilerUrl = `https://api.maptiler.com/maps/streets/256/${zoomLevel}/${tileX}/${tileY}.png?key=${process.env.REACT_APP_MAPTILER_KEY}`;
 
     if (!layer || zoomLevel <= minZoom) {
@@ -232,6 +267,91 @@ function TerrainViewer(props) {
     );
   }
 
+  async function get3DDemTileUrl(viewerId, minX, minY, maxX, maxY, width, height, callback) {
+    const SW = convertToWgs84([minX, minY]);
+    const NE = convertToWgs84([maxX, maxY]);
+    const bounds = L.latLngBounds(L.latLng(SW[1], SW[0]), L.latLng(NE[1], NE[0]));
+    const origZoom = getBoundsZoomLevel(bounds);
+    // Difference between zooms based on tile size
+    const zoomLevel =
+      origZoom > 2 ? origZoom - Math.log2(DEFAULT_TILE_SIZE / DEFAULT_DEM_TILE_SIZE) : origZoom;
+
+    const { tileX, tileY } = getTileXAndTileY(zoomLevel, minX, minY, maxX, maxY);
+
+    const dsh = getDataSourceHandler(DEM_3D_CUSTOM_TO_DATASOURCE[props.demSource3D]);
+    const minZoomLevel = dsh
+      ? dsh.getLeafletZoomConfig(DEM_3D_CUSTOM_TO_DATASOURCE[props.demSource3D]).min
+      : minZoom;
+
+    if (!layer || zoomLevel <= minZoomLevel) {
+      let url = `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${zoomLevel}/${tileX}/${tileY}.png`;
+      callback(url);
+      return;
+    }
+
+    const getMapParams = {
+      bbox: new BBox(CRS_EPSG3857, minX, minY, maxX, maxY),
+      format: MimeTypes.PNG,
+      width: DEFAULT_DEM_TILE_SIZE,
+      height: DEFAULT_DEM_TILE_SIZE,
+      fromTime: fromTime && fromTime.toDate(),
+      toTime: toTime.toDate(),
+      preview: 2,
+      effects: constructGetMapParamsEffects(props),
+      tileCoord: {
+        x: tileX,
+        y: tileY,
+        z: zoomLevel,
+      },
+    };
+    const reqConfig = {
+      cancelToken: cancelToken,
+      authToken: getGetMapAuthToken(auth),
+      retries: 0,
+      ...reqConfigGetMap,
+    };
+
+    function onCallback(url) {
+      callback(url);
+    }
+
+    const demLayer = new DEMLayer({
+      demInstance: props.demSource3D,
+      evalscript: `
+      //VERSION=3
+      function setup(){
+        return {
+          input: ["DEM"],
+          output: {bands: 3, sampleType: "UINT8"}
+        }
+      }
+
+      function evaluatePixel(sample) {
+        // RGB color coded elevation data
+        var dem = sample.DEM + 32768;
+        var red = Math.floor(dem / 256);
+        var green = Math.floor(dem - 256 * red);
+        var blue = Math.floor(256 * (dem - green - 256 * red));
+        return [red, green, blue];
+      }
+    `,
+    });
+
+    getMapTile(
+      demLayer,
+      getMapParams,
+      minX,
+      minY,
+      maxX,
+      maxY,
+      DEFAULT_DEM_TILE_SIZE,
+      DEFAULT_DEM_TILE_SIZE,
+      onCallback,
+      reqConfig,
+      onTileError,
+    );
+  }
+
   async function on3DInitialized() {
     if (!is3D) {
       return;
@@ -246,9 +366,14 @@ function TerrainViewer(props) {
     window.set3DLocale(locale);
     setLayer(layer);
     setCancelToken(new CancelToken());
-    const tileSize = 64;
-    const maxZoomLevel = 18;
-    const demInstance = 'MAPZEN';
+    const tileSize = DEFAULT_DEM_TILE_SIZE;
+    const maxZoomLevel = DEFAULT_DEM_MAX_ZOOM;
+    const demInstance = props.demSource3D
+      ? is3DDemSourceCustom(props.demSource3D)
+        ? 'CUSTOM'
+        : props.demSource3D
+      : DEFAULT_DEM_SOURCE;
+
     const terrainViewerId = window.create3DViewer(
       'terrain-map-container',
       x,
@@ -385,6 +510,7 @@ function TerrainViewer(props) {
     store.dispatch(terrainViewerSlice.actions.resetTerrainViewerSettings());
     store.dispatch(terrainViewerSlice.actions.setTerrainViewerId(null));
   }
+
   if (is3D) {
     window.get3DMapTileUrl = get3DMapTileUrl;
     window.on3DButtonClicked = on3DButtonClicked;
@@ -392,6 +518,9 @@ function TerrainViewer(props) {
     window.on3DLoadingStateChanged = on3DLoadingStateChanged;
     window.on3DSettingsChanged = on3DSettingsChanged;
     window.set3DLocation = set3DLocation;
+    if (is3DDemSourceCustom(props.demSource3D)) {
+      window.get3DDemTileUrl = get3DDemTileUrl;
+    }
   }
 
   if (disabled) {
@@ -495,6 +624,8 @@ const mapStoreToProps = (store) => ({
   minQa: store.visualization.minQa,
   speckleFilter: store.visualization.speckleFilter,
   orthorectification: store.visualization.orthorectification,
+  backscatterCoeff: store.visualization.backscatterCoeff,
+  demSource3D: store.visualization.demSource3D,
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,
   selectedThemeId: store.themes.selectedThemeId,

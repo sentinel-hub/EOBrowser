@@ -75,10 +75,12 @@ class App extends Component {
   }
 
   async componentDidUpdate(prevProps) {
-    if (this.props.handlePositions === prevProps.handlePositions) {
-      updatePath(this.props);
-    } else {
-      updatePath(this.props, false);
+    if (this.props.termsPrivacyAccepted) {
+      if (this.props.handlePositions === prevProps.handlePositions) {
+        updatePath(this.props);
+      } else {
+        updatePath(this.props, false);
+      }
     }
 
     if (this.props.authToken && this.props.authToken !== prevProps.authToken) {
@@ -125,7 +127,16 @@ class App extends Component {
   };
 
   render() {
-    const { modalId, authToken, selectedModeId, googleAPI, is3D, terrainViewerId, datasetId } = this.props;
+    const {
+      modalId,
+      authToken,
+      selectedModeId,
+      googleAPI,
+      is3D,
+      terrainViewerId,
+      datasetId,
+      termsPrivacyAccepted,
+    } = this.props;
     const authenticated = Boolean(authToken);
     const zoomConfig = getZoomConfiguration(datasetId);
     return (
@@ -169,7 +180,9 @@ class App extends Component {
         <Notification />
         {!is3D && !terrainViewerId && (
           <Tutorial
-            popupDisabled={this.state.hasSwitchedFrom3D || this.props.timelapseSharePreviewMode}
+            popupDisabled={
+              this.state.hasSwitchedFrom3D || this.props.timelapseSharePreviewMode || !termsPrivacyAccepted
+            }
             selectedLanguage={this.props.selectedLanguage}
           />
         )}
@@ -246,6 +259,9 @@ const mapStoreToProps = (store) => ({
   upsampling: store.visualization.upsampling,
   downsampling: store.visualization.downsampling,
   speckleFilter: store.visualization.speckleFilter,
+  orthorectification: store.visualization.orthorectification,
+  demSource3D: store.visualization.demSource3D,
+  backscatterCoeff: store.visualization.backscatterCoeff,
   dataFusion: store.visualization.dataFusion,
   selectedThemeId: store.themes.selectedThemeId,
   selectedModeId: store.themes.selectedModeId,
@@ -254,6 +270,7 @@ const mapStoreToProps = (store) => ({
   timelapse: store.timelapse,
   terrainViewerId: store.terrainViewer.id,
   timelapseSharePreviewMode: store.timelapse.timelapseSharePreviewMode,
+  termsPrivacyAccepted: store.auth.terms_privacy_accepted,
 });
 
 export default connect(mapStoreToProps, null)(App);

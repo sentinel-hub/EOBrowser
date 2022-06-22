@@ -10,13 +10,15 @@ import { PLANET_NICFI } from './dataSourceConstants';
 import { FetchingFunction } from '../search';
 import { DATASOURCES } from '../../../const';
 import { filterLayers } from './filter';
+import { getLayersWithDate } from './planetNicfi.utils';
+import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 
 export const YYYY_MM_REGEX = /\d{4}-\d{2}/g;
 const DATA_BOUNDS = [-179.9, -30.009514, 179.9, 30.102505];
 
 export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
   urls = [];
-  searchGroupLabel = 'Planet-NICFI';
+  searchGroupLabel = 'Planet NICFI';
   searchGroupKey = 'planet-nicfi';
   preselectedDatasets = new Set();
   searchFilters = {};
@@ -57,8 +59,8 @@ export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
     }
     return (
       <GenericSearchGroup
-        key={`planet-nicfi`}
-        label="Planet-NICFI"
+        key={this.searchGroupKey}
+        label={this.searchGroupLabel}
         saveCheckedState={this.saveCheckedState}
         dataSourceTooltip={<PlanetBasemapTooltip />}
         saveFiltersValues={this.saveSearchFilters}
@@ -167,21 +169,13 @@ export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
   };
 
   getLayers = (data, datasetId, url, layersExclude, layersInclude, selectedDate) => {
-    const foundMosaicKey = Object.keys(this.mosaicDateRanges).find((key) => {
-      const mosaic = this.mosaicDateRanges[key];
-      return selectedDate.isBetween(mosaic.fromTime, mosaic.toTime);
-    });
-    let layers = data.filter(
-      (layer) =>
-        filterLayers(layer.layerId, layersExclude, layersInclude) &&
-        foundMosaicKey &&
-        this.mosaicDateRanges[foundMosaicKey].layerIds.includes(layer.layerId),
-    );
-    layers.forEach((l) => {
+    let layers = data.filter((layer) => filterLayers(layer.layerId, layersExclude, layersInclude));
+    const layersWithSameDate = getLayersWithDate(layers, selectedDate);
+    layersWithSameDate.forEach((l) => {
       l.url = url;
       l.title = l.title.replace('Planet Medres', 'PS Tropical');
     });
-    return layers;
+    return layersWithSameDate;
   };
 
   convertToStandardTiles = (data, datasetId) => {
@@ -246,6 +240,8 @@ export default class PlanetBasemapDataSourceHandler extends DataSourceHandler {
   isCopernicus = () => false;
 
   isSentinelHub = () => false;
-  supportsTimelapse = () => false;
-  supportsImgExport = () => false;
+  supportsTimelapse = () => true;
+  supportsImgExport = () => true;
+  getSupportedImageFormats = () => [IMAGE_FORMATS.PNG, IMAGE_FORMATS.JPG];
+  supportsAnalyticalImgExport = () => false;
 }

@@ -23,6 +23,8 @@ Note that because the code relies on a specific SentinelHub clientId which is no
 * Run `npm run prettier` to prettify `js`, `json`, `css` and `scss` files
 * Run `npm run lint` to lint `js`, `json`, `css` and `scss` files
 * Run `npm run build` to build the application sources
+* Run `npm run translate` to add strings to the translation files
+* Run `npm run debug-translations` to replace all translation strings with "XXXXXX"
 
 ## Multilanguage support
 
@@ -32,8 +34,10 @@ Your language is missing and you want to help to translate it? Contact us at inf
 
 - Danish (Main functionality): Carsten Skovgård Andersen (Stjernekammeret, Bellahøj Skole)
 - Estonian: ESERO Estonia
+- French: [CNES](https://cnes.fr/en), ESERO France, ESERO Luxembourg
 - German: ESERO Austria/ESERO Germany
 - Greek: [GET](https://www.getmap.eu/?lang=en)
+- Latvian: Valters Žeižis
 - Polish: ESERO Poland
 - Slovenian: Krištof Oštir ([Faculty of Civil and Geodetic Engineering](https://www.en.fgg.uni-lj.si/), University of Ljubljana) with financial support from the Slovenian Research Agency research core funding No. P2-0406 Earth observation and geoinformatics
 - Spanish: ESERO Spain

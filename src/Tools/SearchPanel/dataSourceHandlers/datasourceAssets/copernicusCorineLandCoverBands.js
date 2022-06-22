@@ -115,7 +115,7 @@ export const CORINE_LAND_COVER_BANDS = [
   {
     name: '23',
     color: '#80ff00',
-    getDescription: () => t`Broad-leaved fores`,
+    getDescription: () => t`Broad-leaved forest`,
   },
   {
     name: '24',

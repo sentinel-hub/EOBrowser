@@ -5,7 +5,7 @@ import DayPicker from 'react-day-picker';
 import { t } from 'ttag';
 
 import { getFirstDayOfWeek, getWeekDaysLong, getWeekDaysMin, getMonths } from './MomentLocaleUtils';
-import { momentToDate } from './Datepicker.utils';
+import { momentToDateWithUTCValues } from './Datepicker.utils';
 import Navbar from './Navbar';
 import YearMonthForm from './YearMonthForm';
 
@@ -30,7 +30,7 @@ function Calendar(props) {
   } = props;
 
   const modifiers = {
-    highlighted: highlightedDays,
+    highlighted: highlightedDays.map((d) => momentToDateWithUTCValues(d)),
   };
 
   return ReactDOM.createPortal(
@@ -47,15 +47,15 @@ function Calendar(props) {
       )}
       <DayPicker
         showOutsideDays
-        selectedDays={momentToDate(selectedDay)}
+        selectedDays={selectedDay ? momentToDateWithUTCValues(selectedDay) : null}
         modifiers={modifiers}
-        month={momentToDate(selectedDay)}
+        month={selectedDay ? momentToDateWithUTCValues(selectedDay) : null}
         onMonthChange={handleMonthChange}
         onDayClick={handleDayClick}
         disabledDays={[
           {
-            after: momentToDate(maxDate),
-            before: momentToDate(minDate),
+            after: momentToDateWithUTCValues(maxDate),
+            before: momentToDateWithUTCValues(minDate),
           },
         ]}
         navbarElement={<Navbar minDate={minDate} maxDate={maxDate} selectedDate={selectedDay} />}
@@ -75,7 +75,7 @@ function Calendar(props) {
         firstDayOfWeek={getFirstDayOfWeek(locale)}
       />
     </div>,
-    calendarContainer.current ? calendarContainer.current : calendarContainer, // Works with both direct DOM element or react ref object,
+    calendarContainer && calendarContainer.current ? calendarContainer.current : calendarContainer,
   );
 }
 

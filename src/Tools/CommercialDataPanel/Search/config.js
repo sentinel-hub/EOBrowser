@@ -4,6 +4,7 @@ import { t } from 'ttag';
 import {
   AirbusProcessingLevel,
   MaxarSensor,
+  PlanetItemType,
   PlanetProductBundle,
   TPDICollections,
 } from '@sentinel-hub/sentinelhub-js';
@@ -12,6 +13,7 @@ import { SelectInput } from './SelectInput';
 import { SliderInput } from './SliderInput';
 import { ToggleInput } from './ToggleInput';
 import { createSelectOptions } from '../commercialData.utils';
+import { PlanetSupportedProductBundles } from '@sentinel-hub/sentinelhub-js';
 
 export const minDateRange = moment.utc('1982-01-01');
 export const maxDateRange = moment.utc().endOf('day');
@@ -19,10 +21,20 @@ export const maxDateRange = moment.utc().endOf('day');
 export const providerSpecificSearchParameters = {
   [TPDICollections.PLANET_SCOPE]: [
     {
+      id: 'itemType',
+      label: () => t`Item type`,
+      render: SelectInput,
+      options: [
+        { value: PlanetItemType.PSScene, label: PlanetItemType.PSScene },
+        { value: PlanetItemType.PSScene4Band, label: `${PlanetItemType.PSScene4Band} (${t`deprecated`})` },
+      ],
+    },
+    {
       id: 'productBundle',
       label: () => t`Product bundle`,
       render: SelectInput,
       options: createSelectOptions(PlanetProductBundle),
+      filterOptions: (option, { itemType }) => PlanetSupportedProductBundles[itemType].includes(option.value),
     },
     {
       id: 'maxCloudCoverage',

@@ -17,8 +17,8 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
   preselectedDatasets = new Set([PROBAV_S1]);
   datasetSearchLabels = {
     [PROBAV_S1]: t`1 day (S1)`,
-    [PROBAV_S5]: t`5 day (S5)`,
-    [PROBAV_S10]: t`10 day (S10)`,
+    [PROBAV_S5]: t`5 days (S5)`,
+    [PROBAV_S10]: t`10 days (S10)`,
   };
   datasetSearchIds = { [PROBAV_S1]: 'PROBAV_S1', [PROBAV_S5]: 'PROBAV_S5', [PROBAV_S10]: 'PROBAV_S10' };
   searchFilters = {};
@@ -222,4 +222,6 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
   isCopernicus = () => false;
 
   isSentinelHub = () => false;
+
+  supportsAnalyticalImgExport = () => false;
 }

@@ -74,3 +74,11 @@ t`When checked, moving the mouse while the middle button is pressed,
 rotates the world around the clicked point, 
 otherwise the camera rotates around itself. 
 Alt key, being pressed when starting to rotate, toggles this behavior.`;
+t`Cannot load initial 3D data! Retry?`;
+t`Depth offset (Eye angle [\u00B0])`;
+t`Depth contrast (Eye gap [m])`;
+t`Save`;
+t`Stereo mode`;
+t`Anaglyph stereo mode`;
+t`Use the red-cyan glasses, with the red filter on the left side, and the cyan filter on the right side`;
+t`Ok`;

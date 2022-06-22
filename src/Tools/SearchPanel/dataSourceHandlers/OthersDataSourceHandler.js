@@ -4,13 +4,15 @@ import { t } from 'ttag';
 
 import DataSourceHandler from './DataSourceHandler';
 import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/GenericSearchGroup';
+import { CNESLandCoverTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/CNESLandCoverTooltip';
 import { WorldCoverTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/ESAWorldCoverTooltip';
 import { GHSTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/GlobalHumanSettlementTooltip';
 
 import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 
 import { FetchingFunction } from '../search';
-import { ESA_WORLD_COVER, GLOBAL_HUMAN_SETTLEMENT } from './dataSourceConstants';
+import { CNES_LAND_COVER, ESA_WORLD_COVER, GLOBAL_HUMAN_SETTLEMENT } from './dataSourceConstants';
+import { CNES_LAND_COVER_BANDS } from './datasourceAssets/CNESLandCoverBands';
 import { ESA_WORLD_COVER_BANDS } from './datasourceAssets/copernicusWorldCoverBands';
 import { GHS_BANDS } from './datasourceAssets/GHSBands';
 import { convertGeoJSONToEPSG4326 } from '../../../utils/coords';
@@ -18,11 +20,13 @@ import { DATASOURCES } from '../../../const';
 
 export default class OthersDataSourceHandler extends DataSourceHandler {
   getDatasetSearchLabels = () => ({
+    [CNES_LAND_COVER]: 'CNES Land Cover Map',
     [ESA_WORLD_COVER]: 'ESA WorldCover',
     [GLOBAL_HUMAN_SETTLEMENT]: 'Global Human Settlement',
   });
 
   urls = {
+    [CNES_LAND_COVER]: [],
     [ESA_WORLD_COVER]: [],
     [GLOBAL_HUMAN_SETTLEMENT]: [],
   };
@@ -31,6 +35,10 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
   datasource = DATASOURCES.OTHER;
 
   leafletZoomConfig = {
+    [CNES_LAND_COVER]: {
+      min: 4,
+      max: 18,
+    },
     [ESA_WORLD_COVER]: {
       min: 8,
       max: 20,
@@ -42,11 +50,13 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
   };
 
   KNOWN_COLLECTIONS = {
+    [CNES_LAND_COVER]: ['9baa27-YOUR-INSTANCEID-HERE'],
     [ESA_WORLD_COVER]: ['0b940c-YOUR-INSTANCEID-HERE'],
     [GLOBAL_HUMAN_SETTLEMENT]: ['3dbeea-YOUR-INSTANCEID-HERE'],
   };
 
   KNOWN_COLLECTIONS_LOCATIONS = {
+    [CNES_LAND_COVER]: LocationIdSHv3.awsEuCentral1,
     [ESA_WORLD_COVER]: LocationIdSHv3.awsEuCentral1,
     [GLOBAL_HUMAN_SETTLEMENT]: LocationIdSHv3.creo,
   };
@@ -65,6 +75,7 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
         this.allLayers.push(...layersWithDataset);
       }
     }
+    this.saveFISLayers(url, layers);
     return handlesAny;
   }
 
@@ -99,6 +110,12 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
 
   renderOptionsHelpTooltips = (option) => {
     switch (option) {
+      case CNES_LAND_COVER:
+        return (
+          <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+            <CNESLandCoverTooltip />
+          </HelpTooltip>
+        );
       case ESA_WORLD_COVER:
         return (
           <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
@@ -169,6 +186,8 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
 
   getBands = (datasetId) => {
     switch (datasetId) {
+      case CNES_LAND_COVER:
+        return CNES_LAND_COVER_BANDS;
       case ESA_WORLD_COVER:
         return ESA_WORLD_COVER_BANDS;
       case GLOBAL_HUMAN_SETTLEMENT:

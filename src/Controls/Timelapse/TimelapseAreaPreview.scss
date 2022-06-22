@@ -15,7 +15,11 @@
     color: #38f;
     background: rgba(0, 0, 0, 0);
     font-size: 20px;
-    transform: translateY(-150%);
+    transform: translateY(-60px);
+
+    &.description {
+      font-size: 0.8em;
+    }
   }
 }
 

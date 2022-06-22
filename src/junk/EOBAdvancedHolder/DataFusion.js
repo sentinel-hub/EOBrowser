@@ -120,12 +120,12 @@ class DataFusion extends React.Component {
         additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
       },
       [DATASET_AWS_LOTL1.id]: {
-        label: 'Landsat 8 L1',
+        label: 'Landsat 8-9 L1',
         dataset: DATASET_AWS_LOTL1,
         additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
       },
       [DATASET_AWS_LOTL2.id]: {
-        label: 'Landsat 8 L2',
+        label: 'Landsat 8-9 L2',
         dataset: DATASET_AWS_LOTL2,
         additionalMosaickingOrders: [{ label: t`Least cloud coverage`, id: 'leastCC' }],
       },

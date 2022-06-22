@@ -40,6 +40,7 @@ $headerPadding: 10px;
   .img-btn {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
   }
 
   .result-item {
@@ -63,6 +64,7 @@ $headerPadding: 10px;
       max-width: none !important;
       padding: 0 0 5px 0;
       width: 125px;
+      word-wrap: anywhere;
     }
 
     & > * {
@@ -72,6 +74,7 @@ $headerPadding: 10px;
 
     .preview-image {
       width: 125px;
+      text-align: center;
 
       &:hover {
         cursor: pointer;
@@ -139,6 +142,9 @@ $headerPadding: 10px;
 
         &.bold {
           font-weight: bold;
+          display: flex;
+          align-items: baseline;
+          word-wrap: anywhere;
         }
 
         & > :first-child {

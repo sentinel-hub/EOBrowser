@@ -38,8 +38,8 @@ function renderQuotas(quotas) {
             return (
               <tr key={quota.id}>
                 <td>{`${Providers[quota.collectionId]}`}</td>
-                <td>{`${formatNumberAsRoundedUnit(quota.quotaSqkm, 2, '')}`}</td>
-                <td>{`${formatNumberAsRoundedUnit(quota.quotaUsed, 2, '')}`}</td>
+                <td>{`${formatNumberAsRoundedUnit(quota.quotaSqkm, 2, '', t`N/A`)}`}</td>
+                <td>{`${formatNumberAsRoundedUnit(quota.quotaUsed, 2, '', t`N/A`)}`}</td>
               </tr>
             );
           })}

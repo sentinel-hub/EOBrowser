@@ -5,10 +5,20 @@ import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
 import Rodal from 'rodal';
 import { EXPORT_FORMAT } from '../../const';
 import InputWithBouncyLimit from '../../components/InputWithBouncyLimit/InputWithBouncyLimit';
+import HelpTooltip from '../../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/HelpTooltip';
 
-export default function TimelapseSettings({ size, format, updateSize, updateFormat, toggleDownloadPanel }) {
+export default function TimelapseSettings({
+  size,
+  format,
+  fadeDuration,
+  updateSize,
+  updateFormat,
+  updateFadeDuration,
+  toggleDownloadPanel,
+}) {
   const [localSize, setLocalSize] = useState(size);
   const [localFormat, setLocalFormat] = useState(format);
+  const [localFadeDuration, setLocalFadeDuration] = useState(fadeDuration);
 
   function onUpdateWidth(width) {
     setLocalSize({ ...localSize, width, height: Math.round(width / size.ratio) });
@@ -21,6 +31,7 @@ export default function TimelapseSettings({ size, format, updateSize, updateForm
   function onSaveButtonClick() {
     updateSize(localSize);
     updateFormat(localFormat);
+    updateFadeDuration(localFadeDuration);
     toggleDownloadPanel(false);
   }
 
@@ -29,7 +40,7 @@ export default function TimelapseSettings({ size, format, updateSize, updateForm
       className="settings"
       visible={true}
       customStyles={{
-        width: '300px',
+        width: '350px',
         height: 'auto',
         bottom: 'auto',
         top: '50%',
@@ -47,7 +58,7 @@ export default function TimelapseSettings({ size, format, updateSize, updateForm
             min={200}
             max={2500}
             step={1}
-            timeoutDuration={2000}
+            timeoutDuration={1000}
             value={localSize.width}
             setValue={onUpdateWidth}
           />
@@ -61,11 +72,30 @@ export default function TimelapseSettings({ size, format, updateSize, updateForm
             min={200}
             max={2500}
             step={1}
-            timeoutDuration={2000}
+            timeoutDuration={1000}
             value={localSize.height}
             setValue={onUpdateHeight}
           />
           <span className="unit">px</span>
+        </div>
+        <div className="settings-row">
+          <label className="label">
+            {t`Fade duration`}:
+            <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+              {t`Fade duration relative to frame duration`}
+            </HelpTooltip>
+          </label>
+          <InputWithBouncyLimit
+            className="input"
+            type="float"
+            min={0.1}
+            max={1}
+            step={0.01}
+            timeoutDuration={1000}
+            value={localFadeDuration}
+            setValue={setLocalFadeDuration}
+          />
+          <span className="unit">[0.1-1]</span>
         </div>
         <div className="settings-row">
           <label className="label">{t`Format`}:</label>

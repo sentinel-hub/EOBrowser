@@ -32,7 +32,11 @@ import {
   getDataSourceHandler,
   datasourceForDatasetId,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
-import { getLoggedInErrorMsg, getOnlyBasicImgDownloadAvailableMsg } from '../../junk/ConstMessages';
+import {
+  getAnalyticalExportNotSupportedMsg,
+  getLoggedInErrorMsg,
+  getOnlyBasicImgDownloadAvailableMsg,
+} from '../../junk/ConstMessages';
 import { isDataFusionEnabled, fetchEvalscriptFromEvalscripturl } from '../../utils';
 import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
 import { getGetMapAuthToken } from '../../App';
@@ -80,7 +84,7 @@ function ImageDownload(props) {
       const selectedTheme = props.themesLists[props.selectedThemesListId].find(
         (t) => t.id === props.selectedThemeId,
       );
-      getAllLayers(props.visualizationUrl, props.datasetId, selectedTheme).then((allLayers) =>
+      getAllLayers(props.visualizationUrl, props.datasetId, selectedTheme, props.fromTime).then((allLayers) =>
         setAllLayers(allLayers),
       );
       setSupportedImageFormats(getSupportedImageFormats(props.datasetId));
@@ -91,6 +95,7 @@ function ImageDownload(props) {
     props.themesLists,
     props.selectedThemesListId,
     props.selectedThemeId,
+    props.fromTime,
   ]);
 
   useEffect(() => {
@@ -197,6 +202,7 @@ function ImageDownload(props) {
       downsampling,
       speckleFilter,
       orthorectification,
+      backscatterCoeff,
       bounds,
       aoiGeometry,
     } = props;
@@ -235,6 +241,7 @@ function ImageDownload(props) {
       downsampling: downsampling,
       speckleFilter: speckleFilter,
       orthorectification: orthorectification,
+      backscatterCoeff: backscatterCoeff,
       cancelToken: cancelToken,
       showLogo: showLogo,
       shouldClipExtraBands: shouldClipExtraBands,
@@ -371,14 +378,19 @@ function ImageDownload(props) {
   }
 
   function checkIfCurrentLayerHasLegend() {
-    const { layerId, datasetId, selectedThemeId } = props;
+    const { layerId, datasetId, selectedThemeId, toTime } = props;
     if (layerId) {
       const layer = allLayers.find((l) => l.layerId === layerId);
       if (layer) {
         if (layer.legend || layer.legendUrl) {
           return true;
         }
-        const predefinedLayerMetadata = findMatchingLayerMetadata(datasetId, layerId, selectedThemeId);
+        const predefinedLayerMetadata = findMatchingLayerMetadata(
+          datasetId,
+          layerId,
+          selectedThemeId,
+          toTime,
+        );
         if (predefinedLayerMetadata && predefinedLayerMetadata.legend) {
           return true;
         }
@@ -393,6 +405,10 @@ function ImageDownload(props) {
 
   function displayOnlyBasicDownloadPossibleMessage() {
     store.dispatch(notificationSlice.actions.displayError(getOnlyBasicImgDownloadAvailableMsg()));
+  }
+
+  function displayAnalyticalModeNotSupportedByDatasource() {
+    store.dispatch(notificationSlice.actions.displayError(getAnalyticalExportNotSupportedMsg()));
   }
 
   function addWarning(warningType, layerName) {
@@ -419,7 +435,8 @@ function ImageDownload(props) {
   const isUserLoggedIn = props.user && props.user.userdata;
   const isGIBS = datasourceForDatasetId(props.datasetId) === DATASOURCES.GIBS;
   const isOnCompareTab = props.selectedTabIndex === MAIN_TABS.COMPARE_TAB;
-
+  const dsh = getDataSourceHandler(props.datasetId);
+  const supportsAnalyticalImgExport = dsh && dsh.supportsAnalyticalImgExport();
   return (
     <Rodal
       animation="slideUp"
@@ -450,9 +467,13 @@ function ImageDownload(props) {
                 text={t`Analytical`}
                 className={selectedTab === TABS.ANALYTICAL ? 'selected' : ''}
                 onClick={() => setSelectedTab(TABS.ANALYTICAL)}
-                disabled={!isUserLoggedIn || isOnCompareTab}
+                disabled={!isUserLoggedIn || isOnCompareTab || !supportsAnalyticalImgExport}
                 onDisabledClick={
-                  isOnCompareTab ? displayOnlyBasicDownloadPossibleMessage : displayLogInToAccessMessage
+                  isOnCompareTab
+                    ? displayOnlyBasicDownloadPossibleMessage
+                    : !supportsAnalyticalImgExport
+                    ? displayAnalyticalModeNotSupportedByDatasource
+                    : displayLogInToAccessMessage
                 }
               />
 
@@ -541,6 +562,7 @@ const mapStoreToProps = (store) => ({
   downsampling: store.visualization.downsampling,
   speckleFilter: store.visualization.speckleFilter,
   orthorectification: store.visualization.orthorectification,
+  backscatterCoeff: store.visualization.backscatterCoeff,
   minQa: store.visualization.minQa,
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,

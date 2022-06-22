@@ -61,6 +61,7 @@ class TimelapseAreaPreview extends Component {
         >
           <Tooltip className="timelapse-area-tooltip" permanent={true} opacity={1.0} direction={'center'}>
             <div className="timelapse-area-tooltip-content">{t`Create a timelapse of this area`}</div>
+            <div className="timelapse-area-tooltip-content description">{t`To create a timelapse of a custom area, create AOI first`}</div>
           </Tooltip>
         </Marker>
       </Rectangle>

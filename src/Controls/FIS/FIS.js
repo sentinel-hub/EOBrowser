@@ -5,20 +5,26 @@ import { t } from 'ttag';
 
 import { EOBCCSlider } from '../../junk/EOBCommon/EOBCCSlider/EOBCCSlider';
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
-import { LayersFactory, CRS_WGS84 } from '@sentinel-hub/sentinelhub-js';
+import {
+  CRS_EPSG4326,
+  LayersFactory,
+  StatisticsProviderType,
+  StatisticsUtils,
+} from '@sentinel-hub/sentinelhub-js';
 import moment from 'moment';
 import { XYFrame } from 'semiotic';
 import Rodal from 'rodal';
 import 'rodal/lib/rodal.css';
 
 import store, { modalSlice } from '../../store';
-import { getRecommendedResolution } from '../../utils/coords';
+import { getRecommendedResolution, reprojectGeometry } from '../../utils/coords';
 import {
   getDataSourceHandler,
   getDatasetLabel,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { constructCSVFromData } from './FIS.utils';
-import { reqConfigMemoryCache } from '../../const';
+import { checkAllMandatoryOutputsExist } from '../../utils/parseEvalscript';
+import { reqConfigMemoryCache, STATISTICS_MANDATORY_OUTPUTS } from '../../const';
 
 import './FIS.scss';
 
@@ -93,26 +99,49 @@ class FIS extends Component {
       poiGeometry,
       poiOrAoi,
     } = this.props;
+
     const datasourceHandler = getDataSourceHandler(datasetId);
+
+    let supportStatisticalApi = false;
+    if (!customSelected) {
+      //check evalscript if outputs for statistical api are defined
+      const visualizationLayer = await LayersFactory.makeLayer(
+        visualizationUrl,
+        layerId,
+        null,
+        reqConfigMemoryCache,
+      );
+      await visualizationLayer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
+      supportStatisticalApi = checkAllMandatoryOutputsExist(
+        visualizationLayer.evalscript,
+        STATISTICS_MANDATORY_OUTPUTS,
+      );
+    }
+
+    //check if FIS layer is defined for selected layer
     const FISLayer = datasourceHandler.getFISLayer(visualizationUrl, datasetId, layerId, customSelected);
+
+    // use statistical api if output for statistical api is defined in evalscript
+    const targetLayer = supportStatisticalApi ? layerId : FISLayer;
+
     const shJsDatasetId = datasourceHandler.getSentinelHubDataset(datasetId)
       ? datasourceHandler.getSentinelHubDataset(datasetId).id
       : null;
-    let layer = await LayersFactory.makeLayers(
-      visualizationUrl,
-      (layer, dataset) =>
-        !shJsDatasetId && !customSelected
-          ? dataset === null && layer === FISLayer
-          : customSelected
-          ? dataset.id === shJsDatasetId
-          : dataset.id === shJsDatasetId && layer === FISLayer,
-      null,
-      reqConfigMemoryCache,
+
+    const layer = await LayersFactory.makeLayers(visualizationUrl, (layer, dataset) =>
+      !shJsDatasetId && !customSelected
+        ? dataset === null && layer === targetLayer
+        : customSelected
+        ? dataset.id === shJsDatasetId
+        : dataset.id === shJsDatasetId && layer === targetLayer,
     );
+
     this.layer = layer[0];
 
     if (customSelected) {
+      // for custom scripts just set evalscript to custom script and check if output for statistical api is defined
       this.layer.evalscript = evalscript;
+      supportStatisticalApi = checkAllMandatoryOutputsExist(evalscript, STATISTICS_MANDATORY_OUTPUTS);
     }
 
     const { resolution, fisResolutionCeiling } = datasourceHandler.getResolutionLimits(datasetId);
@@ -124,7 +153,7 @@ class FIS extends Component {
     let batchFromTime = moment
       .max(fromTime, this.availableData.fromTime.clone().subtract(this.MAX_REQUEST_INTERVAL))
       .startOf('day');
-    let batchToTime = this.availableData.fromTime.clone();
+    let batchToTime = moment.utc(this.availableData.fromTime.clone()).add(1, 'day').startOf('day');
 
     if (!batchFromTime.isSame(fromTime)) {
       this.setState({
@@ -135,20 +164,73 @@ class FIS extends Component {
       this.setState({ fetchingInProgress: true });
     }
 
+    const geometryWithSwitchedCoordinates =
+      // getStats makes request with ESPG:4326, but geojson is in WGS:84.
+      {
+        type: 'Polygon',
+        coordinates: [geometry.coordinates[0].map((coord) => [coord[1], coord[0]])],
+      };
+
+    let requestGeometry = geometryWithSwitchedCoordinates;
+    let crs = CRS_EPSG4326;
+
+    if (supportStatisticalApi) {
+      //switch CRS and reproject geometry to EPSG:3857
+      crs = {
+        authId: 'EPSG:3857',
+        auth: 'EPSG',
+        srid: 3857,
+        urn: 'urn:ogc:def:crs:EPSG::3857',
+        opengisUrl: 'http://www.opengis.net/def/crs/EPSG/0/3857',
+      };
+      requestGeometry = reprojectGeometry(geometry, 'EPSG:4326', 'EPSG:3857');
+    }
+
     while (fromTime.isBefore(this.availableData.fromTime)) {
-      const data = await layer[0]
-        .getStats({
-          geometry: geometry,
-          fromTime: batchFromTime,
-          toTime: batchToTime,
-          resolution: recommendedResolution,
-          bins: 10,
-          crs: CRS_WGS84,
-        })
+      const statsParams = {
+        geometry: requestGeometry,
+        crs: crs,
+        fromTime: batchFromTime,
+        toTime: batchToTime,
+        resolution: recommendedResolution,
+        bins: 10,
+      };
+
+      if (supportStatisticalApi) {
+        statsParams['output'] = STATISTICS_MANDATORY_OUTPUTS[0];
+      }
+
+      const statisticsProvider = supportStatisticalApi
+        ? StatisticsProviderType.STAPI
+        : StatisticsProviderType.FIS;
+
+      let data = await layer[0]
+        .getStats(statsParams, {}, statisticsProvider)
         .catch((err) => this.handleRequestError(err));
 
       if (!data) {
         break;
+      }
+
+      if (statisticsProvider === StatisticsProviderType.STAPI && data.status !== 'OK') {
+        const errors = new Set();
+        //try to get error message from response
+        try {
+          if (data.data && data.data.length > 0) {
+            data.data.forEach((interval) => {
+              if (interval.error) {
+                errors.add(interval.error.message);
+              }
+            });
+          }
+        } catch (e) {}
+
+        this.handleRequestError(`Error fetching data. ${Array.from(errors).join(' ')}`);
+        break;
+      }
+
+      if (statisticsProvider === StatisticsProviderType.STAPI) {
+        data = StatisticsUtils.convertToFISResponse(data.data, STATISTICS_MANDATORY_OUTPUTS[0]);
       }
 
       this.onDataReceived(batchFromTime, batchToTime, data, true);

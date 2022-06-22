@@ -70,6 +70,7 @@ export function userCanAccessLockedFunctionality(user, selectedTheme) {
   - downsampling: downsampling (SH datasets only)
   - speckleFilter: speckle filter (Sentinel 1)
   - orthorectification: orthorectification (Sentinel 1 only)
+  - backscatterCoeff: backscatterCoeff (Sentinel 1 only)
   - dataFusion: dataFusion settings
   - handlePositions: positions of pins in index feature.
   - gradient: gradient used to calculate color in index feature. 
@@ -105,6 +106,8 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
     downsampling,
     speckleFilter,
     orthorectification,
+    demSource3D,
+    backscatterCoeff,
     dataFusion,
     handlePositions,
     gradient,
@@ -201,6 +204,12 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
     }
     if (orthorectification !== undefined) {
       params.orthorectification = JSON.stringify(orthorectification);
+    }
+    if (demSource3D !== undefined) {
+      params.demSource3D = JSON.stringify(demSource3D);
+    }
+    if (backscatterCoeff !== undefined) {
+      params.backscatterCoeff = JSON.stringify(backscatterCoeff);
     }
     if (isDataFusionEnabled(dataFusion)) {
       params.dataFusion = JSON.stringify(dataFusion);

@@ -40,6 +40,7 @@ const mapStoreToProps = (store) => ({
   selectedThemeId: store.themes.selectedThemeId,
   selectedModeId: store.themes.selectedModeId,
   selectedLanguage: store.language.selectedLanguage,
+  toTime: store.visualization.toTime,
 });
 
 export default connect(mapStoreToProps, null)(Visualizations);

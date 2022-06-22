@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { t } from 'ttag';
-import { TPDICollections } from '@sentinel-hub/sentinelhub-js';
+import {
+  TPDICollections,
+  TPDI,
+  CancelToken,
+  isCancelled,
+  BBox,
+  CRS_EPSG4326,
+} from '@sentinel-hub/sentinelhub-js';
 
 import { OrderInputTooltip } from './OrderInputTooltip';
+import { getProvider, createSearchParams } from '../commercialData.utils';
 
 export const CollectionSelectionType = {
   CREATE: 'CREATE',
@@ -25,6 +32,16 @@ const DefaultCollections = {
 };
 
 const CollectionsCache = new Map();
+
+const createCollectionsCacheKey = (user, searchParams) => {
+  const cacheKeys = [user.access_token, searchParams.dataProvider];
+  if (searchParams.dataProvider === TPDICollections.PLANET_SCOPE) {
+    cacheKeys.push(searchParams.itemType);
+    cacheKeys.push(searchParams.productBundle);
+  }
+
+  return cacheKeys.join('-');
+};
 
 export const CollectionSelection = ({ disabled, orderOptions, setOrderOptions, searchParams, user }) => {
   const [userCollections, setUserCollections] = useState([]);
@@ -81,35 +98,30 @@ export const CollectionSelection = ({ disabled, orderOptions, setOrderOptions, s
   };
 
   useEffect(() => {
-    let source = axios.CancelToken.source();
+    let cancelToken = new CancelToken();
     const fetchUserCollections = async () => {
       try {
         setLoading(true);
+        const provider = getProvider(searchParams.dataProvider);
 
-        if (CollectionsCache.has(user.access_token)) {
-          setUserCollections(CollectionsCache.get(user.access_token));
+        if (CollectionsCache.has(createCollectionsCacheKey(user, searchParams))) {
+          setUserCollections(CollectionsCache.get(createCollectionsCacheKey(user, searchParams)));
           return;
         }
 
-        const headers = {
-          Authorization: `Bearer ${user.access_token}`,
-          'Content-Type': 'application/json',
-        };
         const requestConfig = {
-          headers: headers,
+          authToken: user.access_token,
+          cancelToken: cancelToken,
         };
 
-        //taken from request builder
-        const res = await axios.get(`https://services.sentinel-hub.com/api/v1/byoc/global`, requestConfig);
-        if (res.data) {
-          let collections = res.data.data.filter((col) => col.s3Bucket === 'sh.tpdi.byoc.eu-central-1');
-          if (collections.length > 0) {
-            setUserCollections(collections);
-            CollectionsCache.set(user.access_token, collections);
-          }
-        }
+        const params = createSearchParams(searchParams);
+        // use default bbox as bounds (bbox or geometry) are mandatory for searchcompatiblecollections endpoint
+        params.bbox = new BBox(CRS_EPSG4326, -180, -90, 180, 90);
+        const compatibleCollections = await TPDI.getCompatibleCollections(provider, params, requestConfig);
+        setUserCollections(compatibleCollections);
+        CollectionsCache.set(createCollectionsCacheKey(user, searchParams), compatibleCollections);
       } catch (err) {
-        if (!axios.isCancel(err)) {
+        if (!isCancelled(err)) {
           console.error(err);
         }
       } finally {
@@ -120,11 +132,11 @@ export const CollectionSelection = ({ disabled, orderOptions, setOrderOptions, s
       fetchUserCollections();
     }
     return () => {
-      if (source) {
-        source.cancel();
+      if (cancelToken) {
+        cancelToken.cancel();
       }
     };
-  }, [user]);
+  }, [user, searchParams]);
 
   //update collectionId param once collections are loaded
   useEffect(() => {

@@ -374,9 +374,9 @@ function eob3d(){
     }
     var strongName;
     try {
-      unflattenKeylistIntoAnswers(['ie10'], '0FDEAB1F2722E35B2E0E1024421EB5CF');
-      unflattenKeylistIntoAnswers(['gecko1_8'], 'BB4A5BC91C2602496BB77FF0913A032B');
-      unflattenKeylistIntoAnswers(['safari'], 'BB4A5BC91C2602496BB77FF0913A032B' + ':1');
+      unflattenKeylistIntoAnswers(['ie10'], '1681E408BCF768666F277335517A43F5');
+      unflattenKeylistIntoAnswers(['gecko1_8'], 'FF4607DC8A0D3779638C1B13C77525BD');
+      unflattenKeylistIntoAnswers(['safari'], 'FF4607DC8A0D3779638C1B13C77525BD' + ':1');
       strongName = answers[computePropValue('user.agent')];
       var idx = strongName.indexOf(':');
       if (idx != -1) {
@@ -394,18 +394,7 @@ function eob3d(){
     if (!$wnd_0.__gwt_stylesLoaded) {
       $wnd_0.__gwt_stylesLoaded = {};
     }
-    function installOneStylesheet(stylesheetUrl){
-      if (!__gwt_stylesLoaded[stylesheetUrl]) {
-        var l = $doc_0.createElement('link');
-        l.setAttribute('rel', 'stylesheet');
-        l.setAttribute('href', computeUrlForResource(stylesheetUrl));
-        $doc_0.getElementsByTagName('head')[0].appendChild(l);
-        __gwt_stylesLoaded[stylesheetUrl] = true;
-      }
-    }
-
     sendStats('loadExternalRefs', 'begin');
-    installOneStylesheet('font/fontIcon.css');
     sendStats('loadExternalRefs', 'end');
   }
 

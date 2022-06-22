@@ -30,7 +30,10 @@ const DEFAULT_SELECTED_MODE = process.env.REACT_APP_DEFAULT_MODE_ID
 
 class ThemesProvider extends React.Component {
   async componentDidMount() {
-    const { themeIdFromUrlParams, themesUrl, user } = this.props;
+    const { themeIdFromUrlParams, themesUrl, user, termsPrivacyAccepted } = this.props;
+    if (!termsPrivacyAccepted) {
+      return;
+    }
     if (user && user.access_token) {
       // User is an object by default, so if(user) is truthy (probably should be changed)
       await this.fetchUserInstances();
@@ -205,8 +208,8 @@ class ThemesProvider extends React.Component {
   };
 
   setSelectedThemeIdFromMode = (selectedMode) => {
-    const { urlThemesList, themeIdFromUrlParams } = this.props;
-    if (themeIdFromUrlParams) {
+    const { urlThemesList, themeIdFromUrlParams, anonToken } = this.props;
+    if (themeIdFromUrlParams && anonToken) {
       store.dispatch(themesSlice.actions.setSelectedThemeId({ selectedThemeId: themeIdFromUrlParams }));
     } else {
       if (urlThemesList.length > 0) {
@@ -214,6 +217,13 @@ class ThemesProvider extends React.Component {
           themesSlice.actions.setSelectedThemeId({
             selectedThemeId: urlThemesList[0].id,
             selectedThemesListId: URL_THEMES_LIST,
+          }),
+        );
+      } else if (!anonToken) {
+        store.dispatch(
+          themesSlice.actions.setSelectedThemeId({
+            selectedThemeId: null,
+            selectedThemesListId: null,
           }),
         );
       } else {
@@ -278,6 +288,8 @@ class ThemesProvider extends React.Component {
 }
 
 const mapStoreToProps = (store) => ({
+  anonToken: store.auth.anonToken,
+  termsPrivacyAccepted: store.auth.terms_privacy_accepted,
   selectedThemeId: store.themes.selectedThemeId,
   dataSourcesInitialized: store.themes.dataSourcesInitialized,
   themesUrl: store.themes.themesUrl,

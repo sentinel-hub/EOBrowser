@@ -101,3 +101,28 @@ export function getBoundsZoomLevel(bounds) {
 
   return Math.min(latZoom, lngZoom, ZOOM_MAX);
 }
+
+const round = (number, precision) => {
+  return Math.floor(number * 10 ** precision) / 10 ** precision;
+};
+
+const reprojectCoordinates = (coords, fromProj, toProj) => {
+  return [
+    coords[0]
+      .map((coord) => proj4(fromProj, toProj, coord))
+      .map((pair) => [round(pair[0], 6), round(pair[1], 6)]),
+  ];
+};
+
+export const reprojectGeometry = (geometry, fromProj, toProj) => {
+  try {
+    const transformedCoords = reprojectCoordinates(geometry.coordinates, fromProj, toProj);
+    const polygon = {
+      type: 'Polygon',
+      coordinates: transformedCoords,
+    };
+    return polygon;
+  } catch (err) {
+    console.error('Unable to reproject geometry', err);
+  }
+};

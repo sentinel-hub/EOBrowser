@@ -61,6 +61,8 @@ export default class VisualizationLayer extends Component {
       selectedThemeId,
       selectedModeId,
       setEvalScriptAndCustomVisualization,
+      toTime,
+      supportsCustom,
     } = this.props;
 
     const iconSrc = this.getIconSrc(viz);
@@ -68,7 +70,7 @@ export default class VisualizationLayer extends Component {
     const isActive = selectedVisualizationId === vizId && !customSelected;
     const hasEvalScript = !!viz.evalscript;
 
-    const layerMetadata = findMatchingLayerMetadata(datasetId, viz.layerId, selectedThemeId);
+    const layerMetadata = findMatchingLayerMetadata(datasetId, viz.layerId, selectedThemeId, toTime);
     const longDescription = getDescriptionFromMetadata(layerMetadata);
     const shortDescription =
       getShortDescriptionFromMetadata(layerMetadata, selectedModeId) || viz.description;
@@ -85,7 +87,7 @@ export default class VisualizationLayer extends Component {
           <img className="icon" crossOrigin="Anonymous" src={iconSrc} alt="" />
           {isActive && (
             <div className="layer-icons-wrapper">
-              {hasEvalScript && (
+              {hasEvalScript && supportsCustom && (
                 <i
                   className={`fas fa-edit`}
                   title={t`Show evalscript`}
@@ -110,15 +112,17 @@ export default class VisualizationLayer extends Component {
           {isActive && this.state.detailsOpen && (
             <div className="layer-details">
               <Legend legendDefinitionFromLayer={legend} legendUrl={viz.legendUrl} />
-              <div className="layer-description">
-                <ReactMarkdown
-                  escapeHtml={true}
-                  source={longDescription}
-                  renderers={{
-                    link: (props) => <ExternalLink href={props.href}>{props.children}</ExternalLink>,
-                  }}
-                />
-              </div>
+              {longDescription && (
+                <div className="layer-description">
+                  <ReactMarkdown
+                    escapeHtml={true}
+                    source={longDescription}
+                    renderers={{
+                      link: (props) => <ExternalLink href={props.href}>{props.children}</ExternalLink>,
+                    }}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

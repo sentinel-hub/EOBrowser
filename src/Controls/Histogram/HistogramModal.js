@@ -10,8 +10,8 @@ import {
   getDataForIndex,
   getLayerName,
   checkIfIndexOutputPresent,
-  MISSING_INDEX_OUTPUT_ERROR,
-  NO_INDEX_LAYER_SELECTED,
+  getMissingIndexOutputError,
+  getNoIndexLayerOutputError,
 } from './Histogram.utils';
 import {
   getDatasetLabel,
@@ -89,7 +89,7 @@ class HistogramModal extends Component {
     if (!isIndexOutputPresent) {
       this.setState({
         refreshEnabled: false,
-        refreshTooltip: customSelected ? MISSING_INDEX_OUTPUT_ERROR : NO_INDEX_LAYER_SELECTED,
+        refreshTooltip: customSelected ? getMissingIndexOutputError() : getNoIndexLayerOutputError(),
       });
       return;
     }

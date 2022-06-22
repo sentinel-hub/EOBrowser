@@ -3,6 +3,8 @@ import {
   setEvalscriptSampleType,
   setEvalscriptOutputScale,
   setEvalscriptOutputBandNumber,
+  getOutputIds,
+  checkAllMandatoryOutputsExist,
 } from './parseEvalscript';
 
 const inputEvalscript1 = `
@@ -79,6 +81,44 @@ function evaluatePixel(samples, inputData, inputMetadata, customData, outputMeta
   return val
 }
 `;
+
+const inputEvalscript4 = `
+//VERSION=3
+function evaluatePixel(samples) {
+
+    let val = index(samples.B3, samples.B2);
+  const viz= colorBlend(val,
+    [0.0, 0.5, 1.0],
+    [
+      [1,0,0], 
+      [1,1,0], 
+      [0.1,0.31,0], 
+    ]);
+  
+     return {
+       default: [...viz,samples.dataMask],
+       eobrowserStats:[val,samples.dataMask],
+       dataMask: [samples.dataMask]
+    };
+}
+
+function setup() {
+  return {
+    input: [{
+      bands: [
+        "B2",
+        "B3",
+        "dataMask"
+      ]
+    }],
+     output: [
+          { id: "default", bands:4 },   
+          { id:"eobrowserStats",bands:2},
+          { id: "dataMask", bands: 1 }
+        ]
+  }
+}`;
+
 const expectedSetup3 = {
   id: 'default',
   sampleType: 'AUTO',
@@ -144,4 +184,32 @@ test.each([
   const newEvalscript = setEvalscriptOutputBandNumber(evalscript, nBands);
   const { nBands: actualNewNBands } = getEvalscriptSetup(newEvalscript);
   expect(actualNewNBands).toEqual(nBands);
+});
+
+test.each([
+  [null, null], // null evalscript
+  ['evalscript', null], //incorrect format
+  [inputEvalscript1, [undefined]], //evalscript output is an object withouth id
+  [inputEvalscript2, ['some-id']], //evalscript output is an array
+  [inputEvalscript3, [undefined]], //evalscript output is an array of 1 element without id
+  [inputEvalscript4, ['default', 'eobrowserStats', 'dataMask']], //evalscript output is an array of 3 elements
+])('Test getOutputIds method', (evalscript, expectedOutputs) => {
+  const outputs = getOutputIds(evalscript);
+  expect(outputs).toEqual(expectedOutputs);
+});
+
+test.each([
+  [null, ['some-id'], false],
+  ['evalscript', ['some-id'], false],
+  [inputEvalscript1, null, false],
+  [inputEvalscript1, [], false],
+  [inputEvalscript1, ['some-id'], false],
+  [inputEvalscript2, ['some-id'], true],
+  [inputEvalscript3, ['some-id'], false],
+  [inputEvalscript4, ['eobrowserStats', 'dataMask'], true],
+  [inputEvalscript4, ['dataMask', 'eobrowserStats'], true],
+  [inputEvalscript4, ['dataMask', 'index'], false],
+])('Test checkAllMandatoryOutputsExist method', (evalscript, mandatoryOutputs, expected) => {
+  const result = checkAllMandatoryOutputsExist(evalscript, mandatoryOutputs);
+  expect(result).toEqual(expected);
 });

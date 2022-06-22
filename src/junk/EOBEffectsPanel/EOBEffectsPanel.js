@@ -10,7 +10,14 @@ import './EOBEffectsPanel.scss';
 import HelpTooltip from '../../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/HelpTooltip';
 import ExternalLink from '../../ExternalLink/ExternalLink';
 
-import { defaultEffects, ORTHORECTIFICATION_OPTIONS } from '../../const';
+import {
+  BACK_COEF_OPTIONS,
+  defaultEffects,
+  ORTHORECTIFICATION_OPTIONS,
+  DEM_3D_SOURCES,
+  DISABLED_ORTHORECTIFICATION,
+} from '../../const';
+import { BackscatterCoeff, DEMInstanceType } from '@sentinel-hub/sentinelhub-js';
 
 export const findSpeckleFilterIndex = (speckleFilters, speckleFilter) =>
   speckleFilter
@@ -43,6 +50,7 @@ export class EOBEffectsPanel extends React.Component {
     onResetEffects: () => {},
 
     updateOrthorectification: (value) => {},
+    updateDemSource3D: (value) => {},
   };
 
   constructor(props) {
@@ -81,8 +89,7 @@ export class EOBEffectsPanel extends React.Component {
       minQa = 50,
       upsampling = '',
       downsampling = '',
-      speckleFilter = '',
-      orthorectification = '',
+      demSource3D = DEMInstanceType.MAPZEN,
     } = this.props.effects;
 
     this.state = {
@@ -108,9 +115,7 @@ export class EOBEffectsPanel extends React.Component {
       upsampling: upsampling,
       downsampling: downsampling,
 
-      speckleFilter: speckleFilter,
-
-      orthorectification: orthorectification,
+      demSource3D: demSource3D,
 
       advancedRgbEffectsOpen: advancedRgbEffectsOpen,
     };
@@ -154,8 +159,7 @@ export class EOBEffectsPanel extends React.Component {
     upsampling: '',
     downsampling: '',
 
-    speckleFilter: '',
-    orthorectification: '',
+    demSource3D: DEMInstanceType.MAPZEN,
   });
 
   logToLinear = (e, min, max) => {
@@ -290,18 +294,23 @@ export class EOBEffectsPanel extends React.Component {
   updateSpeckleFilter = (e) => {
     const speckleFilter = this.props.supportedSpeckleFilters[e.target.value];
 
-    this.setState(
-      { speckleFilter: speckleFilter ? speckleFilter.params : undefined },
-      this.props.onUpdateSpeckleFilter(speckleFilter ? speckleFilter.params : undefined),
-    );
+    this.props.onUpdateSpeckleFilter(speckleFilter ? speckleFilter.params : undefined);
   };
 
   updateOrthorectification = (e) => {
+    this.props.onUpdateOrthorectification(e.target.value);
+  };
+
+  updateBackCoeff = (e) => {
+    this.props.onUpdateBackScatterCoeff(e.target.value);
+  };
+
+  updateDemSource3D = (e) => {
     this.setState(
       {
-        orthorectification: e.target.value,
+        demSource3D: e.target.value,
       },
-      this.props.onUpdateOrthorectification(e.target.value),
+      this.props.onUpdateDemSource3D(e.target.value),
     );
   };
 
@@ -617,8 +626,27 @@ export class EOBEffectsPanel extends React.Component {
     );
   }
 
+  render3DDemSourceSelection() {
+    const { demSource3D } = this.state;
+
+    return (
+      <div className="effect-container effect-with-dropdown">
+        <span className="effect-name">{t`DEM source`}</span>
+        <div className="effect-dropdown">
+          <select className="dropdown" value={demSource3D} onChange={this.updateDemSource3D}>
+            {Object.keys(DEM_3D_SOURCES).map((opt) => (
+              <option className="dem-source-3d-option" key={`dem-source-3d-${opt}`} value={opt}>
+                {DEM_3D_SOURCES[opt]}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    );
+  }
+
   renderSpeckleFilterSelection() {
-    const { speckleFilter } = this.state;
+    const { speckleFilter } = this.props.effects;
     const speckleFilterIndex = findSpeckleFilterIndex(this.props.supportedSpeckleFilters, speckleFilter);
 
     return (
@@ -665,19 +693,68 @@ export class EOBEffectsPanel extends React.Component {
   }
 
   renderOrthorectificationSelection() {
-    const { orthorectification } = this.state;
-
+    const { orthorectification, backscatterCoeff } = this.props.effects;
+    // Disable Layer default and "Disabled" orthorectification options when BackscatterCoeff.GAMMA0_TERRAIN
+    const disableNonOrthorectification = backscatterCoeff === BackscatterCoeff.GAMMA0_TERRAIN;
+    const optionValue = orthorectification ?? '';
     return (
       <div className="effect-container effect-with-dropdown">
-        <span className="effect-name">{t`Orthorectification`}</span>
+        <span className="effect-name">
+          {t`Orthorectification`}
+          <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+            {t`Orthorectification creates a planimetrically correct image. Specify the DEM used for Orthorectification process here.`}
+            <br />
+            <br />
+            <ExternalLink href="https://docs.sentinel-hub.com/api/latest/data/sentinel-1-grd/#processing-options">
+              {t`More information`}
+            </ExternalLink>
+          </HelpTooltip>
+        </span>
         <div className="effect-dropdown">
-          <select className="dropdown" onChange={this.updateOrthorectification} value={orthorectification}>
-            <option key="default" value="">
+          <select className="dropdown" onChange={this.updateOrthorectification} value={optionValue}>
+            <option key="default" value="" disabled={disableNonOrthorectification}>
               Layer default
             </option>
             {Object.keys(ORTHORECTIFICATION_OPTIONS).map((opt) => (
-              <option key={opt} value={opt}>
+              <option
+                key={opt}
+                value={opt}
+                disabled={disableNonOrthorectification && opt === DISABLED_ORTHORECTIFICATION}
+              >
                 {ORTHORECTIFICATION_OPTIONS[opt]}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    );
+  }
+
+  renderBackCoeff() {
+    const { backscatterCoeff } = this.props.effects;
+    const optionValue = backscatterCoeff ?? '';
+
+    return (
+      <div className="effect-container effect-with-dropdown">
+        <span className="effect-name">
+          {t`Backscatter coefficient`}
+          <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+            {t`Measurement values returned will be in the chosen backscatter coefficient. Radiometric terrain correction can be enabled by setting the Backscatter coefficient to gamma0_terrain; in this case orthorectification will be enabled using the DEM selected under Orthorectification.`}
+            <br />
+            <br />
+            <ExternalLink href="https://docs.sentinel-hub.com/api/latest/data/sentinel-1-grd/#processing-options">
+              {t`More information`}
+            </ExternalLink>
+          </HelpTooltip>
+        </span>
+        <div className="effect-dropdown">
+          <select className="dropdown" onChange={this.updateBackCoeff} value={optionValue}>
+            <option key="default" value={''}>
+              Layer default
+            </option>
+            {BACK_COEF_OPTIONS.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
               </option>
             ))}
           </select>
@@ -699,11 +776,14 @@ export class EOBEffectsPanel extends React.Component {
           }
         </div>
 
-        {(this.props.doesDatasetSupportSpeckleFilter || this.props.doesDatasetSupportOrthorectification) && (
+        {(this.props.doesDatasetSupportSpeckleFilter ||
+          this.props.doesDatasetSupportOrthorectification ||
+          this.props.doesDatasetSupportBackscatterCoeff) && (
           <>
             <div className="title">{t`Processing parameters`}</div>
             {this.props.doesDatasetSupportSpeckleFilter && this.renderSpeckleFilterSelection()}
             {this.props.doesDatasetSupportOrthorectification && this.renderOrthorectificationSelection()}
+            {this.props.doesDatasetSupportBackscatterCoeff && this.renderBackCoeff()}
             <hr />
           </>
         )}
@@ -736,6 +816,8 @@ export class EOBEffectsPanel extends React.Component {
         {this.props.doesDatasetSupportMinQa && this.renderMinQaSlider()}
 
         {this.props.doesDatasetSupportInterpolation && this.renderInterpolationSelection()}
+
+        {this.props.is3D && this.render3DDemSourceSelection()}
       </div>
     );
   }

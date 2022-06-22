@@ -1,28 +1,17 @@
 import React from 'react';
-import Codemirror from 'react-codemirror';
 import { fetchEvalscriptFromEvalscripturl } from '../../utils';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/dracula.css';
+import { CodeEditor, themeEoBrowserDark, themeEoBrowserLight } from '@sentinel-hub/evalscript-code-editor';
 import './EvalScriptInput.scss';
 import { t } from 'ttag';
-import { JSHINT } from 'jshint';
-
-require('codemirror/addon/lint/javascript-lint');
-require('codemirror/addon/lint/lint.css');
-require('codemirror/addon/lint/lint.js');
-
-window.JSHINT = JSHINT;
 
 export class EvalScriptInput extends React.Component {
   constructor(props) {
     super(props);
-    const { evalscript, isEvalUrl, evalscripturl = '' } = props;
+    const { isEvalUrl, evalscripturl, evalscript } = props;
     this.state = {
-      evalscript,
       isEvalUrl,
       evalscripturl,
-      evalScriptFocused: false,
+      evalscript,
     };
   }
 
@@ -61,7 +50,6 @@ export class EvalScriptInput extends React.Component {
       .then((res) => {
         const { data: text } = res;
         this.updateCode(text);
-        this._CM.codeMirror.setValue(text);
         this.setState({ loading: false, success: true }, () => {
           this.onCallback();
           setTimeout(() => this.setState({ success: false }), 2000);
@@ -86,7 +74,7 @@ export class EvalScriptInput extends React.Component {
       return;
     }
 
-    this.props.onRefresh();
+    this.props.onRefreshEvalscript();
   };
 
   onCloseClick = () => {
@@ -96,38 +84,27 @@ export class EvalScriptInput extends React.Component {
   render() {
     const { error, loading, success, evalscript, evalscripturl, isEvalUrl } = this.state;
     const hasWarning = evalscripturl.length > 0 && !evalscripturl.startsWith('https://');
-    const options = {
-      lineNumbers: true,
-      mode: 'javascript',
-      lint: {
-        esversion: 6,
-      },
-      readOnly: !!isEvalUrl,
-      theme: `default${!!isEvalUrl ? ' readonly' : ''}`,
-      gutters: ['CodeMirror-lint-markers'],
-    };
     return (
-      <div style={{ clear: 'both' }}>
-        <div className="code-mirror-wrapper">
-          <div
-            className={`react-code-mirror${this.state.evalScriptFocused ? '-resizable' : '-not-resizable'}`}
-          >
-            <i className="fas fa-times"></i>
-            <Codemirror
-              value={evalscript || ''}
-              onChange={this.updateCode}
-              options={options}
-              ref={(el) => (this._CM = el)}
-              onFocusChange={() =>
-                !isEvalUrl && this.setState({ evalScriptFocused: !this.state.evalScriptFocused })
-              }
-            />
-          </div>
+      <div>
+        <div className="code-editor-wrap">
+          <CodeEditor
+            themeDark={themeEoBrowserDark}
+            themeLight={themeEoBrowserLight}
+            value={evalscript || ''}
+            onChange={this.updateCode}
+            isReadOnly={isEvalUrl}
+            portalId="code_editor_portal"
+            zIndex={9999}
+            onRunEvalscriptClick={this.handleRefreshClick}
+            runEvalscriptButtonText={t`Refresh Evalscript`}
+            runningEvalscriptButtonText={t`Refreshing Evalscript`}
+            readOnlyMessage={t`Editor is in read only mode. Uncheck "Load script from URL" to edit the code`}
+          />
         </div>
         {isEvalUrl && (
           <div className="info-uncheck-url">
             <i className="fa fa-info" />
-            {t`Uncheck Load script from URL to edit the code`}
+            {t`Uncheck Load script from URL to edit the code.`}
           </div>
         )}
         {error && (
@@ -183,7 +160,7 @@ export class EvalScriptInput extends React.Component {
             disabled={this.refreshEvalscriptDisabled()}
           >
             <i className="fa fa-refresh" />
-            {t`Refresh`}
+            {t`Refresh Evalscript`}
           </button>
         </div>
       </div>

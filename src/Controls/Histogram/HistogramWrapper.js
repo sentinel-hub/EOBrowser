@@ -10,8 +10,8 @@ import store, { notificationSlice } from '../../store';
 
 import {
   checkIfIndexOutputPresent,
-  MISSING_INDEX_OUTPUT_ERROR,
-  NO_INDEX_LAYER_SELECTED,
+  getMissingIndexOutputError,
+  getNoIndexLayerOutputError,
 } from './Histogram.utils';
 
 import {
@@ -90,7 +90,7 @@ class HistogramWrapper extends Component {
     if (!isIndexOutputPresent) {
       this.setState({
         histogramEnabled: false,
-        errorMessage: customSelected ? MISSING_INDEX_OUTPUT_ERROR : NO_INDEX_LAYER_SELECTED,
+        errorMessage: customSelected ? getMissingIndexOutputError() : getNoIndexLayerOutputError(),
       });
       return;
     }

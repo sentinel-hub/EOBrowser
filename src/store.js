@@ -12,6 +12,7 @@ import {
   EXPORT_FORMAT,
   SEARCH_PANEL_TABS,
 } from './const';
+import { DEMInstanceType } from '@sentinel-hub/sentinelhub-js';
 
 export const aoiSlice = createSlice({
   name: 'aoi',
@@ -142,6 +143,7 @@ export const authSlice = createSlice({
       userdata: null,
       token_expiration: null,
       access_token: null,
+      terms_privacy_accepted: false,
     },
     anonToken: null,
   },
@@ -158,6 +160,9 @@ export const authSlice = createSlice({
     },
     setAnonToken: (state, action) => {
       state.anonToken = action.payload;
+    },
+    setTermsPrivacyAccepted: (state, action) => {
+      state.terms_privacy_accepted = action.payload;
     },
   },
 });
@@ -313,6 +318,8 @@ export const visualizationSlice = createSlice({
     downsampling: undefined,
     speckleFilter: undefined,
     orthorectification: undefined,
+    backscatterCoeff: undefined,
+    demSource3D: DEMInstanceType.MAPZEN,
     error: undefined,
   },
   reducers: {
@@ -396,6 +403,12 @@ export const visualizationSlice = createSlice({
     setOrthorectification: (state, action) => {
       state.orthorectification = action.payload;
     },
+    setBackScatterCoeff: (state, action) => {
+      state.backscatterCoeff = action.payload;
+    },
+    setDemSource3D: (state, action) => {
+      state.demSource3D = action.payload;
+    },
     setEffects: (state, action) => {
       if (action.payload.gainEffect !== undefined) {
         state.gainEffect = action.payload.gainEffect;
@@ -436,6 +449,9 @@ export const visualizationSlice = createSlice({
       if (action.payload.orthorectification !== undefined) {
         state.orthorectification = action.payload.orthorectification;
       }
+      if (action.payload.demSource3D !== undefined) {
+        state.demSource3D = action.payload.demSource3D;
+      }
     },
     setError: (state, action) => {
       state.error = action.payload;
@@ -454,6 +470,8 @@ export const visualizationSlice = createSlice({
       state.downsampling = undefined;
       state.speckleFilter = undefined;
       state.orthorectification = undefined;
+      state.backscatterCoeff = undefined;
+      state.demSource3D = DEMInstanceType.MAPZEN;
     },
     resetRgbEffects: (state) => {
       state.redRangeEffect = [0, 1];
@@ -494,7 +512,6 @@ export const visualizationSlice = createSlice({
       if (action.payload.visibleOnMap !== undefined) {
         state.visibleOnMap = action.payload.visibleOnMap;
       }
-
       if (action.payload.gainEffect !== undefined) {
         state.gainEffect = action.payload.gainEffect;
       }
@@ -534,6 +551,12 @@ export const visualizationSlice = createSlice({
       if (action.payload.orthorectification !== undefined) {
         state.orthorectification = action.payload.orthorectification;
       }
+      if (action.payload.demSource3D !== undefined) {
+        state.demSource3D = action.payload.demSource3D;
+      }
+      if (action.payload.backscatterCoeff !== undefined) {
+        state.backscatterCoeff = action.payload.backscatterCoeff;
+      }
     },
     reset: (state) => {
       state.fromTime = undefined;
@@ -559,6 +582,8 @@ export const visualizationSlice = createSlice({
       state.downsampling = undefined;
       state.speckleFilter = undefined;
       state.orthorectification = undefined;
+      state.backscatterCoeff = undefined;
+      state.demSource3D = DEMInstanceType.MAPZEN;
     },
   },
 });
@@ -740,6 +765,7 @@ export const timelapseSlice = createSlice({
     previewFileUrl: null,
     size: null,
     format: EXPORT_FORMAT.gif,
+    fadeDuration: 0.5,
   },
   reducers: {
     set: (state, action) => {
@@ -763,6 +789,10 @@ export const timelapseSlice = createSlice({
       state.transition = 'none';
       state.pins = [];
       state.timelapseSharePreviewMode = false;
+      state.previewFileUrl = null;
+      state.size = null;
+      state.format = EXPORT_FORMAT.gif;
+      state.fadeDuration = 0.5;
     },
     toggleTimelapseAreaPreview: (state) => {
       state.displayTimelapseAreaPreview = !state.displayTimelapseAreaPreview;
@@ -823,6 +853,9 @@ export const timelapseSlice = createSlice({
     },
     setFormat: (state, action) => {
       state.format = action.payload;
+    },
+    setFadeDuration: (state, action) => {
+      state.fadeDuration = action.payload;
     },
   },
 });

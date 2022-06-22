@@ -13,12 +13,13 @@ import { checkIfIndexOutputInEvalscript } from '../../utils/parseEvalscript';
 import { reqConfigMemoryCache, MAX_SH_IMAGE_SIZE } from '../../const';
 import { refetchWithDefaultToken } from '../../utils/fetching.utils';
 
-export const MISSING_INDEX_OUTPUT_ERROR =
+export const getMissingIndexOutputError = () =>
   t`The setup function in the evalscript does not contain the correct output. The output needs to include:` +
   `\n\n` +
   `{ id: "index", bands: 1, sampleType: "FLOAT32" }`;
 
-export const NO_INDEX_LAYER_SELECTED = t`You are visualising a layer that doesn't represent an index. The histogram feature currently only works for index layers (e.g. NDVI).\n\n Please select an index layer to use this feature.`;
+export const getNoIndexLayerOutputError = () =>
+  t`You are visualising a layer that doesn't represent an index. The histogram feature currently only works for index layers (e.g. NDVI).\n\n Please select an index layer to use this feature.`;
 
 export async function getLayerName(visualizationUrl, layerId, cancelToken) {
   try {
@@ -126,7 +127,7 @@ export async function getDataForLayer(props, cancelToken) {
 
     const isIndexOutputPresent = checkIfIndexOutputPresent(props);
     if (!isIndexOutputPresent) {
-      throw new Error(NO_INDEX_LAYER_SELECTED);
+      throw new Error(getNoIndexLayerOutputError());
     }
 
     const blobs = await getTiffImages(layer, props, cancelToken);
@@ -145,7 +146,7 @@ export async function getDataForIndex(props, cancelToken) {
 
     const isIndexOutputPresent = checkIfIndexOutputPresent(props);
     if (!isIndexOutputPresent) {
-      throw new Error(MISSING_INDEX_OUTPUT_ERROR);
+      throw new Error(getMissingIndexOutputError());
     }
 
     const dsh = getDataSourceHandler(datasetId);

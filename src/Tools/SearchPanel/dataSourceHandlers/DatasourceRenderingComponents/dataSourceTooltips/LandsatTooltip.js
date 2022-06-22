@@ -69,8 +69,8 @@ const getLandsat7ETMAWS_Markdown = () => t`
 **Common Usage**: Monitoring of vegetation, ice and water resources, change detection and the creation of land use - land cover maps.
 `;
 
-const getLandsat8AWS_Markdown = () => t`
-**Landsat 8** is the most recently launched Landsat satellite (provided by NASA/USGS) and carries the Operational Land Imager (OLI) and the Thermal Infrared Sensor (TIRS) instruments, with 9 optical and 2 thermal bands. These two sensors provide seasonal coverage of the global landmass.
+const getLandsat89AWS_Markdown = () => t`
+The **Landsat 8-9** collection contains imagery from the two most recently launched Landsat satellites (Landsat 8 and Landsat 9, provided by NASA/USGS). Both carry the Operational Land Imager (OLI) and the Thermal Infrared Sensor (TIRS), with 9 optical and 2 thermal bands. These two sensors provide seasonal coverage of the global landmass.
 
 **Spatial resolution:** 15 m for the panchromatic band and 30 m for the rest (the thermal bands is re-sampled from 100 m).
 
@@ -166,7 +166,8 @@ export const Landsat45AWSTooltip = () => {
   return renderTooltip({
     source: getLandsat45AWS_Markdown(),
     credits: 'USGS',
-    creditsLink: 'https://landsat.gsfc.nasa.gov/landsat-4-5/tm',
+    creditsLink:
+      'https://www.usgs.gov/centers/eros/science/usgs-eros-archive-landsat-archives-landsat-4-5-thematic-mapper-tm-level-1-data',
   });
 };
 
@@ -188,13 +189,25 @@ export const Landsat7ETMAWSTooltip = () => {
   });
 };
 
-export const Landsat8AWSTooltip = () => {
-  return renderTooltip({
-    source: getLandsat8AWS_Markdown(),
-    credits: 'USGS',
-    creditsLink: 'https://www.usgs.gov/core-science-systems/nli/landsat/landsat-8',
-  });
+export const Landsat89AWSTooltip = () => {
+  return (
+    <div>
+      <div className="data-source-group-tooltip-description">
+        <ReactMarkdown source={getLandsat89AWS_Markdown()} />
+      </div>
+      <div className="data-source-group-tooltip-credits">
+        <div>{t`Credits:`}</div>
+        <div>
+          <ExternalLink href={'https://www.usgs.gov/landsat-missions/landsat-8'}>USGS - L8</ExternalLink>
+        </div>
+        <div>
+          <ExternalLink href={'https://www.usgs.gov/landsat-missions/landsat-9'}>USGS - L9</ExternalLink>
+        </div>
+      </div>
+    </div>
+  );
 };
+
 export const LandsatEOCloudTooltip = () => {
   return renderTooltip({
     source: getLandsatEOCloud_Markdown(),

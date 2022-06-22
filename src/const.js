@@ -5,11 +5,17 @@ import {
   CacheTarget,
   SpeckleFilterType,
   DEMInstanceTypeOrthorectification,
+  BackscatterCoeff,
+  DEMInstanceType,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
 import { DEFAULT_THEMES } from './assets/default_themes.js';
 import { EDUCATION_THEMES } from './assets/education_themes.js';
+import {
+  DEM_COPERNICUS_30,
+  DEM_COPERNICUS_90,
+} from './Tools/SearchPanel/dataSourceHandlers/dataSourceConstants.js';
 
 export const ModalId = {
   IMG_DOWNLOAD: 'ImgDownload',
@@ -19,6 +25,7 @@ export const ModalId = {
   PINS_STORY_BUILDER: 'PinsStoryBuilder',
   TERRAIN_VIEWER: 'TerrainViewer',
   PRIVATE_THEMEID_LOGIN: 'PrivateThemeIdLogin',
+  TERMS_AND_PRIVACY_CONSENT: 'TermsAndPrivacy',
 };
 
 export const MODE_THEMES_LIST = 'mode';
@@ -67,6 +74,7 @@ export const S1_DEFAULT_PARAMS = {
   resolution: Resolution.HIGH,
   orthorectification: '',
   speckleFilter: { type: SpeckleFilterType.NONE },
+  backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
 };
 
 export const reqConfigMemoryCache = {
@@ -107,11 +115,32 @@ export const ORTHORECTIFICATION_OPTIONS = {
   [DEMInstanceTypeOrthorectification.COPERNICUS_90]: t`Yes` + ' (Copernicus 90m DEM)',
 };
 
+export const BACK_COEF_OPTIONS = [
+  BackscatterCoeff.BETA0,
+  BackscatterCoeff.GAMMA0_ELLIPSOID,
+  BackscatterCoeff.GAMMA0_TERRAIN,
+  BackscatterCoeff.SIGMA0_ELLIPSOID,
+];
+
+export const DEM_3D_SOURCES = {
+  [DEMInstanceType.MAPZEN]: 'Mapzen DEM',
+  NASA_ASTER_GDEM: 'NASA ASTER GDEM',
+  [DEMInstanceType.COPERNICUS_30]: 'Copernicus 30m DEM',
+  [DEMInstanceType.COPERNICUS_90]: 'Copernicus 90m DEM',
+};
+
+export const DEM_3D_CUSTOM_TO_DATASOURCE = {
+  [DEMInstanceType.COPERNICUS_30]: DEM_COPERNICUS_30,
+  [DEMInstanceType.COPERNICUS_90]: DEM_COPERNICUS_90,
+};
+
+export const EQUATOR_LENGTH = 40075016.685578488;
+
 export const DATASOURCES = {
   S1: 'Sentinel-1',
   S2: 'Sentinel-2',
   S3: 'Sentinel-3',
-  S5: 'Sentinel-5',
+  S5: 'Sentinel-5P',
   MODIS: 'MODIS',
   PROBAV: 'Proba-V',
   EOCLOUD_LANDSAT: 'LandsatEOCloud',
@@ -159,4 +188,9 @@ export const defaultEffects = {
   downsampling: '',
   speckleFilter: '',
   orthorectification: '',
+  demSource3D: DEMInstanceType.MAPZEN,
 };
+
+export const STATISTICS_MANDATORY_OUTPUTS = ['eobrowserStats', 'dataMask'];
+
+export const LOCAL_STORAGE_PRIVACY_CONSENT_KEY = 'eobrowser-privacy-consent';

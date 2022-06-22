@@ -3,12 +3,16 @@ import { PREDEFINED_LAYERS_METADATA } from '../../assets/layers_metadata';
 /*
 returns legend definition from layers_metadata.json for provided datasource and layer.
 */
-export function findMatchingLayerMetadata(datasourceId, layerId, themeId) {
+export function findMatchingLayerMetadata(datasourceId, layerId, themeId, time) {
   const layerMetadata = PREDEFINED_LAYERS_METADATA.find(
     (l) =>
       !!l.match.find(
         (m) =>
-          m.datasourceId === datasourceId && m.layerId === layerId && (m.theme ? m.theme === themeId : true),
+          m.datasourceId === datasourceId &&
+          m.layerId === layerId &&
+          (m.theme ? m.theme === themeId : true) &&
+          (time && m.timeTo ? time <= m.timeTo : true) &&
+          (time && m.timeFrom ? time >= m.timeFrom : true),
       ),
   );
   return layerMetadata;

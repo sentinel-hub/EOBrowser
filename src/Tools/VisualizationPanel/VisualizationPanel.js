@@ -7,13 +7,16 @@ import EOBAdvancedHolder, {
   CUSTOM_VISUALIZATION_URL_ROUTES,
 } from '../../junk/EOBAdvancedHolder/EOBAdvancedHolder';
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
-import { LayersFactory, BBox, CRS_EPSG4326, Interpolator } from '@sentinel-hub/sentinelhub-js';
+import {
+  LayersFactory,
+  BBox,
+  CRS_EPSG4326,
+  Interpolator,
+  BackscatterCoeff,
+  DEMInstanceTypeOrthorectification,
+} from '@sentinel-hub/sentinelhub-js';
 import Rodal from 'rodal';
 import { t } from 'ttag';
-//Those 3 needs to be imported for synax highlighting to work properly.
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/dracula.css';
 import { withRouter } from 'react-router-dom';
 import proj4 from 'proj4';
 
@@ -31,7 +34,7 @@ import { DATASOURCES, EDUCATION_MODE, reqConfigMemoryCache } from '../../const';
 import { VisualizationTimeSelect } from '../../components/VisualizationTimeSelect/VisualizationTimeSelect';
 
 import VisualizationErrorPanel from './VisualizationErrorPanel';
-import { YYYY_MM_REGEX } from '../SearchPanel/dataSourceHandlers/PlanetBasemapDataSourceHandler';
+import planetUtils from '../SearchPanel/dataSourceHandlers/planetNicfi.utils';
 
 class VisualizationPanel extends Component {
   defaultState = {
@@ -368,16 +371,9 @@ class VisualizationPanel extends Component {
       let newSelectedLayer = allLayers[0];
 
       if (selectedLayer) {
-        const selectedLayerDateArr = selectedLayer.match(YYYY_MM_REGEX);
         // If NDVI layer is currently selected and date changes, we will get a new list of layers
         // Find the NDVI from the new list and select this layer as the selected layer
-        newSelectedLayer = allLayers.find((l) => {
-          const currentLayerDateArr = l.layerId.match(YYYY_MM_REGEX);
-          return (
-            l.layerId.replace(currentLayerDateArr.join('_'), '_DATE_') ===
-            selectedLayer.replace(selectedLayerDateArr.join('_'), '_DATE_')
-          );
-        });
+        newSelectedLayer = planetUtils.getNewLayerFromDateChange(allLayers, selectedLayer);
       }
 
       this.setState(
@@ -705,6 +701,23 @@ class VisualizationPanel extends Component {
     store.dispatch(visualizationSlice.actions.setOrthorectification(x ? x : undefined));
   };
 
+  onUpdateBackScatterCoeff = (x) => {
+    // set orthorectify to true and demInstance to COPERNICUS10/30, for Radiometric terrian correct (GAMMA)_TERRAIN)
+    if (x === BackscatterCoeff.GAMMA0_TERRAIN) {
+      store.dispatch(
+        visualizationSlice.actions.setOrthorectification(DEMInstanceTypeOrthorectification.COPERNICUS),
+      );
+    } else {
+      store.dispatch(visualizationSlice.actions.setOrthorectification(undefined));
+    }
+
+    store.dispatch(visualizationSlice.actions.setBackScatterCoeff(x ? x : undefined));
+  };
+
+  updateDemSource3D = (x) => {
+    store.dispatch(visualizationSlice.actions.setDemSource3D(x ? x : undefined));
+  };
+
   resetEffects = () => {
     store.dispatch(visualizationSlice.actions.resetEffects());
   };
@@ -753,6 +766,14 @@ class VisualizationPanel extends Component {
     return false;
   };
 
+  doesDatasetSupportBackscatterCoeff = (datasetId) => {
+    const dsh = getDataSourceHandler(datasetId);
+    if (dsh) {
+      return dsh.supportsBackscatterCoeff(datasetId);
+    }
+    return false;
+  };
+
   toggleSocialSharePanel = () => {
     this.setState((prevState) => ({
       displaySocialShareOptions: !prevState.displaySocialShareOptions,
@@ -795,6 +816,7 @@ class VisualizationPanel extends Component {
       downsampling,
       speckleFilter,
       orthorectification,
+      backscatterCoeff,
       customSelected,
       selectedThemeId,
     } = this.props;
@@ -826,6 +848,7 @@ class VisualizationPanel extends Component {
       upsampling,
       downsampling,
       speckleFilter,
+      backscatterCoeff,
       orthorectification,
       themeId: selectedThemeId,
     };
@@ -913,6 +936,8 @@ class VisualizationPanel extends Component {
       downsampling,
       speckleFilter,
       orthorectification,
+      backscatterCoeff,
+      demSource3D,
       datasetId,
       zoomToTileConfig,
       is3D,
@@ -945,6 +970,8 @@ class VisualizationPanel extends Component {
       downsampling: this.props.downsampling,
       speckleFilter: this.props.speckleFilter,
       orthorectification: this.props.orthorectification,
+      backscatterCoeff: this.props.backscatterCoeff,
+      demSource3D: this.props.demSource3D,
     };
 
     return (
@@ -980,14 +1007,18 @@ class VisualizationPanel extends Component {
               upsampling: upsampling,
               downsampling: downsampling,
               speckleFilter: speckleFilter,
+              backscatterCoeff: backscatterCoeff,
               orthorectification: orthorectification,
+              demSource3D: demSource3D,
             }}
+            is3D={is3D}
             isFISLayer={false}
             defaultMinQaValue={this.getDefaultMinQa(datasetId)}
             doesDatasetSupportMinQa={this.doesDatasetSupportMinQa(datasetId)}
             doesDatasetSupportInterpolation={this.doesDatasetSupportInterpolation(datasetId)}
             doesDatasetSupportSpeckleFilter={this.doesDatasetSupportSpeckleFilter(datasetId)}
             doesDatasetSupportOrthorectification={this.doesDatasetSupportOrthorectification(datasetId)}
+            doesDatasetSupportBackscatterCoeff={this.doesDatasetSupportBackscatterCoeff(datasetId)}
             interpolations={supportedInterpolations}
             supportedSpeckleFilters={supportedSpeckleFilters}
             canApplySpeckleFilter={canApplySpeckleFilter}
@@ -1004,6 +1035,8 @@ class VisualizationPanel extends Component {
             onUpdateDownsampling={this.updateDownsampling}
             onUpdateSpeckleFilter={this.updateSpeckleFilter}
             onUpdateOrthorectification={this.updateOrthorectification}
+            onUpdateBackScatterCoeff={this.onUpdateBackScatterCoeff}
+            onUpdateDemSource3D={this.updateDemSource3D}
             onResetEffects={this.resetEffects}
             onResetRgbEffects={this.resetRgbEffects}
           />
@@ -1042,7 +1075,7 @@ class VisualizationPanel extends Component {
                 onUpdateScript={this.onUpdateScript}
                 onDataFusionChange={this.onDataFusionChange}
                 onBack={this.onBack}
-                onCodeMirrorRefresh={this.onVisualizeEvalscript}
+                onEvalscriptRefresh={this.onVisualizeEvalscript}
                 onCompositeChange={this.onCompositeChange}
                 onIndexScriptChange={this.onIndexScriptChange}
                 supportsIndex={supportsIndex}
@@ -1085,6 +1118,8 @@ const mapStoreToProps = (store) => ({
   downsampling: store.visualization.downsampling,
   speckleFilter: store.visualization.speckleFilter,
   orthorectification: store.visualization.orthorectification,
+  backscatterCoeff: store.visualization.backscatterCoeff,
+  demSource3D: store.visualization.demSource3D,
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,
   selectedThemeId: store.themes.selectedThemeId,

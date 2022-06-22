@@ -9,7 +9,9 @@ export const SUPPORTED_LANGUAGES = [
   { langCode: 'de', text: 'Deutsch', flagCode: 'DE' },
   { langCode: 'et', text: 'Eesti keel', flagCode: 'EE' },
   { langCode: 'es', text: 'español', flagCode: 'ES' },
+  { langCode: 'fr', text: 'Français', flagCode: 'FR' },
   { langCode: 'el', text: 'ελληνικά', flagCode: 'GR' },
+  { langCode: 'lv', text: 'latviešu', flagCode: 'LV' },
   { langCode: 'pl', text: 'polski', flagCode: 'PL' },
   { langCode: 'sl', text: 'slovenščina', flagCode: 'SI' },
 ];

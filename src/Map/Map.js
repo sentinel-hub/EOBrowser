@@ -161,6 +161,7 @@ class Map extends React.Component {
       downsampling,
       speckleFilter,
       orthorectification,
+      backscatterCoeff,
       selectedLanguage,
       auth,
       displayTimelapseAreaPreview,
@@ -281,6 +282,7 @@ class Map extends React.Component {
                   downsampling={downsampling}
                   speckleFilter={speckleFilterProp}
                   orthorectification={orthorectification}
+                  backscatterCoeff={backscatterCoeff}
                   accessToken={getAppropriateAuthToken(auth, selectedThemeId)}
                   getMapAuthToken={getGetMapAuthToken(auth)}
                   onTileImageError={this.onTileError}
@@ -317,6 +319,7 @@ class Map extends React.Component {
                   downsampling,
                   speckleFilterProp,
                   orthorectification,
+                  backscatterCoeff,
                   themeId,
                 } = p;
                 const dsh = getDataSourceHandler(datasetId);
@@ -372,6 +375,7 @@ class Map extends React.Component {
                     downsampling={downsampling}
                     speckleFilter={speckleFilterProp}
                     orthorectification={orthorectification}
+                    backscatterCoeff={backscatterCoeff}
                     pane={SENTINELHUB_LAYER_PANE_ID}
                     progress={this.progress}
                     accessToken={getAppropriateAuthToken(auth, themeId)}
@@ -536,6 +540,7 @@ const mapStoreToProps = (store) => {
     downsampling: store.visualization.downsampling,
     speckleFilter: store.visualization.speckleFilter,
     orthorectification: store.visualization.orthorectification,
+    backscatterCoeff: store.visualization.backscatterCoeff,
     error: store.visualization.error,
     comparedLayers: store.compare.comparedLayers,
     comparedOpacity: store.compare.comparedOpacity,

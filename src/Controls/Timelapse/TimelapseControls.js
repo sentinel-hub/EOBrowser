@@ -7,7 +7,7 @@ import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
 import { getDatasetLabel } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { isMobile } from 'react-device-detect';
 
-const PERIODS_FOR_BEST_IMG = [
+const getPeriodsForBestImg = () => [
   { value: 'orbit', text: t`orbit` },
   { value: 'day', text: t`day` },
   { value: 'isoWeek', text: t`week` },
@@ -75,7 +75,7 @@ export class TimelapseControls extends Component {
           </div>
 
           <div className="select-period-options">
-            {PERIODS_FOR_BEST_IMG.map((p) => (
+            {getPeriodsForBestImg().map((p) => (
               <label key={p.value} className={`period ${selectedPeriod === p.value ? 'selected' : ''}`}>
                 <input
                   type="radio"

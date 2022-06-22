@@ -2,7 +2,7 @@ import React from 'react';
 import geo_area from '@mapbox/geojson-area';
 import { t } from 'ttag';
 
-import { FisChartLink } from '../FisChartLink';
+import FisChartLink from '../FisChartLink';
 import { getLoggedInErrorMsg } from '../ConstMessages';
 import { AOI_SHAPE } from '../../const';
 
@@ -36,7 +36,7 @@ export class EOBAOIPanelButton extends React.Component {
         // eslint-disable-next-line
         <a
           onClick={() => this.props.onDrawShape(AOI_SHAPE.rectangle)}
-          title={t`Draw rectangular area of interest for image downloads`}
+          title={t`Draw rectangular area of interest for image downloads and timelapse`}
         >
           <i className={`far fa-square`} />
         </a>
@@ -46,7 +46,7 @@ export class EOBAOIPanelButton extends React.Component {
         // eslint-disable-next-line
         <a
           onClick={() => this.props.onDrawShape(AOI_SHAPE.polygon)}
-          title={t`Draw polygonal area of interest for image downloads`}
+          title={t`Draw polygonal area of interest for image downloads and timelapse`}
         >
           <i className={`fa fa-pencil`} />
         </a>

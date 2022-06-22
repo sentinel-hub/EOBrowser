@@ -141,7 +141,7 @@ const Result = ({
             <i className="fa fa-info" />
             {product.id}
           </div>
-          <div title={t`Accuisition date`}>
+          <div title={t`Acquisition date`}>
             <i className="fa fa-calendar" />
             {formatDate(product.date)}
           </div>

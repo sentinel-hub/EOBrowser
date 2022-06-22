@@ -71,7 +71,7 @@ export function calcBboxFromXY({
   return coords;
 }
 
-function convertToWgs84(xy) {
+export function convertToWgs84(xy) {
   const R2D = 180 / Math.PI;
   const A = 6378137.0;
 

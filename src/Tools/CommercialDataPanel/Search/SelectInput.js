@@ -10,11 +10,19 @@ export const SelectInput = ({ input, params, onChangeHandler }) => (
     >
       {!!input.nullValues && <option value="">{input.nullValueLabel ? input.nullValueLabel : ''}</option>}
 
-      {Object.keys(input.options).map((option, index) => (
-        <option key={index} value={input.options[option].value}>
-          {input.options[option].label}
-        </option>
-      ))}
+      {input.options &&
+        Array.isArray(input.options) &&
+        input.options
+          .filter((option) => {
+            return input.filterOptions ? input.filterOptions(option, params) : true;
+          })
+          .map((option) => {
+            return (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            );
+          })}
     </select>
   </div>
 );

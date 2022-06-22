@@ -1,6 +1,6 @@
 import React from 'react';
 import { t } from 'ttag';
-import { FisChartLink } from '../FisChartLink';
+import FisChartLink from '../FisChartLink';
 import { getLoggedInErrorMsg } from '../ConstMessages';
 import '../EOBPanel.scss';
 

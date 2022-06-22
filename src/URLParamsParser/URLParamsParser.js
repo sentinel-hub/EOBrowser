@@ -164,6 +164,8 @@ class URLParamsParser extends React.Component {
       downsampling,
       speckleFilter,
       orthorectification,
+      demSource3D,
+      backscatterCoeff,
       dataFusion,
       handlePositions,
       gradient,
@@ -180,6 +182,10 @@ class URLParamsParser extends React.Component {
       parsedLat = DEFAULT_LAT_LNG.lat;
     }
     store.dispatch(mainMapSlice.actions.setPosition({ zoom: parsedZoom, lat: parsedLat, lng: parsedLng }));
+    const redCurveEffectDecoded = redCurve ? JSON.parse(decodeURI(redCurve)) : undefined;
+    const greenCurveEffectDecoded = greenCurve ? JSON.parse(decodeURI(greenCurve)) : undefined;
+    const blueCurveEffectDecoded = blueCurve ? JSON.parse(decodeURI(blueCurve)) : undefined;
+
     const newVisualizationParams = {
       datasetId: datasetId,
       fromTime: fromTime ? moment.utc(fromTime) : null,
@@ -195,14 +201,14 @@ class URLParamsParser extends React.Component {
       greenRangeEffect: greenRange ? JSON.parse(greenRange) : undefined,
       blueRangeEffect: blueRange ? JSON.parse(blueRange) : undefined,
 
-      redCurveEffect: redCurve
-        ? { points: JSON.parse(redCurve), values: computeNewValuesFromPoints(JSON.parse(redCurve)) }
+      redCurveEffect: redCurveEffectDecoded
+        ? { points: redCurveEffectDecoded, values: computeNewValuesFromPoints(redCurveEffectDecoded) }
         : undefined,
-      greenCurveEffect: greenCurve
-        ? { points: JSON.parse(greenCurve), values: computeNewValuesFromPoints(JSON.parse(greenCurve)) }
+      greenCurveEffect: greenCurveEffectDecoded
+        ? { points: greenCurveEffectDecoded, values: computeNewValuesFromPoints(greenCurveEffectDecoded) }
         : undefined,
-      blueCurveEffect: blueCurve
-        ? { points: JSON.parse(blueCurve), values: computeNewValuesFromPoints(JSON.parse(blueCurve)) }
+      blueCurveEffect: blueCurveEffectDecoded
+        ? { points: blueCurveEffectDecoded, values: computeNewValuesFromPoints(blueCurveEffectDecoded) }
         : undefined,
 
       minQa: minQa ? parseInt(minQa) : undefined,
@@ -210,6 +216,8 @@ class URLParamsParser extends React.Component {
       downsampling: downsampling,
       speckleFilter: speckleFilter ? JSON.parse(speckleFilter) : undefined,
       orthorectification: orthorectification ? JSON.parse(orthorectification) : undefined,
+      demSource3D: demSource3D ? JSON.parse(demSource3D) : undefined,
+      backscatterCoeff: backscatterCoeff ? JSON.parse(backscatterCoeff) : undefined,
       dataFusion: dataFusion ? parseDataFusion(dataFusion, datasetId) : undefined,
       ...getNewDatasetPropertiesIfDeprecatedDatasetId(datasetId, visualizationUrl),
     };

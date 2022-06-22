@@ -93,8 +93,8 @@ class Highlights extends Component {
 
   render() {
     const { highlights, isThemeSelected, is3D } = this.props;
-    const noHighlightsInThemeMsg = t`This theme has no highlights`;
-    const noThemeSelected = t`Please select a theme`;
+    const noHighlightsInThemeMsg = t`This theme has no highlights.`;
+    const noThemeSelected = t`Please select a theme.`;
 
     return (
       <div className="highlights-panel">

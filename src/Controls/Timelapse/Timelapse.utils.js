@@ -18,9 +18,10 @@ import {
 import SHlogo from '../../junk/EOBCommon/assets/shLogo.png';
 import copernicus from '../../junk/EOBCommon/assets/copernicus.png';
 import { addOverlays } from '../../junk/EOB3TimelapsePanel/imageOverlays';
-import { TRANSITION } from '../../const';
+import { DATASOURCES, TRANSITION } from '../../const';
+import planetUtils from '../../Tools/SearchPanel/dataSourceHandlers/planetNicfi.utils';
 
-export const DEFAULT_IMAGE_WIDTH = 512;
+export const DEFAULT_IMAGE_DIMENSION = 512;
 
 export function getTimelapseBounds(pixelBounds, zoom, aoi) {
   if (aoi && aoi.bounds) {
@@ -46,13 +47,18 @@ export function getTimelapseBounds(pixelBounds, zoom, aoi) {
 }
 
 export function determineDefaultImageSize(pixelBounds, zoom, aoi) {
-  const bounds = getTimelapseBounds(pixelBounds, zoom, aoi);
-  const dimenstions = getDimensionsInMeters(bounds);
-  const ratio = dimenstions.width / dimenstions.height;
+  const timelapseBounds = getTimelapseBounds(pixelBounds, zoom, aoi);
+  const timelapseDimensions = getDimensionsInMeters(timelapseBounds);
+
+  const ratio = timelapseDimensions.width / timelapseDimensions.height;
+  const totalPixels = DEFAULT_IMAGE_DIMENSION * DEFAULT_IMAGE_DIMENSION;
+
+  const height = Math.sqrt(totalPixels / ratio);
+  const width = height * ratio;
 
   return {
-    width: DEFAULT_IMAGE_WIDTH,
-    height: Math.round(DEFAULT_IMAGE_WIDTH / ratio),
+    width: Math.round(width),
+    height: Math.round(height),
     ratio,
   };
 }
@@ -136,9 +142,9 @@ export async function fetchTimelapseImage(params) {
   };
 
   let blob = await fetchImage(layer, options).catch((err) => {
-    console.warn(err);
+    console.warn('Unable to fetch image', err);
+    throw err;
   });
-  if (!blob) return;
 
   if (showBorders) {
     const bbox = constructBBoxFromBounds(bounds);
@@ -359,14 +365,14 @@ export const findNextActiveImageIndex = (
   canWeFilterByCoverage,
   maxCCPercentAllowed,
   minCoverageAllowed,
-  activeImage,
+  activeImageIndex,
 ) => {
   if (!images) {
     return null;
   }
 
   for (let i = 1; i <= images.length; i++) {
-    const index = (activeImage + i) % images.length;
+    const index = (activeImageIndex + i) % images.length;
     if (
       isImageApplicable(
         images[index],
@@ -418,7 +424,10 @@ export const generateS3PreSignedPost = async (access_token, filename) => {
 
     const res = await axios.get(url, requestParams);
     return res.data;
-  } catch (e) {}
+  } catch (err) {
+    console.warn('Error generating presigned post', err);
+    throw err;
+  }
 };
 
 export const uploadFileToS3 = async (preSignedPost, file) => {
@@ -430,50 +439,40 @@ export const uploadFileToS3 = async (preSignedPost, file) => {
     postData.append('file', file);
 
     await axios.post(preSignedPost.url, postData);
-  } catch (e) {}
+  } catch (err) {
+    console.warn('Error uploading file to S3', err);
+    throw err;
+  }
 };
 
 export const getS3FileUrl = (res) => {
   return res.url + res.fields.key;
 };
 
-export const generateTimelapseWithGifshot = ({
-  applicableImageUrls,
-  datasetId,
-  timelapseFPS,
-  size,
-  progress,
-}) => {
+export const generateTimelapseWithGifshot = ({ imageUrls, datasetId, timelapseFPS, size, progress }) => {
   return new Promise((resolve, reject) => {
-    progress({
-      generatingTimelapse: true,
-      generatingTimelapseProgress: null,
-    });
+    progress(0);
 
-    if (applicableImageUrls.length === 0) {
+    if (imageUrls.length === 0) {
       reject();
     }
 
     gifshot.createGIF(
       {
-        images: applicableImageUrls,
+        images: imageUrls,
         gifWidth: size && size.width,
         gifHeight: size && size.height,
         interval: 1 / timelapseFPS,
         numWorkers: 4,
         progressCallback: (percent) => {
-          progress({ generatingTimelapseProgress: percent });
+          progress(percent);
         },
       },
       (obj) => {
         if (obj.error) {
-          progress({ generatingTimelapse: false });
           reject();
         } else {
-          progress({
-            generatingTimelapse: false,
-            generatingTimelapseProgress: null,
-          });
+          progress(1);
 
           const file = new File([obj.image], generateTimelapseFilename(datasetId) + '.gif', {
             type: obj.image.type,
@@ -486,18 +485,16 @@ export const generateTimelapseWithGifshot = ({
 };
 
 export const generateTimelapseWithFFMPEG = ({
-  applicableImageUrls,
+  imageUrls,
   datasetId,
   timelapseFPS,
+  fadeDuration,
   transition,
   size,
   progress,
 }) => {
   return new Promise((resolve, reject) => {
-    progress({
-      generatingTimelapse: true,
-      generatingTimelapseProgress: null,
-    });
+    progress(0);
 
     const worker = new Worker('ffmpeg.js/ffmpeg-worker-mp4.js');
     worker.onmessage = (e) => {
@@ -513,7 +510,7 @@ export const generateTimelapseWithFFMPEG = ({
           break;
         case 'stderr':
           console.log(msg.data);
-          updateProgress(msg.data, applicableImageUrls.length);
+          updateProgress(msg.data, imageUrls.length);
           break;
         case 'done':
           console.log(msg.data);
@@ -529,7 +526,7 @@ export const generateTimelapseWithFFMPEG = ({
     const runFFmpegProcess = () => {
       worker.postMessage({
         type: 'run',
-        MEMFS: applicableImageUrls.map((url, index) => ({
+        MEMFS: imageUrls.map((url, index) => ({
           name: `img${`00${index}`.slice(-3)}.png`,
           data: convertDataURIToBinary(url),
         })),
@@ -542,7 +539,7 @@ export const generateTimelapseWithFFMPEG = ({
       // https://superuser.com/questions/624567/how-to-create-a-video-from-images-using-ffmpeg
       return [
         '-r',
-        (1 / timelapseFPS).toString(),
+        timelapseFPS.toString(),
         '-i',
         'img%03d.png',
         '-vf',
@@ -556,7 +553,7 @@ export const generateTimelapseWithFFMPEG = ({
     const ffmpegArgumentsTransitionFade = () => {
       // https://superuser.com/questions/833232/create-video-with-5-images-with-fadein-out-effect-in-ffmpeg/
       return [
-        ...applicableImageUrls.flatMap((url, index) => [
+        ...imageUrls.flatMap((url, index) => [
           '-loop',
           '1',
           '-t',
@@ -564,22 +561,20 @@ export const generateTimelapseWithFFMPEG = ({
           '-i',
           `img${`00${index}`.slice(-3)}.png`,
         ]),
-        ...(applicableImageUrls.length > 1
+        ...(imageUrls.length > 1
           ? [
               '-filter_complex',
               [
-                ...applicableImageUrls.map(
-                  (url, index) => `[${index}]crop=${width}:${height}[cropped${index}]`,
-                ),
-                ...applicableImageUrls
+                ...imageUrls.map((url, index) => `[${index}]crop=${width}:${height}[cropped${index}]`),
+                ...imageUrls
                   .slice(0, -1)
                   .map(
                     (url, index) =>
-                      `[cropped${index + 1}]fade=d=${0.5 / timelapseFPS}:t=in:alpha=1,setpts=PTS-STARTPTS+${
-                        (index + 1) / timelapseFPS
-                      }/TB[fade${index + 1}]`,
+                      `[cropped${index + 1}]fade=d=${
+                        fadeDuration / timelapseFPS
+                      }:t=in:alpha=1,setpts=PTS-STARTPTS+${(index + 1) / timelapseFPS}/TB[fade${index + 1}]`,
                   ),
-                ...applicableImageUrls
+                ...imageUrls
                   .slice(0, -1)
                   .map(
                     (url, index) =>
@@ -589,7 +584,7 @@ export const generateTimelapseWithFFMPEG = ({
                   ),
               ].join(';'),
               '-map',
-              `[slice${applicableImageUrls.length - 1}]`,
+              `[slice${imageUrls.length - 1}]`,
             ]
           : []),
         '-pix_fmt',
@@ -603,15 +598,12 @@ export const generateTimelapseWithFFMPEG = ({
       if (parsedProgress) {
         const outputFPS = transition === TRANSITION.none ? 1 : 25;
         const totalFrames = (totalImages * outputFPS) / timelapseFPS;
-        progress({ generatingTimelapseProgress: Math.min(parsedProgress[1] / totalFrames, 1) });
+        progress(Math.min(parsedProgress[1] / totalFrames, 1));
       }
     };
 
     const doneFFmpegProcess = (msg) => {
-      progress({
-        generatingTimelapse: false,
-        generatingTimelapseProgress: null,
-      });
+      progress(1);
 
       if (msg.data?.MEMFS[0]?.data?.length > 0) {
         const file = new File([msg.data.MEMFS[0].data], generateTimelapseFilename(datasetId) + '.mp4', {
@@ -643,4 +635,16 @@ export const generateTimelapseFilename = (datasetId) => {
 
 const floorToEven = (value) => {
   return Math.floor(value / 2) * 2;
+};
+
+// We need to get get a new layer for each flyover if the datasource is PLANET NICFI as we cant change the date per PLANET NICFI layer
+export const getFlyOverVisualization = async (visualization, flyover) => {
+  const dsh = getDataSourceHandler(visualization.datasetId);
+  const isPlanetNicfi = dsh && dsh.datasource === DATASOURCES.PLANET_NICFI;
+  return {
+    ...visualization,
+    ...(isPlanetNicfi && {
+      layer: await planetUtils.getSameLayerWithDifferentDate(visualization.layer.layerId, flyover.fromTime),
+    }),
+  };
 };

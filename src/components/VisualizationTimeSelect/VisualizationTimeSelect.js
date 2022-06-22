@@ -8,6 +8,7 @@ import './VisualizationTimeSelect.scss';
 export class VisualizationTimeSelect extends Component {
   state = {
     timespanExpanded: false,
+    maxCloudCover: 100,
   };
 
   updateTimespan = (fromTime, toTime) => {
@@ -39,7 +40,6 @@ export class VisualizationTimeSelect extends Component {
       minDate,
       onQueryDatesForActiveMonth,
       showNextPrev,
-      maxCloudCover,
       fromTime,
       toTime,
       timespanSupported,
@@ -47,7 +47,7 @@ export class VisualizationTimeSelect extends Component {
       hasCloudCoverage,
     } = this.props;
 
-    const { timespanExpanded } = this.state;
+    const { timespanExpanded, maxCloudCover } = this.state;
     if (!toTime) {
       return null;
     }
@@ -93,7 +93,7 @@ export class VisualizationTimeSelect extends Component {
                   showNextPrevDateArrows={showNextPrev}
                   onQueryDatesForActiveMonth={onQueryFlyoversForActiveMonth}
                   hasCloudCoverFilter={true}
-                  setMaxCloudCover={(value) => this.setState({ setMaxCloudCover: value })}
+                  setMaxCloudCover={(value) => this.setState({ maxCloudCover: value })}
                   maxCloudCover={maxCloudCover}
                 />
               ) : (
