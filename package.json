@@ -79,7 +79,7 @@
     "three": "^0.120.1",
     "ttag": "^1.7.22",
     "turf-inside": "^3.0.12",
-    "urijs": "^1.18.1",
+    "urijs": "^1.19.11",
     "wellknown": "^0.5.0"
   },
   "scripts": {
