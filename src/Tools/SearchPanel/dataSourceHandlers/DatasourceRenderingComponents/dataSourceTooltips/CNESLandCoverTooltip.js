@@ -20,7 +20,8 @@ const CNESLandCoverTooltip = () => (
     <div className="data-source-group-tooltip-credits">
       <div>{t`Credits:`}</div>
       <div>
-        <ExternalLink href="https://www.theia-land.fr/en/product/land-cover-map/">Theia</ExternalLink>
+        <ExternalLink href="https://www.theia-land.fr/en/product/land-cover-map/">Theia</ExternalLink>,{' '}
+        <ExternalLink href="https://www.cesbio.cnrs.fr/">CESBIO</ExternalLink>
       </div>
     </div>
   </div>

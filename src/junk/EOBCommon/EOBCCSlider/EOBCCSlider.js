@@ -25,7 +25,7 @@ export class EOBCCSlider extends React.Component {
             min={this.props.min}
             max={this.props.max}
             step={1}
-            defaultValue={this.props.cloudCoverPercentage}
+            value={this.props.cloudCoverPercentage}
             onChange={this.props.onChange}
           />
         </div>

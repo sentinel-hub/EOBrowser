@@ -16,24 +16,25 @@ import './CommercialDataPanel.scss';
 import Accordion from '../../components/Accordion/Accordion';
 import Quotas from './Quotas/Quotas';
 import { Results } from './Results/Results';
-import Orders from './Orders/Orders';
-import OrderOptions, { OrderType } from './OrderOptions/OrderOptions';
+import Transactions from './Transactions/Transactions';
+import TransactionOptions from './TransactionOptions/TransactionOptions';
 import Search from './Search/Search';
 import { providerSpecificSearchParameters } from './Search/config';
-import { CollectionSelectionType } from './OrderOptions/CollectionSelection';
-import { ConfirmationDialog } from './Orders/ConfirmationDialog';
+import { CollectionSelectionType } from './TransactionOptions/CollectionSelection';
+import { ConfirmationDialog } from './Transactions/ConfirmationDialog';
 import {
   calculateAOICoverage,
   getProvider,
   extractErrorMessage,
   createSearchParams,
 } from './commercialData.utils';
+import { TRANSACTION_TYPE, OrderType } from '../../const';
 import store, { commercialDataSlice } from '../../store';
 
 import moment from 'moment';
 import ReactMarkdown from 'react-markdown';
 
-const Tabs = {
+export const Tabs = {
   SEARCH_OPTIONS: 0,
   RESULTS: 1,
   ORDER_OPTIONS: 2,
@@ -89,7 +90,7 @@ const defaultSearchParams = {
   toTime: moment.utc().endOf('day'),
 };
 
-const defaultOrderOptions = {
+const defaultTransactionOptions = {
   name: null,
   type: OrderType.QUERY,
   limit: 10,
@@ -149,13 +150,14 @@ const CommercialDataPanel = ({
   const [actionInProgress, setActionInProgress] = useState(false);
   const [actionError, setActionError] = useState();
   const [selectedProducts, setSelectedProducts] = useState([]);
-  const [orderOptions, setOrderOptions] = useState(defaultOrderOptions);
-  const [activeOrderId, setActiveOrderId] = useState();
+  const [transactionOptions, setTransactionOptions] = useState(defaultTransactionOptions);
+  const [activeItemId, setActiveItemId] = useState();
   const [confirmAction, setConfirmAction] = useState(false);
   const [cachedPreviews, setCachedPreviews] = useState([]);
   const [quotas, setQuotas] = useState([]);
   const [areQuotasLoading, setAreQuotasLoading] = useState(false);
   const [quotasError, setQuotasError] = useState(null);
+  const [transactionType, setTransactionType] = useState(TRANSACTION_TYPE.ORDER);
 
   const setSearchResults = (payload) => {
     store.dispatch(commercialDataSlice.actions.setSearchResults(payload));
@@ -174,15 +176,22 @@ const CommercialDataPanel = ({
           });
         }
 
-        //reset order params on data provider change
+        //reset transaction params on data provider change
         if (prevState[name] !== value) {
-          setOrderOptions({
-            ...defaultOrderOptions,
+          setTransactionOptions({
+            ...defaultTransactionOptions,
             ...(value === TPDICollections.PLANET_SCOPE && {
               harmonizeTo: PlanetScopeHarmonization.NONE,
             }),
           });
         }
+        setTransactionType(TRANSACTION_TYPE.ORDER);
+
+        //reset selected products
+        setSelectedProducts([]);
+
+        //reset search results
+        setSearchResults([]);
       }
 
       //remove values for advanced options on disabling advanced options
@@ -200,8 +209,8 @@ const CommercialDataPanel = ({
       if (name === 'itemType') {
         newParams.productBundle = defaultPlanetProductBundle[value];
 
-        setOrderOptions({
-          ...orderOptions,
+        setTransactionOptions({
+          ...transactionOptions,
           harmonizeTo: isPlanetHarmonizationSupported(value, newParams.productBundle)
             ? defaultPlanetHarmonizeTo[value]
             : PlanetScopeHarmonization.NONE,
@@ -209,8 +218,8 @@ const CommercialDataPanel = ({
       }
 
       if (name === 'productBundle') {
-        setOrderOptions({
-          ...orderOptions,
+        setTransactionOptions({
+          ...transactionOptions,
           harmonizeTo: isPlanetHarmonizationSupported(newParams.itemType, value)
             ? defaultPlanetHarmonizeTo[newParams.itemType]
             : PlanetScopeHarmonization.NONE,
@@ -269,7 +278,7 @@ const CommercialDataPanel = ({
     }
   };
 
-  const onCreateOrder = async () => {
+  const onCreateTransaction = async () => {
     setActionInProgress(true);
     setActionError(null);
     try {
@@ -279,21 +288,23 @@ const CommercialDataPanel = ({
         authToken: user.access_token,
       };
 
-      const newOrder = await TPDI.createOrder(
+      const createFunction =
+        transactionType === TRANSACTION_TYPE.ORDER ? TPDI.createOrder : TPDI.createSubscription;
+      const newTransaction = await createFunction(
         getProvider(params.dataProvider),
-        orderOptions.name,
-        orderOptions.collectionId,
-        orderOptions.type === OrderType.PRODUCTS ? selectedProducts : null,
+        transactionOptions.name,
+        transactionOptions.collectionId,
+        transactionType === TRANSACTION_TYPE.ORDER && OrderType.PRODUCTS ? selectedProducts : null,
         params,
-        orderOptions,
+        transactionOptions,
         requestsConfig,
       );
+      toggleAccordion(Tabs.MY_ORDERS);
 
-      if (newOrder && newOrder.id) {
-        setActiveOrderId(newOrder.id);
+      if (newTransaction && newTransaction.id) {
+        setActiveItemId(newTransaction.id);
       }
       reset();
-      toggleAccordion(Tabs.MY_ORDERS);
     } catch (err) {
       console.error(err);
       setActionError(extractErrorMessage(err));
@@ -318,7 +329,7 @@ const CommercialDataPanel = ({
     if (!selectedProducts.includes(productId)) {
       setSelectedProducts([...selectedProducts, productId]);
     }
-    setOrderOptions({ ...orderOptions, type: OrderType.PRODUCTS });
+    setTransactionOptions({ ...transactionOptions, type: OrderType.PRODUCTS });
   };
 
   const removeProduct = (productId) => {
@@ -330,7 +341,7 @@ const CommercialDataPanel = ({
   const reset = () => {
     setSearchParams(defaultSearchParams);
     setSelectedProducts([]);
-    setOrderOptions(defaultOrderOptions);
+    setTransactionOptions(defaultTransactionOptions);
     store.dispatch(commercialDataSlice.actions.reset());
   };
 
@@ -364,7 +375,7 @@ const CommercialDataPanel = ({
       <Accordion
         open={true}
         hidden={selectedAccordion !== Tabs.SEARCH_OPTIONS}
-        title={t`Search options`}
+        title={t`Query`}
         toggleOpen={() => toggleAccordion(Tabs.SEARCH_OPTIONS)}
       >
         <Search
@@ -377,7 +388,7 @@ const CommercialDataPanel = ({
       </Accordion>
       <Accordion
         open={selectedAccordion === Tabs.RESULTS}
-        title={t`Results`}
+        title={t`Products`}
         toggleOpen={() => toggleAccordion(Tabs.RESULTS, true)}
       >
         <Results
@@ -399,33 +410,39 @@ const CommercialDataPanel = ({
       </Accordion>
       <Accordion
         open={selectedAccordion === Tabs.ORDER_OPTIONS}
-        title={t`Order options`}
+        title={t`Create order/subscription`}
         toggleOpen={() => toggleAccordion(Tabs.ORDER_OPTIONS)}
         disabled={!quotasEnabled}
       >
-        <OrderOptions
+        <TransactionOptions
           actionError={actionError}
           actionInProgress={actionInProgress}
-          onCreateOrder={onCreateOrder}
-          orderOptions={orderOptions}
+          onCreateTransaction={onCreateTransaction}
+          transactionOptions={transactionOptions}
           removeProduct={removeProduct}
           searchParams={searchParams}
           searchResults={searchResults}
           selectedProducts={selectedProducts}
-          setOrderOptions={setOrderOptions}
+          setTransactionOptions={setTransactionOptions}
           setConfirmAction={setConfirmAction}
+          transactionType={transactionType}
+          setTransactionType={setTransactionType}
+          toggleAccordion={toggleAccordion}
+          handleSearchParamChange={handleSearchParamChange}
         />
       </Accordion>
       <Accordion
         open={selectedAccordion === Tabs.MY_ORDERS}
-        title={t`My orders`}
+        title={t`My orders and subscriptions`}
         toggleOpen={() => toggleAccordion(Tabs.MY_ORDERS)}
         disabled={!quotasEnabled}
       >
-        <Orders
-          activeOrderId={activeOrderId}
-          setActiveOrderId={setActiveOrderId}
+        <Transactions
+          activeItemId={activeItemId}
+          setActiveItemId={setActiveItemId}
           setConfirmAction={setConfirmAction}
+          transactionType={transactionType}
+          setTransactionType={setTransactionType}
         />
       </Accordion>
       <Accordion

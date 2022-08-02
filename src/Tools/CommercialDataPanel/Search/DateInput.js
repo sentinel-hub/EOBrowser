@@ -8,9 +8,7 @@ const DateInput = ({ name, value, label, onChangeHandler, min, max, calendarCont
         <label title={label}>{label}</label>
         <DatePicker
           selectedDay={value}
-          calendarContainer={
-            calendarContainerRef && calendarContainerRef.current ? calendarContainerRef.current : null
-          }
+          calendarContainer={calendarContainerRef}
           setSelectedDay={(selectedDate) => onChangeHandler(name, selectedDate)}
           minDate={min}
           maxDate={max}

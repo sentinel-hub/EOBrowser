@@ -5,8 +5,8 @@ import banner from './banner_climate_change.png';
 import moment from 'moment';
 
 export default class Banner extends React.Component {
-  startDate = moment('2022-03-24');
-  endDate = moment.utc('2022-06-30');
+  startDate = moment('2022-06-30');
+  endDate = moment.utc('2022-09-11T21:59');
 
   render() {
     const shouldBeShown = moment().isBetween(this.startDate, this.endDate, 'minutes', '[]');

@@ -9,7 +9,7 @@ const readdir = util.promisify(fs.readdir);
 
 //joining path of directory
 const appDir = process.cwd();
-const translationsPath = path.join(appDir, 'src/translations');
+const translationsPath = path.join(appDir, 'public/translations');
 
 const filesListInDir = async (dir) => {
   try {

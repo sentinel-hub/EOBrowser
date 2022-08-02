@@ -132,7 +132,7 @@ class SearchPanel extends Component {
       return;
     } else if (!results.length) {
       this.setState({
-        searchError: { msg: t`No results found` },
+        searchError: { msg: t`No products found` },
       });
       return;
     }

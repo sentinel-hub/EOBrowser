@@ -23,6 +23,12 @@
       max-height: none;
       background-color: #525e73;
       text-transform: uppercase;
+
+      @media only screen and (max-height: 450px) {
+        & {
+          max-height: 200px;
+        }
+      }
     }
 
     li {

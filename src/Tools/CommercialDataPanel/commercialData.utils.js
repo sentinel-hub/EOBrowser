@@ -15,7 +15,7 @@ import {
 } from '@sentinel-hub/sentinelhub-js';
 import { constructBBoxFromBounds } from '../../Controls/ImgDownload/ImageDownload.utils.js';
 import store, { mainMapSlice, visualizationSlice, tabsSlice, themesSlice } from '../../store';
-import { USER_INSTANCES_THEMES_LIST } from '../../const';
+import { TRANSACTION_TYPE, USER_INSTANCES_THEMES_LIST, OrderType } from '../../const';
 import { getBoundsZoomLevel } from '../../utils/coords';
 
 const SH_ACCOUNT_TRIAL = 11000;
@@ -192,25 +192,28 @@ export const getBoundsAndLatLng = (geometry) => {
   return { bounds: bounds, lat: lat, lng: lng, zoom: zoom };
 };
 
-//fetch user orders
-export const fetchOrders = async (user) => {
-  let allOrders = [];
+// fetch tpdi transactions
+// based on transactionType, transactions can be an order or a subscribtion
+export const fetchTransactions = async (transactionType, user) => {
+  let allTransactions = [];
+  const fetchingFunction =
+    transactionType === TRANSACTION_TYPE.ORDER ? TPDI.getOrders : TPDI.getSubscriptions;
   if (user && !!user.access_token) {
     const requestsConfig = {
       authToken: user.access_token,
     };
-    let results = await TPDI.getOrders(null, requestsConfig, 100, null);
+    let results = await fetchingFunction(null, requestsConfig, 100, null);
     if (results && results.data) {
-      allOrders = [...results.data];
+      allTransactions = [...results.data];
     }
     while (results && results.links && results.links.nextToken) {
-      results = await TPDI.getOrders(null, requestsConfig, 100, results.links.nextToken);
+      results = await fetchingFunction(null, requestsConfig, 100, results.links.nextToken);
       if (results && results.data) {
-        allOrders = [...allOrders, ...results.data];
+        allTransactions = [...allTransactions, ...results.data];
       }
     }
   }
-  return allOrders;
+  return allTransactions;
 };
 
 //fetch all user BYOC layers
@@ -368,4 +371,35 @@ export function createSearchParams(searchParams, aoiGeometry) {
     params.constellation = AirbusConstellation.PHR;
   }
   return params;
+}
+
+export function getTransactionSize(aoiGeometry, options, selectedProducts = [], searchResults = []) {
+  if (!aoiGeometry) {
+    return 0;
+  }
+
+  if (!options) {
+    return (
+      Math.round((parseFloat(geo_area.geometry(aoiGeometry)) / 1000000) * Math.pow(10, 2)) / Math.pow(10, 2)
+    );
+  }
+
+  switch (options.type) {
+    case OrderType.PRODUCTS:
+      //order size is number of products * area
+      return selectedProducts && selectedProducts.length
+        ? (selectedProducts.length *
+            Math.round((parseFloat(geo_area.geometry(aoiGeometry)) / 1000000) * Math.pow(10, 2))) /
+            Math.pow(10, 2)
+        : 0;
+    case OrderType.QUERY:
+      //approx order size equals area of interest * number of results
+      return (
+        (searchResults.length *
+          Math.round((parseFloat(geo_area.geometry(aoiGeometry)) / 1000000) * Math.pow(10, 2))) /
+        Math.pow(10, 2)
+      );
+    default:
+      return 0;
+  }
 }

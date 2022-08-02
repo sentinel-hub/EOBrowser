@@ -1,5 +1,6 @@
 import { useLocale, addLocale } from 'ttag';
 import moment from 'moment';
+import axios from 'axios';
 
 export const LOCAL_STORAGE_KEY = 'eobrowser_lang';
 export const DEFAULT_LANG = 'en';
@@ -14,9 +15,12 @@ export const SUPPORTED_LANGUAGES = [
   { langCode: 'lv', text: 'latviešu', flagCode: 'LV' },
   { langCode: 'pl', text: 'polski', flagCode: 'PL' },
   { langCode: 'sl', text: 'slovenščina', flagCode: 'SI' },
+  { langCode: 'fi', text: 'suomi', flagCode: 'FI' },
+  { langCode: 'sv', text: 'Svenska', flagCode: 'SE' },
 ];
 
-export const changeLanguage = (locale) => {
+export const changeLanguage = async (locale) => {
+  await setTtagLocale(locale);
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useLocale(locale);
   saveLang(locale);
@@ -36,17 +40,14 @@ const saveLang = (locale) => {
   localStorage.setItem(LOCAL_STORAGE_KEY, locale);
 };
 
-export const initLanguages = () => {
-  SUPPORTED_LANGUAGES.forEach((locale) => {
-    if (locale.langCode !== DEFAULT_LANG) {
-      require(`moment/locale/${locale.langCode}`);
-      const ttagObject = require(`../translations/${locale.langCode}.po.json`);
-      if (process.env.REACT_APP_DEBUG_TRANSLATIONS === 'true') {
-        makeDebugTranslations(ttagObject);
-      }
-      addLocale(locale.langCode, ttagObject);
-    }
-  });
+const setTtagLocale = async (locale) => {
+  const { data: ttagObject } = await axios.get(
+    `${process.env.REACT_APP_ROOT_URL}translations/${locale}.po.json`,
+  );
+  if (process.env.REACT_APP_DEBUG_TRANSLATIONS === 'true') {
+    makeDebugTranslations(ttagObject);
+  }
+  addLocale(locale, ttagObject);
 };
 
 function makeDebugTranslations(ttagObject) {

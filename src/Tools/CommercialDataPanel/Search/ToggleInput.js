@@ -6,7 +6,7 @@ export const ToggleInput = ({ input, params, onChangeHandler }) => (
   <div key={`${params.dataProvider}-${input.id}`} className="row">
     <label title={input.label()}>{input.label()}</label>
     <Toggle
-      defaultChecked={params[input.id]}
+      checked={params[input.id]}
       icons={false}
       onChange={() => onChangeHandler(input.id, !params[input.id])}
     />

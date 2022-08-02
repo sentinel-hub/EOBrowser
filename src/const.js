@@ -194,3 +194,13 @@ export const defaultEffects = {
 export const STATISTICS_MANDATORY_OUTPUTS = ['eobrowserStats', 'dataMask'];
 
 export const LOCAL_STORAGE_PRIVACY_CONSENT_KEY = 'eobrowser-privacy-consent';
+
+export const TRANSACTION_TYPE = {
+  ORDER: 'ORDER',
+  SUBSCRIPTION: 'SUBSCRIPTION',
+};
+
+export const OrderType = {
+  PRODUCTS: 'PRODUCTS',
+  QUERY: 'QUERY',
+};

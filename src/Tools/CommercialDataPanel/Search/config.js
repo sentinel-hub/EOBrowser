@@ -16,7 +16,7 @@ import { createSelectOptions } from '../commercialData.utils';
 import { PlanetSupportedProductBundles } from '@sentinel-hub/sentinelhub-js';
 
 export const minDateRange = moment.utc('1982-01-01');
-export const maxDateRange = moment.utc().endOf('day');
+export const maxDateRange = moment.utc().add(10, 'years').endOf('year');
 
 export const providerSpecificSearchParameters = {
   [TPDICollections.PLANET_SCOPE]: [

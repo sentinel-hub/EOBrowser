@@ -179,7 +179,7 @@ export const Results = ({
   if (!searchResults || !searchResults.length) {
     return (
       <div className="commercial-data-results">
-        <NotificationPanel msg={t`No results found`} type="info" />
+        <NotificationPanel msg={t`No products found`} type="info" />
       </div>
     );
   }
@@ -195,7 +195,7 @@ export const Results = ({
             store.dispatch(commercialDataSlice.actions.setDisplaySearchResults(!displaySearchResults))
           }
         />
-        {t`Show results on map`}
+        {t`Show products on map`}
       </label>
 
       {results.map((product) => (
@@ -233,7 +233,7 @@ export const Results = ({
           closeOnEsc={true}
         >
           <div className="commercial-data-results-modal">
-            <div className="header">{t`Results`}</div>
+            <div className="header">{t`Products`}</div>
             <div className="commercial-data-results">
               {filterSearchResults(searchResults, provider, location).map((product) => (
                 <Result

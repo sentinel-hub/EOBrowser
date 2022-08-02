@@ -18,20 +18,13 @@ class LanguageSelector extends Component {
     }, {}),
   };
 
-  constructor(props) {
-    super(props);
-
-    changeLanguage(this.state.selectedLanguage.langCode);
-  }
-
-  onSelectFlag = (flagCode) => {
+  onSelectFlag = async (flagCode) => {
     const locale = SUPPORTED_LANGUAGES.find((lang) => lang.flagCode === flagCode);
     if (!locale) {
       return;
     }
-
+    await changeLanguage(locale.langCode);
     this.setState({ selectedLanguage: locale });
-    changeLanguage(locale.langCode);
     store.dispatch(languageSlice.actions.setLanguage(locale.langCode));
   };
 

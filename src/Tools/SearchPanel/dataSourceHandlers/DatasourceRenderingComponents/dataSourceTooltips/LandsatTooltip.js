@@ -198,9 +198,7 @@ export const Landsat89AWSTooltip = () => {
       <div className="data-source-group-tooltip-credits">
         <div>{t`Credits:`}</div>
         <div>
-          <ExternalLink href={'https://www.usgs.gov/landsat-missions/landsat-8'}>USGS - L8</ExternalLink>
-        </div>
-        <div>
+          <ExternalLink href={'https://www.usgs.gov/landsat-missions/landsat-8'}>USGS - L8</ExternalLink>,{' '}
           <ExternalLink href={'https://www.usgs.gov/landsat-missions/landsat-9'}>USGS - L9</ExternalLink>
         </div>
       </div>

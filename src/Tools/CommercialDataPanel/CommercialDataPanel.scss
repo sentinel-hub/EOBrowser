@@ -4,10 +4,11 @@
   color: $textCol;
   display: flex;
   flex-flow: column;
+  font-size: 14px;
 
   .accordion-title {
     font-weight: 500;
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .accordion-content {
@@ -24,6 +25,47 @@
         a {
           color: $primaryCol;
         }
+      }
+    }
+  }
+
+  .aoi-selection {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    i {
+      color: $primaryCol;
+      padding: 0 5px;
+      cursor: pointer;
+
+      &.disabled {
+        color: $textColor;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .dropdown {
+    padding: 7px 0 2px 0;
+  }
+
+  .transaction-type-selection {
+    .eob-btn {
+      margin-right: 20px;
+      background-color: $mainLight;
+      border-radius: 0;
+      border-bottom: 3px solid $mainLight;
+      color: #fff;
+      font-size: 14px;
+
+      &.selected {
+        border-bottom: 3px solid #b6bf00;
+      }
+
+      &:hover {
+        box-shadow: none;
+        color: #b6bf00;
       }
     }
   }
