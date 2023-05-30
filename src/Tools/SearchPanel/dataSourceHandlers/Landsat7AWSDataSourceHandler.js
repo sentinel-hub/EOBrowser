@@ -13,6 +13,7 @@ export default class Landsat7AWSETMDataSourceHandler extends LandsatDataSourceHa
   datasource = DATASOURCES.AWS_LANDSAT7_ETM;
   searchGroupLabel = 'Landsat 7 ETM+';
   searchGroupKey = 'landsat7-aws';
+  preselectedDatasets = new Set([AWS_LETML2]);
   datasetSearchLabels = {
     [AWS_LETML1]: t`Level 1`,
     [AWS_LETML2]: t`Level 2`,

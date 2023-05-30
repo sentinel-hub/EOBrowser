@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import Rodal from 'rodal';
 import { t } from 'ttag';
 import FileSaver from 'file-saver';
-import { CancelToken } from '@sentinel-hub/sentinelhub-js';
+import { CancelToken, CRS_EPSG3857, CRS_EPSG4326 } from '@sentinel-hub/sentinelhub-js';
 import JSZip from 'jszip';
+import moment from 'moment';
 
 import 'rodal/lib/rodal.css';
 
@@ -18,14 +19,15 @@ import {
   constructV3Evalscript,
   fetchImageFromParams,
   getSupportedImageFormats,
-  getImageDimensionFromBounds,
+  getImageDimensionFromBoundsWithCap,
   constructBasicEvalscript,
   isTiff,
   getNicename,
   fetchAndPatchImagesFromParams,
+  getImageDimensions,
 } from './ImageDownload.utils';
 import { findMatchingLayerMetadata } from '../../Tools/VisualizationPanel/legendUtils';
-import { IMAGE_FORMATS_INFO } from './consts';
+import { IMAGE_FORMATS, IMAGE_FORMATS_INFO, RESOLUTION_DIVISORS, RESOLUTION_OPTIONS } from './consts';
 import ImageDownloadErrorPanel from './ImageDownloadErrorPanel';
 import { ImageDownloadWarningPanel } from './ImageDownloadWarningPanel';
 import {
@@ -44,7 +46,8 @@ import { getTerrainViewerImage } from '../../TerrainViewer/TerrainViewer.utils';
 
 import './ImageDownload.scss';
 import { DATASOURCES, TABS as MAIN_TABS } from '../../const';
-import moment from 'moment';
+import { reprojectGeometry } from '../../utils/reproject';
+import { CUSTOM_TAG } from './AnalyticalForm';
 
 function ImageDownload(props) {
   const [selectedTab, setSelectedTab] = useState(props.is3D ? TABS.TERRAIN_VIEWER : TABS.BASIC);
@@ -55,17 +58,92 @@ function ImageDownload(props) {
   const [error, setError] = useState(null);
   const [warnings, setWarnings] = useState(null);
 
+  const hasAoi = !!props.aoiGeometry;
+
+  const [basicFormState, setBasicFormState] = useState({
+    showLegend: false,
+    showCaptions: true,
+    userDescription: '',
+    addMapOverlays: true,
+    cropToAoi: hasAoi,
+    drawAoiGeoToImg: false,
+    imageFormat: IMAGE_FORMATS.JPG,
+  });
+  const [analyticalFormState, setAnalyticalFormState] = useState({
+    imageFormat: IMAGE_FORMATS.JPG,
+    selectedCrs: hasAoi ? CRS_EPSG4326.authId : CRS_EPSG3857.authId,
+    showLogo: props.allowShowLogoAnalytical,
+    resolutionDivisor: 2,
+    selectedResolution: RESOLUTION_OPTIONS.MEDIUM,
+    selectedLayers: props.layerId ? [props.layerId] : props.customSelected ? [CUSTOM_TAG] : [],
+    selectedBands: [],
+    customSelected: props.customSelected,
+    addDataMask: false,
+    clipExtraBandsTiff: true,
+    customResolution: [10, 10],
+  });
+  const [printFormState, setPrintFormState] = useState({
+    showCaptions: true,
+    showLegend: false,
+    userDescription: '',
+    imageFormat: IMAGE_FORMATS.JPG,
+    resolutionDpi: 300,
+    imageWidthInches: 33.1,
+  });
+  const [terrainViewerFormState, setTerrainViewerFormState] = useState({
+    showLegend: false,
+    showCaptions: true,
+    userDescription: '',
+    imageFormat: IMAGE_FORMATS.JPG,
+    width: getMapDimensions(props.pixelBounds).width,
+    height: getMapDimensions(props.pixelBounds).height,
+  });
+
+  function updateSelectedLayers(layers) {
+    setAnalyticalFormState({
+      ...analyticalFormState,
+      selectedLayers: layers,
+    });
+
+    updateFormData('customSelected', layers.includes(CUSTOM_TAG), setAnalyticalFormState);
+  }
+
+  function updateSelectedBands(bands) {
+    setAnalyticalFormState({
+      ...analyticalFormState,
+      selectedBands: bands,
+    });
+  }
+
+  function updateFormData(field, newValue, setState) {
+    setState((prevState) => ({
+      ...prevState,
+      [field]: newValue,
+    }));
+  }
+
   let defaultWidth;
   let defaultHeight;
 
   if (props.is3D) {
     ({ width: defaultWidth, height: defaultHeight } = getMapDimensions(props.pixelBounds));
   } else {
-    ({ width: defaultWidth, height: defaultHeight } = getImageDimensionFromBounds(
-      props.bounds,
-      props.datasetId,
-    ));
+    if (selectedTab === TABS.BASIC) {
+      const { cropToAoi } = basicFormState;
+      const bounds = cropToAoi ? props.aoiBounds : props.mapBounds;
+      ({ width: defaultWidth, height: defaultHeight } = getImageDimensionFromBoundsWithCap(
+        bounds,
+        props.datasetId,
+      ));
+    } else {
+      const bounds = props.aoiBounds ? props.aoiBounds : props.mapBounds;
+      ({ width: defaultWidth, height: defaultHeight } = getImageDimensionFromBoundsWithCap(
+        bounds,
+        props.datasetId,
+      ));
+    }
   }
+
   const effects = constructGetMapParamsEffects(props);
   const getMapAuthToken = getGetMapAuthToken(props.auth);
 
@@ -107,16 +185,24 @@ function ImageDownload(props) {
     setError(null);
     setWarnings(null);
     const { pixelBounds, aoiGeometry, comparedLayers, selectedTabIndex } = props;
-    const { imageFormat } = formData;
+    const { imageFormat, cropToAoi } = formData;
 
     setLoadingImages(true);
     cancelToken = new CancelToken();
 
     let { width, height } = getMapDimensions(pixelBounds);
 
-    if (aoiGeometry) {
+    if (aoiGeometry && cropToAoi) {
       // defaultWidth and defaultHeight are in this case referring to bounds of the geometry
       // We keep one of the map dimensions and scale the other
+      const ratio = defaultWidth / defaultHeight;
+
+      if (ratio >= 1) {
+        height = Math.floor(width / ratio);
+      } else {
+        width = Math.floor(ratio * height);
+      }
+    } else {
       const ratio = defaultWidth / defaultHeight;
 
       if (ratio >= 1) {
@@ -131,9 +217,13 @@ function ImageDownload(props) {
       imageFormat: imageFormat,
       width: width,
       height: height,
-      geometry: aoiGeometry,
       getMapAuthToken: getMapAuthToken,
     };
+
+    if (cropToAoi) {
+      baseParams.geometry = aoiGeometry;
+    }
+
     if (effects) {
       baseParams.effects = effects;
     }
@@ -147,12 +237,15 @@ function ImageDownload(props) {
   }
 
   async function executeDownloadBasicCompared(props, formData, baseParams) {
-    const { imageFormat } = formData;
+    const { imageFormat, cropToAoi } = formData;
+    const bounds = cropToAoi ? props.aoiBounds : props.mapBounds;
+
     const { finalImage, finalFileName } = await fetchAndPatchImagesFromParams(
       {
         ...props,
         ...formData,
         ...baseParams,
+        bounds,
         comparedLayers: props.comparedLayers.map((cLayer) => {
           let newCLayer = Object.assign({}, cLayer);
           newCLayer.fromTime = cLayer.fromTime ? moment(cLayer.fromTime) : undefined;
@@ -172,9 +265,10 @@ function ImageDownload(props) {
 
   async function executeDownloadBasicVisualization(props, formData, baseParams) {
     let image;
-    const { imageFormat } = formData;
+    const { imageFormat, cropToAoi } = formData;
+    const bounds = cropToAoi ? props.aoiBounds : props.mapBounds;
     try {
-      image = await fetchImageFromParams({ ...props, ...formData, ...baseParams }, setWarnings);
+      image = await fetchImageFromParams({ ...props, ...formData, ...baseParams, bounds }, setWarnings);
     } catch (err) {
       setError(err);
       setLoadingImages(false);
@@ -203,11 +297,12 @@ function ImageDownload(props) {
       speckleFilter,
       orthorectification,
       backscatterCoeff,
-      bounds,
       aoiGeometry,
+      aoiBounds,
+      mapBounds,
     } = props;
     const {
-      resolutionDivisor,
+      selectedResolution,
       customSelected,
       selectedBands,
       selectedLayers,
@@ -216,12 +311,27 @@ function ImageDownload(props) {
       showLogo,
       addDataMask,
       clipExtraBandsTiff,
+      customResolution,
     } = formData;
-    const width = Math.floor(defaultWidth / resolutionDivisor);
-    const height = Math.floor(defaultHeight / resolutionDivisor);
+    const bounds = aoiGeometry ? aoiBounds : mapBounds;
+    const resolutionDivisor = RESOLUTION_DIVISORS[selectedResolution].value;
+    let width;
+    let height;
+    if (selectedResolution === RESOLUTION_OPTIONS.CUSTOM) {
+      const imageDimensions = getImageDimensions(bounds, customResolution, selectedCrs);
+      width = imageDimensions.width;
+      height = imageDimensions.height;
+    } else {
+      const imageDimensions = getImageDimensionFromBoundsWithCap(bounds, datasetId);
+      width = Math.floor(imageDimensions.width / resolutionDivisor);
+      height = Math.floor(imageDimensions.height / resolutionDivisor);
+    }
 
     const shouldClipExtraBands = clipExtraBandsTiff && isTiff(imageFormat);
-
+    const reprojectedGeom = reprojectGeometry(aoiGeometry, {
+      toCrs: selectedCrs,
+      fromCrs: CRS_EPSG4326.authId,
+    });
     cancelToken = new CancelToken();
 
     const requestsParams = [];
@@ -235,7 +345,7 @@ function ImageDownload(props) {
       fromTime: fromTime,
       toTime: toTime,
       bounds: bounds,
-      geometry: aoiGeometry,
+      geometry: reprojectedGeom,
       minQa: minQa,
       upsampling: upsampling,
       downsampling: downsampling,
@@ -286,11 +396,13 @@ function ImageDownload(props) {
     }
 
     for (let layer of selectedLayers) {
-      requestsParams.push({
-        ...baseParams,
-        layerId: layer,
-        effects: effects,
-      });
+      if (layer !== CUSTOM_TAG) {
+        requestsParams.push({
+          ...baseParams,
+          layerId: layer,
+          effects: effects,
+        });
+      }
     }
 
     const images = await Promise.all(
@@ -325,6 +437,7 @@ function ImageDownload(props) {
     const { aoiGeometry } = props;
     const { imageWidthInches, resolutionDpi, imageFormat, showCaptions, showLegend, userDescription } =
       formData;
+    const bounds = props.aoiGeometry ? props.aoiBounds : props.mapBounds;
 
     setError(null);
     setWarnings(null);
@@ -342,6 +455,7 @@ function ImageDownload(props) {
       imageFormat: imageFormat,
       width: width,
       height: height,
+      bounds: bounds,
       geometry: aoiGeometry,
       effects: effects,
       getMapAuthToken: getMapAuthToken,
@@ -513,14 +627,27 @@ function ImageDownload(props) {
           defaultHeight={defaultHeight}
           supportedImageFormats={supportedImageFormats}
           addingMapOverlaysPossible={!props.aoiGeometry} // applying map overlays currently relies on lat, lng and zoom, which aren't used when geometry is present
-          bounds={props.bounds}
+          aoiBounds={props.aoiBounds}
+          mapBounds={props.mapBounds}
+          zoom={props.zoom}
           datasetId={props.datasetId}
           isDataFusionEnabled={isDataFusionEnabled(props.dataFusion)}
           allowShowLogoAnalytical={!isGIBS}
           areEffectsSet={!!effects}
-          hasAOI={!!props.aoiGeometry}
+          hasAoi={!!props.aoiGeometry}
           is3D={props.is3D}
           isUserLoggedIn={isUserLoggedIn}
+          updateSelectedLayers={updateSelectedLayers}
+          updateFormData={updateFormData}
+          updateSelectedBands={updateSelectedBands}
+          basicFormState={basicFormState}
+          analyticalFormState={analyticalFormState}
+          printFormState={printFormState}
+          terrainViewerFormState={terrainViewerFormState}
+          setBasicFormState={setBasicFormState}
+          setAnalyticalFormState={setAnalyticalFormState}
+          setPrintFormState={setPrintFormState}
+          setTerrainViewerFormState={setTerrainViewerFormState}
         />
         <ImageDownloadErrorPanel error={error} />
       </div>
@@ -532,7 +659,8 @@ const mapStoreToProps = (store) => ({
   lat: store.mainMap.lat,
   lng: store.mainMap.lng,
   zoom: store.mainMap.zoom,
-  bounds: store.aoi.bounds ? store.aoi.bounds : store.mainMap.bounds,
+  aoiBounds: store.aoi.bounds,
+  mapBounds: store.mainMap.bounds,
   pixelBounds: store.mainMap.pixelBounds,
   enabledOverlaysId: store.mainMap.enabledOverlaysId,
   user: store.auth.user,
@@ -569,6 +697,7 @@ const mapStoreToProps = (store) => ({
   selectedThemeId: store.themes.selectedThemeId,
   auth: store.auth,
   is3D: store.mainMap.is3D,
+  terrainViewerSettings: store.terrainViewer.settings,
   terrainViewerId: store.terrainViewer.id,
 });
 

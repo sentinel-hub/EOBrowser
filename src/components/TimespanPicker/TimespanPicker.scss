@@ -15,7 +15,7 @@
     font-size: 14px;
     padding-top: 6px;
 
-    @media screen and (max-width: 450px) {
+    @media screen and (max-width: $breakpoint-450) {
       padding-bottom: 3px;
     }
   }
@@ -30,7 +30,7 @@
     margin-right: 5px;
     justify-content: space-between;
 
-    @media screen and (max-width: 450px) {
+    @media screen and (max-width: $breakpoint-450) {
       &.expanded {
         flex-direction: column;
         align-items: flex-start;

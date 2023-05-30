@@ -1,4 +1,6 @@
-import { MimeTypes, CRS_EPSG4326, CRS_EPSG3857 } from '@sentinel-hub/sentinelhub-js';
+import { MimeTypes, CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84 } from '@sentinel-hub/sentinelhub-js';
+import proj4 from 'proj4';
+import { createUtmCrsListPerHemisphere, HEMISPHERES } from '../../utils/utm';
 
 export const IMAGE_FORMATS = {
   JPG: 'jpg',
@@ -64,13 +66,39 @@ export const IMAGE_FORMATS_INFO = {
   },
 };
 
-export const RESOLUTION_DIVISORS = [
-  { text: 'LOW', value: 4 },
-  { text: 'MEDIUM', value: 2 },
-  { text: 'HIGH', value: 1 },
-];
+export const RESOLUTION_OPTIONS = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  CUSTOM: 'CUSTOM',
+};
 
-export const AVAILABLE_CRS = [
-  { id: CRS_EPSG3857.authId, text: 'Popular Web Mercator (EPSG:3857)', value: CRS_EPSG3857 },
-  { id: CRS_EPSG4326.authId, text: 'WGS 84 (EPSG:4326)', value: CRS_EPSG4326 },
-];
+export const RESOLUTION_DIVISORS = {
+  [RESOLUTION_OPTIONS.LOW]: { text: 'LOW', value: 4 },
+  [RESOLUTION_OPTIONS.MEDIUM]: { text: 'MEDIUM', value: 2 },
+  [RESOLUTION_OPTIONS.HIGH]: { text: 'HIGH', value: 1 },
+  [RESOLUTION_OPTIONS.CUSTOM]: { text: 'CUSTOM', value: undefined },
+};
+
+const southernUtmCrs = createUtmCrsListPerHemisphere(HEMISPHERES.S);
+const northernUtmCrs = createUtmCrsListPerHemisphere(HEMISPHERES.N);
+
+export const AVAILABLE_CRS = {
+  [CRS_EPSG3857.authId]: {
+    id: CRS_EPSG3857.authId,
+    text: 'Popular Web Mercator (EPSG:3857)',
+    projection: proj4('EPSG:3857'),
+  },
+  [CRS_EPSG4326.authId]: {
+    id: CRS_EPSG4326.authId,
+    text: 'WGS 84 (EPSG:4326)',
+    projection: proj4('EPSG:4326'),
+  },
+  'OGC:CRS84': {
+    id: CRS_WGS84.authId,
+    text: 'WGS 84',
+    projection: proj4('EPSG:4326'), // used as an alias for 4326
+  },
+  ...southernUtmCrs,
+  ...northernUtmCrs,
+};

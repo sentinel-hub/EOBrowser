@@ -191,7 +191,7 @@
   }
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: $breakpoint-900) {
   .pins-story-builder {
     .horizontal-stack {
       flex-direction: column;

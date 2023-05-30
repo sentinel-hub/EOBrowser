@@ -11,6 +11,7 @@ import { DATASOURCES } from '../../const';
 class ResultItem extends React.Component {
   state = {
     linksVisible: false,
+    previewError: false,
   };
 
   toggleLinksPanel = async () => {
@@ -25,6 +26,7 @@ class ResultItem extends React.Component {
 
   render() {
     const { sensingTime, datasetId, datasource, metadata } = this.props.tile;
+    const { previewError } = this.state;
     return (
       <div
         onMouseEnter={(e) => this.props.onHover(this.props.tile)}
@@ -33,12 +35,13 @@ class ResultItem extends React.Component {
       >
         <div className="img-info">
           <div className="img-btn">
-            {metadata.previewUrl ? (
+            {metadata.previewUrl && !previewError ? (
               <img
                 className="preview-image"
                 src={metadata.previewUrl}
                 alt={`${datasource} ${datasetId}`}
                 onClick={this.handleClick}
+                onError={() => this.setState({ previewError: true })}
               />
             ) : (
               <div className="no-image">{`${getDatasetLabel(datasetId)}`}</div>

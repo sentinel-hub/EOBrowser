@@ -10,7 +10,7 @@ import './CommercialData.scss';
 
 const getCommercialDataDescription = () => t`
 	
-Browse, visualise and analyze Very High Resolution (VHR) data directly in EO Browser, tapping into global archives of Planet [PlanetScope](https://docs.sentinel-hub.com/api/latest/data/planet-scope/), Airbus [Pleiades](https://docs.sentinel-hub.com/api/latest/data/airbus/pleiades/) and [SPOT](https://docs.sentinel-hub.com/api/latest/data/airbus/spot/) as well as [Maxar WorldView](https://docs.sentinel-hub.com/api/latest/data/maxar/world-view/).  
+Browse, visualise and analyze Very High Resolution (VHR) data directly in EO Browser, tapping into global archives of Planet [PlanetScope](https://docs.sentinel-hub.com/api/latest/data/planet-scope/) and [SkySat](https://docs.sentinel-hub.com/api/latest/data/planet/skysat/), Airbus [Pleiades](https://docs.sentinel-hub.com/api/latest/data/airbus/pleiades/) and [SPOT](https://docs.sentinel-hub.com/api/latest/data/airbus/spot/) as well as [Maxar WorldView](https://docs.sentinel-hub.com/api/latest/data/maxar/world-view/).  
 
 Observe the planet at resolutions starting at 3 meters and all the way up to 0.5 meters for a cost down to 0.9 EUR per km².
 
@@ -64,7 +64,7 @@ const CommercialData = ({ user, displayVideo }) => {
             allowFullScreen
           ></iframe>
         )}
-        <ReactMarkdown source={getCommercialDataDescription()} />
+        <ReactMarkdown source={getCommercialDataDescription()} linkTarget="_blank" />
       </div>
     );
   }

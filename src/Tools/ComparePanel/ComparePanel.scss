@@ -13,7 +13,7 @@
     justify-content: space-between;
     align-items: flex-end;
 
-    > div {
+    .button {
       cursor: pointer;
       color: #b6bf00;
       text-decoration: none;
@@ -31,7 +31,8 @@
     }
 
     .remove-all,
-    .add-all-pins {
+    .add-all-pins,
+    .share {
       cursor: pointer;
       color: $primaryCol;
       text-decoration: none;
@@ -46,6 +47,11 @@
         cursor: default;
         pointer-events: none;
       }
+    }
+
+    .social-networks {
+      position: absolute;
+      top: 140px;
     }
   }
 }

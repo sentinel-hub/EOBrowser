@@ -6,7 +6,7 @@ import logoCopernicus from './images/logo-tooltips-copernicus.png';
 import logoCreodias from './images/logo-tooltips-creodias.png';
 
 const s3Markdown = () => t`
-**Sentinel-3** mission main objective is to measure sea surface topography, sea and land surface temperature, ocean and land surface colour. Sentinel-3 has four different instruments on board. Data acquired by the Ocean and Land Colour Instrument (OLCI) and the Sea and Land Surface Temperature Instrument (SLSTR) are available in this platform.
+**Sentinel-3** mission's main objective is to measure the sea surface topography, the sea and land surface temperature, and the colour of the ocean and land surface. To achieve this goal, Sentinel-3 has a combination of different instruments on board. The most important instruments are the Ocean and Land Colour Instrument (OLCI), the SAR Radar Altimeter (SRAL) and the Sea and Land Surface Temperature Radiometer (SLSTR).
 
 **Data availability:** Since May 2016 onwards.
 `;

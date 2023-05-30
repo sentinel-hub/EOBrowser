@@ -5,9 +5,28 @@ import Rodal from 'rodal';
 import { t } from 'ttag';
 
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
-import { parseContent, getFileExtension, loadFileContent } from './EOBUploadGeoFile.utils';
+import {
+  parseContent,
+  getFileExtension,
+  loadFileContent,
+  UPLOAD_GEOMETRY_TYPE,
+} from './EOBUploadGeoFile.utils';
 
 import './EOBUploadGeoFile.scss';
+
+const getFileUploadText = (fileUploadType) => {
+  let fileUploadText;
+
+  switch (fileUploadType) {
+    case UPLOAD_GEOMETRY_TYPE.LINE:
+      fileUploadText = t`Upload a KML/KMZ, GPX, WKT (in EPSG:4326) or GEOJSON/JSON file.`;
+      break;
+    default:
+      fileUploadText = t`Upload a KML/KMZ, GPX, WKT (in EPSG:4326) or GEOJSON/JSON file to create area of interest. Area will be used for clipping when exporting an image.`;
+  }
+
+  return fileUploadText;
+};
 
 export class EOBUploadGeoFile extends Component {
   state = {
@@ -23,7 +42,7 @@ export class EOBUploadGeoFile extends Component {
         const format = getFileExtension(file.name);
         try {
           const data = await loadFileContent(file, format);
-          this.handleParseContent(data, format);
+          this.handleParseContent(data, this.props.type, format);
         } catch (e) {
           this.setState({ error: e.message });
         }
@@ -31,9 +50,9 @@ export class EOBUploadGeoFile extends Component {
     }
   };
 
-  handleParseContent = (content, format = null) => {
+  handleParseContent = (content, type = UPLOAD_GEOMETRY_TYPE.POLYGON, format = null) => {
     try {
-      let area = parseContent(content, format);
+      let area = parseContent(content, type, format);
       this.props.onUpload(area);
     } catch (e) {
       this.setState({ error: `Error: ${e.message}` });
@@ -42,7 +61,7 @@ export class EOBUploadGeoFile extends Component {
 
   render() {
     const fileUploadTitle = t`File upload`;
-    const fileUploadText = t`Upload a KML/KMZ, GPX, WKT (in EPSG:4326) or GEOJSON/JSON file to create area of interest. Area will be used for clipping when exporting an image.`;
+    const fileUploadText = getFileUploadText(this.props.type);
     const dropAFileString = t`Drop KML/KMZ, GPX, WKT (in EPSG:4326), GEOJSON/JSON file or search your computer`;
 
     const { inputGeometry } = this.state;
@@ -87,7 +106,7 @@ export class EOBUploadGeoFile extends Component {
             className="primary"
             fluid
             disabled={!inputGeometry}
-            onClick={() => this.handleParseContent(inputGeometry, null)}
+            onClick={() => this.handleParseContent(inputGeometry, this.props.type, null)}
           />
 
           {this.state.error && <p className="error">{this.state.error}</p>}

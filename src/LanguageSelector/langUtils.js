@@ -14,9 +14,11 @@ export const SUPPORTED_LANGUAGES = [
   { langCode: 'el', text: 'ελληνικά', flagCode: 'GR' },
   { langCode: 'lv', text: 'latviešu', flagCode: 'LV' },
   { langCode: 'pl', text: 'polski', flagCode: 'PL' },
+  { langCode: 'pt', text: 'português', flagCode: 'PT' },
   { langCode: 'sl', text: 'slovenščina', flagCode: 'SI' },
   { langCode: 'fi', text: 'suomi', flagCode: 'FI' },
   { langCode: 'sv', text: 'Svenska', flagCode: 'SE' },
+  { langCode: 'uk', text: 'Українська', flagCode: 'UA' },
 ];
 
 export const changeLanguage = async (locale) => {

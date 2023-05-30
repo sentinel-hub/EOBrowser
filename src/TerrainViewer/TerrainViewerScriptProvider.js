@@ -14,6 +14,7 @@ export default function TerrainViewerScriptProvider({ children }) {
 
   function on3DInitialized() {
     setScriptLoaded(true);
+    window.set3DTheme('EOB');
   }
 
   window.on3DInitialized = on3DInitialized;

@@ -10,6 +10,7 @@ import {
   isImageClearEnough,
   isImageSelected,
 } from './Timelapse.utils';
+import Loader from '../../Loader/Loader';
 
 export class TimelapseImages extends Component {
   renderImage(image, i) {
@@ -30,8 +31,10 @@ export class TimelapseImages extends Component {
       minCoverageAllowed,
     );
     const isSelected = isImageSelected(image);
-    const isClearEnough = isImageClearEnough(image, canWeFilterByClouds, maxCCPercentAllowed);
-    const isCoverageEnough = isImageCoverageEnough(image, canWeFilterByCoverage, minCoverageAllowed);
+    const isClearEnough =
+      image && isImageClearEnough(image.averageCloudCoverPercent, canWeFilterByClouds, maxCCPercentAllowed);
+    const isCoverageEnough =
+      image && isImageCoverageEnough(image.coveragePercent, canWeFilterByCoverage, minCoverageAllowed);
 
     return (
       <div className="image-container" key={i}>
@@ -50,7 +53,11 @@ export class TimelapseImages extends Component {
             />
           ) : null}
 
-          <img className="image" src={image.url} alt="" onClick={() => this.props.setImageToActive(i)} />
+          {image.url ? (
+            <img className="image" src={image.url} alt="" onClick={() => this.props.setImageToActive(i)} />
+          ) : isApplicable ? (
+            <Loader />
+          ) : null}
           <i className="image-date">{dateTimeDisplayFormat(image.toTime, selectedPeriod)}</i>
         </div>
         {isApplicable ? (
@@ -90,6 +97,7 @@ export class TimelapseImages extends Component {
       isSelectAllChecked,
       enableBorders,
       showBorders,
+      is3D,
     } = this.props;
 
     if (!images) {
@@ -101,7 +109,7 @@ export class TimelapseImages extends Component {
         <div className="container">
           <div className="filter-tools">
             {canWeFilterByCoverage ? (
-              <div className="ccslider">
+              <div className={`ccslider ${loadingImages && is3D ? 'disabled' : ''}`}>
                 {t`Min. tile coverage`}:
                 <EOBCCSlider
                   sliderWidth={100}
@@ -115,7 +123,7 @@ export class TimelapseImages extends Component {
 
           <div className="filter-tools">
             {canWeFilterByClouds ? (
-              <div className="ccslider">
+              <div className={`ccslider ${loadingImages && is3D ? 'disabled' : ''}`}>
                 {t`Max. cloud coverage`}:
                 <EOBCCSlider
                   sliderWidth={100}

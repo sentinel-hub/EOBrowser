@@ -9,6 +9,8 @@ import { NotificationPanel } from '../../junk/NotificationPanel/NotificationPane
 import ComparedLayer from './ComparedLayer';
 
 import './ComparePanel.scss';
+import { saveSharedPinsToServer } from '../Pins/Pin.utils';
+import SocialShare from '../../components/SocialShare/SocialShare';
 
 export const COMPARE_SPLIT = t`split`;
 export const COMPARE_OPACITY = t`opacity`;
@@ -16,13 +18,12 @@ const NO_COMPARE_LAYERS_MESSAGE = () => t`No layers to compare.`;
 
 class ComparePanel extends Component {
   state = {
-    compareMode: COMPARE_SPLIT,
+    displaySocialShareOptions: false,
+    compareSharedPinsId: null,
   };
 
   onChangeCompareMode = (e) => {
-    this.setState({
-      compareMode: e.target.value,
-    });
+    store.dispatch(compareLayersSlice.actions.setCompareMode(e.target.value));
     store.dispatch(compareLayersSlice.actions.resetOpacityAndClipping());
   };
 
@@ -60,22 +61,65 @@ class ComparePanel extends Component {
     store.dispatch(compareLayersSlice.actions.addComparedLayers(pins.map((p) => p.item)));
   };
 
+  shareCompare = () => {
+    const { comparedLayers } = this.props;
+
+    (async () => {
+      try {
+        const sharedPinsId = await saveSharedPinsToServer(comparedLayers);
+
+        this.setState(() => ({
+          compareSharedPinsId: sharedPinsId,
+          displaySocialShareOptions: true,
+        }));
+      } catch (e) {}
+    })();
+  };
+
+  toggleSocialSharePanel = () => {
+    this.setState((prevState) => ({
+      displaySocialShareOptions: !prevState.displaySocialShareOptions,
+    }));
+  };
+
   render() {
-    const { compareMode } = this.state;
-    const { comparedLayers, comparedOpacity, comparedClipping, pins } = this.props;
+    const { displaySocialShareOptions, compareSharedPinsId } = this.state;
+    const { compareMode, comparedLayers, comparedOpacity, comparedClipping, pins } = this.props;
 
     return (
       <div className="compare-panel">
         <div className="compare-panel-header">
-          <div className={`remove-all ${comparedLayers.length === 0 && 'disabled'}`} onClick={this.removeAll}>
+          <div
+            className={`button remove-all ${comparedLayers.length === 0 && 'disabled'}`}
+            onClick={this.removeAll}
+          >
             <i className="fa fa-trash" />
             {t`Remove all`}
           </div>
-          <div className={`add-all-pins ${pins.length === 0 && 'disabled'}`} onClick={this.addAllPins}>
+          <div className={`button add-all-pins ${pins.length === 0 && 'disabled'}`} onClick={this.addAllPins}>
             <i className="fa fa-plus-square" />
             {t`Add all pins`}
           </div>
-          <div className="compare-panel-toggle">
+          <div
+            className={`button share ${comparedLayers.length === 0 && 'disabled'}`}
+            onClick={this.shareCompare}
+          >
+            <i className="fa fa-share-alt" />
+            {t`Share`}
+          </div>
+          <SocialShare
+            extraParams={{
+              compareShare: true,
+              compareMode: compareMode,
+              compareSharedPinsId: compareSharedPinsId,
+              comparedOpacity: JSON.stringify(comparedOpacity),
+              comparedClipping: JSON.stringify(comparedClipping),
+            }}
+            displaySocialShareOptions={displaySocialShareOptions}
+            toggleSocialSharePanel={this.toggleSocialSharePanel}
+            datasetId={null}
+          />
+          <div className="button compare-panel-toggle">
             <select className="dropdown" value={compareMode} onChange={this.onChangeCompareMode}>
               <option key={0} value={COMPARE_SPLIT}>
                 {t`Split`}
@@ -110,6 +154,7 @@ class ComparePanel extends Component {
 }
 
 const mapStoreToProps = (store) => ({
+  compareMode: store.compare.compareMode,
   comparedLayers: store.compare.comparedLayers,
   comparedOpacity: store.compare.comparedOpacity,
   comparedClipping: store.compare.comparedClipping,

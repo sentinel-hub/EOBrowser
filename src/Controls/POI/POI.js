@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { EOBPOIPanelButton } from '../../junk/EOBPOIPanelButton/EOBPOIPanelButton';
+import EOBPOIPanelButton from '../../junk/EOBPOIPanelButton/EOBPOIPanelButton';
 import { connect } from 'react-redux';
 import L from 'leaflet';
 import '@geoman-io/leaflet-geoman-free';

@@ -5,10 +5,10 @@ import gifshot from 'gifshot';
 
 import {
   fetchImage,
-  getMapDimensions,
   getAppropriateApiType,
   constructBBoxFromBounds,
   getDimensionsInMeters,
+  getMapDimensions,
 } from '../ImgDownload/ImageDownload.utils';
 import {
   getDataSourceHandler,
@@ -17,40 +17,46 @@ import {
 
 import SHlogo from '../../junk/EOBCommon/assets/shLogo.png';
 import copernicus from '../../junk/EOBCommon/assets/copernicus.png';
-import { addOverlays } from '../../junk/EOB3TimelapsePanel/imageOverlays';
+import { convertToWgs84, wgs84ToMercator } from '../../junk/EOBCommon/utils/coords';
 import { DATASOURCES, TRANSITION } from '../../const';
 import planetUtils from '../../Tools/SearchPanel/dataSourceHandlers/planetNicfi.utils';
+import { drawBlobOnCanvas } from '@sentinel-hub/sentinelhub-js';
 
 export const DEFAULT_IMAGE_DIMENSION = 512;
 
-export function getTimelapseBounds(pixelBounds, zoom, aoi) {
+export function getTimelapseBounds(mapBounds, aoi) {
   if (aoi && aoi.bounds) {
     return aoi.bounds;
   }
 
-  const { width: mapWidth, height: mapHeight } = getMapDimensions(pixelBounds);
-  const selectedMapDimension = Math.min(mapWidth, mapHeight);
+  const rectMax = wgs84ToMercator(mapBounds.getNorthEast());
+  const rectMin = wgs84ToMercator(mapBounds.getSouthWest());
 
-  const { x, y } = pixelBounds.getCenter();
-  const halfDimension = selectedMapDimension / 2 - 1;
+  const center = {
+    x: (rectMax.x + rectMin.x) / 2,
+    y: (rectMax.y + rectMin.y) / 2,
+  };
+  const squareEdge = Math.min(rectMax.x - rectMin.x, rectMax.y - rectMin.y);
 
-  const { lat: south, lng: west } = L.CRS.EPSG3857.pointToLatLng(
-    L.point(x - halfDimension, y + halfDimension),
-    zoom,
-  );
-  const { lat: north, lng: east } = L.CRS.EPSG3857.pointToLatLng(
-    L.point(x + halfDimension, y - halfDimension),
-    zoom,
-  );
+  const squareMax = {
+    x: center.x + squareEdge / 2,
+    y: center.y + squareEdge / 2,
+  };
+  const squareMin = {
+    x: center.x - squareEdge / 2,
+    y: center.y - squareEdge / 2,
+  };
 
-  return new LatLngBounds({ lat: south, lng: west }, { lat: north, lng: east });
+  const southWest = convertToWgs84([squareMin.x, squareMin.y]);
+  const northEast = convertToWgs84([squareMax.x, squareMax.y]);
+
+  return new LatLngBounds({ lat: southWest[1], lng: southWest[0] }, { lat: northEast[1], lng: northEast[0] });
 }
 
-export function determineDefaultImageSize(pixelBounds, zoom, aoi) {
-  const timelapseBounds = getTimelapseBounds(pixelBounds, zoom, aoi);
-  const timelapseDimensions = getDimensionsInMeters(timelapseBounds);
-
-  const ratio = timelapseDimensions.width / timelapseDimensions.height;
+export function determineDefaultImageSize(bounds, aoi) {
+  const timelapseBounds = getTimelapseBounds(bounds, aoi);
+  const dimenstions = getDimensionsInMeters(timelapseBounds);
+  const ratio = dimenstions.width / dimenstions.height;
   const totalPixels = DEFAULT_IMAGE_DIMENSION * DEFAULT_IMAGE_DIMENSION;
 
   const height = Math.sqrt(totalPixels / ratio);
@@ -59,6 +65,21 @@ export function determineDefaultImageSize(pixelBounds, zoom, aoi) {
   return {
     width: Math.round(width),
     height: Math.round(height),
+    ratio,
+  };
+}
+
+export function determineDefaultImageSize3D(pixelBounds) {
+  const { width, height } = getMapDimensions(pixelBounds);
+  const ratio = width / height;
+  const totalPixels = DEFAULT_IMAGE_DIMENSION * DEFAULT_IMAGE_DIMENSION;
+
+  const finalHeight = Math.sqrt(totalPixels / ratio);
+  const finalWidth = finalHeight * ratio;
+
+  return {
+    width: Math.round(finalWidth),
+    height: Math.round(finalHeight),
     ratio,
   };
 }
@@ -138,6 +159,7 @@ export async function fetchTimelapseImage(params) {
   const apiType = await getAppropriateApiType(layer, imageFormat);
   const options = {
     ...params,
+    bounds,
     apiType,
   };
 
@@ -160,22 +182,25 @@ export async function fetchTimelapseImage(params) {
     );
   }
 
-  const showLogos = checkIfShouldShowCopernicusSHLogos(datasetId);
-  // MAKE SURE TO REVOKE AT SOME POINT!!!!
-  const objectURL = await addLabelsAndLogos(
+  const dsh = getDataSourceHandler(datasetId);
+
+  const objectURL = URL.createObjectURL(blob);
+  const objectURLWithLogos = await addLabelsAndLogos(
     dateTimeDisplayFormat(toTime, selectedPeriod),
-    blob,
+    objectURL,
     width,
     height,
     L.CRS.EPSG3857.distance(
       L.latLng(bounds.getSouth(), bounds.getWest()),
       L.latLng(bounds.getSouth(), bounds.getEast()),
     ),
-    showLogos,
+    dsh?.isCopernicus(),
+    dsh?.isSentinelHub() || checkIfCustom(datasetId),
   );
+  URL.revokeObjectURL(objectURL);
 
   return {
-    url: objectURL,
+    url: objectURLWithLogos,
   };
 }
 
@@ -185,25 +210,17 @@ export function dateTimeDisplayFormat(datetime, period) {
     : datetime.clone().format('YYYY-MM-DD');
 }
 
-function checkIfShouldShowCopernicusSHLogos(datasetId) {
-  const dsh = getDataSourceHandler(datasetId);
-  const isBYOC = checkIfCustom(datasetId);
-  if (isBYOC || dsh?.isCopernicus() || dsh?.isSentinelHub()) {
-    return true;
-  }
-  return false;
-}
-
 export function addLabelsAndLogos(
   dateToBeShown,
-  blob,
+  objectUrl,
   width,
   height,
   imageWidthMeters,
-  showSHCopernicusLogos = true,
+  showCopernicusLogos = true,
+  showSHLogos = true,
 ) {
   const canvas = document.createElement('canvas');
-  const { widthPx, label } = scalebarPixelWidthAndDistance(imageWidthMeters / width);
+
   return new Promise((resolve, reject) => {
     const mainImg = new Image();
     const sh = new Image();
@@ -234,29 +251,33 @@ export function addLabelsAndLogos(
 
         ctx.fillText(dateToBeShown, canvas.width - dateSize.width - rightLeftPadding, 16);
         //scale
-        ctx.shadowColor = 'black';
-        ctx.shadowBlur = 2;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-        ctx.strokeStyle = '#fff';
-        ctx.fillStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.textAlign = 'center';
-        ctx.beginPath();
-        ctx.moveTo(10, 15);
-        ctx.lineTo(10, 5);
-        ctx.font = '11px Arial';
-        ctx.lineTo(widthPx + 10, 5);
-        ctx.lineTo(widthPx + 10, 15);
-        ctx.stroke();
-        ctx.textAlign = 'center';
-        ctx.shadowColor = 'black';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-        ctx.strokeStyle = '#767777';
-        ctx.strokeText(label, widthPx / 2 + 10, 17);
-        ctx.fillText(label, widthPx / 2 + 10, 17);
+        if (imageWidthMeters !== null) {
+          const { widthPx, label } = scalebarPixelWidthAndDistance(imageWidthMeters / width);
+
+          ctx.shadowColor = 'black';
+          ctx.shadowBlur = 2;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          ctx.strokeStyle = '#fff';
+          ctx.fillStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.textAlign = 'center';
+          ctx.beginPath();
+          ctx.moveTo(10, 15);
+          ctx.lineTo(10, 5);
+          ctx.font = '11px Arial';
+          ctx.lineTo(widthPx + 10, 5);
+          ctx.lineTo(widthPx + 10, 15);
+          ctx.stroke();
+          ctx.textAlign = 'center';
+          ctx.shadowColor = 'black';
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          ctx.strokeStyle = '#767777';
+          ctx.strokeText(label, widthPx / 2 + 10, 17);
+          ctx.fillText(label, widthPx / 2 + 10, 17);
+        }
 
         // logos
         ctx.shadowColor = 'black';
@@ -264,7 +285,7 @@ export function addLabelsAndLogos(
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
 
-        if (showSHCopernicusLogos) {
+        if (showSHLogos) {
           //sentinel hub logo
           const shResizeFactor = 0.85;
           const shWidth = sh.width * shResizeFactor;
@@ -273,13 +294,15 @@ export function addLabelsAndLogos(
           const shYpos = canvas.height - shHeight - 4;
           ctx.drawImage(sh, shXpos, shYpos, shWidth, shHeight);
 
-          //copernicus logo
-          const cpImgResizeFactor = 0.8;
-          const cpImgWidth = cpImg.width * cpImgResizeFactor;
-          const cpImgHeight = cpImg.height * cpImgResizeFactor;
-          const cpImgXpos = shXpos - cpImgWidth - 8;
-          const cpImgYpos = canvas.height - cpImgHeight - 8;
-          ctx.drawImage(cpImg, cpImgXpos, cpImgYpos, cpImgWidth, cpImgHeight);
+          if (showCopernicusLogos) {
+            //copernicus logo
+            const cpImgResizeFactor = 0.8;
+            const cpImgWidth = cpImg.width * cpImgResizeFactor;
+            const cpImgHeight = cpImg.height * cpImgResizeFactor;
+            const cpImgXpos = shXpos - cpImgWidth - 8;
+            const cpImgYpos = canvas.height - cpImgHeight - 8;
+            ctx.drawImage(cpImg, cpImgXpos, cpImgYpos, cpImgWidth, cpImgHeight);
+          }
         }
 
         const dataUrl = canvas.toDataURL('image/jpg', 0.9);
@@ -293,7 +316,7 @@ export function addLabelsAndLogos(
     mainImg.onerror = (err) => {
       reject(err);
     };
-    mainImg.src = URL.createObjectURL(blob);
+    mainImg.src = objectUrl;
     sh.src = SHlogo;
     cpImg.src = copernicus;
   });
@@ -396,18 +419,18 @@ export const isImageApplicable = (
 ) => {
   return (
     isImageSelected(image) &&
-    isImageClearEnough(image, canWeFilterByClouds, maxCCPercentAllowed) &&
-    isImageCoverageEnough(image, canWeFilterByCoverage, minCoverageAllowed)
+    isImageClearEnough(image.averageCloudCoverPercent, canWeFilterByClouds, maxCCPercentAllowed) &&
+    isImageCoverageEnough(image.coveragePercent, canWeFilterByCoverage, minCoverageAllowed)
   );
 };
 
 export const isImageSelected = (image) => image && image.isSelected;
 
-export const isImageClearEnough = (image, canWeFilterByClouds, maxCCPercentAllowed) =>
-  image && (canWeFilterByClouds ? Math.round(image.averageCloudCoverPercent) <= maxCCPercentAllowed : true);
+export const isImageClearEnough = (averageCloudCoverPercent, canWeFilterByClouds, maxCCPercentAllowed) =>
+  canWeFilterByClouds ? Math.round(averageCloudCoverPercent) <= maxCCPercentAllowed : true;
 
-export const isImageCoverageEnough = (image, canWeFilterByCoverage, minCoverageAllowed) =>
-  image && (canWeFilterByCoverage ? Math.round(image.coveragePercent) >= minCoverageAllowed : true);
+export const isImageCoverageEnough = (coveragePercent, canWeFilterByCoverage, minCoverageAllowed) =>
+  canWeFilterByCoverage ? Math.round(coveragePercent) >= minCoverageAllowed : true;
 
 export const generateS3PreSignedPost = async (access_token, filename) => {
   try {
@@ -446,7 +469,7 @@ export const uploadFileToS3 = async (preSignedPost, file) => {
 };
 
 export const getS3FileUrl = (res) => {
-  return res.url + res.fields.key;
+  return res.url + (res.url.at(-1) === '/' ? '' : '/') + res.fields.key;
 };
 
 export const generateTimelapseWithGifshot = ({ imageUrls, datasetId, timelapseFPS, size, progress }) => {
@@ -493,6 +516,8 @@ export const generateTimelapseWithFFMPEG = ({
   size,
   progress,
 }) => {
+  let isOutOfMemory = false;
+
   return new Promise((resolve, reject) => {
     progress(0);
 
@@ -510,6 +535,7 @@ export const generateTimelapseWithFFMPEG = ({
           break;
         case 'stderr':
           console.log(msg.data);
+          isOutOfMemory = isOutOfMemory || msg.data === 'OOM';
           updateProgress(msg.data, imageUrls.length);
           break;
         case 'done':
@@ -605,7 +631,7 @@ export const generateTimelapseWithFFMPEG = ({
     const doneFFmpegProcess = (msg) => {
       progress(1);
 
-      if (msg.data?.MEMFS[0]?.data?.length > 0) {
+      if (!isOutOfMemory && msg.data?.MEMFS[0]?.data?.length > 0) {
         const file = new File([msg.data.MEMFS[0].data], generateTimelapseFilename(datasetId) + '.mp4', {
           type: 'video/mp4',
         });
@@ -636,6 +662,61 @@ export const generateTimelapseFilename = (datasetId) => {
 const floorToEven = (value) => {
   return Math.floor(value / 2) * 2;
 };
+
+// call wms and return blob
+async function getOverlayImageBlob(width, height, bbox, overlayLayer) {
+  const layerParams = overlayLayer(width, height, bbox);
+  const res = await axios.get(layerParams.url, {
+    responseType: 'blob',
+    params: layerParams.params,
+  });
+  return new Blob([res.data], { type: 'image/jpeg' });
+}
+
+// draw all layers defined in overlayLayers over original image imgBlob
+async function addOverlays(imgBlob, width, height, bbox, overlayLayers, timelapseWidth, timelapseHeight) {
+  try {
+    //draw original image on canvas
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    canvas.width = timelapseWidth;
+    canvas.height = timelapseHeight;
+    await drawBlobOnCanvas(context, imgBlob);
+
+    //get overlay images
+    const overlayImages = [];
+    await Promise.all(
+      overlayLayers.map(async (overlayLayer) => {
+        const overlayImageBlob = await getOverlayImageBlob(width, height, bbox, overlayLayer);
+        overlayImages.push({
+          idx: overlayLayer.idx,
+          imgBlob: overlayImageBlob,
+        });
+      }),
+    );
+
+    //sort images and draw them on canvas
+    await Promise.all(
+      overlayImages
+        .sort((a, b) => a.sortIndex - b.sortIndex)
+        .map(async (image) => await drawBlobOnCanvas(context, image.imgBlob)),
+    );
+
+    //export canvas back to blob
+    const blob = await new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        resolve(blob);
+      }, 'image/jpeg');
+    });
+
+    return blob;
+  } catch (e) {
+    //if something goes wrong just return original image
+    console.error(e);
+    return imgBlob;
+  }
+}
 
 // We need to get get a new layer for each flyover if the datasource is PLANET NICFI as we cant change the date per PLANET NICFI layer
 export const getFlyOverVisualization = async (visualization, flyover) => {

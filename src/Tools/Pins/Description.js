@@ -41,7 +41,7 @@ class Description extends React.Component {
     const { canEdit, content, showContent } = this.props;
 
     return showContent ? (
-      <div className="pin-description-container" title={t`Edit pin description`}>
+      <div className="pin-description-container">
         {this.state.editing ? (
           <textarea name="description" rows={8} onChange={this.handleContentChange} value={newContent} />
         ) : content === '' || !content ? (
@@ -75,7 +75,7 @@ class Description extends React.Component {
             </>
           ) : canEdit ? (
             <span onClick={this.toggleEditing}>
-              <i className="fa fa-pencil" />
+              <i className="fa fa-pencil" title={t`Edit pin description`} />
             </span>
           ) : null}
         </div>

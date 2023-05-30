@@ -2,18 +2,18 @@ import React from 'react';
 import Toggle from 'react-toggle';
 import { t } from 'ttag';
 import { CheckboxGroup, Checkbox } from 'react-checkbox-group';
-import { CRS_EPSG4326 } from '@sentinel-hub/sentinelhub-js';
 
-import { AVAILABLE_CRS, RESOLUTION_DIVISORS, IMAGE_FORMATS, IMAGE_FORMATS_INFO } from './consts';
+import { RESOLUTION_DIVISORS, IMAGE_FORMATS, IMAGE_FORMATS_INFO, RESOLUTION_OPTIONS } from './consts';
 import { isTiff } from './ImageDownload.utils';
 import ExternalLink from '../../ExternalLink/ExternalLink';
 import Loader from '../../Loader/Loader';
+
+export const CUSTOM_TAG = ' Custom';
 
 export default class AnalyticalForm extends React.PureComponent {
   CAPTIONS_TITLE = t`File will have logo attached.`;
   DATAMASK_TITLE = t`A dataMask-band will be included in the downloaded raw bands as second band.`;
   TIFF_BANDS_SELECTION = t`The Tagged Image File Format (TIFF) can hold a large number of bands, however many common image viewers (e.g. Windows Photo Viewer) can't display TIFF images with more than 3 bands.\nIf this option is enabled, only the first 3 bands will be included in the image.\nIf this option is disabled, all bands will be included in the image, but you will have to use an application which supports more than 3 bands (e.g. QGIS) to display the TIFF image.`;
-  AOI_CRS = t`EPSG:3857 is not available when an AOI is specified.`;
 
   componentDidUpdate(prevProps) {
     if (prevProps.imageFormat !== this.props.imageFormat) {
@@ -33,12 +33,13 @@ export default class AnalyticalForm extends React.PureComponent {
   render() {
     const {
       imageFormat,
-      resolutionDivisor,
+      selectedResolution,
       selectedCrs,
       allLayers,
       allBands,
       showLogo,
       renderImageSize,
+      areImageDimensionsValid,
       updateFormData,
       renderCRSResolution,
       onErrorMessage,
@@ -52,13 +53,11 @@ export default class AnalyticalForm extends React.PureComponent {
       addDataMask,
       allowShowLogoAnalytical,
       clipExtraBandsTiff,
-      hasAOI,
+      customResolution,
+      getCrsOptions,
     } = this.props;
 
     const isJPGorPNG = imageFormat === IMAGE_FORMATS.JPG || imageFormat === IMAGE_FORMATS.PNG;
-    const availableCrs = hasAOI
-      ? AVAILABLE_CRS.filter((crs) => crs.id === CRS_EPSG4326.authId)
-      : AVAILABLE_CRS;
 
     if (allLayers.length === 0) {
       return <Loader />;
@@ -105,31 +104,49 @@ export default class AnalyticalForm extends React.PureComponent {
           <div>
             <select
               className="dropdown"
-              value={resolutionDivisor}
-              onChange={(ev) => updateFormData('resolutionDivisor', ev.target.value)}
+              value={selectedResolution}
+              onChange={(ev) => updateFormData('selectedResolution', ev.target.value)}
             >
-              {RESOLUTION_DIVISORS.map((r) => (
-                <option key={r.text} value={r.value}>
-                  {r.text}
+              {Object.keys(RESOLUTION_DIVISORS).map((key) => (
+                <option key={RESOLUTION_DIVISORS[key].text} value={key}>
+                  {RESOLUTION_DIVISORS[key].text}
                 </option>
               ))}
             </select>
-            <small>{renderImageSize(resolutionDivisor)}</small>
+            <small className={!areImageDimensionsValid ? 'error' : ''}>
+              {renderImageSize(selectedResolution)}
+            </small>
+            {!areImageDimensionsValid && (
+              <small className="error">
+                {' ' + t`Image width and height must be between 1px and 2500px`}
+              </small>
+            )}
           </div>
         </div>
+        {selectedResolution === RESOLUTION_OPTIONS.CUSTOM && (
+          <>
+            <div className="row">
+              <label>{t`Resolution X (m/px)` + ':'}</label>
+              <input
+                min={0}
+                type={'number'}
+                value={customResolution[0]}
+                onChange={(ev) => updateFormData('customResolution', [ev.target.value, customResolution[1]])}
+              ></input>
+            </div>
+            <div className="row">
+              <label>{t`Resolution Y (m/px)` + ':'}</label>
+              <input
+                min={0}
+                type={'number'}
+                value={customResolution[1]}
+                onChange={(ev) => updateFormData('customResolution', [customResolution[0], ev.target.value])}
+              ></input>
+            </div>
+          </>
+        )}
         <div className="row">
-          <label>
-            {t`Coordinate system`}
-            {': '}
-            {hasAOI && (
-              <i
-                className="fa fa-question-circle"
-                onClick={() => {
-                  onErrorMessage(this.AOI_CRS);
-                }}
-              />
-            )}
-          </label>
+          <label>{t`Coordinate system` + ':'}</label>
 
           <div>
             <select
@@ -137,13 +154,17 @@ export default class AnalyticalForm extends React.PureComponent {
               value={selectedCrs}
               onChange={(ev) => updateFormData('selectedCrs', ev.target.value)}
             >
-              {availableCrs.map((obj) => (
+              {getCrsOptions().map((obj) => (
                 <option key={obj.text} value={obj.id}>
                   {obj.text}
                 </option>
               ))}
             </select>
-            <small>{renderCRSResolution(resolutionDivisor, selectedCrs)}</small>
+            <small>
+              {selectedResolution === RESOLUTION_OPTIONS.CUSTOM
+                ? null
+                : renderCRSResolution(selectedResolution, selectedCrs)}
+            </small>
           </div>
         </div>
         {selectedBands.length > 0 && !isJPGorPNG && (
@@ -188,17 +209,13 @@ export default class AnalyticalForm extends React.PureComponent {
           <div className="download-layers">
             <div className="column">
               <span className="layer-title">{t`Visualized`}</span>
-              {isCurrentLayerCustom ? (
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={customSelected}
-                    onChange={(e) => updateFormData('customSelected', e.target.checked)}
-                  />
-                  Custom
-                </label>
-              ) : null}
               <CheckboxGroup name="layers" value={selectedLayers} onChange={updateSelectedLayers}>
+                {isCurrentLayerCustom && (
+                  <label key={CUSTOM_TAG}>
+                    <Checkbox value={CUSTOM_TAG} checked={customSelected} />
+                    {CUSTOM_TAG}
+                  </label>
+                )}
                 {allLayers.map((l) => (
                   <label key={l.layerId}>
                     <Checkbox value={l.layerId} /> {l.title}

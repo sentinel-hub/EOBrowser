@@ -154,7 +154,7 @@
   }
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: $breakpoint-400) {
   #logo-header {
     flex-direction: column;
     align-items: initial;

@@ -50,6 +50,7 @@ export default function TermsAndPrivacyConsentForm() {
         padding: 30,
       }}
       showCloseButton={false}
+      onClose={() => {}}
     >
       <div className="terms-and-privacy">
         {hasRejected ? (

@@ -1,6 +1,6 @@
 import { t } from 'ttag';
 
-export const GLOBAL_SURFACE_WATER_BANDS = [
+export const COPERNICUS_GLOBAL_SURFACE_WATER_BANDS = [
   {
     name: 'change',
     getDescription: () =>

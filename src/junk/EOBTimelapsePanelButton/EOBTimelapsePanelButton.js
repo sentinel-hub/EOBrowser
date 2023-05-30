@@ -6,7 +6,7 @@ import {
   getLayerNotSelectedMsg,
   getCompareModeErrorMsg,
   getDatasourceNotSupportedMsg,
-  getNotSupportedIn3DMsg,
+  zoomTooLow3DMsg,
 } from '../ConstMessages';
 import store, { modalSlice, timelapseSlice } from '../../store';
 
@@ -14,9 +14,11 @@ import '../EOBPanel.scss';
 import { ModalId, TABS } from '../../const';
 
 export class EOBTimelapsePanelButton extends React.Component {
-  toggleAreaPreview = () => {
+  onButtonClick = () => {
     const { aoi } = this.props;
     if (aoi && aoi.bounds) {
+      store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TIMELAPSE }));
+    } else if (this.props.is3D) {
       store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TIMELAPSE }));
     } else {
       store.dispatch(timelapseSlice.actions.toggleTimelapseAreaPreview());
@@ -26,14 +28,9 @@ export class EOBTimelapsePanelButton extends React.Component {
   render() {
     const isLayerSelected = !!this.props.selectedResult;
     const isTimelapseSupported =
-      isLayerSelected &&
-      this.props.selectedResult.getDates &&
-      this.props.selectedResult.baseUrls.WMS &&
-      !this.props.is3D;
+      isLayerSelected && this.props.selectedResult.getDates && this.props.selectedResult.baseUrls.WMS;
 
-    const errMsg = this.props.is3D
-      ? getNotSupportedIn3DMsg()
-      : this.props.isCompareMode
+    const errMsg = this.props.isCompareMode
       ? getCompareModeErrorMsg()
       : !this.props.isLoggedIn
       ? getLoggedInErrorMsg()
@@ -41,6 +38,8 @@ export class EOBTimelapsePanelButton extends React.Component {
       ? getLayerNotSelectedMsg()
       : !isTimelapseSupported
       ? getDatasourceNotSupportedMsg()
+      : this.props.zoomTooLow
+      ? zoomTooLow3DMsg()
       : null;
     const isEnabled = errMsg === null;
     const errorMessage = errMsg ? `(${errMsg})` : '';
@@ -54,7 +53,7 @@ export class EOBTimelapsePanelButton extends React.Component {
             this.props.onErrorMessage(title);
             return;
           }
-          this.toggleAreaPreview();
+          this.onButtonClick();
         }}
       >
         {

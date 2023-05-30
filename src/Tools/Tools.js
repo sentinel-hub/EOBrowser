@@ -16,6 +16,7 @@ import store, { notificationSlice, visualizationSlice, tabsSlice, compareLayersS
 import { savePinsToServer, savePinsToSessionStorage, constructPinFromProps } from './Pins/Pin.utils';
 import { checkIfCustom } from './SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getNotSupportedIn3DMsg } from '../junk/ConstMessages';
+import { FUNCTIONALITY_TEMPORARILY_UNAVAILABLE_MSG } from '../const';
 
 import './Tools.scss';
 import { TABS } from '../const';
@@ -124,6 +125,10 @@ class Tools extends Component {
       customSelected,
       selectedThemeId,
     } = this.props;
+    if (!process.env.REACT_APP_EOB_BACKEND) {
+      store.dispatch(notificationSlice.actions.displayError(FUNCTIONALITY_TEMPORARILY_UNAVAILABLE_MSG));
+      return;
+    }
     if (
       !(
         datasetId &&

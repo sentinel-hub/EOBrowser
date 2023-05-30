@@ -191,4 +191,10 @@
       }
     }
   }
+
+  small {
+    .error {
+      color: $errorCol;
+    }
+  }
 }

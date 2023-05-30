@@ -11,6 +11,7 @@ import {
   Interpolator,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
+import { point as turfPoint } from '@turf/helpers';
 
 import {
   getDataSourceHandler,
@@ -43,6 +44,9 @@ import { reqConfigMemoryCache, MAX_SH_IMAGE_SIZE, DISABLED_ORTHORECTIFICATION } 
 
 import copernicus from '../../junk/EOBCommon/assets/copernicus.png';
 import SHlogo from '../../junk/EOBCommon/assets/shLogo.png';
+import { isAuthIdUtm } from '../../utils/utm';
+import { reprojectGeometry } from '../../utils/reproject';
+import { getBboxFromCoords } from '../../utils/geojson.utils';
 
 const PARTITION_PADDING = 5;
 const SCALEBAR_LEFT_PADDING = 10;
@@ -54,37 +58,63 @@ const FONT_SIZES = {
   copyright: { base: 5, min: 9 },
 };
 
+const DEGREE_TO_METER_SCALE = 111139;
+
 export function getMapDimensions(pixelBounds, resolutionDivisor = 1) {
   const width = pixelBounds.max.x - pixelBounds.min.x;
   const height = pixelBounds.max.y - pixelBounds.min.y;
   return { width: Math.floor(width / resolutionDivisor), height: Math.floor(height / resolutionDivisor) };
 }
 
-export function getDimensionsInMeters(bounds) {
-  const { x: maxX, y: maxY } = wgs84ToMercator(bounds.getNorthEast());
-  const { x: minX, y: minY } = wgs84ToMercator(bounds.getSouthWest());
-  const width = maxX - minX;
-  const height = maxY - minY;
+export function getDimensionsInMeters(bounds, targetCrs = CRS_EPSG3857.authId) {
+  const scaleFactor = targetCrs === CRS_EPSG4326.authId ? DEGREE_TO_METER_SCALE : 1;
+  const bbox = constructBBoxFromBounds(bounds);
+  const transformedGeometry = reprojectGeometry(bbox.toGeoJSON(), {
+    fromCrs: bbox.crs.authId,
+    toCrs: targetCrs,
+  });
+  const [minX, minY, maxX, maxY] = getBboxFromCoords(transformedGeometry.coordinates);
+  const width = (maxX - minX) * scaleFactor;
+  const height = (maxY - minY) * scaleFactor;
   return { width: width, height: height };
 }
 
-export function getImageDimensionFromBounds(bounds, datasetId) {
+export function getImageDimensions(bounds, resolution, targetCrs) {
+  const { width, height } = getDimensionsInMeters(bounds, targetCrs);
+
+  return {
+    width: Math.round(width / resolution[0]),
+    height: Math.round(height / resolution[1]),
+  };
+}
+
+export function getImageDimensionFromBoundsWithCap(bounds, datasetId) {
   /*
     Accepts latLngBounds and converts them to Mercator (to use meters)
     Gets datasource max resolution (in meters per pixel)
     Calculates the image size at that resolution and dimension, caps it at IMAGE_SIZE_LIMIT
   */
-  const { width, height } = getDimensionsInMeters(bounds);
-  const ratio = height / width;
   const dsh = getDataSourceHandler(datasetId);
   let resolution;
   if (dsh) {
     resolution = dsh.getResolutionLimits(datasetId).resolution;
   }
   const maxResolution = resolution || 0.5;
-  const maxImageWidth = Math.min(width / maxResolution, MAX_SH_IMAGE_SIZE);
-  const maxImageHeight = maxImageWidth * ratio;
-  return { width: Math.floor(maxImageWidth), height: Math.floor(maxImageHeight) };
+  const { width, height } = getImageDimensions(bounds, [maxResolution, maxResolution], CRS_EPSG3857.authId);
+  const ratio = height / width;
+  const isLandscape = width >= height;
+
+  let newImgWidth;
+  let newImgHeight;
+  if (isLandscape) {
+    newImgWidth = Math.min(width, MAX_SH_IMAGE_SIZE);
+    newImgHeight = newImgWidth * ratio;
+  } else {
+    newImgHeight = Math.min(height, MAX_SH_IMAGE_SIZE);
+    newImgWidth = newImgHeight / ratio;
+  }
+
+  return { width: newImgWidth, height: newImgHeight };
 }
 
 export async function fetchImage(layer, options) {
@@ -159,6 +189,9 @@ export async function fetchAndPatchImagesFromParams(params, setWarnings, setErro
     userDescription,
     enabledOverlaysId,
     toTime,
+    drawAoiGeoToImg,
+    aoiGeometry,
+    bounds,
   } = params;
 
   const canvas = document.createElement('canvas');
@@ -278,6 +311,9 @@ export async function fetchAndPatchImagesFromParams(params, setWarnings, setErro
     true,
     addLogos,
     drawCopernicusLogo,
+    drawAoiGeoToImg,
+    aoiGeometry,
+    bounds,
   );
   return {
     finalImage: finalBlob,
@@ -314,6 +350,9 @@ export async function fetchImageFromParams(params, raiseWarning) {
     cancelToken,
     shouldClipExtraBands,
     getMapAuthToken,
+    drawAoiGeoToImg,
+    aoiGeometry,
+    bounds,
   } = params;
 
   const layer = await getLayerFromParams(params, cancelToken);
@@ -404,6 +443,9 @@ export async function fetchImageFromParams(params, raiseWarning) {
     true,
     addLogos,
     drawCopernicusLogo,
+    drawAoiGeoToImg,
+    aoiGeometry,
+    bounds,
   );
 
   const nicename = getNicename(fromTime, toTime, datasetId, layer.title, customSelected, isRawBand, bandName);
@@ -601,6 +643,31 @@ export function constructBBoxFromBounds(bounds, crs = CRS_EPSG4326.authId) {
     const { x: minX, y: minY } = wgs84ToMercator(bounds.getSouthWest());
     return new BBox(CRS_EPSG3857, minX, minY, maxX, maxY);
   }
+  if (isAuthIdUtm(crs)) {
+    const epsgCode = crs.split('EPSG:')[1];
+    // last 2 values in epsgCode is the zone
+    // numbers with leading 0, for example 01 to 1
+    const mockedCrsObject = {
+      authId: crs,
+      auth: 'EPSG',
+      srid: crs,
+      urn: undefined,
+      opengisUrl: `http://www.opengis.net/def/crs/EPSG/0/${epsgCode}`,
+    };
+    const bbox4326 = new BBox(
+      CRS_EPSG4326,
+      bounds.getWest(),
+      bounds.getSouth(),
+      bounds.getEast(),
+      bounds.getNorth(),
+    );
+    const transformedGeometry = reprojectGeometry(bbox4326.toGeoJSON(), {
+      fromCrs: CRS_EPSG4326.authId,
+      toCrs: crs,
+    });
+    const [minX, minY, maxX, maxY] = getBboxFromCoords(transformedGeometry.coordinates);
+    return new BBox(mockedCrsObject, minX, minY, maxX, maxY);
+  }
 }
 
 export async function addImageOverlays(
@@ -624,8 +691,11 @@ export async function addImageOverlays(
   showScaleBar = true,
   logos = true,
   drawCopernicusLogo = true,
+  drawAoiGeoToImg,
+  aoiGeometry,
+  bounds,
 ) {
-  if (!(showLegend || showCaptions || addMapOverlays || showLogo)) {
+  if (!(showLegend || showCaptions || addMapOverlays || showLogo || drawAoiGeoToImg)) {
     return blob;
   }
   const canvas = document.createElement('canvas');
@@ -658,6 +728,9 @@ export async function addImageOverlays(
   if (showLogo) {
     const logosPartitionWidth = ctx.canvas.width * 0.4 - PARTITION_PADDING;
     await drawLogos(ctx, logosPartitionWidth, getLowerYAxis(ctx), drawCopernicusLogo);
+  }
+  if (drawAoiGeoToImg) {
+    drawGeometryOnImg(ctx, aoiGeometry, bounds);
   }
 
   return await canvasToBlob(canvas, mimeType);
@@ -938,6 +1011,112 @@ function drawCopyrightText(ctx, text, copyrightPartitionX, copyrightPartitionWid
     const y = baselineY - (lines.length - index - 1) * lineHeight;
     ctx.fillText(line, x, y);
   });
+}
+
+function calculateXYScale(imageWidth, imageHeight, realWorldWidth, realWorldHeight) {
+  return {
+    xScale: imageWidth / realWorldWidth,
+    yScale: imageHeight / realWorldHeight,
+  };
+}
+
+const lineStyle = {
+  strokeColor: '#3388ff',
+  lineWidth: 3,
+};
+
+function drawGeometryOnImg(ctx, aoiGeometry, leafletBounds) {
+  const bbox = constructBBoxFromBounds(leafletBounds);
+  const mercatorBBox = ensureMercatorBBox(bbox);
+  const imageWidth = ctx.canvas.width;
+  const imageHeight = ctx.canvas.height;
+
+  handleDrawGeometryOnImg(ctx, aoiGeometry, mercatorBBox, imageWidth, imageHeight);
+}
+
+function handleDrawGeometryOnImg(ctx, aoiGeometry, mercatorBBox, imageWidth, imageHeight) {
+  switch (aoiGeometry.type) {
+    case 'Polygon':
+      drawPolygon(ctx, aoiGeometry, mercatorBBox, imageWidth, imageHeight, lineStyle);
+      break;
+    case 'MultiPolygon':
+      drawMultiPolygon(ctx, aoiGeometry, mercatorBBox, imageWidth, imageHeight, lineStyle);
+      break;
+
+    default:
+      throw new Error(`${aoiGeometry.type} not supported. Only Polygon or MultiPolygon are supported`);
+  }
+}
+
+function drawPolygon(ctx, geometry, mercatorBBox, imageWidth, imageHeight, lineStyle) {
+  for (const polygonCoords of geometry.coordinates) {
+    ctx.strokeStyle = lineStyle.strokeColor;
+    ctx.lineWidth = lineStyle.lineWidth;
+    for (let i = 0; i < polygonCoords.length; i++) {
+      const lng = polygonCoords[i][0];
+      const lat = polygonCoords[i][1];
+      const pixelCoords = getPixelCoordinates(lng, lat, mercatorBBox, imageWidth, imageHeight);
+      if (i === 0) {
+        ctx.beginPath();
+        ctx.moveTo(pixelCoords.x, pixelCoords.y);
+      } else {
+        ctx.lineTo(pixelCoords.x, pixelCoords.y);
+      }
+    }
+    ctx.stroke();
+  }
+}
+
+function drawMultiPolygon(ctx, geometry, mercatorBBox, imageWidth, imageHeight, lineStyle) {
+  for (const polygonCoords of geometry.coordinates) {
+    ctx.strokeStyle = lineStyle.strokeColor;
+    ctx.lineWidth = lineStyle.lineWidth;
+    for (const coords of polygonCoords) {
+      for (let i = 0; i < coords.length; i++) {
+        const lng = coords[i][0];
+        const lat = coords[i][1];
+        const pixelCoords = getPixelCoordinates(lng, lat, mercatorBBox, imageWidth, imageHeight);
+        if (i === 0) {
+          ctx.beginPath();
+          ctx.moveTo(pixelCoords.x, pixelCoords.y);
+        } else {
+          ctx.lineTo(pixelCoords.x, pixelCoords.y);
+        }
+      }
+      ctx.stroke();
+    }
+  }
+}
+
+export function getPixelCoordinates(lng, lat, mercatorBBox, imageWidth, imageHeight) {
+  const tPoint = turfPoint([lng, lat]);
+  const mercatorPoint = reprojectGeometry(tPoint.geometry, { fromCrs: 'EPSG:4326', toCrs: 'EPSG:3857' });
+
+  const realWorldWidth = Math.abs(mercatorBBox.maxX - mercatorBBox.minX);
+  const realWorldHeight = Math.abs(mercatorBBox.maxY - mercatorBBox.minY);
+
+  const { xScale, yScale } = calculateXYScale(imageWidth, imageHeight, realWorldWidth, realWorldHeight);
+
+  return {
+    x: Math.round((mercatorPoint.coordinates[0] - mercatorBBox.minX) * xScale),
+    y: Math.round((mercatorBBox.maxY - mercatorPoint.coordinates[1]) * yScale),
+  };
+}
+
+export function ensureMercatorBBox(bbox) {
+  const minPoint = turfPoint([bbox.minX, bbox.minY]);
+  const maxPoint = turfPoint([bbox.maxX, bbox.maxY]);
+
+  const minPointMercator = reprojectGeometry(minPoint.geometry, { fromCrs: 'EPSG:4326', toCrs: 'EPSG:3857' });
+  const maxPointMercator = reprojectGeometry(maxPoint.geometry, { fromCrs: 'EPSG:4326', toCrs: 'EPSG:3857' });
+
+  return new BBox(
+    CRS_EPSG3857,
+    minPointMercator.coordinates[0],
+    minPointMercator.coordinates[1],
+    maxPointMercator.coordinates[0],
+    maxPointMercator.coordinates[1],
+  );
 }
 
 async function drawLogos(ctx, logosPartitionWidth, bottomY, drawCopernicusLogo) {

@@ -10,6 +10,7 @@ import HistogramWrapper from './Histogram/HistogramWrapper';
 import { withLeaflet } from 'react-leaflet';
 
 import './Controls.scss';
+import LOI from './LOI/LOI';
 
 class Controls extends Component {
   render() {
@@ -21,6 +22,11 @@ class Controls extends Component {
           <>
             <LeafletPMLanguage map={this.props.leaflet.map} />
             <AOI
+              className={animatedClass}
+              map={this.props.leaflet.map}
+              locale={this.props.selectedLanguage}
+            />
+            <LOI
               className={animatedClass}
               map={this.props.leaflet.map}
               locale={this.props.selectedLanguage}

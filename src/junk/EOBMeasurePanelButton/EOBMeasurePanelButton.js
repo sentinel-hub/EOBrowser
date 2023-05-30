@@ -2,7 +2,6 @@ import React from 'react';
 import { t } from 'ttag';
 
 import MeasureIcon from './MeasureIcon';
-import { getLoggedInErrorMsg } from '../ConstMessages';
 import '../EOBPanel.scss';
 import './EOBMeasurePanelButton.scss';
 
@@ -32,20 +31,13 @@ export class EOBMeasurePanelButton extends React.Component {
   );
 
   renderMeasureIcon = () => {
-    const errMsg = this.props.isLoggedIn ? null : getLoggedInErrorMsg();
-    const isEnabled = errMsg === null;
-    const errorMessage = errMsg ? `(${errMsg})` : '';
-    const title = t`Measure` + ` ${errorMessage}`;
+    const title = t`Measure (Click to place first vertex and double click to finish)`;
     return (
       // jsx-a11y/anchor-is-valid
       // eslint-disable-next-line
       <a
-        className={`drawGeometry ${this.props.isLoggedIn ? '' : 'disabled'}`}
+        className={`drawGeometry`}
         onClick={(ev) => {
-          if (!isEnabled) {
-            this.props.onErrorMessage(title);
-            return;
-          }
           this.props.toggleMeasure();
         }}
         title={title}
@@ -67,7 +59,7 @@ export class EOBMeasurePanelButton extends React.Component {
   }
 }
 
-const PrettyDistance = ({ distance }) => {
+export const PrettyDistance = ({ distance }) => {
   const divided = distance / 1000;
   if (divided >= 1) {
     return (

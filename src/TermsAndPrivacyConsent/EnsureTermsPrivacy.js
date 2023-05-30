@@ -1,38 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 
-import store, { modalSlice, authSlice } from '../store';
-import { ModalId, LOCAL_STORAGE_PRIVACY_CONSENT_KEY } from '../const';
+import store, { authSlice } from '../store';
+import { LOCAL_STORAGE_PRIVACY_CONSENT_KEY } from '../const';
+import TermsAndPrivacyConsentForm from './TermsAndPrivacyConsentForm';
 
-function EnsureTermsPrivacy({ children, termsPrivacyAccepted, userToken }) {
-  const [ensuringConsentComplete, setEnsuringConsentComplete] = useState(false);
-
+function EnsureTermsPrivacy({ userToken, termsPrivacyAccepted }) {
   useEffect(() => {
-    if (userToken) {
+    const consent = localStorage.getItem(LOCAL_STORAGE_PRIVACY_CONSENT_KEY) === 'true';
+    if (userToken || consent) {
       store.dispatch(authSlice.actions.setTermsPrivacyAccepted(true));
-    } else {
-      const consent = localStorage.getItem(LOCAL_STORAGE_PRIVACY_CONSENT_KEY);
-
-      if (consent !== 'true') {
-        store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TERMS_AND_PRIVACY_CONSENT }));
-      } else {
-        store.dispatch(authSlice.actions.setTermsPrivacyAccepted(true));
-      }
+    } else if (termsPrivacyAccepted) {
+      localStorage.setItem(LOCAL_STORAGE_PRIVACY_CONSENT_KEY, true);
     }
-    setEnsuringConsentComplete(true);
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    if (userToken) {
-      store.dispatch(authSlice.actions.setTermsPrivacyAccepted(true));
-      localStorage.setItem(LOCAL_STORAGE_PRIVACY_CONSENT_KEY, true);
-    }
-  }, [userToken]);
-
-  if (ensuringConsentComplete) {
-    return children;
+  if (!termsPrivacyAccepted) {
+    return <TermsAndPrivacyConsentForm />;
   }
+
   return (
     <div className="initial-loader">
       <i className="fa fa-cog fa-spin fa-3x fa-fw" />
@@ -41,8 +28,8 @@ function EnsureTermsPrivacy({ children, termsPrivacyAccepted, userToken }) {
 }
 
 const mapStoreToProps = (store) => ({
-  termsPrivacyAccepted: store.auth.terms_privacy_accepted,
   userToken: store.auth.user.access_token,
+  termsPrivacyAccepted: store.auth.terms_privacy_accepted,
 });
 
 export default connect(mapStoreToProps, null)(EnsureTermsPrivacy);

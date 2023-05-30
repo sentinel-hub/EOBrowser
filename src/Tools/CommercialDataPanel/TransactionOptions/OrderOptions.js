@@ -12,6 +12,7 @@ import { renderProviderSpecificTransactionParams } from './renderProviderSpecifi
 import { OrderType } from '../../../const';
 import { getTransactionSize } from '../commercialData.utils';
 import SearchForm from '../Search/SearchForm';
+import { PLANET_SKYSAT_MIN_ORDER_SIZE, TPDI_PROVIDER_ORDER_WARNINGS } from '../const';
 
 const OrderTypeLabel = {
   [OrderType.PRODUCTS]: 'Products',
@@ -64,8 +65,15 @@ const OrderOptions = ({
       return false;
     }
 
-    if (searchParams && searchParams.dataProvider === TPDICollections.PLANET_SCOPE && !planetApiKey) {
-      return false;
+    if (searchParams) {
+      if (
+        searchParams.dataProvider === TPDICollections.PLANET_SCOPE ||
+        searchParams.dataProvider === TPDICollections.PLANET_SKYSAT
+      ) {
+        if (!planetApiKey) {
+          return false;
+        }
+      }
     }
 
     return !!aoiGeometry;
@@ -180,7 +188,11 @@ const OrderOptions = ({
           searchParams: searchParams,
           setTransactionOptions: setTransactionOptions,
         })}
-
+      {searchParams.dataProvider === TPDICollections.PLANET_SKYSAT &&
+        getTransactionSize(aoiGeometry, transactionOptions, selectedProducts, searchResults) <
+          PLANET_SKYSAT_MIN_ORDER_SIZE && (
+          <NotificationPanel type="error" msg={TPDI_PROVIDER_ORDER_WARNINGS[TPDICollections.PLANET_SKYSAT]} />
+        )}
       <div className="actions">
         <EOBButton
           className="commercial-data-button"

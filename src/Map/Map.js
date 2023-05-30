@@ -14,12 +14,12 @@ import NProgress from 'nprogress';
 import ReactLeafletGoogleLayer from './plugins/ReactLeafletGoogleLayer';
 import 'nprogress/nprogress.css';
 
-import store, { commercialDataSlice, mainMapSlice, visualizationSlice } from '../store';
+import store, { commercialDataSlice, mainMapSlice, themesSlice, visualizationSlice } from '../store';
 import 'leaflet/dist/leaflet.css';
 import './Map.scss';
 import L from 'leaflet';
 import moment from 'moment';
-import { AOI_SHAPE, SEARCH_PANEL_TABS, TABS } from '../const';
+import { EDUCATION_MODE, MODES, SEARCH_PANEL_TABS, TABS } from '../const';
 import Controls from '../Controls/Controls';
 import PreviewLayer from '../Tools/Results/PreviewLayer';
 import LeafletControls from './LeafletControls/LeafletControls';
@@ -43,6 +43,8 @@ import {
 import { checkUserAccount } from '../Tools/CommercialDataPanel/commercialData.utils';
 import MaptilerLogo from './maptiler-logo-adaptive.svg';
 import { SpeckleFilterType } from '@sentinel-hub/sentinelhub-js';
+import { isRectangle } from '../utils/geojson.utils';
+import EOBModeSelection from '../junk/EOBModeSelection/EOBModeSelection';
 
 const BASE_PANE_ID = 'baseMapPane';
 const BASE_PANE_ZINDEX = 5;
@@ -85,8 +87,10 @@ class Map extends React.Component {
   }
 
   updateViewport = (viewport) => {
-    viewport.center = Object.values(L.latLng(...viewport.center).wrap());
-    store.dispatch(mainMapSlice.actions.setViewport(viewport));
+    if (viewport?.center) {
+      viewport.center = Object.values(L.latLng(...viewport.center).wrap());
+      store.dispatch(mainMapSlice.actions.setViewport(viewport));
+    }
   };
 
   setBounds = (ev) => {
@@ -120,6 +124,11 @@ class Map extends React.Component {
     if (error) {
       store.dispatch(visualizationSlice.actions.setError(null));
     }
+  };
+
+  onSelectMode = (modeId) => {
+    store.dispatch(visualizationSlice.actions.reset());
+    store.dispatch(themesSlice.actions.setSelectedModeIdAndDefaultTheme(modeId));
   };
 
   render() {
@@ -167,6 +176,9 @@ class Map extends React.Component {
       displayTimelapseAreaPreview,
       googleAPI,
       shouldAnimateControls,
+      is3D,
+      selectedModeId,
+      elevationProfileHighlightedPoint,
     } = this.props;
 
     const zoomConfig = getZoomConfiguration(datasetId);
@@ -291,7 +303,8 @@ class Map extends React.Component {
               </Overlay>
             )}
 
-          {comparedLayers.length &&
+          {authenticated &&
+            comparedLayers.length &&
             selectedTabIndex === TABS.COMPARE_TAB &&
             comparedLayers
               .slice()
@@ -405,11 +418,14 @@ class Map extends React.Component {
           ))}
         </LayersControl>
 
-        {(this.props.aoiShape === AOI_SHAPE.polygon || !this.props.aoiShape) && this.props.aoiGeometry && (
+        {this.props.aoiGeometry && !isRectangle(this.props.aoiGeometry) && (
           <GeoJSON id="aoi-layer" data={this.props.aoiGeometry} key={this.props.aoiLastEdited} />
         )}
-        {this.props.aoiShape === AOI_SHAPE.rectangle && this.props.aoiBounds && (
+        {this.props.aoiGeometry && this.props.aoiBounds && isRectangle(this.props.aoiGeometry) && (
           <Rectangle id="aoi-layer" bounds={this.props.aoiBounds} key={this.props.aoiLastEdited} />
+        )}
+        {this.props.loiGeometry && (
+          <GeoJSON id="loi-layer" data={this.props.loiGeometry} key={this.props.loiLastEdited} />
         )}
         {!this.props.poiPosition ? null : <Marker id="poi-layer" position={this.props.poiPosition} />}
 
@@ -424,6 +440,24 @@ class Map extends React.Component {
         {this.props.highlightedTile ? (
           <GeoJSON data={this.props.highlightedTile.geometry} style={() => highlightedTileStyle} />
         ) : null}
+
+        {this.props.elevationProfileHighlightedPoint ? (
+          <GeoJSON
+            data={this.props.elevationProfileHighlightedPoint}
+            key={JSON.stringify(elevationProfileHighlightedPoint)}
+            pointToLayer={(feature, latlng) => {
+              return L.circleMarker(latlng, {
+                radius: 8,
+                fillColor: '#fff',
+                color: '#3388ff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 1,
+              });
+            }}
+          />
+        ) : null}
+
         {displayTimelapseAreaPreview && selectedTabIndex === TABS.VISUALIZE_TAB && (
           <TimelapseAreaPreview lat={lat} lng={lng} zoom={zoom} mapBounds={mapBounds} />
         )}
@@ -476,6 +510,15 @@ class Map extends React.Component {
             />
           )}
 
+        {selectedModeId && !is3D && (
+          <EOBModeSelection
+            highlighted={this.props.selectedModeId === EDUCATION_MODE.id}
+            modes={MODES}
+            onSelectMode={this.onSelectMode}
+            selectedModeId={this.props.selectedModeId}
+          />
+        )}
+
         <LeafletControls key={selectedLanguage} />
         <SearchBox
           googleAPI={googleAPI}
@@ -507,9 +550,10 @@ const mapStoreToProps = (store) => {
     mapBounds: store.mainMap.bounds,
     enabledOverlaysId: store.mainMap.enabledOverlaysId,
     aoiGeometry: store.aoi.geometry,
-    aoiShape: store.aoi.shape,
     aoiBounds: store.aoi.bounds,
     aoiLastEdited: store.aoi.lastEdited,
+    loiGeometry: store.loi.geometry,
+    loiLastEdited: store.loi.lastEdited,
     displayTimelapseAreaPreview: store.timelapse.displayTimelapseAreaPreview,
     poiPosition: store.poi.position,
     poiLastEdited: store.poi.lastEdited,
@@ -551,6 +595,9 @@ const mapStoreToProps = (store) => {
     commercialDataDisplaySearchResults: store.commercialData.displaySearchResults,
     commercialDataSelectedOrder: store.commercialData.selectedOrder,
     selectedTabSearchPanelIndex: store.tabs.selectedTabSearchPanelIndex,
+    is3D: store.mainMap.is3D,
+    selectedModeId: store.themes.selectedModeId,
+    elevationProfileHighlightedPoint: store.elevationProfile.highlightedPoint,
   };
 };
 

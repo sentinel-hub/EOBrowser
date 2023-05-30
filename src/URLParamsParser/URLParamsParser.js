@@ -17,12 +17,15 @@ import store, {
   terrainViewerSlice,
   timelapseSlice,
   modalSlice,
+  compareLayersSlice,
+  tabsSlice,
 } from '../store';
 import { b64DecodeUnicode } from '../utils/base64MDN';
 
 import { computeNewValuesFromPoints } from '../junk/EOBEffectsPanel/AdvancedRgbEffects/CurveEditor/CurveEditor.utils';
 import { DEFAULT_LAT_LNG } from '../const';
 import { ModalId } from '../const';
+import { getSharedPins } from '../Tools/Pins/Pin.utils';
 
 class URLParamsParser extends React.Component {
   state = {
@@ -173,6 +176,11 @@ class URLParamsParser extends React.Component {
       timelapse,
       timelapseSharePreviewMode,
       previewFileUrl,
+      compareShare,
+      compareSharedPinsId,
+      compareMode,
+      comparedOpacity,
+      comparedClipping,
     } = params;
 
     let { lat: parsedLat, lng: parsedLng, zoom: parsedZoom } = parsePosition(lat, lng, zoom);
@@ -222,6 +230,9 @@ class URLParamsParser extends React.Component {
       ...getNewDatasetPropertiesIfDeprecatedDatasetId(datasetId, visualizationUrl),
     };
     store.dispatch(visualizationSlice.actions.setVisualizationParams(newVisualizationParams));
+    if (datasetId && !compareShare) {
+      store.dispatch(tabsSlice.actions.setTabIndex(2));
+    }
 
     if (handlePositions && gradient) {
       const parsedGradient = gradient.split(',');
@@ -263,6 +274,22 @@ class URLParamsParser extends React.Component {
       if (previewFileUrl) {
         store.dispatch(timelapseSlice.actions.setPreviewFileUrl(previewFileUrl));
       }
+    }
+
+    if (compareShare) {
+      (async () => {
+        const pins = await getSharedPins(compareSharedPinsId);
+
+        store.dispatch(
+          compareLayersSlice.actions.restoreComparedLayers({
+            layers: pins.items,
+            compareMode: compareMode,
+            comparedOpacity: JSON.parse(comparedOpacity),
+            comparedClipping: JSON.parse(comparedClipping),
+          }),
+        );
+        store.dispatch(tabsSlice.actions.setTabIndex(4));
+      })();
     }
   };
 

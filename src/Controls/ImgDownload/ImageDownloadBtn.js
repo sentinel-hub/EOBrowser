@@ -35,6 +35,13 @@ class ImageDownloadBtn extends Component {
     const isOnComparePanel = selectedTabIndex === TABS.COMPARE_TAB;
     const hasVisualization = !!(layerId || customSelected);
 
+    if (!isOnVisualizationPanel && !isOnComparePanel) {
+      return {
+        enabled: false,
+        errorMessage: t`you can only download an image while visualizing or comparing`,
+      };
+    }
+
     if (hasVisualization && datasetId && !isOnComparePanel) {
       return this.checkIfSupportedByDatasetId(datasetId);
     }
@@ -42,12 +49,7 @@ class ImageDownloadBtn extends Component {
     if (!hasVisualization && !isOnComparePanel) {
       return { enabled: false, errorMessage: t`please select a layer` };
     }
-    if (!isOnVisualizationPanel && !isOnComparePanel) {
-      return {
-        enabled: false,
-        errorMessage: t`you can only download an image while visualizing or comparing`,
-      };
-    }
+
     if (isOnComparePanel && comparedLayers.length < 2) {
       return { enabled: false, errorMessage: t`you need to compare at least 2 layers` };
     }

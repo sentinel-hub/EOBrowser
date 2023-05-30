@@ -14,9 +14,12 @@ import { SliderInput } from './SliderInput';
 import { ToggleInput } from './ToggleInput';
 import { createSelectOptions } from '../commercialData.utils';
 import { PlanetSupportedProductBundles } from '@sentinel-hub/sentinelhub-js';
+import { Link } from './Link';
 
 export const minDateRange = moment.utc('1982-01-01');
 export const maxDateRange = moment.utc().add(10, 'years').endOf('year');
+
+export const GEOCENTO_EARTHIMAGES = 'GEOCENTO_EARTHIMAGES';
 
 export const providerSpecificSearchParameters = {
   [TPDICollections.PLANET_SCOPE]: [
@@ -24,10 +27,31 @@ export const providerSpecificSearchParameters = {
       id: 'itemType',
       label: () => t`Item type`,
       render: SelectInput,
-      options: [
-        { value: PlanetItemType.PSScene, label: PlanetItemType.PSScene },
-        { value: PlanetItemType.PSScene4Band, label: `${PlanetItemType.PSScene4Band} (${t`deprecated`})` },
-      ],
+      options: [{ value: PlanetItemType.PSScene, label: PlanetItemType.PSScene }],
+    },
+    {
+      id: 'productBundle',
+      label: () => t`Product bundle`,
+      render: SelectInput,
+      options: createSelectOptions(PlanetProductBundle),
+      filterOptions: (option, { itemType }) => PlanetSupportedProductBundles[itemType].includes(option.value),
+    },
+    {
+      id: 'maxCloudCoverage',
+      label: () => t`Max. Cloud Coverage`,
+      render: SliderInput,
+      min: 0,
+      max: 100,
+      showIcons: false,
+      unit: '%',
+    },
+  ],
+  [TPDICollections.PLANET_SKYSAT]: [
+    {
+      id: 'itemType',
+      label: () => t`Item type`,
+      render: SelectInput,
+      options: [{ value: PlanetItemType.SkySatCollect, label: PlanetItemType.SkySatCollect }],
     },
     {
       id: 'productBundle',
@@ -209,6 +233,13 @@ export const providerSpecificSearchParameters = {
       unit: '°',
       defaultValue: 90,
       advanced: true,
+    },
+  ],
+  [GEOCENTO_EARTHIMAGES]: [
+    {
+      id: 'advancedOptions',
+      label: () => t`Data transfer instructions`,
+      render: Link,
     },
   ],
 };

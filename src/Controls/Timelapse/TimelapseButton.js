@@ -5,6 +5,7 @@ import 'rodal/lib/rodal.css';
 
 import store, { notificationSlice, timelapseSlice } from '../../store';
 import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { TIMELAPSE_3D_MIN_EYE_HEIGHT } from '../../TerrainViewer/TerrainViewer.const';
 
 class TimelapseButton extends Component {
   componentDidUpdate = (prevProps) => {
@@ -31,6 +32,12 @@ class TimelapseButton extends Component {
   };
 
   render() {
+    const { is3D, terrainViewerSettings } = this.props;
+    let zoomTooLow = false;
+    if (is3D && terrainViewerSettings && Object.keys(terrainViewerSettings).length > 3) {
+      const { z } = terrainViewerSettings;
+      zoomTooLow = z > TIMELAPSE_3D_MIN_EYE_HEIGHT;
+    }
     return (
       <div className="timelapse-wrapper">
         <EOBTimelapsePanelButton
@@ -40,6 +47,7 @@ class TimelapseButton extends Component {
           is3D={this.props.is3D}
           aoi={this.props.aoi}
           onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
+          zoomTooLow={zoomTooLow}
         />
       </div>
     );
@@ -56,6 +64,7 @@ const mapStoreToProps = (store) => ({
   selectedTabIndex: store.tabs.selectedTabIndex,
   is3D: store.mainMap.is3D,
   aoi: store.aoi,
+  terrainViewerSettings: store.terrainViewer.settings,
 });
 
 export default connect(mapStoreToProps, null)(TimelapseButton);

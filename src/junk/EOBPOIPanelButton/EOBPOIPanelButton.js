@@ -3,8 +3,11 @@ import { t } from 'ttag';
 import FisChartLink from '../FisChartLink';
 import { getLoggedInErrorMsg } from '../ConstMessages';
 import '../EOBPanel.scss';
+import PixelExplorer from '../../Controls/PixelExplorer/PixelExplorer';
+import SpectralExplorerButton from '../../Controls/SpectralExplorer/SpectralExplorerButton';
+import { connect } from 'react-redux';
 
-export class EOBPOIPanelButton extends React.Component {
+class EOBPOIPanelButton extends React.Component {
   state = {
     showOptions: false,
   };
@@ -42,6 +45,13 @@ export class EOBPOIPanelButton extends React.Component {
       {
         // jsx-a11y/anchor-is-valid
         // eslint-disable-next-line
+        <a onClick={this.props.deleteMarker} title={t`Remove geometry`}>
+          <i className={`fa fa-close`} />
+        </a>
+      }
+      {
+        // jsx-a11y/anchor-is-valid
+        // eslint-disable-next-line
         <a onClick={() => this.props.centerOnFeature('poiLayer')} title={t`Center map on feature`}>
           <i className={`fa fa-crosshairs`} />
         </a>
@@ -56,13 +66,14 @@ export class EOBPOIPanelButton extends React.Component {
           onErrorMessage={this.props.onErrorMessage}
         />
       )}
-      {
-        // jsx-a11y/anchor-is-valid
-        // eslint-disable-next-line
-        <a onClick={this.props.deleteMarker} title={t`Remove geometry`}>
-          <i className={`fa fa-close`} />
-        </a>
-      }
+      {this.props.poi && (
+        <SpectralExplorerButton
+          datasetId={this.props.datasetId}
+          geometry={this.props.poiGeometry}
+          onErrorMessage={this.props.onErrorMessage}
+          geometryType={'poi'}
+        />
+      )}
     </span>
   );
 
@@ -70,9 +81,17 @@ export class EOBPOIPanelButton extends React.Component {
     const { poi } = this.props;
     return (
       <div className="poiPanel panelButton floatItem" title={t`Area of interest`}>
+        {<PixelExplorer />}
         {poi && !this.props.disabled && this.renderMarkerInfo()}
         {this.renderMarkerIcon()}
       </div>
     );
   }
 }
+
+const mapStoreToProps = (store) => ({
+  datasetId: store.visualization.datasetId,
+  poiGeometry: store.poi.geometry,
+});
+
+export default connect(mapStoreToProps)(EOBPOIPanelButton);

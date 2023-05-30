@@ -18,6 +18,7 @@
     align-content: center;
     color: $primaryCol;
     padding: 3px 8px 3px 3px;
+    cursor: pointer;
   }
 
   .holders {
@@ -26,6 +27,8 @@
     .linkedin-share-button {
       i {
         font-size: 30px;
+        color: $primaryCol;
+        margin-right: 5px;
       }
     }
   }

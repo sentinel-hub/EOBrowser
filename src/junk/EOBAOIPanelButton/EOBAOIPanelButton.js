@@ -5,13 +5,14 @@ import { t } from 'ttag';
 import FisChartLink from '../FisChartLink';
 import { getLoggedInErrorMsg } from '../ConstMessages';
 import { AOI_SHAPE } from '../../const';
+import SpectralExplorerButton from '../../Controls/SpectralExplorer/SpectralExplorerButton';
 
 import '../EOBPanel.scss';
+import CopyGeometryToClipboardButton from './CopyGeometryToClipboardButton';
 
 export class EOBAOIPanelButton extends React.Component {
   state = {
     showOptions: false,
-    copyGeometryConfirmation: false,
   };
 
   showOptions = () => {
@@ -30,7 +31,9 @@ export class EOBAOIPanelButton extends React.Component {
 
   renderOptionButtons = () => (
     <div className="aoiCords">
-      <OpenUploadDataDialogButton handleClick={this.props.openUploadGeoFileDialog} />
+      {!this.props.aoiBounds && (
+        <OpenUploadDataDialogButton handleClick={this.props.openUploadGeoFileDialog} />
+      )}
       {
         // jsx-a11y/anchor-is-valid
         // eslint-disable-next-line
@@ -54,20 +57,6 @@ export class EOBAOIPanelButton extends React.Component {
     </div>
   );
 
-  copyGeometryToClipboard = () => {
-    const geometry = this.props.aoiBounds.geometry ? this.props.aoiBounds.geometry : this.props.aoiBounds;
-    let textField = document.createElement('textarea');
-    textField.innerText = JSON.stringify(geometry);
-    document.body.appendChild(textField);
-    textField.select();
-    document.execCommand('copy');
-    textField.remove();
-    this.setState({
-      copyGeometryConfirmation: true,
-    });
-    setTimeout(() => this.setState({ copyGeometryConfirmation: false }), 400);
-  };
-
   renderAioInfo = () => {
     const area = (
       parseFloat(
@@ -77,17 +66,7 @@ export class EOBAOIPanelButton extends React.Component {
 
     return (
       <span className="aoiCords">
-        <span
-          className="copy-coord"
-          title={t`Copy geometry to clipboard`}
-          onClick={this.copyGeometryToClipboard}
-        >
-          {this.state.copyGeometryConfirmation ? (
-            <i className="fas fa-check-circle" />
-          ) : (
-            <i className="far fa-copy" />
-          )}
-        </span>
+        <CopyGeometryToClipboardButton geometry={this.props.aoiBounds.geometry ?? this.props.aoiBounds} />
         {!isNaN(area) && (
           <span className="area-text">
             {area} {t`km`}
@@ -95,6 +74,16 @@ export class EOBAOIPanelButton extends React.Component {
           </span>
         )}
         <span>
+          {
+            // jsx-a11y/anchor-is-valid
+            // eslint-disable-next-line
+            <a
+              onClick={this.props.resetAoi}
+              title={this.props.isAoiClip ? t`Cancel edit.` : t`Remove geometry`}
+            >
+              <i className={`fa fa-close`} />
+            </a>
+          }
           {
             // jsx-a11y/anchor-is-valid
             // eslint-disable-next-line
@@ -112,16 +101,13 @@ export class EOBAOIPanelButton extends React.Component {
               onErrorMessage={this.props.onErrorMessage}
             />
           )}
-          {
-            // jsx-a11y/anchor-is-valid
-            // eslint-disable-next-line
-            <a
-              onClick={this.props.resetAoi}
-              title={this.props.isAoiClip ? t`Cancel edit.` : t`Remove geometry`}
-            >
-              <i className={`fa fa-close`} />
-            </a>
-          }
+
+          <SpectralExplorerButton
+            datasetId={this.props.datasetId}
+            geometry={this.props.aoiGeometry}
+            onErrorMessage={this.props.onErrorMessage}
+            geometryType={'aoi'}
+          />
         </span>
       </span>
     );
@@ -131,10 +117,11 @@ export class EOBAOIPanelButton extends React.Component {
     const { aoiBounds, isAoiClip } = this.props;
     const { showOptions } = this.state;
     const doWeHaveAOI = aoiBounds || isAoiClip;
-    const showOptionsMenu = !doWeHaveAOI && showOptions;
+    const showOptionsMenu = showOptions || doWeHaveAOI;
     const errMsg = this.props.disabled ? getLoggedInErrorMsg() : null;
     const isEnabled = errMsg === null;
-    const title = t`Draw area of interest` + errMsg ? errMsg : '';
+    const title = t`Create an area of interest`;
+
     return (
       <div
         className="aoiPanel panelButton floatItem"
@@ -147,8 +134,8 @@ export class EOBAOIPanelButton extends React.Component {
         }}
         title={title}
       >
-        {showOptionsMenu && this.renderOptionButtons()}
         {doWeHaveAOI && !this.props.disabled && this.renderAioInfo()}
+        {showOptionsMenu && this.renderOptionButtons()}
         {
           // jsx-a11y/anchor-is-valid
           // eslint-disable-next-line
@@ -166,7 +153,7 @@ export class EOBAOIPanelButton extends React.Component {
 const OpenUploadDataDialogButton = ({ handleClick }) => (
   // jsx-a11y/anchor-is-valid
   // eslint-disable-next-line
-  <a title={t`Upload data`} onClick={handleClick}>
+  <a title={t`Upload a file to create an area of interest`} onClick={handleClick}>
     <i className="fa fa-upload" />
   </a>
 );

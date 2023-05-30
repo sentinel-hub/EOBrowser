@@ -1,13 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { connect } from 'react-redux';
-import {
-  BBox,
-  CRS_EPSG3857,
-  MimeTypes,
-  CancelToken,
-  DEMLayer,
-  DEMInstanceType,
-} from '@sentinel-hub/sentinelhub-js';
+import { BBox, CRS_EPSG3857, MimeTypes, CancelToken, DEMLayer } from '@sentinel-hub/sentinelhub-js';
 import proj4 from 'proj4';
 import { t } from 'ttag';
 import L from 'leaflet';
@@ -23,22 +16,21 @@ import {
   getZoomFromEyeHeight,
   getEyeHeightFromZoom,
   getHeightFromZoom,
+  getMaptilerUrl,
+  getTileCoord,
   getTileXAndTileY,
   is3DDemSourceCustom,
+  getDem3DMaxZoomLevel,
+  getDemProviderType,
 } from './TerrainViewer.utils';
+import { CURRENT_TERRAIN_VIEWER_ID, TERRAIN_VIEWER_IDS } from './TerrainViewer.const';
 import {
   datasourceForDatasetId,
   getDataSourceHandler,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getGetMapAuthToken } from '../App';
 import { constructGetMapParamsEffects } from '../utils/effectsUtils';
-import {
-  DATASOURCES,
-  DEM_3D_CUSTOM_TO_DATASOURCE,
-  EQUATOR_LENGTH,
-  reqConfigGetMap,
-  reqConfigMemoryCache,
-} from '../const';
+import { DATASOURCES, DEM_3D_CUSTOM_TO_DATASOURCE, reqConfigGetMap, reqConfigMemoryCache } from '../const';
 import Controls from '../Controls/Controls';
 import { constructErrorMessage, isDataFusionEnabled } from '../utils';
 import ExternalLink from '../ExternalLink/ExternalLink';
@@ -89,9 +81,7 @@ function TerrainViewer(props) {
     sunTime,
   } = terrainViewerSettings || {};
   const DEFAULT_TILE_SIZE = 512;
-  const DEFAULT_DEM_TILE_SIZE = 64;
-  const DEFAULT_DEM_MAX_ZOOM = 18;
-  const DEFAULT_DEM_SOURCE = DEMInstanceType.MAPZEN;
+  const DEFAULT_DEM_TILE_SIZE = 512;
 
   let minZoom = 7;
   if (dataSourcesInitialized && datasetId) {
@@ -135,7 +125,9 @@ function TerrainViewer(props) {
         props.datasetId &&
         (props.layerId || props.evalscript || props.evalscripturl)
       ) {
-        const newLayer = await getLayerFromParams(props);
+        const newLayer = await getLayerFromParams(props).catch((e) => {
+          console.warn(e.message);
+        });
         if (newLayer) {
           if (!isDataFusionEnabled(props.dataFusion)) {
             await newLayer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
@@ -185,14 +177,10 @@ function TerrainViewer(props) {
   useEffect(() => {
     if (terrainViewerId) {
       const tileSize = DEFAULT_DEM_TILE_SIZE;
-      const maxZoomLevel = DEFAULT_DEM_MAX_ZOOM;
-      const demSource3D = props.demSource3D
-        ? is3DDemSourceCustom(props.demSource3D)
-          ? 'CUSTOM'
-          : props.demSource3D
-        : DEFAULT_DEM_SOURCE;
+      const maxZoomLevel = getDem3DMaxZoomLevel(props.demSource3D);
+      const demProviderType = getDemProviderType(props.demSource3D);
 
-      window.set3DDemProvider(terrainViewerId, demSource3D, tileSize, maxZoomLevel);
+      window.set3DDemProvider(terrainViewerId, demProviderType, tileSize, maxZoomLevel);
       window.set3DPosition(terrainViewerId, x, y, z, rotH, rotV);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -209,12 +197,19 @@ function TerrainViewer(props) {
   }
 
   function get3DMapTileUrl(viewerId, minX, minY, maxX, maxY, width, height, callback) {
-    const zoomLevel = Math.max(
-      0,
-      Math.min(19, 1 + Math.floor(Math.log(EQUATOR_LENGTH / ((maxX - minX) * 1.001)) / Math.log(2))),
-    );
-    const { tileX, tileY } = getTileXAndTileY(zoomLevel, minX, minY, maxX, maxY);
-    const mapTilerUrl = `https://api.maptiler.com/maps/streets/256/${zoomLevel}/${tileX}/${tileY}.png?key=${process.env.REACT_APP_MAPTILER_KEY}`;
+    const func = window.get3DMapTileUrlFunctions[CURRENT_TERRAIN_VIEWER_ID];
+    if (func) {
+      func(minX, minY, maxX, maxY, width, height, callback);
+    } else {
+      const { tileX, tileY, zoomLevel } = getTileCoord(minX, minY, maxX, maxY);
+      const mapTilerUrl = getMaptilerUrl({ tileX, tileY, zoomLevel });
+      callback(mapTilerUrl);
+    }
+  }
+
+  function getTerrainViewerMapTileUrl(minX, minY, maxX, maxY, width, height, callback) {
+    const { tileX, tileY, zoomLevel } = getTileCoord(minX, minY, maxX, maxY);
+    const mapTilerUrl = getMaptilerUrl({ tileX, tileY, zoomLevel });
 
     if (!layer || zoomLevel <= minZoom) {
       callback(mapTilerUrl);
@@ -251,20 +246,19 @@ function TerrainViewer(props) {
       }
     }
 
-    getMapTile(
+    getMapTile({
       layer,
-      getMapParams,
+      params: getMapParams,
       minX,
       minY,
       maxX,
       maxY,
       width,
       height,
-      onCallback,
+      callback: onCallback,
       reqConfig,
       onTileError,
-      mapTilerUrl,
-    );
+    });
   }
 
   async function get3DDemTileUrl(viewerId, minX, minY, maxX, maxY, width, height, callback) {
@@ -312,7 +306,7 @@ function TerrainViewer(props) {
     };
 
     function onCallback(url) {
-      callback(url);
+      callback(url, 'png', () => URL.revokeObjectURL(url));
     }
 
     const demLayer = new DEMLayer({
@@ -337,26 +331,28 @@ function TerrainViewer(props) {
     `,
     });
 
-    getMapTile(
-      demLayer,
-      getMapParams,
+    getMapTile({
+      layer: demLayer,
+      params: getMapParams,
       minX,
       minY,
       maxX,
       maxY,
-      DEFAULT_DEM_TILE_SIZE,
-      DEFAULT_DEM_TILE_SIZE,
-      onCallback,
+      width: DEFAULT_DEM_TILE_SIZE,
+      height: DEFAULT_DEM_TILE_SIZE,
+      callback: onCallback,
       reqConfig,
       onTileError,
-    );
+    });
   }
 
   async function on3DInitialized() {
     if (!is3D) {
       return;
     }
-    const layer = await getLayerFromParams(props);
+    const layer = await getLayerFromParams(props).catch((e) => {
+      console.warn(e.message);
+    });
     if (layer && !isDataFusionEnabled(props.dataFusion)) {
       await layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
     }
@@ -367,12 +363,8 @@ function TerrainViewer(props) {
     setLayer(layer);
     setCancelToken(new CancelToken());
     const tileSize = DEFAULT_DEM_TILE_SIZE;
-    const maxZoomLevel = DEFAULT_DEM_MAX_ZOOM;
-    const demInstance = props.demSource3D
-      ? is3DDemSourceCustom(props.demSource3D)
-        ? 'CUSTOM'
-        : props.demSource3D
-      : DEFAULT_DEM_SOURCE;
+    const maxZoomLevel = getDem3DMaxZoomLevel(props.demSource3D);
+    const demProviderType = getDemProviderType(props.demSource3D);
 
     const terrainViewerId = window.create3DViewer(
       'terrain-map-container',
@@ -381,7 +373,7 @@ function TerrainViewer(props) {
       z,
       rotH,
       rotV,
-      demInstance,
+      demProviderType,
       tileSize,
       maxZoomLevel,
     );
@@ -427,9 +419,16 @@ function TerrainViewer(props) {
     setTimeoutId(newTimeoutId);
   }
 
-  function on3DLoadingStateChanged(viewerId, isLoading, type) {
+  function onTerrainViewerLoadingStateChanged(isLoading, type) {
     if (type === 'OVERALL') {
       setLoader(isLoading);
+    }
+  }
+
+  function on3DLoadingStateChanged(viewerId, isLoading, type) {
+    const func = window.on3DLoadingStateChangedFunctions[CURRENT_TERRAIN_VIEWER_ID];
+    if (func) {
+      func(isLoading, type);
     }
   }
 
@@ -512,16 +511,36 @@ function TerrainViewer(props) {
   }
 
   if (is3D) {
+    if (!window.on3DLoadingStateChangedFunctions) {
+      window.on3DLoadingStateChangedFunctions = {};
+    }
+    if (!window.get3DMapTileUrlFunctions) {
+      window.get3DMapTileUrlFunctions = {};
+    }
     window.get3DMapTileUrl = get3DMapTileUrl;
     window.on3DButtonClicked = on3DButtonClicked;
     window.on3DPositionChanged = on3DPositionChanged;
     window.on3DLoadingStateChanged = on3DLoadingStateChanged;
     window.on3DSettingsChanged = on3DSettingsChanged;
     window.set3DLocation = set3DLocation;
+    window.on3DLoadingStateChangedFunctions[TERRAIN_VIEWER_IDS.MAIN] = onTerrainViewerLoadingStateChanged;
+    window.get3DMapTileUrlFunctions[TERRAIN_VIEWER_IDS.MAIN] = getTerrainViewerMapTileUrl;
     if (is3DDemSourceCustom(props.demSource3D)) {
       window.get3DDemTileUrl = get3DDemTileUrl;
     }
   }
+
+  useEffect(() => {
+    if (layer) {
+      window.get3DMapTileUrl = get3DMapTileUrl;
+      window.reload3DTextures(terrainViewerId);
+    }
+    // eslint-disable-next-line
+  }, [layer]);
+
+  window.set3DLocation = set3DLocation;
+  window.terrainViewerId = terrainViewerId;
+  window.on3DObjectInteraction = (viewerId, x, y, z, longitude, latitude, distance, isClicked) => {};
 
   if (disabled) {
     return null;

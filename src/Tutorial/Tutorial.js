@@ -189,7 +189,11 @@ class Tutorial extends Component {
   render() {
     return (
       <div>
-        <div id="tutorial-animatedinfopanel-button" className="tutorial-panel-button" title={t`Show info`}>
+        <div
+          id="tutorial-animatedinfopanel-button"
+          className="tutorial-panel-button"
+          title={t`Show tutorial`}
+        >
           <span>
             <i className="fa fa-info" />
           </span>
@@ -198,7 +202,7 @@ class Tutorial extends Component {
         <div
           id="infoButton"
           className="tutorial-infopanel-button tutorial-panel-button"
-          title={t`Show info`}
+          title={t`Show tutorial`}
           onClick={(ev) => {
             this.handleStartTutorial(ev);
           }}

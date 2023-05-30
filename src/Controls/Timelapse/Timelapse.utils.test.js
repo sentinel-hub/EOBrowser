@@ -1,4 +1,4 @@
-import { Bounds, LatLngBounds } from 'leaflet';
+import { LatLngBounds } from 'leaflet';
 import moment from 'moment';
 import {
   getFlyoversToFetch,
@@ -15,27 +15,26 @@ jest.mock('../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers', () =>
 }));
 
 describe('getTimelapseBounds', () => {
-  const pixelBounds = new Bounds([
-    [71120, 47154],
-    [70175, 46401],
-  ]);
-  const zoom = 10;
+  const rectangularBounds = new LatLngBounds(
+    { lat: 46.11441972281433, lng: 14.609413146972656 },
+    { lat: 45.9647540591795, lng: 14.377498626708986 },
+  );
 
-  const bounds = new LatLngBounds(
-    { lat: 74.75816257328852, lng: -83.49609375000001 },
-    { lat: 75.02695401233501, lng: -82.46475219726564 },
+  const squareBounds = new LatLngBounds(
+    { lat: 45.9647540591795, lng: 14.385652542114277 },
+    { lat: 46.114419722814326, lng: 14.601259231567363 },
   );
 
   const aoi = {
-    bounds,
+    bounds: rectangularBounds,
   };
 
-  it('should return a center bbox when pixel bounds and zoom is passed', () => {
-    expect(getTimelapseBounds(pixelBounds, zoom)).toEqual(bounds);
+  it('should return a center square bbox when bounds are passed', () => {
+    expect(getTimelapseBounds(rectangularBounds)).toEqual(squareBounds);
   });
 
-  it('should return bounds when aoi bounds are passed', () => {
-    expect(getTimelapseBounds(pixelBounds, zoom, aoi)).toEqual(bounds);
+  it('should return aoi bounds when aoi bounds are passed', () => {
+    expect(getTimelapseBounds(rectangularBounds, aoi)).toEqual(rectangularBounds);
   });
 });
 
@@ -191,22 +190,22 @@ describe('isImageCoverageEnough', () => {
       averageCloudCoverPercent: 10,
       coveragePercent: 100,
     };
-    expect(isImageCoverageEnough(image, true, 80)).toBe(true);
+    expect(isImageCoverageEnough(image.coveragePercent, true, 80)).toBe(true);
 
     image.coveragePercent = 70;
-    expect(isImageCoverageEnough(image, true, 80)).toBe(false);
+    expect(isImageCoverageEnough(image.coveragePercent, true, 80)).toBe(false);
 
     image.coveragePercent = 79.4; // round to 79
-    expect(isImageCoverageEnough(image, true, 80)).toBe(false);
+    expect(isImageCoverageEnough(image.coveragePercent, true, 80)).toBe(false);
 
     image.coveragePercent = 79.5; // round to 80
-    expect(isImageCoverageEnough(image, true, 80)).toBe(true);
+    expect(isImageCoverageEnough(image.coveragePercent, true, 80)).toBe(true);
 
     image.coveragePercent = 80;
-    expect(isImageCoverageEnough(image, true, 80)).toBe(true);
+    expect(isImageCoverageEnough(image.coveragePercent, true, 80)).toBe(true);
 
     image.coveragePercent = 80.5; // round to 81
-    expect(isImageCoverageEnough(image, true, 80)).toBe(true);
+    expect(isImageCoverageEnough(image.coveragePercent, true, 80)).toBe(true);
   });
 });
 
@@ -218,21 +217,21 @@ describe('isImageClearEnough', () => {
       averageCloudCoverPercent: 10,
       coveragePercent: 100,
     };
-    expect(isImageClearEnough(image, true, 50)).toBe(true);
+    expect(isImageClearEnough(image.averageCloudCoverPercent, true, 50)).toBe(true);
 
     image.averageCloudCoverPercent = 70;
-    expect(isImageClearEnough(image, true, 50)).toBe(false);
+    expect(isImageClearEnough(image.averageCloudCoverPercent, true, 50)).toBe(false);
 
     image.averageCloudCoverPercent = 50.5; // round to 51
-    expect(isImageClearEnough(image, true, 50)).toBe(false);
+    expect(isImageClearEnough(image.averageCloudCoverPercent, true, 50)).toBe(false);
 
     image.averageCloudCoverPercent = 50.4; // round to 50
-    expect(isImageClearEnough(image, true, 50)).toBe(true);
+    expect(isImageClearEnough(image.averageCloudCoverPercent, true, 50)).toBe(true);
 
     image.averageCloudCoverPercent = 50;
-    expect(isImageClearEnough(image, true, 50)).toBe(true);
+    expect(isImageClearEnough(image.averageCloudCoverPercent, true, 50)).toBe(true);
 
     image.averageCloudCoverPercent = 49.5; // round to 50
-    expect(isImageClearEnough(image, true, 50)).toBe(true);
+    expect(isImageClearEnough(image.averageCloudCoverPercent, true, 50)).toBe(true);
   });
 });

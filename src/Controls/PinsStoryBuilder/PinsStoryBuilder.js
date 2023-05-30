@@ -12,6 +12,7 @@ import {
   CancelToken,
   BBox,
   CRS_EPSG4326,
+  drawBlobOnCanvas,
 } from '@sentinel-hub/sentinelhub-js';
 
 import store, { modalSlice } from '../../store';
@@ -31,7 +32,6 @@ import {
   createSVGLegend,
   drawCaptions,
 } from '../ImgDownload/ImageDownload.utils';
-import { applyBlobToCanvas } from '../../junk/EOB3TimelapsePanel/imageOverlays.js';
 import {
   SENTINEL_COPYRIGHT_TEXT,
   drawLegendImage,
@@ -51,7 +51,7 @@ const blobToCanvas = async (blob, w, h) => {
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext('2d');
-  await applyBlobToCanvas(ctx, w, h, blob);
+  await drawBlobOnCanvas(ctx, blob);
   return canvas;
 };
 

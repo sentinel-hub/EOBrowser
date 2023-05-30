@@ -13,10 +13,21 @@ export default class BasicForm extends React.Component {
   DESCRIPTION_TITLE = t`Add a short description to the exported image.`;
   LEGEND_DISABLED_TITLE = t`Layer does not have any legend data.`;
   LEGEND_TITLE = t`Exported image will include legend.`;
+  CROP_TO_AOI_TITLE = t`Crop image to the bounds of the area of interest.`;
+  CROP_TO_AOI_DISABLED_TITLE = t`To use Crop to AOI, area of interest needs to be selected first.`;
+  DRAW_GEOMETRY_ON_IMAGE_TITLE = t`Draw the area of interest's geometry on the exported image.`;
+  DRAW_GEOMETRY_ON_IMAGE_DISABLED_TITLE = t`To use Draw AOI geometry on Image, area of interest needs to be selected first.`;
 
   componentDidMount() {
     const { updateFormData, addingMapOverlaysPossible } = this.props;
     if (!addingMapOverlaysPossible) {
+      updateFormData('addMapOverlays', false);
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { updateFormData, cropToAoi } = this.props;
+    if (cropToAoi && prevProps.cropToAoi !== cropToAoi) {
       updateFormData('addMapOverlays', false);
     }
   }
@@ -29,12 +40,15 @@ export default class BasicForm extends React.Component {
       showLegend,
       userDescription,
       hasLegendData,
-      addingMapOverlaysPossible,
       onErrorMessage,
       imageFormat,
       isUserLoggedIn,
       isBasicForm,
+      hasAoi,
+      cropToAoi,
+      drawAoiGeoToImg,
     } = this.props;
+
     return (
       <div>
         <div className={`form-field ${isUserLoggedIn ? '' : 'disabled'}`}>
@@ -58,15 +72,13 @@ export default class BasicForm extends React.Component {
           </div>
         </div>
         {isBasicForm && (
-          <div className={`form-field ${addingMapOverlaysPossible ? '' : 'disabled'}`}>
-            <label title={addingMapOverlaysPossible ? this.OVERLAY_TITLE : this.OVERLAY_DISABLED_TITLE}>
+          <div className={`form-field ${cropToAoi ? 'disabled' : ''}`}>
+            <label title={cropToAoi ? this.OVERLAY_DISABLED_TITLE : this.OVERLAY_TITLE}>
               <div>{t`Add map overlays`}</div>
               <i
-                className={`fa fa-question-circle ${addingMapOverlaysPossible ? '' : 'disabled'}`}
+                className={`fa fa-question-circle ${cropToAoi ? 'disabled' : ''}`}
                 onClick={() => {
-                  onErrorMessage(
-                    addingMapOverlaysPossible ? this.OVERLAY_TITLE : this.OVERLAY_DISABLED_TITLE,
-                  );
+                  onErrorMessage(cropToAoi ? this.OVERLAY_DISABLED_TITLE : this.OVERLAY_TITLE);
                 }}
               />
             </label>
@@ -97,6 +109,54 @@ export default class BasicForm extends React.Component {
             />
           </div>
         </div>
+        {isBasicForm ? (
+          <div className={`form-field ${hasAoi ? '' : 'disabled'}`}>
+            <label title={hasAoi ? this.CROP_TO_AOI_TITLE : this.CROP_TO_AOI_DISABLED_TITLE}>
+              <div>{t`Crop to AOI`}</div>
+              <i
+                className="fa fa-question-circle"
+                onClick={() => {
+                  onErrorMessage(hasAoi ? this.CROP_TO_AOI_TITLE : this.CROP_TO_AOI_DISABLED_TITLE);
+                }}
+              />
+            </label>
+            <div className="form-input">
+              <Toggle
+                checked={cropToAoi}
+                icons={false}
+                onChange={() => {
+                  updateFormData('cropToAoi', !cropToAoi);
+                }}
+              />
+            </div>
+          </div>
+        ) : null}
+        {isBasicForm ? (
+          <div className={`form-field ${hasAoi ? '' : 'disabled'}`}>
+            <label
+              title={hasAoi ? this.DRAW_GEOMETRY_ON_IMAGE_TITLE : this.DRAW_GEOMETRY_ON_IMAGE_DISABLED_TITLE}
+            >
+              <div>{t`Draw AOI geometry on Image`}</div>
+              <i
+                className="fa fa-question-circle"
+                onClick={() => {
+                  onErrorMessage(
+                    hasAoi ? this.DRAW_GEOMETRY_ON_IMAGE_TITLE : this.DRAW_GEOMETRY_ON_IMAGE_DISABLED_TITLE,
+                  );
+                }}
+              />
+            </label>
+            <div className="form-input">
+              <Toggle
+                checked={drawAoiGeoToImg}
+                icons={false}
+                onChange={() => {
+                  updateFormData('drawAoiGeoToImg', !drawAoiGeoToImg);
+                }}
+              />
+            </div>
+          </div>
+        ) : null}
         <div className={`form-field ${showCaptions ? '' : 'disabled'}`}>
           <label title={showCaptions ? this.DESCRIPTION_TITLE : this.DESCRIPTION_DISABLED_TITLE}>
             <div>{t`Description`}</div>

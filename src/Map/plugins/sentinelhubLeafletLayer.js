@@ -21,6 +21,7 @@ import {
   Landsat15AWSLMSSL1Layer,
   Landsat7AWSLETML1Layer,
   Landsat7AWSLETML2Layer,
+  HLSAWSLayer,
   MODISLayer,
   DEMLayer,
   ProcessingDataFusionLayer,
@@ -56,6 +57,7 @@ import {
   ESA_L7,
   ESA_L8,
   AWS_L8L1C,
+  AWS_HLS,
   ENVISAT_MERIS,
   DEM_MAPZEN,
   DEM_COPERNICUS_30,
@@ -63,15 +65,21 @@ import {
   COPERNICUS_CORINE_LAND_COVER,
   COPERNICUS_GLOBAL_LAND_COVER,
   COPERNICUS_WATER_BODIES,
-  COPERNICUS_GLOBAL_SURFACE_WATER,
   COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES,
   COPERNICUS_HR_VPP_VEGETATION_INDICES,
   COPERNICUS_HR_VPP_VPP_S1,
   COPERNICUS_HR_VPP_VPP_S2,
   COPERNICUS_CLC_ACCOUNTING,
+  COPERNICUS_HRSI_PSA,
+  COPERNICUS_HRSI_WDS,
+  COPERNICUS_HRSI_SWS,
+  COPERNICUS_HRSI_FSC,
+  COPERNICUS_HRSI_GFSC,
   CNES_LAND_COVER,
   GLOBAL_HUMAN_SETTLEMENT,
   ESA_WORLD_COVER,
+  COPERNICUS_GLOBAL_SURFACE_WATER,
+  IO_LULC_10M_ANNUAL,
   AWS_LOTL1,
   AWS_LOTL2,
   AWS_LTML1,
@@ -240,13 +248,18 @@ class SentinelHubLayer extends L.TileLayer {
           z: coords.z,
         };
       } else {
-        const nwPoint = coords.multiplyBy(tileSize);
-        const sePoint = nwPoint.add([tileSize, tileSize]);
-        const nw = L.CRS.EPSG3857.project(this._map.unproject(nwPoint, coords.z));
-        const se = L.CRS.EPSG3857.project(this._map.unproject(sePoint, coords.z));
-        const bbox = new BBox(CRS_EPSG3857, nw.x, se.y, se.x, nw.y);
+        try {
+          const nwPoint = coords.multiplyBy(tileSize);
+          const sePoint = nwPoint.add([tileSize, tileSize]);
+          const nw = L.CRS.EPSG3857.project(this._map.unproject(nwPoint, coords.z));
+          const se = L.CRS.EPSG3857.project(this._map.unproject(sePoint, coords.z));
+          const bbox = new BBox(CRS_EPSG3857, nw.x, se.y, se.x, nw.y);
 
-        individualTileParams.bbox = bbox;
+          individualTileParams.bbox = bbox;
+        } catch (error) {
+          console.error(error.message);
+          done(error, null);
+        }
       }
       refetchWithDefaultToken(
         (reqConfig) =>
@@ -501,6 +514,13 @@ class SentinelHubLayer extends L.TileLayer {
           upsampling: upsampling,
           downsampling: downsampling,
         });
+      case AWS_HLS:
+        return await new HLSAWSLayer({
+          evalscript: evalscript,
+          evalscriptUrl: evalscripturl,
+          upsampling: upsampling,
+          downsampling: downsampling,
+        });
       case AWS_LOTL1:
         return await new Landsat8AWSLOTL1Layer({
           evalscript: evalscript,
@@ -573,14 +593,20 @@ class SentinelHubLayer extends L.TileLayer {
       case COPERNICUS_CORINE_LAND_COVER:
       case COPERNICUS_GLOBAL_LAND_COVER:
       case COPERNICUS_WATER_BODIES:
-      case COPERNICUS_GLOBAL_SURFACE_WATER:
       case COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES:
       case COPERNICUS_HR_VPP_VEGETATION_INDICES:
       case COPERNICUS_HR_VPP_VPP_S1:
       case COPERNICUS_HR_VPP_VPP_S2:
       case COPERNICUS_CLC_ACCOUNTING:
       case CNES_LAND_COVER:
+      case COPERNICUS_HRSI_PSA:
+      case COPERNICUS_HRSI_WDS:
+      case COPERNICUS_HRSI_SWS:
+      case COPERNICUS_HRSI_FSC:
+      case COPERNICUS_HRSI_GFSC:
       case ESA_WORLD_COVER:
+      case COPERNICUS_GLOBAL_SURFACE_WATER:
+      case IO_LULC_10M_ANNUAL:
       case GLOBAL_HUMAN_SETTLEMENT:
         const dsh = getDataSourceHandler(datasetId);
         return await this.createBYOCLayer(

@@ -7,8 +7,9 @@ import {
   DEMLayer,
   BYOCSubTypes,
 } from '@sentinel-hub/sentinelhub-js';
+import { parseStringPromise } from 'xml2js';
 
-import store, { themesSlice } from '../../../store';
+import store, { notificationSlice, themesSlice } from '../../../store';
 
 import CopernicusServicesDataSourceHandler from './CopernicusServicesDataSourceHandler';
 import Sentinel1DataSourceHandler from './Sentinel1DataSourceHandler';
@@ -59,6 +60,7 @@ import {
   ESA_L7,
   ESA_L8,
   AWS_L8L1C,
+  AWS_HLS,
   ENVISAT_MERIS,
   DEM_MAPZEN,
   DEM_COPERNICUS_30,
@@ -66,15 +68,21 @@ import {
   COPERNICUS_CORINE_LAND_COVER,
   COPERNICUS_GLOBAL_LAND_COVER,
   COPERNICUS_WATER_BODIES,
-  COPERNICUS_GLOBAL_SURFACE_WATER,
   COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES,
   COPERNICUS_HR_VPP_VEGETATION_INDICES,
   COPERNICUS_HR_VPP_VPP_S1,
   COPERNICUS_HR_VPP_VPP_S2,
+  COPERNICUS_HRSI_PSA,
+  COPERNICUS_HRSI_WDS,
+  COPERNICUS_HRSI_SWS,
+  COPERNICUS_HRSI_FSC,
+  COPERNICUS_HRSI_GFSC,
   COPERNICUS_CLC_ACCOUNTING,
   CNES_LAND_COVER,
   GLOBAL_HUMAN_SETTLEMENT,
   ESA_WORLD_COVER,
+  COPERNICUS_GLOBAL_SURFACE_WATER,
+  IO_LULC_10M_ANNUAL,
   AWS_LOTL1,
   AWS_LOTL2,
   AWS_LTML1,
@@ -99,6 +107,7 @@ import {
   CUSTOM,
   PLANET_NICFI,
 } from './dataSourceConstants';
+import HLSAWSDataSourceHandler from './HLSAWSDataSourceHandler';
 
 export let dataSourceHandlers;
 initializeDataSourceHandlers();
@@ -114,6 +123,7 @@ export function initializeDataSourceHandlers() {
     new Landsat7AWSDataSourceHandler(),
     new Landsat8AWSDataSourceHandler(),
     new LandsatEOCloudDataSourceHandler(),
+    new HLSAWSDataSourceHandler(),
     new EnvisatMerisDataSourceHandler(),
     new ModisDataSourceHandler(),
     new DEMDataSourceHandler(),
@@ -273,6 +283,7 @@ export async function prepareDataSourceHandlers(theme) {
       try {
         const layers = await LayersFactory.makeLayers(dataSourceUrl, null, null, {
           timeout: 30000,
+          responseType: 'text',
           cache: {
             expiresIn: Number.POSITIVE_INFINITY,
             targets: [CacheTarget.MEMORY],
@@ -281,6 +292,11 @@ export async function prepareDataSourceHandlers(theme) {
         await updateLayersFromServiceIfNeeded(layers);
         return layers;
       } catch (e) {
+        if (e?.response?.status === 403 && e?.response?.headers['content-type'] === 'application/xml') {
+          const responseData = await parseStringPromise(e.response.data);
+          const responseText = responseData?.ServiceExceptionReport?.ServiceException[0].trim();
+          store.dispatch(notificationSlice.actions.displayPanelError({ message: responseText }));
+        }
         console.warn(e);
         return null;
       }
@@ -351,6 +367,8 @@ export function datasourceForDatasetId(datasetId) {
       return DATASOURCES.AWS_LANDSAT45;
     case AWS_LMSSL1:
       return DATASOURCES.AWS_LANDSAT15;
+    case AWS_HLS:
+      return DATASOURCES.AWS_HLS;
     case ENVISAT_MERIS:
       return DATASOURCES.ENVISAT_MERIS;
     case AWS_LETML1:
@@ -375,17 +393,23 @@ export function datasourceForDatasetId(datasetId) {
     case COPERNICUS_CORINE_LAND_COVER:
     case COPERNICUS_GLOBAL_LAND_COVER:
     case COPERNICUS_WATER_BODIES:
-    case COPERNICUS_GLOBAL_SURFACE_WATER:
     case COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES:
     case COPERNICUS_HR_VPP_VEGETATION_INDICES:
     case COPERNICUS_HR_VPP_VPP_S1:
     case COPERNICUS_HR_VPP_VPP_S2:
+    case COPERNICUS_HRSI_PSA:
+    case COPERNICUS_HRSI_WDS:
+    case COPERNICUS_HRSI_SWS:
+    case COPERNICUS_HRSI_FSC:
+    case COPERNICUS_HRSI_GFSC:
     case COPERNICUS_CLC_ACCOUNTING:
       return DATASOURCES.COPERNICUS;
     case PLANET_NICFI:
       return DATASOURCES.PLANET_NICFI;
     case CNES_LAND_COVER:
     case ESA_WORLD_COVER:
+    case COPERNICUS_GLOBAL_SURFACE_WATER:
+    case IO_LULC_10M_ANNUAL:
     case GLOBAL_HUMAN_SETTLEMENT:
       return DATASOURCES.OTHER;
     default:
@@ -449,6 +473,7 @@ export const datasetLabels = {
   [AWS_LMSSL1]: 'Landsat 1-5 MSS L1',
   [AWS_LETML1]: 'Landsat 7 ETM+ L1',
   [AWS_LETML2]: 'Landsat 7 ETM+ L2',
+  [AWS_HLS]: 'Harmonized Landsat Sentinel (HLS)',
   [ENVISAT_MERIS]: 'Envisat Meris',
   [GIBS_MODIS_TERRA]: 'MODIS Terra',
   [GIBS_MODIS_AQUA]: 'MODIS Aqua',
@@ -467,14 +492,20 @@ export const datasetLabels = {
   [DEM_COPERNICUS_90]: 'DEM COPERNICUS 90',
   [COPERNICUS_CORINE_LAND_COVER]: 'CORINE Land Cover',
   [COPERNICUS_GLOBAL_LAND_COVER]: 'Global Land Cover',
-  [COPERNICUS_GLOBAL_SURFACE_WATER]: 'Global Surface Water',
   [CNES_LAND_COVER]: 'CNES Land Cover',
   [ESA_WORLD_COVER]: 'ESA WorldCover',
+  [COPERNICUS_GLOBAL_SURFACE_WATER]: 'Global Surface Water',
+  [IO_LULC_10M_ANNUAL]: 'IO Land Use Land Cover Map',
   [COPERNICUS_WATER_BODIES]: 'Water Bodies',
   [COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES]: 'Seasonal Trajectories',
   [COPERNICUS_HR_VPP_VEGETATION_INDICES]: 'Vegetation Indices',
   [COPERNICUS_HR_VPP_VPP_S1]: 'Vegetation Phenology and Productivity Season 1',
   [COPERNICUS_HR_VPP_VPP_S2]: 'Vegetation Phenology and Productivity Season 2',
+  [COPERNICUS_HRSI_PSA]: 'Persistent Snow Area',
+  [COPERNICUS_HRSI_WDS]: 'Wet/Dry Snow',
+  [COPERNICUS_HRSI_SWS]: 'SAR Wet Snow',
+  [COPERNICUS_HRSI_FSC]: 'Fractional Snow Cover',
+  [COPERNICUS_HRSI_GFSC]: 'Fractional Snow Cover (Gap-filled)',
   [COPERNICUS_CLC_ACCOUNTING]: 'CORINE Land Cover Accounting Layers',
   [GLOBAL_HUMAN_SETTLEMENT]: 'Global Human Settlement',
   [PLANET_NICFI]: 'Planet NICFI Basemaps',

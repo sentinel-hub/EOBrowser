@@ -19,7 +19,7 @@ const getMarkdown = () => t`
 const S2L2AMarkdown = () => t`
 Level 2A data are high quality data where the effects of the atmosphere on the light being reflected off of the surface of the Earth and reaching the sensor are excluded. Data are available globally since March 2017.
 
-More info about atmospheric correction [here](http://fis.uni-bonn.de/en/recherchetools/infobox/professionals/preprocessing/atmospheric-correction).`;
+More info about atmospheric correction [here](https://www.sentinel-hub.com/develop/api/ogc/custom-parameters/atmospheric-correction/).`;
 
 const S2L1CMarkdown = () => t`
 Level 1C data are data of sufficient quality for most investigations, where all image corrections were done except for the atmospheric correction. Data are available globally since June 2015 onwards.`;
@@ -28,7 +28,7 @@ const Sentinel2Tooltip = () => {
   return (
     <div>
       <div className="data-source-group-tooltip-description">
-        <ReactMarkdown source={getMarkdown()} />
+        <ReactMarkdown source={getMarkdown()} linkTarget="_blank" />
       </div>
       <div className="data-source-group-tooltip-credits">
         <div>{t`Credits:`}</div>
@@ -42,7 +42,7 @@ const Sentinel2Tooltip = () => {
   );
 };
 
-const S2L2ATooltip = () => <ReactMarkdown source={S2L2AMarkdown()} />;
+const S2L2ATooltip = () => <ReactMarkdown source={S2L2AMarkdown()} linkTarget="_blank" />;
 
 const S2L1CTooltip = () => <ReactMarkdown source={S2L1CMarkdown()} />;
 

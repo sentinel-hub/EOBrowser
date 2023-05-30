@@ -16,19 +16,53 @@ import { DATASOURCES } from '../../../const';
 
 export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
   L1C_BANDS = [
-    { name: 'B01', getDescription: () => t`Band 1 - Coastal aerosol - 443 nm`, color: '#4c17e2' },
-    { name: 'B02', getDescription: () => t`Band 2 - Blue - 490 nm`, color: '#699aff' },
-    { name: 'B03', getDescription: () => t`Band 3 - Green - 560 nm`, color: '#a4d26f' },
-    { name: 'B04', getDescription: () => t`Band 4 - Red - 665 nm`, color: '#e47121' },
-    { name: 'B05', getDescription: () => t`Band 5 - Vegetation Red Edge - 705 nm`, color: '#ba0a0a' },
-    { name: 'B06', getDescription: () => t`Band 6 - Vegetation Red Edge - 740 nm`, color: '#cc1412' },
-    { name: 'B07', getDescription: () => t`Band 7 - Vegetation Red Edge - 783 nm`, color: '#c00607' },
-    { name: 'B08', getDescription: () => t`Band 8 - NIR - 842 nm`, color: '#c31e20' },
-    { name: 'B09', getDescription: () => t`Band 9 - Water vapour - 945 nm`, color: '#b31a1b' },
-    { name: 'B10', getDescription: () => t`Band 10 - SWIR - Cirrus - 1375 nm`, color: '#d71234' },
-    { name: 'B11', getDescription: () => t`Band 11 - SWIR - 1610 nm`, color: '#990134' },
-    { name: 'B12', getDescription: () => t`Band 12 - SWIR - 2190 nm`, color: '#800000' },
-    { name: 'B8A', getDescription: () => t`Band 8A - Vegetation Red Edge - 865 nm`, color: '#bc0e10' },
+    {
+      name: 'B01',
+      getDescription: () => t`Band 1 - Coastal aerosol - 443 nm`,
+      color: '#4c17e2',
+      centralWL: 443,
+    },
+    { name: 'B02', getDescription: () => t`Band 2 - Blue - 490 nm`, color: '#699aff', centralWL: 490 },
+    { name: 'B03', getDescription: () => t`Band 3 - Green - 560 nm`, color: '#a4d26f', centralWL: 560 },
+    { name: 'B04', getDescription: () => t`Band 4 - Red - 665 nm`, color: '#e47121', centralWL: 665 },
+    {
+      name: 'B05',
+      getDescription: () => t`Band 5 - Vegetation Red Edge - 705 nm`,
+      color: '#ba0a0a',
+      centralWL: 705,
+    },
+    {
+      name: 'B06',
+      getDescription: () => t`Band 6 - Vegetation Red Edge - 740 nm`,
+      color: '#cc1412',
+      centralWL: 740,
+    },
+    {
+      name: 'B07',
+      getDescription: () => t`Band 7 - Vegetation Red Edge - 783 nm`,
+      color: '#c00607',
+      centralWL: 783,
+    },
+    { name: 'B08', getDescription: () => t`Band 8 - NIR - 842 nm`, color: '#c31e20', centralWL: 842 },
+    {
+      name: 'B8A',
+      getDescription: () => t`Band 8A - Vegetation Red Edge - 865 nm`,
+      color: '#bc0e10',
+      centralWL: 865,
+    },
+    {
+      name: 'B09',
+      getDescription: () => t`Band 9 - Water vapour - 945 nm`,
+      color: '#b31a1b',
+      centralWL: 945,
+    },
+    {
+      name: 'B10',
+      getDescription: () => t`Band 10 - SWIR - Cirrus - 1375 nm`,
+      color: '#d71234',
+    },
+    { name: 'B11', getDescription: () => t`Band 11 - SWIR - 1610 nm`, color: '#990134', centralWL: 1610 },
+    { name: 'B12', getDescription: () => t`Band 12 - SWIR - 2190 nm`, color: '#800000', centralWL: 2190 },
   ];
 
   L2A_BANDS = [...this.L1C_BANDS].filter((b) => b.name !== 'B10');
@@ -239,5 +273,10 @@ export default class Sentinel2AWSDataSourceHandler extends DataSourceHandler {
       default:
         return {};
     }
+  };
+
+  //spectral explorer should be supported only for S2L2A
+  isSpectralExplorerSupported = (datasetId) => {
+    return datasetId === S2L2A;
   };
 }

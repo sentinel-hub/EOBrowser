@@ -8,12 +8,15 @@ import { NotificationPanel } from '../../../Notification/NotificationPanel';
 
 import './Search.scss';
 import SearchForm from './SearchForm';
+import { GEOCENTO_EARTHIMAGES } from './config';
 
 export const TPDICollectionsWithLabels = [
   { value: TPDICollections.AIRBUS_PLEIADES, label: 'Airbus Pleiades' },
   { value: TPDICollections.AIRBUS_SPOT, label: 'Airbus SPOT' },
   { value: TPDICollections.MAXAR_WORLDVIEW, label: 'Maxar WorldView ' },
   { value: TPDICollections.PLANET_SCOPE, label: 'Planet PlanetScope' },
+  { value: TPDICollections.PLANET_SKYSAT, label: 'Planet SkySat' },
+  { value: GEOCENTO_EARTHIMAGES, label: 'Geocento EarthImages' },
 ];
 
 const Search = ({

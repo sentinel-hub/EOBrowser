@@ -4,7 +4,7 @@ import { LayersFactory, ApiType, BBox } from '@sentinel-hub/sentinelhub-js';
 
 import {
   getMapDimensions,
-  getImageDimensionFromBounds,
+  getImageDimensionFromBoundsWithCap,
   constructBBoxFromBounds,
 } from '../../Controls/ImgDownload/ImageDownload.utils.js';
 import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
@@ -41,7 +41,10 @@ export async function getLayerName(visualizationUrl, layerId, cancelToken) {
 async function getTiffImages(layer, props, cancelToken) {
   const { bounds, fromTime, toTime, pixelBounds, aoiGeometry, datasetId } = props;
 
-  const { width: defaultWidth, height: defaultHeight } = getImageDimensionFromBounds(bounds, datasetId);
+  const { width: defaultWidth, height: defaultHeight } = getImageDimensionFromBoundsWithCap(
+    bounds,
+    datasetId,
+  );
   const originalBBox = constructBBoxFromBounds(bounds);
   let { width, height } = getMapDimensions(pixelBounds);
 

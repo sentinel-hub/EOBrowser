@@ -17,7 +17,7 @@ The **ESA WorldCover** product is the first global land cover map at 10 m resolu
 const WorldCoverTooltip = () => (
   <div>
     <div className="data-source-group-tooltip-description">
-      <ReactMarkdown source={WorldCoverMarkdown()} />
+      <ReactMarkdown source={WorldCoverMarkdown()} linkTarget="_blank" />
     </div>
     <div className="data-source-group-tooltip-credits">
       <div>{t`Credits:`}</div>

@@ -133,7 +133,7 @@ const TwitterShare = ({ url, tweetMessage, hashtags }) => (
 const LinkedInShare = ({ url }) => (
   <div
     id="linked-in-holder"
-    title={t`Share on Twitter`}
+    title={t`Share on LinkedIn`}
     className={`holders ${url.length ? '' : 'disabled'}`}
   >
     <ExternalLink

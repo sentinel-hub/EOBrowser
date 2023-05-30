@@ -16,7 +16,9 @@
     "@mapbox/togeojson": "^0.16.0",
     "@reduxjs/toolkit": "^1.0.4",
     "@sentinel-hub/evalscript-code-editor": "^1.0.40",
-    "@sentinel-hub/sentinelhub-js": "^0.2.77",
+    "@sentinel-hub/sentinelhub-js": "^0.2.94",
+    "@turf/area": "^6.3.0",
+    "@turf/bbox": "^6.5.0",
     "@turf/bbox-polygon": "^6.5.0",
     "@turf/boolean-point-in-polygon": "^6.0.1",
     "@turf/center": "^6.0.1",
@@ -75,12 +77,13 @@
     "react-transition-group": "^1.2.1",
     "rodal": "^1.7.0",
     "sass": "^1.39.0",
-    "semiotic": "^1.11.1",
+    "semiotic": "^1.20.5",
     "three": "^0.120.1",
     "ttag": "^1.7.22",
     "turf-inside": "^3.0.12",
     "urijs": "^1.18.1",
-    "wellknown": "^0.5.0"
+    "wellknown": "^0.5.0",
+    "xml2js": "^0.4.23"
   },
   "scripts": {
     "start": "react-scripts start",

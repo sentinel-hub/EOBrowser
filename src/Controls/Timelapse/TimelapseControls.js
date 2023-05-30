@@ -113,7 +113,7 @@ export class TimelapseControls extends Component {
           loading={loadingImages || loadingLayer}
         />
 
-        {!isMobile && (
+        {!isMobile && !!process.env.REACT_APP_EOB_BACKEND && (
           <div className="add-layers">
             <span onClick={() => onSidebarPopupToggle('pins')}>
               <i className="fas fa-plus-circle"></i> {t`Add layers from pins`}

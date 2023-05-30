@@ -17,7 +17,7 @@ The **Global Human Settlement** (GHS) framework produces global maps of built-up
 const GHSTooltip = () => (
   <div>
     <div className="data-source-group-tooltip-description">
-      <ReactMarkdown source={GHSMarkdown()} />
+      <ReactMarkdown source={GHSMarkdown()} linkTarget="_blank" />
     </div>
     <div className="data-source-group-tooltip-credits">
       <div>{t`Credits:`}</div>

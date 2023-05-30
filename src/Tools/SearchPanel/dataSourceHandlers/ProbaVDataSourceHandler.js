@@ -88,7 +88,7 @@ export default class ProbaVDataSourceHandler extends DataSourceHandler {
       // Performance optimization - instead of WMS GetCapabilities request:
       //   const url = `${this.KNOWN_URL}?SERVICE=WMS&REQUEST=GetCapabilities&time=${new Date().valueOf()}`;
       // we use a cached version:
-      const url = 'https://eob-getcapabilities-cache.s3.eu-central-1.amazonaws.com/probav.xml';
+      const url = 'https://eob-getcapabilities-cache-prod.s3.eu-central-1.amazonaws.com/probav.xml';
       const func = this.getResultsFromProbaV;
       const ff = new FetchingFunction(
         selectedDataset,

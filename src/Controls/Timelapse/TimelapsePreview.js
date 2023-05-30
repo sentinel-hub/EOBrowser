@@ -8,7 +8,7 @@ import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
 import { generateS3PreSignedPost, getS3FileUrl, isImageApplicable, uploadFileToS3 } from './Timelapse.utils';
 import SocialShare from '../../components/SocialShare/SocialShare';
 import FileSaver from 'file-saver';
-import { TRANSITION } from '../../const';
+import { TRANSITION, FUNCTIONALITY_TEMPORARILY_UNAVAILABLE_MSG } from '../../const';
 import TimelapseSettings from './TimelapseSettings';
 
 export class TimelapsePreview extends Component {
@@ -16,17 +16,27 @@ export class TimelapsePreview extends Component {
     displaySocialShareOptions: false,
     displayDownloadPanel: false,
     previewFileUrlPassThrough: null,
+    show3DDownloadWarning: true,
   };
 
   toggleSocialSharePanel = async () => {
-    const displaySocialShareOptions = !this.state.displaySocialShareOptions;
+    let displaySocialShareOptions = !this.state.displaySocialShareOptions;
 
     if (displaySocialShareOptions) {
-      this.setState({
-        previewFileUrlPassThrough: this.props.previewFileUrl
-          ? this.props.previewFileUrl
-          : await this.generatePreviewFile(),
-      });
+      this.onCloseWarning();
+
+      if (!process.env.REACT_APP_EOB_BACKEND) {
+        this.props.showErrorMessage(FUNCTIONALITY_TEMPORARILY_UNAVAILABLE_MSG);
+        return;
+      }
+
+      const file = this.props.previewFileUrl || (await this.generatePreviewFile());
+
+      if (file) {
+        this.setState({ previewFileUrlPassThrough: file });
+      } else {
+        displaySocialShareOptions = false;
+      }
     }
 
     this.setState({ displaySocialShareOptions });
@@ -40,6 +50,7 @@ export class TimelapsePreview extends Component {
 
   downloadTimelapse = async () => {
     this.toggleDownloadPanel(false);
+    this.onCloseWarning();
 
     if (this.props.previewFileUrl) {
       const link = document.createElement('a');
@@ -112,6 +123,10 @@ export class TimelapsePreview extends Component {
     this.toggleDownloadPanel(false);
   };
 
+  onCloseWarning = () => {
+    this.setState({ show3DDownloadWarning: false });
+  };
+
   render() {
     const {
       images,
@@ -130,9 +145,11 @@ export class TimelapsePreview extends Component {
       size,
       format,
       fadeDuration,
+      delayLastFrame,
+      is3D,
     } = this.props;
 
-    const { previewFileUrlPassThrough, displayDownloadPanel } = this.state;
+    const { previewFileUrlPassThrough, displayDownloadPanel, show3DDownloadWarning } = this.state;
 
     let image, applicableImageIndexes, applicableImageActiveIndex;
 
@@ -172,8 +189,15 @@ export class TimelapsePreview extends Component {
     return (
       <div className="preview-panel">
         {generatingTimelapse && (
-          <div className="progress">
-            <div className="bar" style={{ width: `${generatingTimelapseProgress * 100}%` }} />
+          <div className="progress-wrapper">
+            <div className="progress">
+              <div className="bar" style={{ width: `${generatingTimelapseProgress * 100}%` }} />
+            </div>
+            <div className="cancel">
+              <div className="eob-btn" onClick={() => this.props.setGenerationCancelled(true)}>
+                Cancel
+              </div>
+            </div>
           </div>
         )}
 
@@ -199,6 +223,19 @@ export class TimelapsePreview extends Component {
             <img className="preview-image" src={image.url} alt="" />
           )}
         </div>
+
+        {is3D && !this.shouldDisplayPreviewFile() && (
+          <div className="download-3d-warning">
+            {show3DDownloadWarning && (
+              <div className="warning-message">
+                <div>{t`Preview is in low resolution for performance optimisation. Timelapse will be downloaded at the full resolution specified in the settings. Generation may take around 30 seconds per frame.`}</div>
+                <div className="close-3d-warning-button" onClick={this.onCloseWarning}>
+                  <i className="fa fa-close" />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <SocialShare
           extraParams={{
@@ -291,6 +328,8 @@ export class TimelapsePreview extends Component {
                   updateFadeDuration={this.props.updateFadeDuration}
                   toggleDownloadPanel={this.toggleDownloadPanel}
                   searchDatesAndFetchImages={this.props.searchDatesAndFetchImages}
+                  delayLastFrame={delayLastFrame}
+                  updateDelayLastFrame={this.props.updateDelayLastFrame}
                 />
               ) : null}
             </>
@@ -308,7 +347,7 @@ export class TimelapsePreview extends Component {
             className={'share' + (generatingTimelapse || loadingImages ? ' disabled' : '')}
             onClick={this.toggleSocialSharePanel}
           >
-            Share
+            {t`Share`}
           </div>
         </div>
       </div>

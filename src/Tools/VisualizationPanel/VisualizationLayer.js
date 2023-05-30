@@ -101,7 +101,7 @@ export default class VisualizationLayer extends Component {
               {hasDetails && (
                 <i
                   className={`fa fa-angle-double-down ${this.state.detailsOpen ? 'show' : ''}`}
-                  title={t`Show details`}
+                  title={this.state.detailsOpen ? t`Hide details` : t`Show details`}
                   onClick={this.toggleDetails}
                 />
               )}

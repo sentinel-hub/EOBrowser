@@ -180,9 +180,8 @@ async function updatePreviews(previewsDir, previewsIndexFile) {
         // We assume that all the layers within the same group will be able to use the same bbox and time from/to:
         const candidates = await findSomeResults(layer);
         if (candidates.length === 0) {
-          throw new Error(
-            `No results in the pre-defined areas for: ${contentPart.url} (${contentPart.name})`,
-          );
+          console.warn(`No results in the pre-defined areas for: ${contentPart.url} (${contentPart.name})`);
+          continue;
         }
 
         // for each layer, download its image:
@@ -253,7 +252,7 @@ async function updatePreviews(previewsDir, previewsIndexFile) {
   }
 
   // write an index file so we know (in Playground app) which files exist:
-  fs.writeFileSync(previewsIndexFile, JSON.stringify(previews, null, 2));
+  fs.writeFileSync(previewsIndexFile, JSON.stringify(previews, null, 2).concat('\n'));
 }
 
 updatePreviews('./public/previews', './src/previews.json')

@@ -131,7 +131,7 @@ const renderTooltip = ({ credits, creditsLink, source }) => {
 
 const renderHelpTooltip = (tooltip) => (
   <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
-    <ReactMarkdown source={tooltip} />
+    <ReactMarkdown source={tooltip} linkTarget="_blank" />
   </HelpTooltip>
 );
 
@@ -193,7 +193,7 @@ export const Landsat89AWSTooltip = () => {
   return (
     <div>
       <div className="data-source-group-tooltip-description">
-        <ReactMarkdown source={getLandsat89AWS_Markdown()} />
+        <ReactMarkdown source={getLandsat89AWS_Markdown()} linkTarget="_blank" />
       </div>
       <div className="data-source-group-tooltip-credits">
         <div>{t`Credits:`}</div>

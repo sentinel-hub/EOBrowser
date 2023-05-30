@@ -19,7 +19,7 @@ import { Results } from './Results/Results';
 import Transactions from './Transactions/Transactions';
 import TransactionOptions from './TransactionOptions/TransactionOptions';
 import Search from './Search/Search';
-import { providerSpecificSearchParameters } from './Search/config';
+import { GEOCENTO_EARTHIMAGES, providerSpecificSearchParameters } from './Search/config';
 import { CollectionSelectionType } from './TransactionOptions/CollectionSelection';
 import { ConfirmationDialog } from './Transactions/ConfirmationDialog';
 import {
@@ -27,6 +27,7 @@ import {
   getProvider,
   extractErrorMessage,
   createSearchParams,
+  openGeocentoLink,
 } from './commercialData.utils';
 import { TRANSACTION_TYPE, OrderType } from '../../const';
 import store, { commercialDataSlice } from '../../store';
@@ -46,6 +47,7 @@ export const Tabs = {
 const defaultPlanetProductBundle = {
   [PlanetItemType.PSScene]: PlanetProductBundle.ANALYTIC_UDM2,
   [PlanetItemType.PSScene4Band]: PlanetProductBundle.ANALYTIC_UDM2,
+  [PlanetItemType.SkySatCollect]: PlanetProductBundle.ANALYTIC_UDM2,
 };
 
 export const defaultPlanetHarmonizeTo = {
@@ -78,6 +80,11 @@ const defaultSearchParamsForProvider = (dataProvider) => {
         itemType: PlanetItemType.PSScene,
         productBundle: defaultPlanetProductBundle[PlanetItemType.PSScene],
       };
+    case TPDICollections.PLANET_SKYSAT:
+      return {
+        itemType: PlanetItemType.SkySatCollect,
+        productBundle: defaultPlanetProductBundle[PlanetItemType.SkySatCollect],
+      };
     default:
       return {};
   }
@@ -99,7 +106,7 @@ const defaultTransactionOptions = {
   manualCollection: false,
   planetApiKey: null,
   productKernel: ResamplingKernel.CC,
-  harmonizeTo: undefined,
+  harmonizeTo: PlanetScopeHarmonization.NONE,
 };
 
 const pageSize = {
@@ -114,8 +121,9 @@ const getCommercialHelpText = (quotas) => t`
 The "Commercial data" tab allows you to search, purchase, and visualize Commercial Third-Party data.
 
 **Available constellations**  
-We currently offer data from 4 different commercial data providers:
-- Planet [Planet scope](https://docs.sentinel-hub.com/api/latest/data/planet-scope/) (4 bands, 3m resolution)
+We currently offer data from 3 different commercial data providers offering data from 5 different constellations:
+- Planet [Planet scope](https://docs.sentinel-hub.com/api/latest/data/planet-scope/) (4/8 bands, 3m resolution)
+- Planet [SkySat](https://docs.sentinel-hub.com/api/latest/data/planet/skysat/) (4 bands, 0.5m resolution)
 - Airbus [Pleiades](https://docs.sentinel-hub.com/api/latest/data/airbus/pleiades/) (5 bands, 0.5m - 2m resolution)
 - Airbus [SPOT](https://docs.sentinel-hub.com/api/latest/data/airbus/spot/) (5 bands, 1.5m - 6m resolution)
 - Maxar [WorldView](https://docs.sentinel-hub.com/api/latest/data/maxar/world-view/) (5 bands, 0.5m - 2m resolution)
@@ -168,21 +176,22 @@ const CommercialDataPanel = ({
       let newParams = { ...prevState };
       //remove previous dataProvider specific values on provider change
       if (name === 'dataProvider') {
-        newParams = { ...newParams, ...defaultSearchParamsForProvider(value) };
         let providerParameters = providerSpecificSearchParameters[newParams.dataProvider];
         if (!!providerParameters) {
           providerParameters.forEach((param) => {
             delete newParams[param.id];
           });
+          newParams = { ...newParams, ...defaultSearchParamsForProvider(value) };
         }
 
         //reset transaction params on data provider change
         if (prevState[name] !== value) {
           setTransactionOptions({
             ...defaultTransactionOptions,
-            ...(value === TPDICollections.PLANET_SCOPE && {
-              harmonizeTo: PlanetScopeHarmonization.NONE,
-            }),
+            ...(value === TPDICollections.PLANET_SCOPE ||
+              (value === TPDICollections.PLANET_SKYSAT && {
+                harmonizeTo: PlanetScopeHarmonization.NONE,
+              })),
           });
         }
         setTransactionType(TRANSACTION_TYPE.ORDER);
@@ -239,6 +248,11 @@ const CommercialDataPanel = ({
     try {
       const params = createSearchParams(searchParams, aoiGeometry);
 
+      if (params.dataProvider === GEOCENTO_EARTHIMAGES) {
+        openGeocentoLink(searchParams, aoiGeometry);
+        return;
+      }
+
       let provider = getProvider(params.dataProvider);
 
       const requestsConfig = {
@@ -271,8 +285,9 @@ const CommercialDataPanel = ({
       toggleAccordion(Tabs.RESULTS, true);
     } catch (err) {
       console.error(err);
-      const responseErrorMessage = err?.request?.response?.error?.errors[0]?.violation;
-      setActionError(responseErrorMessage || err.message);
+      const responseErrorMessage = err?.request?.response?.error?.errors?.[0]?.violation;
+      const maxarResponseErrorMessage = err?.request?.response?.error?.message;
+      setActionError(responseErrorMessage || maxarResponseErrorMessage || err.message);
     } finally {
       setActionInProgress(false);
     }

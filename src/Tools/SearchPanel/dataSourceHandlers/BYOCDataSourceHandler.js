@@ -1,5 +1,5 @@
 import React from 'react';
-import { BYOCLayer, DATASET_BYOC, BYOCSubTypes } from '@sentinel-hub/sentinelhub-js';
+import { BYOCLayer, DATASET_BYOC, BYOCSubTypes, CRS_EPSG4326 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
 import DataSourceHandler from './DataSourceHandler';
@@ -7,10 +7,10 @@ import CopernicusServicesDataSourceHandler from './CopernicusServicesDataSourceH
 import OthersDataSourceHandler from './OthersDataSourceHandler';
 import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/GenericSearchGroup';
 import { FetchingFunction } from '../search';
-import { convertGeoJSONToEPSG4326 } from '../../../utils/coords';
 import { filterLayers } from './filter';
 import { constructV3Evalscript, isFunction } from '../../../utils';
 import { DATASOURCES } from '../../../const';
+import { reprojectGeometry } from '../../../utils/reproject';
 
 const CRS_EPSG4326_urn = 'urn:ogc:def:crs:EPSG::4326';
 
@@ -140,7 +140,7 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
   convertToStandardTiles = (data, datasetId) => {
     const tiles = data.map((t) => {
       if (t.geometry && t.geometry.crs && t.geometry.crs.properties.name !== CRS_EPSG4326_urn) {
-        convertGeoJSONToEPSG4326(t.geometry);
+        reprojectGeometry(t.geometry, { toCrs: CRS_EPSG4326.authId });
       }
       return {
         sensingTime: t.sensingTime,

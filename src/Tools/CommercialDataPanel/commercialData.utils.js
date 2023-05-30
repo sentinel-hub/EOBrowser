@@ -4,6 +4,7 @@ import geo_area from '@mapbox/geojson-area';
 import intersect from '@turf/intersect';
 import moment from 'moment';
 import inside from 'turf-inside';
+import { t } from 'ttag';
 import {
   TPDICollections,
   TPDProvider,
@@ -12,11 +13,13 @@ import {
   BYOCSubTypes,
   CRS_EPSG4326,
   AirbusConstellation,
+  PlanetItemType,
 } from '@sentinel-hub/sentinelhub-js';
 import { constructBBoxFromBounds } from '../../Controls/ImgDownload/ImageDownload.utils.js';
 import store, { mainMapSlice, visualizationSlice, tabsSlice, themesSlice } from '../../store';
 import { TRANSACTION_TYPE, USER_INSTANCES_THEMES_LIST, OrderType } from '../../const';
 import { getBoundsZoomLevel } from '../../utils/coords';
+import { isRectangle, isPolygon } from '../../utils/geojson.utils.js';
 
 const SH_ACCOUNT_TRIAL = 11000;
 const SH_DOMAIN_SERVICE = 1;
@@ -349,10 +352,38 @@ export const getProvider = (dataProvider) => {
     provider = TPDProvider.AIRBUS;
   } else if (dataProvider === TPDICollections.MAXAR_WORLDVIEW) {
     provider = TPDProvider.MAXAR;
-  } else if (dataProvider === TPDICollections.PLANET_SCOPE) {
+  } else if (
+    dataProvider === TPDICollections.PLANET_SCOPE ||
+    dataProvider === TPDICollections.PLANET_SKYSAT
+  ) {
     provider = TPDProvider.PLANET;
   }
   return provider;
+};
+
+export const getTpdiCollectionFromTransaction = (transaction) => {
+  const provider = transaction.provider;
+  if (provider === TPDProvider.AIRBUS) {
+    const constellation = AirbusConstellation[transaction.input.data[0].constellation];
+    return TPDICollections[`${TPDProvider.AIRBUS}_${constellation}`];
+  }
+  if (provider === TPDProvider.PLANET) {
+    const itemType = PlanetItemType[transaction.input.data[0].itemType];
+    switch (itemType) {
+      case PlanetItemType.PSScene:
+      case PlanetItemType.PSScene4Band:
+        return TPDICollections.PLANET_SCOPE;
+      case PlanetItemType.SkySatCollect:
+        return TPDICollections.PLANET_SKYSAT;
+      default:
+        throw new Error(`${itemType} not found in PlanetItemType`);
+    }
+  }
+  if (provider === TPDProvider.MAXAR) {
+    return TPDICollections.MAXAR_WORLDVIEW;
+  } else {
+    throw new Error(`Couldn't find collection`);
+  }
 };
 
 export function createSearchParams(searchParams, aoiGeometry) {
@@ -402,4 +433,28 @@ export function getTransactionSize(aoiGeometry, options, selectedProducts = [], 
     default:
       return 0;
   }
+}
+
+export function openGeocentoLink(searchParams, geometry) {
+  const GEOCENTO_URL = 'https://imagery.geocento.com/';
+
+  const fromTime = searchParams.fromTime.format('YYYY-MM-DD');
+  const toTime = searchParams.toTime.format('YYYY-MM-DD');
+  const timeParam = `time=${fromTime}/${toTime}`;
+
+  const aoiParam = ((geometry) => {
+    if (isRectangle(geometry)) {
+      const coordinates = [...geometry.coordinates[0][0], ...geometry.coordinates[0][2]].join(',');
+      return `bbox=${coordinates}`;
+    } else if (isPolygon(geometry)) {
+      const coordinates = geometry.coordinates[0].map((edge) => edge.join(' ')).join(',');
+      return `polygon=POLYGON((${coordinates}))`;
+    } else {
+      throw new Error(t`MultiPolygons not supported by Geocento`);
+    }
+  })(geometry);
+
+  const params = [...(aoiParam ? [aoiParam] : []), ...(timeParam ? [timeParam] : [])];
+
+  window.open(`${GEOCENTO_URL}#mapviewer:${params.join('&')}`);
 }

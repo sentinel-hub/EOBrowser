@@ -20,7 +20,7 @@ import { t } from 'ttag';
 import { withRouter } from 'react-router-dom';
 import proj4 from 'proj4';
 
-import store, { mainMapSlice, visualizationSlice, tabsSlice, compareLayersSlice } from '../../store';
+import store, { mainMapSlice, visualizationSlice, compareLayersSlice } from '../../store';
 import Visualizations from './Visualizations';
 import Loader from '../../Loader/Loader';
 import './VisualizationPanel.scss';
@@ -252,7 +252,6 @@ class VisualizationPanel extends Component {
     this.setState({
       visualizations: null,
     });
-    store.dispatch(tabsSlice.actions.setTabIndex(2));
 
     if (getDataSourceHandler(this.props.datasetId).datasource === DATASOURCES.PLANET_NICFI) {
       this.createPlanetNicfiLayers();

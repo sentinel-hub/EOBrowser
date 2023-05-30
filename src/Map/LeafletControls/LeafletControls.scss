@@ -12,19 +12,19 @@
         }
       }
 
-      @media screen and (max-width: 1200px) {
+      @media screen and (max-width: $breakpoint-1200) {
         .leaflet-control-attribution {
           max-width: 340px;
         }
       }
 
-      @media screen and (max-width: 890px) {
+      @media screen and (max-width: $breakpoint-890) {
         .leaflet-control-attribution {
           bottom: 25px;
         }
       }
 
-      @media screen and (max-width: 400px) {
+      @media screen and (max-width: $breakpoint-400) {
         .leaflet-control-attribution {
           bottom: 23px;
           font-size: 10px;
@@ -63,7 +63,7 @@
         }
       }
 
-      @media screen and (max-width: 700px) {
+      @media screen and (max-width: $breakpoint-700) {
         .leaflet-control-zoom {
           display: none;
         }
@@ -80,13 +80,13 @@
         }
       }
 
-      @media screen and (max-width: 500px) {
+      @media screen and (max-width: $breakpoint-500) {
         .leaflet-control-scale {
           margin-right: 10px;
         }
       }
 
-      @media screen and (max-width: 400px) {
+      @media screen and (max-width: $breakpoint-400) {
         .leaflet-control-scale {
           margin-right: 5px;
         }
@@ -108,27 +108,27 @@
         display: none;
       }
 
-      @media screen and (max-width: 500px) {
+      @media screen and (max-width: $breakpoint-500) {
         .leaflet-control-map-coordinates {
           clear: both;
         }
       }
 
-      @media screen and (max-width: 500px) {
+      @media screen and (max-width: $breakpoint-500) {
         .leaflet-control-map-coordinates {
           bottom: 60px;
           margin-right: 10px;
         }
       }
 
-      @media screen and (max-width: 400px) {
+      @media screen and (max-width: $breakpoint-400) {
         .leaflet-control-map-coordinates {
           margin-right: 5px;
         }
       }
     }
 
-    @media screen and (max-width: 700px) {
+    @media screen and (max-width: $breakpoint-700) {
       .leaflet-bottom.leaflet-right {
         height: 19px;
       }

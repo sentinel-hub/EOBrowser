@@ -7,16 +7,15 @@ import {
 } from '@sentinel-hub/sentinelhub-js';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/css/v4-shims.css';
-import EOBModeSelection from './junk/EOBModeSelection/EOBModeSelection';
 
-import store, { themesSlice, visualizationSlice } from './store';
+import store, { notificationSlice } from './store';
 import Map from './Map/Map';
 import Notification from './Notification/Notification';
 import Tools from './Tools/Tools';
 import { Modals, propsSufficientToRender } from './Modals/Utils';
 import { updatePath } from './utils/';
 import { importSharedPins } from './Tools/Pins/Pin.utils';
-import { EDUCATION_MODE, MODES } from './const';
+import { MODES } from './const';
 import TerrainViewerScriptProvider from './TerrainViewer/TerrainViewerScriptProvider';
 import TerrainViewer from './TerrainViewer/TerrainViewer';
 import Tutorial from './Tutorial/Tutorial';
@@ -42,9 +41,17 @@ class App extends Component {
   async componentDidMount() {
     const { sharedPinsListIdFromUrlParams } = this.props;
     if (sharedPinsListIdFromUrlParams) {
-      const pins = await importSharedPins(sharedPinsListIdFromUrlParams);
-      if (pins) {
-        this.setLastAddedPin(pins.uniqueId);
+      if (process.env.REACT_APP_EOB_BACKEND) {
+        const pins = await importSharedPins(sharedPinsListIdFromUrlParams);
+        if (pins) {
+          this.setLastAddedPin(pins.uniqueId);
+        }
+      } else {
+        store.dispatch(
+          notificationSlice.actions.displayError(
+            'Accessing shared pins is temporarily unavailable due to updates. Please try again later.',
+          ),
+        );
       }
     }
 
@@ -61,13 +68,13 @@ class App extends Component {
           url.startsWith('https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?') &&
           url.includes('request=GetCapabilities')
         ) {
-          return 'https://eob-getcapabilities-cache.s3.eu-central-1.amazonaws.com/gibs.xml';
+          return 'https://eob-getcapabilities-cache-prod.s3.eu-central-1.amazonaws.com/gibs.xml';
         }
         if (
           url.startsWith('https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows?') &&
           url.includes('request=GetCapabilities')
         ) {
-          return 'https://eob-getcapabilities-cache.s3.eu-central-1.amazonaws.com/probav.xml';
+          return 'https://eob-getcapabilities-cache-prod.s3.eu-central-1.amazonaws.com/probav.xml';
         }
         return url;
       },
@@ -115,11 +122,6 @@ class App extends Component {
 
   setLastAddedPin = (lastAddedPin) => this.setState({ lastAddedPin: lastAddedPin });
 
-  onSelectMode = (modeId) => {
-    store.dispatch(visualizationSlice.actions.reset());
-    store.dispatch(themesSlice.actions.setSelectedModeIdAndDefaultTheme(modeId));
-  };
-
   shouldDisplayTileGeometries = (shouldDisplay) => {
     this.setState({
       displayingTileGeometries: shouldDisplay,
@@ -127,16 +129,8 @@ class App extends Component {
   };
 
   render() {
-    const {
-      modalId,
-      authToken,
-      selectedModeId,
-      googleAPI,
-      is3D,
-      terrainViewerId,
-      datasetId,
-      termsPrivacyAccepted,
-    } = this.props;
+    const { modalId, authToken, googleAPI, is3D, terrainViewerId, datasetId, termsPrivacyAccepted } =
+      this.props;
     const authenticated = Boolean(authToken);
     const zoomConfig = getZoomConfiguration(datasetId);
     return (
@@ -166,14 +160,7 @@ class App extends Component {
           getThemeAndSetMode={this.getThemeAndSetMode}
           shouldDisplayTileGeometries={this.shouldDisplayTileGeometries}
         />
-        {selectedModeId && !is3D && (
-          <EOBModeSelection
-            highlighted={this.props.selectedModeId === EDUCATION_MODE.id}
-            modes={MODES}
-            onSelectMode={this.onSelectMode}
-            selectedModeId={this.props.selectedModeId}
-          />
-        )}
+
         {modalId &&
           propsSufficientToRender(this.props) &&
           Modals[modalId]({ setLastAddedPin: this.setLastAddedPin })}
@@ -264,7 +251,6 @@ const mapStoreToProps = (store) => ({
   backscatterCoeff: store.visualization.backscatterCoeff,
   dataFusion: store.visualization.dataFusion,
   selectedThemeId: store.themes.selectedThemeId,
-  selectedModeId: store.themes.selectedModeId,
   pixelBounds: store.mainMap.pixelBounds,
   terrainViewerSettings: store.terrainViewer.settings,
   timelapse: store.timelapse,

@@ -31,8 +31,8 @@ const DEMTooltip = () => {
     </div>
   );
 };
-const MapzenTooltip = () => <ReactMarkdown source={MapzenMarkdown()} />;
-const Copernicus30Tooltip = () => <ReactMarkdown source={Copernicus30Markdown()} />;
-const Copernicus90Tooltip = () => <ReactMarkdown source={Copernicus90Markdown()} />;
+const MapzenTooltip = () => <ReactMarkdown source={MapzenMarkdown()} linkTarget="_blank" />;
+const Copernicus30Tooltip = () => <ReactMarkdown source={Copernicus30Markdown()} linkTarget="_blank" />;
+const Copernicus90Tooltip = () => <ReactMarkdown source={Copernicus90Markdown()} linkTarget="_blank" />;
 
 export { DEMTooltip, MapzenTooltip, Copernicus30Tooltip, Copernicus90Tooltip };

@@ -226,4 +226,6 @@ export default class DataSourceHandler {
   isSentinelHub = () => true;
   supportsImgExport = () => true;
   supportsAnalyticalImgExport = () => true;
+
+  isSpectralExplorerSupported = () => false;
 }

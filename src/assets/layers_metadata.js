@@ -4,10 +4,16 @@ import { EDUCATION_MODE } from '../const';
 import {
   CNES_LAND_COVER,
   ESA_WORLD_COVER,
+  IO_LULC_10M_ANNUAL,
   COPERNICUS_HR_VPP_VEGETATION_INDICES,
   COPERNICUS_HR_VPP_VPP_S1,
   COPERNICUS_HR_VPP_VPP_S2,
   COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES,
+  COPERNICUS_HRSI_PSA,
+  COPERNICUS_HRSI_WDS,
+  COPERNICUS_HRSI_SWS,
+  COPERNICUS_HRSI_FSC,
+  COPERNICUS_HRSI_GFSC,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 
 export const PREDEFINED_LAYERS_METADATA = [
@@ -468,6 +474,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'AWS_LETML2', layerId: 'NDVI' },
       { datasourceId: 'AWS_LETML1', layerId: 'NDVI' },
       { datasourceId: 'AWS_LMSSL1', layerId: 'NDVI' },
+      { datasourceId: 'AWS_HLS', layerId: '3_NDVI' },
     ],
     legend: {
       type: 'continuous',
@@ -640,6 +647,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: '99_MOISTURE-INDEX' },
       { datasourceId: 'AWS_LETML2', layerId: 'MOISTURE-INDEX' },
       { datasourceId: 'AWS_LETML1', layerId: 'MOISTURE-INDEX' },
+      { datasourceId: 'AWS_HLS', layerId: '4_MOISTURE-INDEX' },
     ],
     legend: {
       type: 'continuous',
@@ -676,6 +684,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'AWS_LETML1', layerId: 'NDWI' },
       { datasourceId: 'AWS_LETML2', layerId: 'NDWI' },
       { datasourceId: 'AWS_LMSSL1', layerId: 'NDWI' },
+      { datasourceId: 'AWS_HLS', layerId: '6_NDWI' },
     ],
     legend: {
       type: 'continuous',
@@ -729,6 +738,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: '2_FALSE-COLOR' },
       { datasourceId: 'AWS_LETML2', layerId: 'FALSE-COLOR' },
       { datasourceId: 'AWS_LETML1', layerId: 'FALSE-COLOR' },
+      { datasourceId: 'S3SLSTR', layerId: 'FALSE_COLOR' },
     ],
 
     description: () =>
@@ -794,6 +804,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: 'TRUE-COLOR' },
       { datasourceId: 'S2L1C', layerId: '1_TRUE-COLOR' },
       { datasourceId: 'S2L2A', layerId: '1_TRUE-COLOR' },
+      { datasourceId: 'S3OLCI', layerId: '1_TRUE-COLOR' },
     ],
 
     description: () =>
@@ -877,6 +888,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: 'FALSE-COLOR-URBAN' },
       { datasourceId: 'S2L1C', layerId: '2_FALSE-COLOR-URBAN' },
       { datasourceId: 'S2L2A', layerId: '2_FALSE-COLOR-URBAN' },
+      { datasourceId: 'AWS_LOTL2', layerId: 'FALSE-COLOR-URBAN' },
     ],
 
     description: () =>
@@ -935,8 +947,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'S2L2A', layerId: '5_SWIR' },
       { datasourceId: 'S2L1C', layerId: 'SWIR' },
       { datasourceId: 'S2L2A', layerId: 'SWIR' },
-      { datasourceId: 'AWS_LETML2', layerId: 'SWIR' },
-      { datasourceId: 'AWS_LETML1', layerId: 'SWIR' },
+      { datasourceId: 'AWS_HLS', layerId: '5_SWIR' },
     ],
     titles: () => ({
       [EDUCATION_MODE.id]: `SWIR`,
@@ -960,7 +971,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       [EDUCATION_MODE.id]: `Short Wave Infrared Composite`,
     }),
     description: () =>
-      t`# Short wave infrared composite (SWIR)\n\nShort wave infrared (SWIR) measurements can help scientists estimate how much water is present in plants and soil, as water absorbs SWIR wavelengths. Short wave infrared bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. In this composite vegetation appears in shades of green, soils and built-up areas are in various shades of brown, and water appears black. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-2/swir-rgb/)`,
+      t`# Short wave infrared composite (SWIR)\n\nShort wave infrared (SWIR) measurements can help scientists estimate how much water is present in plants and soil, as water absorbs SWIR wavelengths. Short wave infrared bands (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands) are also useful for distinguishing between cloud types (water clouds versus ice clouds), snow and ice, all of which appear white in visible light. In this composite vegetation appears in shades of green, soils and built-up areas are in various shades of brown, and water appears black. Newly burned land reflects strongly in SWIR bands, making them valuable for mapping fire damages. Each rock type reflects shortwave infrared light differently, making it possible to map out geology by comparing reflected SWIR light.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/landsat-4-5-tm/swir/)`,
   },
 
   {
@@ -2195,7 +2206,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       },
     ],
     description: () =>
-      t`# Global Surface Water - Occurrence\n\n\n\nThe layer shows the (intra- and inter-annual) variations of surface water presence in the time range between March 1984 and December 2019. Permanent water areas with 100% occurrence over the 36 years are shown in blue, while lighter shades of pink and purple indicate lower degrees of water presence. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_occurrence/).`,
+      t`# Global Surface Water - Occurrence\n\n\n\nThe layer shows the (intra- and inter-annual) variations of surface water presence in the time range between March 1984 and December 2021. Permanent water areas with 100% occurrence over the 38 years are shown in blue, while lighter shades of pink and purple indicate lower degrees of water presence. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_occurrence/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '2_CHANGE-INTENSITY' }],
@@ -2205,9 +2216,9 @@ export const PREDEFINED_LAYERS_METADATA = [
         minPosition: 0,
         maxPosition: 200,
         gradients: [
-          { position: '0', color: 'rgb(255,0,0)', label: '100 % Loss of Occurence' },
-          { position: '100', color: 'rgb(0,0,0)', label: '0 % Change in Occurence' },
-          { position: '200', color: 'rgb(0,255,0)', label: '100 % Increase in Occurence' },
+          { position: '0', color: 'rgb(255,0,0)', label: '100 % Loss' },
+          { position: '100', color: 'rgb(0,0,0)', label: '0 % Change' },
+          { position: '200', color: 'rgb(0,255,0)', label: '100 % Increase' },
         ],
       },
       {
@@ -2229,7 +2240,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       },
     ],
     description: () =>
-      t`# Global Surface Water - Occurrence Change Intensity\n\n\n\nThe layer visualises changes in water occurrence between two different epochs, the first ranging from March 1984 to December 1999, and the other covering the period from January 2000 to December 2019. Areas with increase in water occurrence are visualized in different shades of green, areas with no change are colored black and areas with decrease are shown in shades of red. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_change/).`,
+      t`# Global Surface Water - Occurrence Change Intensity\n\n\n\nThe layer visualises changes in water occurrence between two different epochs, the first ranging from March 1984 to December 1999, and the other covering the period from January 2000 to December 2021. Areas with increase in water occurrence are visualized in different shades of green, areas with no change are colored black and areas with decrease are shown in shades of red. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_change/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '3_SEASONALITY' }],
@@ -2240,7 +2251,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         maxPosition: 12,
         gradients: [
           { position: '1', color: 'rgb(153, 217, 234)', label: '1 month of water' },
-          { position: '12', color: 'rgb(0,0,170)', label: '12 months of water (permanent)' },
+          { position: '12', color: 'rgb(0,0,170)', label: '12 months of water' },
         ],
       },
       {
@@ -2258,7 +2269,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       },
     ],
     description: () =>
-      t`# Global Surface Water - Seasonality\n\n\n\nThe Seasonality layer provides information on the distribution of surface water in 2019. Permanent water bodies (water was present for 12 months) are colored in dark blue and seasonal water (water was present for less than 12 months) in gradually lighter shades of blue, with the lightest blue showing areas where water was present for only 1 month. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_seasonality/#).`,
+      t`# Global Surface Water - Seasonality\n\n\n\nThe Seasonality layer provides information on the distribution of surface water in 2021. Permanent water bodies (water was present for 12 months) are colored in dark blue and seasonal water (water was present for less than 12 months) in gradually lighter shades of blue, with the lightest blue showing areas where water was present for only 1 month. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_seasonality/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '4_RECURRENCE' }],
@@ -2287,7 +2298,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       },
     ],
     description: () =>
-      t`# Global Surface Water - Recurrence\n\n\n\nThe Recurrence layer shows how frequently water returned to a particular location in a defined water period between 1984 and 2019. Orange color indicates low recurrence (water returned to the area infrequently), and light blue color indicates high recurrence (water returned to the area frequently). Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_recurrence/).`,
+      t`# Global Surface Water - Recurrence\n\n\n\nThe Recurrence layer shows how frequently water returned to a particular location in a defined water period between 1984 and 2021. Orange color indicates low recurrence (water returned to the area infrequently), and light blue color indicates high recurrence (water returned to the area frequently). Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_recurrence/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '5_TRANSITIONS' }],
@@ -2345,7 +2356,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Global Surface Water - Transitions\n\n\n\nThe Transitions layer is derived from a comparison between the first and last year in the 36-year time period. It visualises conversions between seasonal and permanent water. For example, "lost seasonal" means, that previously seasonal water was converted to land, "new seasonal" means that land has been converted to seasonal waters and so on. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_transitions/) and learn what each class means [here](https://global-surface-water.appspot.com/faq).`,
+      t`# Global Surface Water - Transitions\n\n\n\nThe Transitions layer is derived from a comparison between the first and last year in the 38-year time period. It visualises conversions between seasonal and permanent water. For example, "lost seasonal" means, that previously seasonal water was converted to land, "new seasonal" means that land has been converted to seasonal waters and so on. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_transitions/) and learn what each class means [here](https://global-surface-water.appspot.com/faq).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '6_EXTENT' }],
@@ -2367,7 +2378,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Global Surface Water - Extent\n\n\n\nThis layer visualizes water in blue. It combines all the other layers and visualizes all the locations for which water presence has ever been detected over the 36-year period. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/global_surface_water_extent/).`,
+      t`# Global Surface Water - Extent\n\n\n\nThis layer visualizes water in blue. It combines all the other layers and visualizes all the locations for which water presence has ever been detected over the 38-year period. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_extent/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_WATER_BODIES', layerId: 'WATER-BODIES' }],
@@ -3105,9 +3116,54 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# ESA WorldCover Map\n\n\n\nThe WorldCover product displays a global land cover map with 11 different land cover classes produced at 10m resolution based on combination of both Sentinel-1 and Sentinel-2 data. In areas where Sentinel-2 images are covered by clouds for an extended period of time, Sentinel-1 data provides complimentary information on the structural characteristics of the observed land cover. Therefore, the combination of Sentinel-1 and Sentinel-2 data makes it possible to update the land cover map almost in real time. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/worldcover/).`,
+      t`# ESA WorldCover Map\n\n\n\nThe WorldCover product displays a global land cover map with 11 different land cover classes produced at 10m resolution based on combination of both Sentinel-1 and Sentinel-2 data. In areas where Sentinel-2 images are covered by clouds for an extended period of time, Sentinel-1 data provides complimentary information on the structural characteristics of the observed land cover. Therefore, the combination of Sentinel-1 and Sentinel-2 data makes it possible to update the land cover map almost in real time. Find more information [here](https://custom-scripts.sentinel-hub.com/other_collections/worldcover/).`,
   },
-
+  {
+    match: [{ datasourceId: IO_LULC_10M_ANNUAL, layerId: 'IO-LAND-USE-LAND-COVER-MAP' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#419bdf',
+          label: 'Water',
+        },
+        {
+          color: '#397d49',
+          label: 'Trees',
+        },
+        {
+          color: '#7a87c6',
+          label: 'Flooded Vegetation',
+        },
+        {
+          color: '#e49635',
+          label: 'Crops',
+        },
+        {
+          color: '#c4281b',
+          label: 'Built Area',
+        },
+        {
+          color: '#a59b8f',
+          label: 'Bare Ground',
+        },
+        {
+          color: '#a8ebff',
+          label: 'Snow and ice',
+        },
+        {
+          color: '#616161',
+          label: 'Clouds',
+        },
+        {
+          color: '#e3e2c3',
+          label: 'Rangeland',
+        },
+      ],
+    },
+    description: () =>
+      t`# 10m Annual Land Use Land Cover (9-class)\n\n\n\nThe 10m Annual Land Use Land Cover (LULC) Map is produced by Impact Observatory, Microsoft, and Esri collaboratively. The data collection is derived from ESA Sentinel-2 imagery at 10m resolution globally using Impact Ovservatory's state of the art deep learning AI land classification model which is trained by billions of human-labeled image pixels. There are 9 LULC classes generated by the algorithm, including Built, Crops, Trees, Water, Rangeland, Flooded Vegetation, Snow/Ice, Bare Ground, and Clouds. Find more information [here](https://custom-scripts.sentinel-hub.com/other_collections/impact-observatory-lulc/).`,
+  },
   {
     match: [{ datasourceId: COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES, layerId: 'PPI-VISUALIZATION' }],
     legend: {
@@ -3366,6 +3422,556 @@ export const PREDEFINED_LAYERS_METADATA = [
       t`# Total Productivity Parameter\n\n\n\nThis layer visualizes the TPROD parameter of the VPP (Vegetation Phenology and Productivity) parameter. TPROD represents total productivity. It is calculated as a sum of all daily PPI (plant phenology index) values, minus their base level value. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-total-productivity-tprod/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
   },
   {
+    match: [{ datasourceId: COPERNICUS_HRSI_PSA, layerId: 'PERSISTENT-SNOW-AREA' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00a600',
+          label: 'No persistent snow',
+        },
+        {
+          color: '#e6f2ff',
+          label: 'Persistent snow',
+        },
+        {
+          color: '#000000',
+          label: 'No Data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Persistent Snow Area\n\n\n\nThis script visualises Persistent Snow Area (PSA). The PSA product is generated annually from FSC products and provides the extent of persistent snow cover (the areas where snow is present throughout the hydrological year). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-psa-psa/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_PSA, layerId: 'PERSISTENT-SNOW-AREA-QUALITY' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00a600',
+          label: 'High quality',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Medium quality',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Low quality',
+        },
+        {
+          color: '#ff0000',
+          label: 'Minimal quality',
+        },
+        {
+          color: '#cccccc',
+          label: 'Masked',
+        },
+        {
+          color: '#000000',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Persistent Snow Area Quality\n\n\n\nThis script visualises the Persistent Snow Area Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-psa-psa-quality/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_WDS, layerId: 'SNOW-STATE-CLASSIFICATION' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#ff4dff',
+          label: 'Wet snow',
+        },
+        {
+          color: '#ffffff',
+          label: 'Dry snow',
+        },
+        {
+          color: '#e6e64d',
+          label: 'Snow free or patchy snow',
+        },
+        {
+          color: '#000000',
+          label: 'Radar shadow',
+        },
+        {
+          color: '#cccccc',
+          label: 'Cloud or cloud shadow',
+        },
+        {
+          color: '#4d4dff',
+          label: 'Water',
+        },
+        {
+          color: '#00a600',
+          label: 'Forest',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Urban areas',
+        },
+        {
+          color: '#ff0000',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Wet / Dry Snow - Snow State Classification \n\n\n\nThis script visualises the Wet / Dry Snow - Snow State Classification (WDS SSC). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-wds-ssc/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_WDS, layerId: 'SNOW-STATE-CLASSIFICATION-QUALITY' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00a600',
+          label: 'High quality',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Medium quality',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Low quality',
+        },
+        {
+          color: '#ff0000',
+          label: 'Minimal quality',
+        },
+        {
+          color: '#cccccc',
+          label: 'Masked',
+        },
+        {
+          color: '#000000',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Wet / Dry Snow - Snow State Classification Quality\n\n\n\nThis script visualises the Wet / Dry Snow - Snow State Classification (WDS QCSSC) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-wds-ssc-quality/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_SWS, layerId: 'SAR-WET-SNOW' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#ff4dff',
+          label: 'Wet snow',
+        },
+        {
+          color: '#ffffff',
+          label: 'Dry snow or snow free or patchy snow',
+        },
+        {
+          color: '#000000',
+          label: 'Radar shadow',
+        },
+        {
+          color: '#4d4dff',
+          label: 'Water',
+        },
+        {
+          color: '#00a600',
+          label: 'Forest',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Urban areas',
+        },
+        {
+          color: 'ccffcc',
+          label: 'Non-mountain areas',
+        },
+        {
+          color: '#ff0000',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# SAR Wet Snow - Wet Snow in high Mountains areas\n\n\n\nThis script visualises SAR Wet Snow in high Mountains - Wet Snow classification in high Mountains (SWS WSM). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-sws-wet-snow-classification-high-mountains/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_SWS, layerId: 'SAR-WET-SNOW-QUALITY' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00a600',
+          label: 'High quality',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Medium quality',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Low quality',
+        },
+        {
+          color: '#ff0000',
+          label: 'Minimal quality',
+        },
+        {
+          color: '#cccccc',
+          label: 'Masked',
+        },
+        {
+          color: '#000000',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# SAR Wet Snow - Wet Snow in high Mountains Quality\n\n\n\nThis script visualises SAR Wet Snow in high Mountains - Wet Snow classification in high Mountains Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-sws-wet-snow-classification-high-mountains-quality/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_FSC, layerId: 'FRACTIONAL-SNOW-COVER-ON-GROUND' }],
+    legend: {
+      type: 'continuous',
+      minPosition: -30,
+      maxPosition: 100,
+      gradients: [
+        { position: -30, color: 'rgb(0%,0%,0%)', label: 'No data' },
+        { position: -23, color: 'rgb(0%,0%,0%)' },
+        { position: -15, color: 'rgb(0%,0%,0%)' },
+        { position: -15, color: 'rgb(90%,90%,90%)', label: 'Cloudy pixels' },
+        { position: -8, color: 'rgb(90%,90%,90%)' },
+        { position: 0, color: 'rgb(90%,90%,90%)' },
+        { position: 0, color: 'rgb(100%,100%,100%)', label: '0%' },
+        { position: 5, color: 'rgb(96%,96%,100%)' },
+        { position: 6, color: 'rgb(96%,96%,100%)' },
+        { position: 10, color: 'rgb(92%,92%,100%)' },
+        { position: 11, color: 'rgb(92%,92%,100%)' },
+        { position: 15, color: 'rgb(88%,88%,100%)' },
+        { position: 16, color: 'rgb(88%,88%,100%)' },
+        { position: 20, color: 'rgb(84%,84%,100%)' },
+        { position: 21, color: 'rgb(84%,84%,100%)' },
+        { position: 25, color: 'rgb(80%,80%,100%)' },
+        { position: 26, color: 'rgb(80%,80%,100%)' },
+        { position: 30, color: 'rgb(76%,76%,100%)' },
+        { position: 31, color: 'rgb(76%,76%,100%)' },
+        { position: 35, color: 'rgb(72%,72%,100%)' },
+        { position: 36, color: 'rgb(72%,72%,100%)' },
+        { position: 40, color: 'rgb(68%,68%,100%)' },
+        { position: 41, color: 'rgb(68%,68%,100%)' },
+        { position: 45, color: 'rgb(64%,64%,100%)' },
+        { position: 46, color: 'rgb(64%,64%,100%)' },
+        { position: 50, color: 'rgb(60%,60%,100%)', label: '50%' },
+        { position: 51, color: 'rgb(60%,60%,100%)' },
+        { position: 55, color: 'rgb(56%,56%,100%)' },
+        { position: 56, color: 'rgb(56%,56%,100%)' },
+        { position: 60, color: 'rgb(52%,52%,100%)' },
+        { position: 61, color: 'rgb(52%,52%,100%)' },
+        { position: 65, color: 'rgb(48%,48%,100%)' },
+        { position: 66, color: 'rgb(48%,48%,100%)' },
+        { position: 70, color: 'rgb(44%,44%,100%)' },
+        { position: 71, color: 'rgb(44%,44%,100%)' },
+        { position: 75, color: 'rgb(40%,40%,100%)' },
+        { position: 76, color: 'rgb(40%,40%,100%)' },
+        { position: 80, color: 'rgb(36%,36%,100%)' },
+        { position: 81, color: 'rgb(36%,36%,100%)' },
+        { position: 85, color: 'rgb(32%,32%,100%)' },
+        { position: 86, color: 'rgb(32%,32%,100%)' },
+        { position: 90, color: 'rgb(28%,28%,100%)' },
+        { position: 91, color: 'rgb(28%,28%,100%)' },
+        { position: 95, color: 'rgb(24%,24%,100%)' },
+        { position: 96, color: 'rgb(24%,24%,100%)' },
+        { position: 99, color: 'rgb(20%,20%,100%)' },
+        { position: 100, color: 'rgb(20%,20%,100%)', label: '100%' },
+      ],
+    },
+    description: () =>
+      t`# Fractional Snow Cover - On-ground\n\n\n\nThis script visualises Fractional Snow Cover - On-ground Fractional Snow Cover (%) (FSCOG). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-fsc-on-ground-fsi/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_FSC, layerId: 'FRACTIONAL-SNOW-COVER-ON-GROUND-QUALITY' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00a600',
+          label: 'High quality',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Medium quality',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Low quality',
+        },
+        {
+          color: '#ff0000',
+          label: 'Minimal quality',
+        },
+        {
+          color: '#cccccc',
+          label: 'Masked',
+        },
+        {
+          color: '#000000',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Fractional Snow Cover - On-ground Quality\n\n\n\nThis script visualises the Fractional Snow Cover - On-ground Fractional Snow Cover (%) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-fsc-on-ground-fsi-quality/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_FSC, layerId: 'FRACTIONAL-SNOW-COVER-TOP-OF-CANOPY' }],
+    legend: {
+      type: 'continuous',
+      minPosition: -30,
+      maxPosition: 100,
+      gradients: [
+        { position: -30, color: 'rgb(0%,0%,0%)', label: 'No data' },
+        { position: -23, color: 'rgb(0%,0%,0%)' },
+        { position: -15, color: 'rgb(0%,0%,0%)' },
+        { position: -15, color: 'rgb(90%,90%,90%)', label: 'Cloudy pixels' },
+        { position: -8, color: 'rgb(90%,90%,90%)' },
+        { position: 0, color: 'rgb(90%,90%,90%)' },
+        { position: 0, color: 'rgb(100%,100%,100%)', label: '0%' },
+        { position: 5, color: 'rgb(96%,96%,100%)' },
+        { position: 6, color: 'rgb(96%,96%,100%)' },
+        { position: 10, color: 'rgb(92%,92%,100%)' },
+        { position: 11, color: 'rgb(92%,92%,100%)' },
+        { position: 15, color: 'rgb(88%,88%,100%)' },
+        { position: 16, color: 'rgb(88%,88%,100%)' },
+        { position: 20, color: 'rgb(84%,84%,100%)' },
+        { position: 21, color: 'rgb(84%,84%,100%)' },
+        { position: 25, color: 'rgb(80%,80%,100%)' },
+        { position: 26, color: 'rgb(80%,80%,100%)' },
+        { position: 30, color: 'rgb(76%,76%,100%)' },
+        { position: 31, color: 'rgb(76%,76%,100%)' },
+        { position: 35, color: 'rgb(72%,72%,100%)' },
+        { position: 36, color: 'rgb(72%,72%,100%)' },
+        { position: 40, color: 'rgb(68%,68%,100%)' },
+        { position: 41, color: 'rgb(68%,68%,100%)' },
+        { position: 45, color: 'rgb(64%,64%,100%)' },
+        { position: 46, color: 'rgb(64%,64%,100%)' },
+        { position: 50, color: 'rgb(60%,60%,100%)', label: '50%' },
+        { position: 51, color: 'rgb(60%,60%,100%)' },
+        { position: 55, color: 'rgb(56%,56%,100%)' },
+        { position: 56, color: 'rgb(56%,56%,100%)' },
+        { position: 60, color: 'rgb(52%,52%,100%)' },
+        { position: 61, color: 'rgb(52%,52%,100%)' },
+        { position: 65, color: 'rgb(48%,48%,100%)' },
+        { position: 66, color: 'rgb(48%,48%,100%)' },
+        { position: 70, color: 'rgb(44%,44%,100%)' },
+        { position: 71, color: 'rgb(44%,44%,100%)' },
+        { position: 75, color: 'rgb(40%,40%,100%)' },
+        { position: 76, color: 'rgb(40%,40%,100%)' },
+        { position: 80, color: 'rgb(36%,36%,100%)' },
+        { position: 81, color: 'rgb(36%,36%,100%)' },
+        { position: 85, color: 'rgb(32%,32%,100%)' },
+        { position: 86, color: 'rgb(32%,32%,100%)' },
+        { position: 90, color: 'rgb(28%,28%,100%)' },
+        { position: 91, color: 'rgb(28%,28%,100%)' },
+        { position: 95, color: 'rgb(24%,24%,100%)' },
+        { position: 96, color: 'rgb(24%,24%,100%)' },
+        { position: 99, color: 'rgb(20%,20%,100%)' },
+        { position: 100, color: 'rgb(20%,20%,100%)', label: '100%' },
+      ],
+    },
+    description: () =>
+      t`# Fractional Snow Cover - Top of Canopy\n\n\n\nThis script visualises Fractional Snow Cover - Top of Canopy Fractional Snow Cover (%) (FSCTOC). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-fsc-top-of-canopy-fsi/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_FSC, layerId: 'FRACTIONAL-SNOW-COVER-TOP-OF-CANOPY-QUALITY' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00a600',
+          label: 'High quality',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Medium quality',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Low quality',
+        },
+        {
+          color: '#ff0000',
+          label: 'Minimal quality',
+        },
+        {
+          color: '#cccccc',
+          label: 'Masked',
+        },
+        {
+          color: '#000000',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Fractional Snow Cover - Top of Canopy Quality\n\n\n\nThis script visualises the Fractional Snow Cover - Top of Canopy Fractional Snow Cover (%) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-fsc-top-of-canopy-fsi-quality/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_FSC, layerId: 'FRACTIONAL-SNOW-COVER-NDSI' }],
+    legend: {
+      type: 'continuous',
+      minPosition: -30,
+      maxPosition: 100,
+      gradients: [
+        { position: -30, color: 'rgb(0%,0%,0%)', label: 'No data' },
+        { position: -23, color: 'rgb(0%,0%,0%)' },
+        { position: -15, color: 'rgb(0%,0%,0%)' },
+        { position: -15, color: 'rgb(90%,90%,90%)', label: 'Cloudy pixels' },
+        { position: -8, color: 'rgb(90%,90%,90%)' },
+        { position: 0, color: 'rgb(90%,90%,90%)' },
+        { position: 0, color: 'rgb(100%,100%,100%)', label: '0%' },
+        { position: 5, color: 'rgb(96%,96%,100%)' },
+        { position: 6, color: 'rgb(96%,96%,100%)' },
+        { position: 10, color: 'rgb(92%,92%,100%)' },
+        { position: 11, color: 'rgb(92%,92%,100%)' },
+        { position: 15, color: 'rgb(88%,88%,100%)' },
+        { position: 16, color: 'rgb(88%,88%,100%)' },
+        { position: 20, color: 'rgb(84%,84%,100%)' },
+        { position: 21, color: 'rgb(84%,84%,100%)' },
+        { position: 25, color: 'rgb(80%,80%,100%)' },
+        { position: 26, color: 'rgb(80%,80%,100%)' },
+        { position: 30, color: 'rgb(76%,76%,100%)' },
+        { position: 31, color: 'rgb(76%,76%,100%)' },
+        { position: 35, color: 'rgb(72%,72%,100%)' },
+        { position: 36, color: 'rgb(72%,72%,100%)' },
+        { position: 40, color: 'rgb(68%,68%,100%)' },
+        { position: 41, color: 'rgb(68%,68%,100%)' },
+        { position: 45, color: 'rgb(64%,64%,100%)' },
+        { position: 46, color: 'rgb(64%,64%,100%)' },
+        { position: 50, color: 'rgb(60%,60%,100%)', label: '50%' },
+        { position: 51, color: 'rgb(60%,60%,100%)' },
+        { position: 55, color: 'rgb(56%,56%,100%)' },
+        { position: 56, color: 'rgb(56%,56%,100%)' },
+        { position: 60, color: 'rgb(52%,52%,100%)' },
+        { position: 61, color: 'rgb(52%,52%,100%)' },
+        { position: 65, color: 'rgb(48%,48%,100%)' },
+        { position: 66, color: 'rgb(48%,48%,100%)' },
+        { position: 70, color: 'rgb(44%,44%,100%)' },
+        { position: 71, color: 'rgb(44%,44%,100%)' },
+        { position: 75, color: 'rgb(40%,40%,100%)' },
+        { position: 76, color: 'rgb(40%,40%,100%)' },
+        { position: 80, color: 'rgb(36%,36%,100%)' },
+        { position: 81, color: 'rgb(36%,36%,100%)' },
+        { position: 85, color: 'rgb(32%,32%,100%)' },
+        { position: 86, color: 'rgb(32%,32%,100%)' },
+        { position: 90, color: 'rgb(28%,28%,100%)' },
+        { position: 91, color: 'rgb(28%,28%,100%)' },
+        { position: 95, color: 'rgb(24%,24%,100%)' },
+        { position: 96, color: 'rgb(24%,24%,100%)' },
+        { position: 99, color: 'rgb(20%,20%,100%)' },
+        { position: 100, color: 'rgb(20%,20%,100%)', label: '100%' },
+      ],
+    },
+    description: () =>
+      t`# Fractional Snow Cover - NDSI\n\n\n\nThis script visualises Fractional Snow Cover NDSI. The product provides the NDSI values in the detected snow area, i.e. area where FSCTOC > 0%. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-fsc-ndsi/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_GFSC, layerId: 'GAP-FILLED-FRACTIONAL-SNOW-COVER' }],
+    legend: {
+      type: 'continuous',
+      minPosition: -30,
+      maxPosition: 100,
+      gradients: [
+        { position: -30, color: 'rgb(0%,0%,0%)', label: 'No data' },
+        { position: -23, color: 'rgb(0%,0%,0%)' },
+        { position: -15, color: 'rgb(0%,0%,0%)' },
+        { position: -15, color: 'rgb(90%,90%,90%)', label: 'Cloudy pixels' },
+        { position: -8, color: 'rgb(90%,90%,90%)' },
+        { position: 0, color: 'rgb(90%,90%,90%)' },
+        { position: 0, color: 'rgb(100%,100%,100%)', label: '0%' },
+        { position: 5, color: 'rgb(96%,96%,100%)' },
+        { position: 6, color: 'rgb(96%,96%,100%)' },
+        { position: 10, color: 'rgb(92%,92%,100%)' },
+        { position: 11, color: 'rgb(92%,92%,100%)' },
+        { position: 15, color: 'rgb(88%,88%,100%)' },
+        { position: 16, color: 'rgb(88%,88%,100%)' },
+        { position: 20, color: 'rgb(84%,84%,100%)' },
+        { position: 21, color: 'rgb(84%,84%,100%)' },
+        { position: 25, color: 'rgb(80%,80%,100%)' },
+        { position: 26, color: 'rgb(80%,80%,100%)' },
+        { position: 30, color: 'rgb(76%,76%,100%)' },
+        { position: 31, color: 'rgb(76%,76%,100%)' },
+        { position: 35, color: 'rgb(72%,72%,100%)' },
+        { position: 36, color: 'rgb(72%,72%,100%)' },
+        { position: 40, color: 'rgb(68%,68%,100%)' },
+        { position: 41, color: 'rgb(68%,68%,100%)' },
+        { position: 45, color: 'rgb(64%,64%,100%)' },
+        { position: 46, color: 'rgb(64%,64%,100%)' },
+        { position: 50, color: 'rgb(60%,60%,100%)', label: '50%' },
+        { position: 51, color: 'rgb(60%,60%,100%)' },
+        { position: 55, color: 'rgb(56%,56%,100%)' },
+        { position: 56, color: 'rgb(56%,56%,100%)' },
+        { position: 60, color: 'rgb(52%,52%,100%)' },
+        { position: 61, color: 'rgb(52%,52%,100%)' },
+        { position: 65, color: 'rgb(48%,48%,100%)' },
+        { position: 66, color: 'rgb(48%,48%,100%)' },
+        { position: 70, color: 'rgb(44%,44%,100%)' },
+        { position: 71, color: 'rgb(44%,44%,100%)' },
+        { position: 75, color: 'rgb(40%,40%,100%)' },
+        { position: 76, color: 'rgb(40%,40%,100%)' },
+        { position: 80, color: 'rgb(36%,36%,100%)' },
+        { position: 81, color: 'rgb(36%,36%,100%)' },
+        { position: 85, color: 'rgb(32%,32%,100%)' },
+        { position: 86, color: 'rgb(32%,32%,100%)' },
+        { position: 90, color: 'rgb(28%,28%,100%)' },
+        { position: 91, color: 'rgb(28%,28%,100%)' },
+        { position: 95, color: 'rgb(24%,24%,100%)' },
+        { position: 96, color: 'rgb(24%,24%,100%)' },
+        { position: 99, color: 'rgb(20%,20%,100%)' },
+        { position: 100, color: 'rgb(20%,20%,100%)', label: '100%' },
+      ],
+    },
+    description: () =>
+      t`# Fractional Snow Cover (Gap-filled)\n\n\n\nThis script visualises Daily cumulative Gap-filled Fractional Snow Cover - Fractional Snow Cover (%). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-gfsc-fsc/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_GFSC, layerId: 'GAP-FILLED-FRACTIONAL-SNOW-COVER-QUALITY' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00a600',
+          label: 'High quality',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Medium quality',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Low quality',
+        },
+        {
+          color: '#ff0000',
+          label: 'Minimal quality',
+        },
+        {
+          color: '#cccccc',
+          label: 'Masked',
+        },
+        {
+          color: '#000000',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# Fractional Snow Cover (Gap-filled) Quality\n\n\n\nThis script visualises the Daily cumulative Gap-filled Fractional Snow Cover - Fractional Snow Cover (%) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-gfsc-fsc-quality/).`,
+  },
+  {
     match: [{ datasourceId: COPERNICUS_HR_VPP_VEGETATION_INDICES, layerId: 'FAPAR-VISUALIZATION' }],
     legend: {
       type: 'continuous',
@@ -3451,5 +4057,84 @@ export const PREDEFINED_LAYERS_METADATA = [
     },
     description: () =>
       t`# Plant Phenology Index\n\n\n\nPPI (Plant Phenology Index) is a physically-based vegetation index derived from radiative transfer equation and is calculated from red and Near-Infrared (NIR) spectral bands. PPI is linearly related to the green leaf area index, and can be used to track canopy green foliage dynamics and therefore provides an efficient approach to retrieving plant phenology. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vi-ppi/#) and [here](https://land.copernicus.eu/user-corner/technical-library/product-user-manual-of-vegetation-indices/).`,
+  },
+
+  // HLS collection
+  {
+    match: [{ datasourceId: 'AWS_HLS', layerId: 'TRUE-COLOR' }],
+    description: () =>
+      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/hls/true_color/)`,
+  },
+  {
+    match: [{ datasourceId: 'AWS_HLS', layerId: '2_FALSE-COLOR' }],
+    description: () =>
+      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/hls/false_color/) and [here.](https://earthobservatory.nasa.gov/features/FalseColor/page6.php)`,
+  },
+
+  {
+    match: [
+      {
+        datasourceId: 'AWS_LOTL2',
+        layerId: 'X_BAND_QUALITY_ASSESSMENT',
+      },
+    ],
+
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#ffffff',
+          label: 'Cloud',
+        },
+        {
+          color: '#afafaf',
+          label: 'Dilated Clouds',
+        },
+        {
+          color: '#996633',
+          label: 'Cloud Shadow',
+        },
+        {
+          color: '#66ffff',
+          label: 'Cirrus',
+        },
+        {
+          color: '#ff00ff',
+          label: 'Snow',
+        },
+        {
+          color: '#0000CC',
+          label: 'Water',
+        },
+      ],
+    },
+    description: () =>
+      t`# Band Quality Assessment visualization\n\n\n\nThe Landsat BQA band provides useful information such as cloudy pixels to users wanting to mask their data from pixels that are either poor quality or contain no useful data. This visualization uses the [decodeL8C2Qa](https://docs.sentinel-hub.com/api/latest/evalscript/functions/#decodel8c2qa) function to decode the BQA band from the Landsat 8/9 Collection 2. Clear pixel, pixel not classified as clouds, snow or water, are displayed as true color image. \n\n\n\nMore info [here](https://www.usgs.gov/landsat-missions/landsat-collection-2-quality-assessment-bands).`,
+  },
+
+  {
+    match: [{ datasourceId: 'S1_AWS_IW_VVVH', layerId: '1_ENHANCED-VISUALIZATION' }],
+    description: () =>
+      t`# False color visualization\n\nThis script offers different false color visualizations and the possibility to easily add more visualizations. Using variables, you can influence the resulting image in terms of what you want to higlight.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-1/sar_false_color_visualization-2/) and [here.](https://pierre-markuse.net/2019/10/22/sentinel-1-sar-data-visualization-in-eo-browser-using-a-custom-script/)`,
+  },
+  {
+    match: [{ datasourceId: 'S1_AWS_IW_VVVH', layerId: '2_ENHANCED-VISUALIZATION-2' }],
+    description: () =>
+      t`# False color visualization-2\n\nThe script visualizes the Earth's surface in False Color from Sentinel-1 data. It helps with maritime monitoring (ice monitoring, ship monitoring,...), land monitoring (agriculture, deforestation,...) and emergency management (flood monitoring, volcano monitoring,...).\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-1/sar_false_color_visualization/)`,
+  },
+  {
+    match: [{ datasourceId: 'S1_AWS_IW_VVVH', layerId: '3_URBAN-AREAS' }],
+    description: () =>
+      t`# Urban Areas visualization\n\nThe script is useful for locating urban areas and individual buildings. It uses VH and VV polarizations to highlight different buildings and topology orientations with purple and green colors. It can be used to track urban expansion, estimate building type or locate buildings in high-risk areas (such as floods).\n\nThe script does not work well in high elevation areas, where snow and high slopes are also highlighted, making it difficult to separate urban areas from the rest of the surface.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-1/urban_areas/)`,
+  },
+  {
+    match: [{ datasourceId: 'S1_AWS_IW_VVVH', layerId: '4_DEFORESTATION' }],
+    description: () =>
+      t`# Deforestation Visualization\n\nThe script uses the VV and VH bands of the Sentinel-1 and transforms the cartesian space of VV and VH into polar coordinates computing the length and angle of the resulting vector as well as the area of the square defined by VV and VH. Then the length of the vector is used as a classifier to distinguish between water, forest and soil.\n\nThe script paints the water and bare soil areas black, and uses both the length and the angle to draw a scale for the forest (green) and soil (red), drawing a stronger green if more forest was classified and a stronger red or black if more soil was found.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-1/sar_deforestation_detection/)`,
+  },
+  {
+    match: [{ datasourceId: 'S1_AWS_IW_VVVH', layerId: '5_WATER-SURFACE-ROUGHNESS-VISUALIZATION' }],
+    description: () =>
+      t`# Water Surface Roughness Visualization \n\nThe script visualizes the Water Surface Roughness from Sentinel-1 data. It helps in maritime monitoring (ship monitoring, oil pollution monitoring, sea currents,...).\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-1/water_surface_roughness_visualization/)`,
   },
 ];

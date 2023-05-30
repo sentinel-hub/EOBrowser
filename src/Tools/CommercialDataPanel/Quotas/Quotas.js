@@ -14,6 +14,7 @@ const Providers = {
   [TPDICollections.AIRBUS_SPOT]: 'Airbus SPOT',
   [TPDICollections.PLANET_SCOPE]: 'Planet PlanetScope',
   [TPDICollections.MAXAR_WORLDVIEW]: 'Maxar WorldView',
+  [TPDICollections.PLANET_SKYSAT]: 'Planet SkySat',
 };
 
 function renderQuotas(quotas) {

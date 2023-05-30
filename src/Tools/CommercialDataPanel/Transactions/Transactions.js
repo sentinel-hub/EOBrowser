@@ -11,6 +11,7 @@ import {
   getBoundsAndLatLng,
   formatNumberAsRoundedUnit,
   showDataOnMap,
+  getTpdiCollectionFromTransaction,
 } from '../commercialData.utils';
 import TransactionTypeSelection from '../TransactionOptions/TransactionTypeSelection';
 import store, { commercialDataSlice, mainMapSlice } from '../../../store';
@@ -21,6 +22,7 @@ import { TRANSACTION_TYPE } from '../../../const';
 import Loader from '../../../Loader/Loader';
 
 import './Transactions.scss';
+import { TPDI_PROVIDER_ORDER_WARNINGS } from '../const';
 
 const transactionStatusAggregator = {
   [TRANSACTION_TYPE.ORDER]: [
@@ -253,15 +255,17 @@ const TransactionDetails = ({ transaction, setAction, layer, transactionType }) 
       </div>
       {JSONProperty(transaction, 'input')}
 
-      {transactionType === TRANSACTION_TYPE.ORDER && transaction.provider === TPDProvider.PLANET && (
-        <NotificationPanel>
-          {t`Note that it is technically possible to order more PlanetScope data than your purchased quota. Make sure your order is in line with the Hectares under Management (HUM) model to avoid overage fees.` +
-            ` `}
-          <ExternalLink href="https://www.sentinel-hub.com/faq/#how-the-planetscope-hectares-under-management-works">
-            {t`More information`}
-          </ExternalLink>
-        </NotificationPanel>
-      )}
+      {transactionType === TRANSACTION_TYPE.ORDER &&
+        transaction.provider === TPDProvider.PLANET &&
+        transaction.status === TPDITransactionStatus.CREATED && (
+          <NotificationPanel>
+            {t`Note that it is technically possible to order more PlanetScope data than your purchased quota. Make sure your order is in line with the Hectares under Management (HUM) model to avoid overage fees.` +
+              ` `}
+            <ExternalLink href="https://www.sentinel-hub.com/faq/#how-the-planetscope-hectares-under-management-works">
+              {t`More information`}
+            </ExternalLink>
+          </NotificationPanel>
+        )}
 
       <div className="buttons">
         {buttons
@@ -487,11 +491,13 @@ export const Transactions = ({
   };
 
   const setAction = (transactionType, action, transaction) => {
+    const collection = getTpdiCollectionFromTransaction(transaction);
     switch (action) {
       case 'confirm':
         setConfirmAction({
           title: () => transactionMessages[transactionType].confirmTitle,
           message: transactionMessages[transactionType].confirmMessage,
+          warning: () => TPDI_PROVIDER_ORDER_WARNINGS[collection],
           action: () => confirmTransactionAction(transactionType, transaction),
           showCancel: true,
         });

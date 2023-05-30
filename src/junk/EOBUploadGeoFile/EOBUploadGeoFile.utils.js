@@ -8,10 +8,24 @@ import JSZip from 'jszip';
 
 const uploadGeoFileErrorMessages = {
   UNSUPORTED_FILE_TYPE: () => t`File type not supported`,
-  UNSUPORTED_GEOJSON: () =>
-    t`Unsupported GeoJSON geometry type! Only Polygon and MultiPolygon are supported.`,
   ERROR_PARSING_FILE: () => t`There was a problem parsing the file`,
   ERROR_PARSING_GEOMETRY: () => t`There was a problem parsing input geometry`,
+  UNSUPORTED_GEOJSON_TYPE: (
+    supportedGeometryTypes = SUPPORTED_GEOMETRY_TYPES[UPLOAD_GEOMETRY_TYPE.POLYGON],
+  ) => {
+    const supported = supportedGeometryTypes.join(', ');
+    return t`Unsupported GeoJSON geometry type! Only ${supported} are supported.`;
+  },
+};
+
+const UPLOAD_GEOMETRY_TYPE = {
+  POLYGON: 'POLYGON',
+  LINE: 'LINE',
+};
+
+const SUPPORTED_GEOMETRY_TYPES = {
+  [UPLOAD_GEOMETRY_TYPE.POLYGON]: ['Polygon', 'MultiPolygon'],
+  [UPLOAD_GEOMETRY_TYPE.LINE]: ['LineString', 'MultiLineString'],
 };
 
 const isValidBbox = (inputArr) => inputArr && inputArr.length === 4 && !inputArr.some((e) => isNaN(e));
@@ -31,32 +45,13 @@ const isValidGeoJson = (json) =>
     'FeatureCollection',
   ].includes(json.type);
 
-const ensurePolygonOrMultiPolygon = (geoJson) => {
-  // We will use only save Polygon/Multipolygon geometry types to the store. So here we will convert them to appropriate types
-  if (geoJson.type === 'Feature') {
-    geoJson = geoJson.geometry;
-  } else if (geoJson.type === 'FeatureCollection') {
-    geoJson = convertFeaturesToMultiPolygon(geoJson.features);
-  } else if (geoJson.type === 'GeometryCollection') {
-    geoJson = convertGeometriesToMultiPolygon(geoJson.geometries);
+const validateGeometryTypes = (geometries, supportedGeometryTypes) => {
+  if (!(geometries && geometries.every((geometry) => supportedGeometryTypes.includes(geometry.type)))) {
+    throw new Error(uploadGeoFileErrorMessages.UNSUPORTED_GEOJSON_TYPE(supportedGeometryTypes));
   }
-
-  if (geoJson.type !== 'Polygon' && geoJson.type !== 'MultiPolygon') {
-    throw new Error(uploadGeoFileErrorMessages.UNSUPORTED_GEOJSON());
-  }
-  geoJson = removeExtraCoordDimensions(geoJson);
-  return geoJson;
 };
 
-const convertFeaturesToMultiPolygon = (features) => {
-  const geometries = features.map((feature) => {
-    ensurePolygonOrMultiPolygon(feature.geometry);
-    return feature.geometry;
-  });
-  return convertGeometriesToMultiPolygon(geometries);
-};
-
-const convertGeometriesToMultiPolygon = (geometries) => {
+const createPolygonsUnion = (geometries) => {
   let multipolygon = geometries[0];
   for (let i = 1; i < geometries.length; i++) {
     multipolygon = union(multipolygon, geometries[i]).geometry;
@@ -64,12 +59,76 @@ const convertGeometriesToMultiPolygon = (geometries) => {
   return multipolygon;
 };
 
-const removeExtraCoordDimensions = (geometry) => {
-  coordEach(geometry, (coord, index) => {
-    if (coord.length > 2) {
-      geometry.coordinates[0][index] = [coord[0], coord[1]];
+const createLinesUnion = (geometries) => {
+  if (geometries.length <= 1) {
+    return geometries[0];
+  }
+  const coordinates = [];
+  geometries.forEach((geom) => {
+    if (geom.type === 'LineString') {
+      coordinates.push(geom.coordinates);
+    } else if (geom.type === 'MultiLineString') {
+      coordinates.push(...geom.coordinates);
     }
   });
+  return { type: 'MultiLineString', coordinates: coordinates };
+};
+
+const createUnion = (geometries, type) => {
+  if (!(geometries && Array.isArray(geometries) && geometries.length)) {
+    return null;
+  }
+
+  switch (type) {
+    case UPLOAD_GEOMETRY_TYPE.LINE:
+      return createLinesUnion(geometries);
+    case UPLOAD_GEOMETRY_TYPE.POLYGON:
+      return createPolygonsUnion(geometries);
+    default:
+      return null;
+  }
+};
+
+const extractGeometriesFromGeoJson = (geoJson, supportedGeometryTypes) => {
+  if (!(geoJson && isValidGeoJson(geoJson))) {
+    throw new Error(uploadGeoFileErrorMessages.ERROR_PARSING_FILE);
+  }
+
+  let geometries;
+
+  switch (geoJson.type) {
+    case 'Feature':
+      geometries = [geoJson.geometry];
+      break;
+    case 'FeatureCollection':
+      geometries = geoJson.features.map((feature) => feature.geometry);
+      break;
+    case 'GeometryCollection':
+      geometries = geoJson.geometries;
+      break;
+    default:
+      geometries = [geoJson];
+      break;
+  }
+  validateGeometryTypes(geometries, supportedGeometryTypes);
+  return geometries;
+};
+
+const removeExtraCoordDimensionsIfNeeded = (geometry) => {
+  if (!geometry) {
+    return null;
+  }
+
+  if (!isValidGeoJson(geometry)) {
+    throw new Error(uploadGeoFileErrorMessages.ERROR_PARSING_GEOMETRY());
+  }
+
+  coordEach(geometry, (coord) => {
+    while (coord.length > 2) {
+      coord.pop();
+    }
+  });
+
   return geometry;
 };
 
@@ -126,16 +185,16 @@ const conversionFunctions = {
 const isFileTypeSupported = (format) => !!conversionFunctions[format];
 
 const convertToGeoJson = (data, format = null) => {
-  let area;
+  let geoJson;
   if (format) {
     // use appropriate convert function when format is provided
-    area = conversionFunctions[format](data);
+    geoJson = conversionFunctions[format](data);
   } else {
     // iterate over all supported formats and use first one that returns something
     for (let format of Object.keys(conversionFunctions)) {
       try {
-        area = conversionFunctions[format](data);
-        if (!!area) {
+        geoJson = conversionFunctions[format](data);
+        if (!!geoJson) {
           break;
         }
       } catch (err) {
@@ -144,7 +203,7 @@ const convertToGeoJson = (data, format = null) => {
     }
   }
 
-  if (!area) {
+  if (!geoJson) {
     throw new Error(
       !!format
         ? uploadGeoFileErrorMessages.ERROR_PARSING_FILE()
@@ -152,13 +211,15 @@ const convertToGeoJson = (data, format = null) => {
     );
   }
 
-  return area;
+  return geoJson;
 };
 
-const parseContent = (data, format = null) => {
+const parseContent = (data, type = UPLOAD_GEOMETRY_TYPE.POLYGON, format = null) => {
   let geoJson = convertToGeoJson(data, format);
-  geoJson = ensurePolygonOrMultiPolygon(geoJson);
-  return geoJson;
+  const geometries = extractGeometriesFromGeoJson(geoJson, SUPPORTED_GEOMETRY_TYPES[type]);
+  const geometriesWithoutZ = geometries.map((geometry) => removeExtraCoordDimensionsIfNeeded(geometry));
+  const union = createUnion(geometriesWithoutZ, type);
+  return union;
 };
 
 const loadFileContent = async (file, format) => {
@@ -183,4 +244,15 @@ const loadFileContent = async (file, format) => {
   });
 };
 
-export { uploadGeoFileErrorMessages, getFileExtension, isFileTypeSupported, parseContent, loadFileContent };
+export {
+  uploadGeoFileErrorMessages,
+  getFileExtension,
+  isFileTypeSupported,
+  parseContent,
+  loadFileContent,
+  UPLOAD_GEOMETRY_TYPE,
+  SUPPORTED_GEOMETRY_TYPES,
+  extractGeometriesFromGeoJson,
+  createUnion,
+  removeExtraCoordDimensionsIfNeeded,
+};

@@ -65,7 +65,7 @@
   }
 
   header {
-    padding: 5px 0;
+    padding: 5px 0 15px;
   }
 
   .scriptBtnPanel {
@@ -75,5 +75,49 @@
 
   .insert-url-block {
     padding: 2px 20px;
+  }
+
+  .custom-visualisation-content {
+    background-color: $mainLight;
+
+    .help-tooltip {
+      float: right;
+    }
+
+    .custom-visualisation-wrapper {
+      padding: 0 10px 10px;
+    }
+
+    .custom-visualisation-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      .tab-button {
+        flex: auto;
+        text-align: center;
+        list-style: none;
+        cursor: pointer;
+        color: #eee;
+        height: 35px;
+        line-height: 35px;
+        background-color: $mainMedium;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .active {
+        background-color: $mainLight;
+      }
+
+      .not-clickable {
+        pointer-events: none;
+      }
+    }
   }
 }

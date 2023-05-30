@@ -1,9 +1,9 @@
-@import "./../../variables.scss";
+@import './../../variables.scss';
 
 .histogram-modal {
   z-index: 1002;
   position: absolute;
-  top: 360px;
+  top: 410px;
   right: 60px;
   padding: 10px;
   width: 500px;
@@ -11,14 +11,14 @@
   background-color: $mainDark;
   color: #fff;
 
-  @media screen and (max-height: 720px) {
+  @media screen and (max-height: $breakpoint-720) {
     & {
       bottom: 10px;
       top: auto;
     }
   }
 
-  @media screen and (max-height: 400px) {
+  @media screen and (max-height: $breakpoint-400) {
     & {
       bottom: 10px;
       top: 10px;
@@ -26,7 +26,7 @@
     }
   }
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: $breakpoint-600) {
     & {
       left: 10px;
       right: auto;
@@ -43,7 +43,7 @@
       flex-grow: 1;
     }
 
-    @media screen and (max-width: 600px) {
+    @media screen and (max-width: $breakpoint-600) {
       & {
         flex-direction: column;
 

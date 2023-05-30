@@ -1,7 +1,6 @@
 import { coordEach } from '@turf/meta';
 import { featureCollection } from '@turf/helpers';
 import geo_area from '@mapbox/geojson-area';
-import proj4 from 'proj4';
 
 export function isCoordsEmpty(geojsonFeature) {
   let coordsEmpty = false;
@@ -46,33 +45,6 @@ export function getRecommendedResolution(boundsGeojson, resolution, fisResolutio
   return recommendedResolution;
 }
 
-export function convertGeoJSONToEPSG4326(geoJSON) {
-  const projFrom = getProj(geoJSON.crs.properties.name);
-  if (!projFrom) {
-    return;
-  }
-  const coords = geoJSON.coordinates;
-  for (var i = coords[0][0].length - 1; i >= 0; i--) {
-    coords[0][0][i] = proj4(projFrom, 'EPSG:4326', coords[0][0][i]);
-  }
-  return geoJSON;
-}
-
-function getProj(crs) {
-  // Can only do WGS84 UTM for now
-  const split = crs.split(':');
-  const name = split[split.length - 3] + ':' + split[split.length - 1];
-  const [projType, projNum] = name.split(':');
-  const isWGS84UTM = projType === 'EPSG' && projNum.startsWith('326') && projNum.length === 5;
-  if (!isWGS84UTM) {
-    return;
-  }
-  const projZone = projNum.slice(3, 5);
-  const proj = `+proj=utm +zone=${projZone} +datum=WGS84 +units=m +no_defs`;
-  proj4.defs(name, proj);
-  return name;
-}
-
 //calculate zoom level for leaflet bounds
 export function getBoundsZoomLevel(bounds) {
   const WORLD_DIM = { height: 256, width: 256 };
@@ -102,27 +74,15 @@ export function getBoundsZoomLevel(bounds) {
   return Math.min(latZoom, lngZoom, ZOOM_MAX);
 }
 
-const round = (number, precision) => {
-  return Math.floor(number * 10 ** precision) / 10 ** precision;
-};
+export function switchGeometryCoordinates(geometry) {
+  // getStats makes request with ESPG:4326, but geojson is in WGS:84.
+  const switchCoordinates = (coordsGroup) => [coordsGroup[0].map((coord) => [coord[1], coord[0]])];
 
-const reprojectCoordinates = (coords, fromProj, toProj) => {
-  return [
-    coords[0]
-      .map((coord) => proj4(fromProj, toProj, coord))
-      .map((pair) => [round(pair[0], 6), round(pair[1], 6)]),
-  ];
-};
-
-export const reprojectGeometry = (geometry, fromProj, toProj) => {
-  try {
-    const transformedCoords = reprojectCoordinates(geometry.coordinates, fromProj, toProj);
-    const polygon = {
-      type: 'Polygon',
-      coordinates: transformedCoords,
-    };
-    return polygon;
-  } catch (err) {
-    console.error('Unable to reproject geometry', err);
-  }
-};
+  return {
+    type: geometry.type,
+    coordinates:
+      geometry.type === 'Polygon'
+        ? switchCoordinates(geometry.coordinates)
+        : geometry.coordinates.map((subPolygonCoords) => switchCoordinates(subPolygonCoords)),
+  };
+}

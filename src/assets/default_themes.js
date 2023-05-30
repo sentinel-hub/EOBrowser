@@ -2,6 +2,35 @@ import { t } from 'ttag';
 
 const EDUCATION_THEMES = [
   {
+    name: () => t`Highlights of the Month`,
+    id: 'HIGHLIGHT',
+    content: [
+      {
+        name: 'EOB3 Sentinel-1 Education + API (V3)',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/31391b-YOUR-INSTANCEID-HERE',
+        preselected: true,
+      },
+    ],
+    pins: [
+      {
+        lat: -3.17573,
+        lng: 29.23157,
+        zoom: 12,
+        title: 'Devastating Flooding in DR Congo (Enhanced Visualization)',
+        toTime: '2023-05-05',
+        layerId: '2_ENHANCED-VISUALIZATION-2',
+        themeId: 'HIGHLIGHT',
+        datasetId: 'S1_AWS_IW_VVVH',
+        evalscripturl: '',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/31391b-YOUR-INSTANCEID-HERE',
+        description:
+          'The Democratic Republic of Congo experienced one of the largest flood and landslide events in recent history between 2 and 4 May 2023, with more than 400 confirmed deaths, some 5,500 missing and immense property damage [[1]](https://edition.cnn.com/2023/05/08/africa/flooding-congo-dead-intl/index.html). The image has been captured by a Synthetic Aperture Radar (SAR), which provides another type of imagery as it can penetrate clouds. It can capture data at any time of day as it does not depend on sunlight, and works in all weather conditions. This makes the sensor a very useful tool to provide timely information about such devastating natural disasters. See a comparison between the flood and the previous normal situation at this [compare link](https://sentinelshare.page.link/Ba18).',
+      },
+    ],
+    highlights: true,
+  },
+  {
     name: () => t`Monitoring Earth from Space`,
     id: 'MONITORING',
     content: [
@@ -18,6 +47,21 @@ const EDUCATION_THEMES = [
       },
     ],
     pins: [
+      {
+        title: 'Clew Bay and Achill Island, Ireland',
+        lat: 53.86376,
+        lng: -9.85062,
+        zoom: 12,
+        datasetId: 'S2L2A',
+        layerId: '2_HIGHLIGHT-OPTIMIZED-NATURAL-COLOR',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/4e7f01-YOUR-INSTANCEID-HERE',
+        toTime: '2021-08-26',
+        evalscript: '',
+        evalscripturl: '',
+        themeId: 'MONITORING',
+        description:
+          '[Clew Bay](https://www.clewbay.net/westport-louisburgh-newport/) is a natural ocean bay in County Mayo, Ireland. It has a system of small islands, remnants of sediment transport during the last Ice Age. [Achill Island](https://en.wikivoyage.org/wiki/Achill_Island) can be seen in the north-west of the image, with some spectacular towering cliffs at the westernmost point.',
+      },
       {
         lat: 21.9502,
         lng: 89.1671,
@@ -44,7 +88,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/4e7f01-YOUR-INSTANCEID-HERE',
         description:
-          '[Veneto agriculture](https://www.recare-hub.eu/news/45-06-bioforsk) is one of the most productive in Italy, producing mainly cereals, fruits and wine. Small, hand farmed fields present a contrast to the growing industrialization of the sector, which suffers from soil degradation.',
+          '[Veneto agriculture](https://www.recare-hub.eu/news/45-06-bioforsk) is one of the most productive in Italy, producing mainly cereals, fruits and wine. Small, hand farmed fields present a contrast to the growing industrialization of the sector, which suffers from soil degradation.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/LzKr) in EO Browser.',
       },
       {
         lat: -15.889,
@@ -58,7 +102,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/4e7f01-YOUR-INSTANCEID-HERE',
         description:
-          'A beautiful Betsiboka river delta is a dramatic example of massive deforestation, that occurs in Madagascar every year. One of the biggest culprits is the slash and burn agriculture, called [tavy](https://www.madamagazine.com/en/english-tavy-kahlschlag-einer-insel/), where the forest is burnt and then farmed in the following months. The other deforestation causes include grazing, logging and production of coal. The forest grows back after being cut down, but until then, the barren soil is vulnerable to erosion by heavy rains, depositing it into rivers, which carry it into the sea, contaminating sea life with deposited iron oxides. As soil formation is a process taking thousands of years, it erodes away each year, until it can no longer support a forest. Due to these processes, Madagascar has already lost [80% of its primary forests](https://www.eoi.es/blogs/guidopreti/2014/02/04/deforestation-in-madagascar-a-threat-to-its-biodiversity/), causing many indigenous species, such as [lemurs](https://monkeysandmountains.com/lemurs-madagascar/), to be endangered.',
+          'A beautiful Betsiboka river delta is a dramatic example of massive deforestation, that occurs in Madagascar every year. One of the biggest culprits is the slash and burn agriculture, called [tavy](https://www.madamagazine.com/en/english-tavy-kahlschlag-einer-insel/), where the forest is burnt and then farmed in the following months. The other deforestation causes include grazing, logging and production of coal. The forest grows back after being cut down, but until then, the barren soil is vulnerable to erosion by heavy rains, depositing it into rivers, which carry it into the sea, contaminating sea life with deposited iron oxides. As soil formation is a process taking thousands of years, it erodes away each year, until it can no longer support a forest. Due to these processes, Madagascar has already lost [80% of its primary forests](https://www.eoi.es/blogs/guidopreti/2014/02/04/deforestation-in-madagascar-a-threat-to-its-biodiversity/), causing many indigenous species, such as [lemurs](https://monkeysandmountains.com/lemurs-madagascar/), to be endangered.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/htuC) in EO Browser.',
       },
       {
         lat: 21.1476,
@@ -101,7 +145,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/4e7f01-YOUR-INSTANCEID-HERE',
         description:
-          "[Venice](https://www.britannica.com/place/Venice/Lagoon-and-tides), a so called island city with a population of [637,245](https://worldpopulationreview.com/world-cities/venice-population/), remains a major Italian port and is one of the world’s oldest tourist and cultural centres. The lagoon's mud banks, shallows, and channels with its marine and bird life provide next to salt pans a source of income for the Venetians. The lagoon has served as protection and as a natural sewerage system. The deepening of channels in the 20th century, the overextraction of fresh water from mainland aquifers, the rising of the Adriatic Sea, and the geologic sinking of the Po River basin have lowered the land level, creating a serious flooding problem. On a regular basis, when high tides combine with winds from the south and east, the waters of the lagoon rise and flood the city, making Venice to be known as the [City built on water](https://www.livitaly.com/how-was-venice-built/).",
+          "[Venice](https://www.britannica.com/place/Venice/Lagoon-and-tides), a so called island city with a population of [637,245](https://worldpopulationreview.com/world-cities/venice-population/), remains a major Italian port and is one of the world’s oldest tourist and cultural centres. The lagoon's mud banks, shallows, and channels with its marine and bird life provide next to salt pans a source of income for the Venetians. The lagoon has served as protection and as a natural sewerage system. The deepening of channels in the 20th century, the overextraction of fresh water from mainland aquifers, the rising of the Adriatic Sea, and the geologic sinking of the Po River basin have lowered the land level, creating a serious flooding problem. On a regular basis, when high tides combine with winds from the south and east, the waters of the lagoon rise and flood the city, making Venice to be known as the [City built on water](https://www.livitaly.com/how-was-venice-built/).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/o8T5) in EO Browser.",
       },
       {
         lat: 38.7931301,
@@ -152,6 +196,21 @@ const EDUCATION_THEMES = [
     ],
     pins: [
       {
+        title: 'Rapeseed Flowering in Mecklenburg-Vorpommern (True color)',
+        lat: 53.49673,
+        lng: 13.58202,
+        zoom: 12,
+        datasetId: 'S2L2A',
+        layerId: '1_TRUE-COLOR',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/c6c712-YOUR-INSTANCEID-HERE',
+        toTime: '2022-05-18',
+        evalscript: '',
+        evalscripturl: '',
+        themeId: 'AGRICULTURE',
+        description:
+          '[Oilseed rape](https://en.wikipedia.org/wiki/Rapeseed) is one of the main crops produced in Europe and is mainly used to produce [biodiesel](https://www.eia.gov/energyexplained/biofuels/biodiesel-rd-other-basics.php). During the flowering period (late April-early May), the fields are coloured by the distinctive yellow flowers, which can also be observed from space.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/knVQ) in EO Browser.',
+      },
+      {
         title: 'Agriculture in Saudi Arabia (Moisture Index)',
         lat: 26.21913,
         lng: 43.49539,
@@ -164,7 +223,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'AGRICULTURE',
         description:
-          'The desert country of Saudi Arabia highly relies on irrigation farming for growing crops, due to its arid and warm climate. The circular shape of the fields is a result of the irrigation system (center-pivot irrigation), which uses water from a huge fossil aquifer. The size of the field ranges from a few hundred meters up to almost one kilometer, limited by the size of the irrigation system. What started more than 40 years ago as a huge success story, ensuring domestic food security for the kingdom, is becoming more and more problematic as the once rich water reserves are depleting. As a result, Saudi Arabia is buying more and more fields abroad to satisfy domestic demand. [More...](https://www.nationalgeographic.de/photography/2018/04/wasser-nahrung-energie-die-wuesten-werden-gruen?image=61750)',
+          'The desert country of Saudi Arabia highly relies on irrigation farming for growing crops, due to its arid and warm climate. The circular shape of the fields is a result of the irrigation system (center-pivot irrigation), which uses water from a huge fossil aquifer. The size of the field ranges from a few hundred meters up to almost one kilometer, limited by the size of the irrigation system. What started more than 40 years ago as a huge success story, ensuring domestic food security for the kingdom, is becoming more and more problematic as the once rich water reserves are depleting. As a result, Saudi Arabia is buying more and more fields abroad to satisfy domestic demand. [More...](https://www.nationalgeographic.de/photography/2018/04/wasser-nahrung-energie-die-wuesten-werden-gruen?image=61750).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/apJJ) in EO Browser.',
       },
       {
         title: 'Agriculture in the Veneto Region, Italy (Barren Soil)',
@@ -179,7 +238,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'AGRICULTURE',
         description:
-          '[Veneto agriculture](https://www.recare-hub.eu/news/45-06-bioforsk) is one of the most productive in Italy, producing mainly cereals, fruits, and wine. Small, hand farmed fields present a contrast to the growing industrialization of the sector, which suffers from soil degradation. The Barren Soil visualization shows that in the middle of spring still a lot of fields lie fallow indicated by the red color.',
+          '[Veneto agriculture](https://www.recare-hub.eu/news/45-06-bioforsk) is one of the most productive in Italy, producing mainly cereals, fruits, and wine. Small, hand farmed fields present a contrast to the growing industrialization of the sector, which suffers from soil degradation. The Barren Soil visualization shows that in the middle of spring still a lot of fields lie fallow indicated by the red color.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/U8nq) in EO Browser.',
       },
       {
         title: 'Agriculture in California, USA (NDVI)',
@@ -194,7 +253,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'AGRICULTURE',
         description:
-          'The [Central Valley](https://ca.water.usgs.gov/projects/central-valley/about-central-valley.html), located west of California’s famous Sierra Nevada, is home to the states biggest and most important agricultural region. The fields are irrigated from the two major rivers of the valley (Sacramento and San Joaquin Rivers) on the one hand, and with groundwater on the other. Despite using less than 1% of the nation’s total farmland, the valley produces 25% of U.S. food. In total more than 250 different crops are grown, the most important being cereal grains, hay, cotton, different fruits and vegetable, and nuts.',
+          'The [Central Valley](https://ca.water.usgs.gov/projects/central-valley/about-central-valley.html), located west of California’s famous Sierra Nevada, is home to the states biggest and most important agricultural region. The fields are irrigated from the two major rivers of the valley (Sacramento and San Joaquin Rivers) on the one hand, and with groundwater on the other. Despite using less than 1% of the nation’s total farmland, the valley produces 25% of U.S. food. In total more than 250 different crops are grown, the most important being cereal grains, hay, cotton, different fruits and vegetable, and nuts.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/v6Fb) in EO Browser.',
       },
       {
         title: 'Agriculture in Ethiopia (False Color)',
@@ -224,7 +283,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'AGRICULTURE',
         description:
-          'The state of West Bengal, where Belda is located, is the most important rice and vegetable producer in the whole India. Taking only 2.7% of the countries area, it provides food for almost 8% of the population. The state is dominated by small and marginal farms, accounting for 96% of all farms. [More](https://wb.gov.in/departments-details.aspx?id=D170907140022669&page=Agriculture)',
+          'The state of West Bengal, where Belda is located, is the most important rice and vegetable producer in the whole India. Taking only 2.7% of the countries area, it provides food for almost 8% of the population. The state is dominated by small and marginal farms, accounting for 96% of all farms. [More](https://wb.gov.in/departments-details.aspx?id=D170907140022669&page=Agriculture)\n\n**Timelapse**: View [here](https://sentinelshare.page.link/EYiL) in EO Browser.',
       },
       {
         title: 'Agriculture in Vietnam (False Color 11,8,2)',
@@ -269,7 +328,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'AGRICULTURE',
         description:
-          'Due to fertile soil and regular flooding, the Nile river basin has supported agriculture for thousands of years. Close to 90 percent of the land currently used for agriculture is under rainfed farming systems (farming systems, that rely on rainfall). These systems are characterized by subsistence-level production and low yields of crops and livestock. There are about 5.6 million hectares of land under irrigation or equipped with irrigation facilities in the Nile Basin. A large proportion – 97 percent – of the land is located in Egypt and Sudan. Three countries – Egypt, Tanzania, and Uganda – produce large quantities of fish, but the freshwater fisheries resources of the basin are showing signs of being overfished. The top three crops grown in the basin are wheat, fodder, and maize. Livestock farming is also thriving, Ethiopia leading with more than 50 million heads of cattle. [Learn more.](http://nileis.nilebasin.org/system/files/Nile%20SoB%20Report%20Chapter%205%20-%20Agriculture.pdf)',
+          'Due to fertile soil and regular flooding, the Nile river basin has supported agriculture for thousands of years. Close to 90 percent of the land currently used for agriculture is under rainfed farming systems (farming systems, that rely on rainfall). These systems are characterized by subsistence-level production and low yields of crops and livestock. There are about 5.6 million hectares of land under irrigation or equipped with irrigation facilities in the Nile Basin. A large proportion – 97 percent – of the land is located in Egypt and Sudan. Three countries – Egypt, Tanzania, and Uganda – produce large quantities of fish, but the freshwater fisheries resources of the basin are showing signs of being overfished. The top three crops grown in the basin are wheat, fodder, and maize. Livestock farming is also thriving, Ethiopia leading with more than 50 million heads of cattle. [Learn more.](http://nileis.nilebasin.org/system/files/Nile%20SoB%20Report%20Chapter%205%20-%20Agriculture.pdf)\n\n**Timelapse**: View [here](https://sentinelshare.page.link/BBd5) in EO Browser.',
       },
       {
         title: 'Agriculture in Zambia (Enhanced True Color)',
@@ -318,7 +377,7 @@ const EDUCATION_THEMES = [
         gain: '2',
         gamma: '1.7',
         description:
-          "South African agriculture's biggest challenge is the absence of water since rainfall doesn't come regularly. Hence, [most agricultural fields are irrigated](http://www.limpopo.riverawarenesskit.org/LIMPOPORAK_COM/EN/MANAGEMENT/WATER_INFRASTRUCTURE/IRRIGATION_INFRASTRUCTURE/SOUTH_AFRICA.HTM), helping make Limpopo an important part of the country's agriculture. [Learn more](https://www.globalafricanetwork.com/company-news/a-2020-vision-of-the-agricultural-sector-in-limpopo/).",
+          "South African agriculture's biggest challenge is the absence of water since rainfall doesn't come regularly. Hence, [most agricultural fields are irrigated](http://www.limpopo.riverawarenesskit.org/LIMPOPORAK_COM/EN/MANAGEMENT/WATER_INFRASTRUCTURE/IRRIGATION_INFRASTRUCTURE/SOUTH_AFRICA.HTM), helping make Limpopo an important part of the country's agriculture. [Learn more](https://www.globalafricanetwork.com/company-news/a-2020-vision-of-the-agricultural-sector-in-limpopo/).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/7UhV) in EO Browser.",
       },
       {
         title: 'Agriculture in Cambodia (False Color 11,8,2)',
@@ -390,7 +449,7 @@ const EDUCATION_THEMES = [
       {
         name: 'Sentinel-5P O3 / NO2 / ...',
         service: 'WMS',
-        url: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
       },
     ],
     pins: [
@@ -401,7 +460,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_CO',
         layerId: 'CO_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-27',
         evalscript: '',
         evalscripturl: '',
@@ -416,7 +475,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_CO',
         layerId: 'CO_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-24',
         evalscript: '',
         evalscripturl: '',
@@ -431,7 +490,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_CO',
         layerId: 'CO_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-27',
         evalscript: '',
         evalscripturl: '',
@@ -446,7 +505,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_CO',
         layerId: 'CO_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-07-10',
         evalscript: '',
         evalscripturl: '',
@@ -461,7 +520,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_CO',
         layerId: 'CO_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-24',
         evalscript: '',
         evalscripturl: '',
@@ -476,13 +535,13 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_NO2',
         layerId: 'NO2_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-24',
         evalscript: '',
         evalscripturl: '',
         themeId: 'ATMOSPHERE',
         description:
-          'Nitrogen dioxide (NO2) and nitrogen oxide (NO) together are usually referred to as nitrogen oxides (NOx = NO + NO2). They are important trace gases in the Earth’s atmosphere, present in both the troposphere and the stratosphere. They enter the atmosphere as a result of anthropogenic activities (notably fossil fuel combustion and biomass burning) and natural processes (such as microbiological processes in soils, wildfires and lightning). During daytime, i.e. in the presence of sunlight, a photochemical cycle involving ozone (O3) converts NO into NO2 (and vice versa) on a timescale of minutes, so that NO2 is a robust measure for concentrations of nitrogen oxides. [More...](http://www.tropomi.eu/data-products/nitrogen-dioxide)',
+          'Nitrogen dioxide (NO2) and nitrogen oxide (NO) together are usually referred to as nitrogen oxides (NOx = NO + NO2). They are important trace gases in the Earth’s atmosphere, present in both the troposphere and the stratosphere. They enter the atmosphere as a result of anthropogenic activities (notably fossil fuel combustion and biomass burning) and natural processes (such as microbiological processes in soils, wildfires and lightning). During daytime, i.e. in the presence of sunlight, a photochemical cycle involving ozone (O3) converts NO into NO2 (and vice versa) on a timescale of minutes, so that NO2 is a robust measure for concentrations of nitrogen oxides. [More...](http://www.tropomi.eu/data-products/nitrogen-dioxide)\n\n**Timelapse**: View [here](https://sentinelshare.page.link/f2SV) in EO Browser.',
       },
       {
         title: 'High NO2 concentrations, Poland',
@@ -491,7 +550,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_NO2',
         layerId: 'NO2_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-24',
         evalscript: '',
         evalscripturl: '',
@@ -506,7 +565,7 @@ const EDUCATION_THEMES = [
         zoom: 6,
         datasetId: 'S5_NO2',
         layerId: 'NO2_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-07-17',
         evalscript: '',
         evalscripturl: '',
@@ -521,7 +580,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_NO2',
         layerId: 'NO2_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-07-17',
         evalscript: '',
         evalscripturl: '',
@@ -536,7 +595,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_CH4',
         layerId: 'CH4_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-01',
         evalscript: '',
         evalscripturl: '',
@@ -551,7 +610,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_CH4',
         layerId: 'CH4_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-03-14',
         evalscript: '',
         evalscripturl: '',
@@ -566,7 +625,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_SO2',
         layerId: 'SO2_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-01-10',
         evalscript: '',
         evalscripturl: '',
@@ -581,7 +640,7 @@ const EDUCATION_THEMES = [
         zoom: 8,
         datasetId: 'S5_SO2',
         layerId: 'SO2_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-08-31',
         evalscript: '',
         evalscripturl: '',
@@ -596,7 +655,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_O3',
         layerId: 'O3_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-24',
         evalscript: '',
         evalscripturl: '',
@@ -611,7 +670,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_HCHO',
         layerId: 'HCHO_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-24',
         evalscript: '',
         evalscripturl: '',
@@ -626,7 +685,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_HCHO',
         layerId: 'HCHO_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-07-02',
         evalscript: '',
         evalscripturl: '',
@@ -641,7 +700,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_AER_AI',
         layerId: 'AER_AI_340_AND_380_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-24',
         evalscript: '',
         evalscripturl: '',
@@ -656,7 +715,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_AER_AI',
         layerId: 'AER_AI_340_AND_380_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-07-04',
         evalscript: '',
         evalscripturl: '',
@@ -671,7 +730,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_AER_AI',
         layerId: 'AER_AI_340_AND_380_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-07-04',
         evalscript: '',
         evalscripturl: '',
@@ -686,7 +745,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_CLOUD',
         layerId: 'CLOUD_OPTICAL_THICKNESS_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-24',
         evalscript: '',
         evalscripturl: '',
@@ -701,7 +760,7 @@ const EDUCATION_THEMES = [
         zoom: 7,
         datasetId: 'S5_CLOUD',
         layerId: 'CLOUD_BASE_PRESSURE_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-15',
         evalscript: '',
         evalscripturl: '',
@@ -781,10 +840,10 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'HISTORICAL',
         description:
-          'Agricultural land in Egypt can be divided into two main categories; Old Lands and New Lands. Old Lands represent highly fertile soils, which are located in the Nile Delta. Due to the River Nile deposits and the highly productive nature of the soil, these areas have been traditionally cultivated with strategic cereal crops, such as rice, wheat and maize, preserving food security for the Egyptian people. During the past four decades, these areas have been encroached by dramatic urban sprawl due to the rapid population growth and economic development. Therefore, there has been a pressing need for the government to find alternative solutions to maintain the sustainability of the national agricultural sector. Consequently, the adopted policies by the government to reclaim new lands in the desert have led to the second category (New Lands). These are barren areas located in the Western and Eastern deserts outside the green zone of the Nile Delta. The New Lands process includes accessibility through constructing roads, houses, installing irrigation and drainage systems and providing reliable sources of water and electricity. Tiba district is one of those newly reclaimed areas located in the western Nile Delta of Egypt with a total area of 125 square km. Learn more [here](https://www.mdpi.com/2077-0472/9/7/137/pdf).',
+          'Agricultural land in Egypt can be divided into two main categories; Old Lands and New Lands. Old Lands represent highly fertile soils, which are located in the Nile Delta. Due to the River Nile deposits and the highly productive nature of the soil, these areas have been traditionally cultivated with strategic cereal crops, such as rice, wheat and maize, preserving food security for the Egyptian people. During the past four decades, these areas have been encroached by dramatic urban sprawl due to the rapid population growth and economic development. Therefore, there has been a pressing need for the government to find alternative solutions to maintain the sustainability of the national agricultural sector. Consequently, the adopted policies by the government to reclaim new lands in the desert have led to the second category (New Lands). These are barren areas located in the Western and Eastern deserts outside the green zone of the Nile Delta. The New Lands process includes accessibility through constructing roads, houses, installing irrigation and drainage systems and providing reliable sources of water and electricity. Tiba district is one of those newly reclaimed areas located in the western Nile Delta of Egypt with a total area of 125 square km. Learn more [here](https://www.mdpi.com/2077-0472/9/7/137/pdf).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/grfc) in EO Browser.',
       },
       {
-        title: 'Lake Poopó, Brazil 2004',
+        title: 'Lake Poopó, Bolivia 2004',
         lat: -18.9069,
         lng: -67.0207,
         zoom: 10,
@@ -799,7 +858,7 @@ const EDUCATION_THEMES = [
           "In a typical year, rainfall during the wet season (December through March) recharges the Bolivian lake Poopó directly and via increased inflow from the Desaguadero River. In 2015, the lake dried up. This is not the first time that Poopó has evaporated; the lake last dried up in 1994. In that case, it took several years for water to return, and even longer for ecosystems to recover. Despite its history, in 2016 and 2017, as the waters still haven't returned, many environmentalists believed the waters will not return this time. There are multiple reasons as to why the droughts in the area are getting worse. Sitting high in the Bolivian Andes, the saline lake is particularly vulnerable to fluctuations because it is shallow — typically no more than 3 meters (9 feet) deep. Due to climate change the area has warmed an estimated one degree Celsius over the past century, leading to an increase in the rate of evaporation from the lake. And the lack of rain over the past year has sped the process even further. The government blamed the drought solely on El Nino and climate change, but even though this is one of the causes, it seems the management of the lake is also the problem. Some of the water that is supposed to fill the lake is being diverted for agriculture and mining. Even when water is available, the river is often clogged with sedimentation, due to the runoff from development and mining in the area. What happened to Lake Poopó is not unlike the drying of the vast Aral Sea in Central Asia. In both cases, a closed water system was overdrawn, with more water going out than coming in. However, in summer 2018, the lake filled up again, although the water line is clearly diminished compared to 2004. If all the problems persist, there is legitimate concern, that next time, the lake might stay dry forever. Learn more [here](https://www.nationalgeographic.com/news/2016/01/160121-lake-poopo-bolivia-dried-out-el-nino-climate-change-water/) and [here](https://earthobservatory.nasa.gov/images/87363/bolivias-lake-poopo-disappears).",
       },
       {
-        title: 'Lake Poopó, Brazil 2020',
+        title: 'Lake Poopó, Bolivia 2020',
         lat: -18.9069,
         lng: -67.0207,
         zoom: 10,
@@ -1002,7 +1061,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'FLOODING',
         description:
-          'Chennai is located on the south-eastern coast of India on a flat coastal plain and is the fourth largest city of the country with over 7 million inhabitants. The city relies heavily on annual monsoon rains to replenish the four water reservoirs that represent the main water resources for the public and extensive automotive industry in the region. Mismanagement of the water resources, combined with 3 years of deficient monsoon rainfall seasons prior to the drought event caused a dramatic depletion of the water reservoirs [related article](https://www.bbc.com/news/world-asia-india-48672330). Additionally, the groundwater aquifer was drained beyond its usual recovering capability threshold because residents reverted to groundwater extraction via [bore wells](https://www.indiawaterportal.org/topics/borewells-and-tubewells). The three *Sentinel-2 L2A*-based Moisture index images from before, while and after the drought, show the desiccation of the Red Hills Reservoir over the heat period in 2019 with a clearly retreating water line. [Further reading](https://www.nationalgeographic.com/environment/2019/07/india-water-crisis-drought-could-be-helped-better-building-planning/)',
+          'Chennai is located on the south-eastern coast of India on a flat coastal plain and is the fourth largest city of the country with over 7 million inhabitants. The city relies heavily on annual monsoon rains to replenish the four water reservoirs that represent the main water resources for the public and extensive automotive industry in the region. Mismanagement of the water resources, combined with 3 years of deficient monsoon rainfall seasons prior to the drought event caused a dramatic depletion of the water reservoirs [related article](https://www.bbc.com/news/world-asia-india-48672330). Additionally, the groundwater aquifer was drained beyond its usual recovering capability threshold because residents reverted to groundwater extraction via [bore wells](https://www.indiawaterportal.org/topics/borewells-and-tubewells). The three *Sentinel-2 L2A*-based Moisture index images from before, while and after the drought, show the desiccation of the Red Hills Reservoir over the heat period in 2019 with a clearly retreating water line. [Further reading](https://www.nationalgeographic.com/environment/2019/07/india-water-crisis-drought-could-be-helped-better-building-planning/)\n\n**Timelapse**: View [here](https://sentinelshare.page.link/bsug) in EO Browser.',
       },
       {
         title: 'Chennai, During the drought (Moisture Index)',
@@ -1017,7 +1076,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'FLOODING',
         description:
-          'Chennai is located on the south-eastern coast of India on a flat coastal plain and is the fourth largest city of the country with over 7 million inhabitants. The city relies heavily on annual monsoon rains to replenish the four water reservoirs that represent the main water resources for the public and extensive automotive industry in the region. Mismanagement of the water resources, combined with 3 years of deficient monsoon rainfall seasons prior to the drought event caused a dramatic depletion of the water reservoirs [related article](https://www.bbc.com/news/world-asia-india-48672330). Additionally, the groundwater aquifer was drained beyond its usual recovering capability threshold because residents reverted to groundwater extraction via [bore wells](https://www.indiawaterportal.org/topics/borewells-and-tubewells). The three *Sentinel-2 L2A*-based Moisture index images from before, while and after the drought, show the desiccation of the Red Hills Reservoir over the heat period in 2019 with a clearly retreating water line. [Further reading](https://www.nationalgeographic.com/environment/2019/07/india-water-crisis-drought-could-be-helped-better-building-planning/)',
+          'Chennai is located on the south-eastern coast of India on a flat coastal plain and is the fourth largest city of the country with over 7 million inhabitants. The city relies heavily on annual monsoon rains to replenish the four water reservoirs that represent the main water resources for the public and extensive automotive industry in the region. Mismanagement of the water resources, combined with 3 years of deficient monsoon rainfall seasons prior to the drought event caused a dramatic depletion of the water reservoirs [related article](https://www.bbc.com/news/world-asia-india-48672330). Additionally, the groundwater aquifer was drained beyond its usual recovering capability threshold because residents reverted to groundwater extraction via [bore wells](https://www.indiawaterportal.org/topics/borewells-and-tubewells). The three *Sentinel-2 L2A*-based Moisture index images from before, while and after the drought, show the desiccation of the Red Hills Reservoir over the heat period in 2019 with a clearly retreating water line. [Further reading](https://www.nationalgeographic.com/environment/2019/07/india-water-crisis-drought-could-be-helped-better-building-planning/)\n\n**Timelapse**: View [here](https://sentinelshare.page.link/bsug) in EO Browser.',
       },
       {
         title: 'Chennai, After the drought (Moisture Index)',
@@ -1032,7 +1091,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'FLOODING',
         description:
-          'Chennai is located on the south-eastern coast of India on a flat coastal plain and is the fourth largest city of the country with over 7 million inhabitants. The city relies heavily on annual monsoon rains to replenish the four water reservoirs that represent the main water resources for the public and extensive automotive industry in the region. Mismanagement of the water resources, combined with 3 years of deficient monsoon rainfall seasons prior to the drought event caused a dramatic depletion of the water reservoirs [related article](https://www.bbc.com/news/world-asia-india-48672330). Additionally, the groundwater aquifer was drained beyond its usual recovering capability threshold because residents reverted to groundwater extraction via [bore wells](https://www.indiawaterportal.org/topics/borewells-and-tubewells). The three *Sentinel-2 L2A*-based Moisture index images from before, while and after the drought, show the desiccation of the Red Hills Reservoir over the heat period in 2019 with a clearly retreating water line. [Further reading](https://www.nationalgeographic.com/environment/2019/07/india-water-crisis-drought-could-be-helped-better-building-planning/)',
+          'Chennai is located on the south-eastern coast of India on a flat coastal plain and is the fourth largest city of the country with over 7 million inhabitants. The city relies heavily on annual monsoon rains to replenish the four water reservoirs that represent the main water resources for the public and extensive automotive industry in the region. Mismanagement of the water resources, combined with 3 years of deficient monsoon rainfall seasons prior to the drought event caused a dramatic depletion of the water reservoirs [related article](https://www.bbc.com/news/world-asia-india-48672330). Additionally, the groundwater aquifer was drained beyond its usual recovering capability threshold because residents reverted to groundwater extraction via [bore wells](https://www.indiawaterportal.org/topics/borewells-and-tubewells). The three *Sentinel-2 L2A*-based Moisture index images from before, while and after the drought, show the desiccation of the Red Hills Reservoir over the heat period in 2019 with a clearly retreating water line. [Further reading](https://www.nationalgeographic.com/environment/2019/07/india-water-crisis-drought-could-be-helped-better-building-planning/)\n\n**Timelapse**: View [here](https://sentinelshare.page.link/bsug) in EO Browser.',
       },
       {
         title: 'Bangladesh, Before the flood (NDWI)',
@@ -1047,7 +1106,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'FLOODING',
         description:
-          'Bangladesh is known as one of the most flood-prone countries in the world. Every year [the monsoon](https://www.nationalgeographic.org/encyclopedia/monsoon/), a weather phenomenon caused by changes in wind direction and transportation of moist air, produces heavy rainfall from June through September. In early July 2019, heavy rains and consequently overflowing rivers flooded numerous districts in northern Bangladesh, forcing nearly 200,000 people to flee their homes ([related article](http://floodlist.com/asia/bangladesh-monsoon-floods-july-2019)). Additionally, on the night of 17 July 2019, the [Jamuna River broke through a flood bank](https://www.preventionweb.net/news/view/66848) and swamped at least 40 villages, aggravating the effects of the monsoon period in the region. A timely identification of flooded areas is essential for an effective flood response. The inundation maps, utilizing the short wave infrared composite (SWIR) and the Normalized Difference Water Index (NDWI), show the difference between the usual landscape state and effects of the 2019 Bangladesh floods and facilitate natural disaster management assessment.',
+          'Bangladesh is known as one of the most flood-prone countries in the world. Every year [the monsoon](https://www.nationalgeographic.org/encyclopedia/monsoon/), a weather phenomenon caused by changes in wind direction and transportation of moist air, produces heavy rainfall from June through September. In early July 2019, heavy rains and consequently overflowing rivers flooded numerous districts in northern Bangladesh, forcing nearly 200,000 people to flee their homes ([related article](http://floodlist.com/asia/bangladesh-monsoon-floods-july-2019)). Additionally, on the night of 17 July 2019, the [Jamuna River broke through a flood bank](https://www.preventionweb.net/news/view/66848) and swamped at least 40 villages, aggravating the effects of the monsoon period in the region. A timely identification of flooded areas is essential for an effective flood response. The inundation maps, utilizing the short wave infrared composite (SWIR) and the Normalized Difference Water Index (NDWI), show the difference between the usual landscape state and effects of the 2019 Bangladesh floods and facilitate natural disaster management assessment.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/ADYY) in EO Browser.',
       },
       {
         title: 'Bangladesh, During the flood (NDWI)',
@@ -1062,7 +1121,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'FLOODING',
         description:
-          'Bangladesh is known as one of the most flood-prone countries in the world. Every year [the monsoon](https://www.nationalgeographic.org/encyclopedia/monsoon/), a weather phenomenon caused by changes in wind direction and transportation of moist air, produces heavy rainfall from June through September. In early July 2019, heavy rains and consequently overflowing rivers flooded numerous districts in northern Bangladesh, forcing nearly 200,000 people to flee their homes ([related article](http://floodlist.com/asia/bangladesh-monsoon-floods-july-2019)). Additionally, on the night of 17 July 2019, the [Jamuna River broke through a flood bank](https://www.preventionweb.net/news/view/66848) and swamped at least 40 villages, aggravating the effects of the monsoon period in the region. A timely identification of flooded areas is essential for an effective flood response. The inundation maps, utilizing the short wave infrared composite (SWIR) and the Normalized Difference Water Index (NDWI), show the difference between the usual landscape state and effects of the 2019 Bangladesh floods and facilitate natural disaster management assessment.',
+          'Bangladesh is known as one of the most flood-prone countries in the world. Every year [the monsoon](https://www.nationalgeographic.org/encyclopedia/monsoon/), a weather phenomenon caused by changes in wind direction and transportation of moist air, produces heavy rainfall from June through September. In early July 2019, heavy rains and consequently overflowing rivers flooded numerous districts in northern Bangladesh, forcing nearly 200,000 people to flee their homes ([related article](http://floodlist.com/asia/bangladesh-monsoon-floods-july-2019)). Additionally, on the night of 17 July 2019, the [Jamuna River broke through a flood bank](https://www.preventionweb.net/news/view/66848) and swamped at least 40 villages, aggravating the effects of the monsoon period in the region. A timely identification of flooded areas is essential for an effective flood response. The inundation maps, utilizing the short wave infrared composite (SWIR) and the Normalized Difference Water Index (NDWI), show the difference between the usual landscape state and effects of the 2019 Bangladesh floods and facilitate natural disaster management assessment.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/ADYY) in EO Browser.',
       },
       {
         title: 'Madagascar, Before the flood',
@@ -1107,7 +1166,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'FLOODING',
         description:
-          'During a multiple-day stretch centered from March 13 – 23, 2019 (but peaking in severity March 13th – 17th), Nebraska, Iowa and South Dakota endured widespread flooding, ranging in scope from minor/moderate to historical/catastrophic (the likes of which had not been observed in several decades). By far the worst flooding occurred along several primary rivers, including the Loup River system, the Cedar River and the Wood River. Not only was this flooding characterized by high water levels (as is the case with all floods), but in many areas damage was also augmented by an unusually-severe break-up of thick river ice. Taking a back seat to the widespread flooding in terms of impacts/severity, much of the local area also endured a winter storm with high winds and blizzard conditions on the night of the 13th into the morning of the 14th. Overflowing rivers prompted evacuations and dam releases, with Iowa, Nebraska and Wisconsin declaring a state of emergency. Dozens of roads have been closed due to flooding and a bridge has been severely damaged near Niobrara, Knox County, Nebraska.',
+          'During a multiple-day stretch centered from March 13 – 23, 2019 (but peaking in severity March 13th – 17th), Nebraska, Iowa and South Dakota endured widespread flooding, ranging in scope from minor/moderate to historical/catastrophic (the likes of which had not been observed in several decades). By far the worst flooding occurred along several primary rivers, including the Loup River system, the Cedar River and the Wood River. Not only was this flooding characterized by high water levels (as is the case with all floods), but in many areas damage was also augmented by an unusually-severe break-up of thick river ice. Taking a back seat to the widespread flooding in terms of impacts/severity, much of the local area also endured a winter storm with high winds and blizzard conditions on the night of the 13th into the morning of the 14th. Overflowing rivers prompted evacuations and dam releases, with Iowa, Nebraska and Wisconsin declaring a state of emergency. Dozens of roads have been closed due to flooding and a bridge has been severely damaged near Niobrara, Knox County, Nebraska.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/jMyq) in EO Browser.',
       },
       {
         title: 'Omaha (Nebraska, USA), During the flood (SWIR)',
@@ -1122,7 +1181,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'FLOODING',
         description:
-          'During a multiple-day stretch centered from March 13 – 23, 2019 (but peaking in severity March 13th – 17th), Nebraska, Iowa and South Dakota endured widespread flooding, ranging in scope from minor/moderate to historical/catastrophic (the likes of which had not been observed in several decades). By far the worst flooding occurred along several primary rivers, including the Loup River system, the Cedar River and the Wood River. Not only was this flooding characterized by high water levels (as is the case with all floods), but in many areas damage was also augmented by an unusually-severe break-up of thick river ice. Taking a back seat to the widespread flooding in terms of impacts/severity, much of the local area also endured a winter storm with high winds and blizzard conditions on the night of the 13th into the morning of the 14th. Overflowing rivers prompted evacuations and dam releases, with Iowa, Nebraska and Wisconsin declaring a state of emergency. Dozens of roads have been closed due to flooding and a bridge has been severely damaged near Niobrara, Knox County, Nebraska.',
+          'During a multiple-day stretch centered from March 13 – 23, 2019 (but peaking in severity March 13th – 17th), Nebraska, Iowa and South Dakota endured widespread flooding, ranging in scope from minor/moderate to historical/catastrophic (the likes of which had not been observed in several decades). By far the worst flooding occurred along several primary rivers, including the Loup River system, the Cedar River and the Wood River. Not only was this flooding characterized by high water levels (as is the case with all floods), but in many areas damage was also augmented by an unusually-severe break-up of thick river ice. Taking a back seat to the widespread flooding in terms of impacts/severity, much of the local area also endured a winter storm with high winds and blizzard conditions on the night of the 13th into the morning of the 14th. Overflowing rivers prompted evacuations and dam releases, with Iowa, Nebraska and Wisconsin declaring a state of emergency. Dozens of roads have been closed due to flooding and a bridge has been severely damaged near Niobrara, Knox County, Nebraska.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/jMyq) in EO Browser.',
       },
       {
         title: 'Denmark in summer',
@@ -1137,7 +1196,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'FLOODING',
         description:
-          'In July, satellite imagery of Europe should look green. Instead, in July 2018, it looked brown due to a severe drought. This drastic color change has happened over just a couple of months. A prolonged dry spell coupled with soaring, record-breaking temperatures has been a devestating combination for farms from Scandinavia and England in the north to France, the Netherlands, and Germany to the south. In particular, July was incredibly hot for northern Europe. Temperatures in late July exceeded 32°C (90°F) as far north as the Arctic Circle. In Denmark, the spring harvests of vegetables and grains was down 40 to 50%. Another consequence of the severe drought were wildfires. Sweden observed around 50 forest fires during the peak of the heat in mid-July, which, according to the World Meteorological Organization, was the worst outbreak of forecast fires in modern records. The extreme heat in the far north has also led to the warming of lakes and oceans as well. And when waters warm that fast, conditions become favorable for blooms of dangerous algae. The Baltic Sea in particular has seen its most severe algal blooms in decades. Learn more [here](https://www.climate.gov/news-features/event-tracker/hot-dry-summer-has-led-drought-europe-2018).',
+          'In July, satellite imagery of Europe should look green. Instead, in July 2018, it looked brown due to a severe drought. This drastic color change has happened over just a couple of months. A prolonged dry spell coupled with soaring, record-breaking temperatures has been a devestating combination for farms from Scandinavia and England in the north to France, the Netherlands, and Germany to the south. In particular, July was incredibly hot for northern Europe. Temperatures in late July exceeded 32°C (90°F) as far north as the Arctic Circle. In Denmark, the spring harvests of vegetables and grains was down 40 to 50%. Another consequence of the severe drought were wildfires. Sweden observed around 50 forest fires during the peak of the heat in mid-July, which, according to the World Meteorological Organization, was the worst outbreak of forecast fires in modern records. The extreme heat in the far north has also led to the warming of lakes and oceans as well. And when waters warm that fast, conditions become favorable for blooms of dangerous algae. The Baltic Sea in particular has seen its most severe algal blooms in decades. Learn more [here](https://www.climate.gov/news-features/event-tracker/hot-dry-summer-has-led-drought-europe-2018).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/XgBq) in EO Browser.',
       },
       {
         title: 'Denmark in summer during the Drought',
@@ -1152,7 +1211,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'FLOODING',
         description:
-          'In July, satellite imagery of Europe should look green. Instead, in July 2018, it looked brown due to a severe drought. This drastic color change has happened over just a couple of months. A prolonged dry spell coupled with soaring, record-breaking temperatures has been a devestating combination for farms from Scandinavia and England in the north to France, the Netherlands, and Germany to the south. In particular, July was incredibly hot for northern Europe. Temperatures in late July exceeded 32°C (90°F) as far north as the Arctic Circle. In Denmark, the spring harvests of vegetables and grains was down 40 to 50%. Another consequence of the severe drought were wildfires. Sweden observed around 50 forest fires during the peak of the heat in mid-July, which, according to the World Meteorological Organization, was the worst outbreak of forecast fires in modern records. The extreme heat in the far north has also led to the warming of lakes and oceans as well. And when waters warm that fast, conditions become favorable for blooms of dangerous algae. The Baltic Sea in particular has seen its most severe algal blooms in decades. Learn more [here](https://www.climate.gov/news-features/event-tracker/hot-dry-summer-has-led-drought-europe-2018).',
+          'In July, satellite imagery of Europe should look green. Instead, in July 2018, it looked brown due to a severe drought. This drastic color change has happened over just a couple of months. A prolonged dry spell coupled with soaring, record-breaking temperatures has been a devestating combination for farms from Scandinavia and England in the north to France, the Netherlands, and Germany to the south. In particular, July was incredibly hot for northern Europe. Temperatures in late July exceeded 32°C (90°F) as far north as the Arctic Circle. In Denmark, the spring harvests of vegetables and grains was down 40 to 50%. Another consequence of the severe drought were wildfires. Sweden observed around 50 forest fires during the peak of the heat in mid-July, which, according to the World Meteorological Organization, was the worst outbreak of forecast fires in modern records. The extreme heat in the far north has also led to the warming of lakes and oceans as well. And when waters warm that fast, conditions become favorable for blooms of dangerous algae. The Baltic Sea in particular has seen its most severe algal blooms in decades. Learn more [here](https://www.climate.gov/news-features/event-tracker/hot-dry-summer-has-led-drought-europe-2018).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/niom) in EO Browser.',
       },
     ],
   },
@@ -1174,6 +1233,36 @@ const EDUCATION_THEMES = [
       },
     ],
     pins: [
+      {
+        title: 'Senj Archipelago, Croatia',
+        lat: 44.87746,
+        lng: 14.78125,
+        zoom: 13,
+        datasetId: 'S2L2A',
+        layerId: '1_TRUE_COLOR',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/239b83-YOUR-INSTANCEID-HERE',
+        toTime: '2022-07-19',
+        evalscript: '',
+        evalscripturl: '',
+        themeId: 'GEOLOGY',
+        description:
+          'The Senj Archipelago includes 3 major islands - [Prvić](https://en.wikipedia.org/wiki/Prvi%C4%87), [St. Grgur](https://en.wikipedia.org/wiki/Sveti_Grgur) and [Goli Otok](https://en.wikipedia.org/wiki/Goli_Otok). All three islands have large areas of barren limestone rock surface, with a directly visible structure due to the lack of vegetation. In addition, sun glint patterns on the water surface allow the interpretation of local wind effects, especially near the shore.',
+      },
+      {
+        title: 'Sea Stacks of Boreray Island, St. Kilda Archipelago, UK',
+        lat: 57.87031,
+        lng: -8.49196,
+        zoom: 15,
+        datasetId: 'S2L1C',
+        layerId: '1_TRUE_COLOR',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/18f7c3-YOUR-INSTANCEID-HERE',
+        toTime: '2019-06-21',
+        evalscript: '',
+        evalscripturl: '',
+        themeId: 'GEOLOGY',
+        description:
+          'This set of uninhabited islands and rocky peaks really tests the limits of satellite image preprocessing: Due to the extremely steep slopes, some pixels are prone to overcorrection to high brightness. In the south of the island, the refraction of wave arcs can be observed in this image. [Learn more](https://whc.unesco.org/en/list/387/).',
+      },
       {
         title: 'Grasberg Open Pit, Indonesia (Geology 12,8,2)',
         lat: -4.05377,
@@ -1403,8 +1492,64 @@ const EDUCATION_THEMES = [
         service: 'WMS',
         url: 'https://services.sentinel-hub.com/ogc/wms/961331-YOUR-INSTANCEID-HERE',
       },
+      {
+        name: 'Ocean (S3-OLCI)',
+        service: 'WMS',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/c76911-YOUR-INSTANCEID-HERE',
+        preselected: true,
+      },
+      {
+        name: 'Ocean (S3-SLSTR)',
+        service: 'WMS',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/a17e3b-YOUR-INSTANCEID-HERE',
+      },
     ],
     pins: [
+      {
+        title: 'Salt Pans and Lakes of Seewinkel, Austria',
+        lat: 47.77801,
+        lng: 16.82445,
+        zoom: 14,
+        datasetId: 'S2L2A',
+        layerId: '1_TRUE_COLOR',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/eac23b-YOUR-INSTANCEID-HERE',
+        toTime: '2022-08-03',
+        evalscript: '',
+        evalscripturl: '',
+        themeId: 'OCEAN',
+        description:
+          'The lowland area immediately east of [Lake Neusiedl](https://www.nationalparksaustria.at/en/national-park-neusiedler-see.html) in Austria is home to many salt pans and lakes. In the current view, some of them are dry with a white salt crust, others are dry with dark brown sediment, while some have open water and are coloured green by algae growth. On the western side of the picture, the dynamics of the reeds on the lakeshore can be observed: Dense, young reeds grow green near the open water, while aging, more fragmented reeds occupy the areas further from the shore.',
+      },
+      {
+        title: 'Tagliamento River, Italy (SWIR)',
+        lat: 46.09508,
+        lng: 12.82156,
+        zoom: 13,
+        datasetId: 'S2L2A',
+        layerId: '5_SWIR',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/eac23b-YOUR-INSTANCEID-HERE',
+        toTime: '2023-05-05',
+        evalscript: '',
+        evalscripturl: '',
+        themeId: 'OCEAN',
+        description:
+          'The rivers Tagliamento, Meduna and Cellina are unregulated gravel-bed rivers that mainly transport water from the Alps to the Adriatic sea during the snowmelt period. In the current view, the [Tagliamento](https://wilderness-society.org/wild-river-tagliamento-in-northern-italy/) in the East has visible water surfaces while the Meduna and the Cellina have none. The view is a Short-Wave Infrared (SWIR) composite, showing vegetation in shades of green, bare soil in brown, gravel in white and water in black.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/KiA6) in EO Browser.',
+      },
+      {
+        title: 'Vistula River, Poland (False color)',
+        lat: 52.42969,
+        lng: 19.95529,
+        zoom: 13,
+        datasetId: 'S2L2A',
+        layerId: '2_FALSE-COLOR',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/eac23b-YOUR-INSTANCEID-HERE',
+        toTime: '2023-04-22',
+        evalscript: '',
+        evalscripturl: '',
+        themeId: 'OCEAN',
+        description:
+          'The Vistula is the longest river in Poland and the ninth-longest river in Europe. The unregulated sections of the Vistula river show a system of islands, gravel bars and meanders. The use of infrared false colour highlights the dark water surface and shows the vegetation in different shades of red. [Learn more](http://awsassets.panda.org/downloads/vistula.pdf).',
+      },
       {
         title: 'Heavy Sedimentation Flow of Betsiboka River (False Color)',
         lat: -15.889,
@@ -1418,7 +1563,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'OCEAN',
         description:
-          'The beautiful Betsiboka river delta is a dramatic example of massive deforestation, that occurs in Madagascar every year. One of the biggest culprits is the slash and burn agriculture, called [tavy](https://www.madamagazine.com/en/english-tavy-kahlschlag-einer-insel/), where the forest is burnt and then farmed in the following months. The other deforestation causes include grazing, logging and the production of coal. The forest grows back after being cut down, but until then, the barren soil is vulnerable to erosion by heavy rains. The rain transports it into rivers and from their into the sea, contaminating sea life with deposited iron oxides. As soil formation is a process taking thousands of years, soil erodes away each year, until it can no longer support a forest. Due to these processes, Madagascar has already lost [80 % of its primary forests](https://www.eoi.es/blogs/guidopreti/2014/02/04/deforestation-in-madagascar-a-threat-to-its-biodiversity/), causing many indigenous species, such as [lemurs](https://monkeysandmountains.com/lemurs-madagascar/), to be endangered.',
+          'The beautiful Betsiboka river delta is a dramatic example of massive deforestation, that occurs in Madagascar every year. One of the biggest culprits is the slash and burn agriculture, called [tavy](https://www.madamagazine.com/en/english-tavy-kahlschlag-einer-insel/), where the forest is burnt and then farmed in the following months. The other deforestation causes include grazing, logging and the production of coal. The forest grows back after being cut down, but until then, the barren soil is vulnerable to erosion by heavy rains. The rain transports it into rivers and from their into the sea, contaminating sea life with deposited iron oxides. As soil formation is a process taking thousands of years, soil erodes away each year, until it can no longer support a forest. Due to these processes, Madagascar has already lost [80 % of its primary forests](https://www.eoi.es/blogs/guidopreti/2014/02/04/deforestation-in-madagascar-a-threat-to-its-biodiversity/), causing many indigenous species, such as [lemurs](https://monkeysandmountains.com/lemurs-madagascar/), to be endangered.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/htuC) in EO Browser.',
       },
       {
         title: 'Low Sedimentation Flow of Betsiboka River (False Color)',
@@ -1479,7 +1624,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'OCEAN',
         description:
-          "The [Tsimlyansk Reservoir](https://www.britannica.com/place/Tsimlyansk-Reservoir) - a big reservoir on the Don River in Russia - is around 250 kilometers long and provides water for a hydropower station, as well as for the irrigation of the surrounding fields. The visualization aims to dynamically visualize the chlorophyll and sediment concentrations in water bodies, the two primary indicators of water quality. Chlorophyll content ranges in colors from dark blue (low chlorophyll content) through green to red (high chlorophyll content). Sediment concentrations are colored brown; opaque brown indicates high sediment content. High chlorophyll and sediment concentrations can both be found on the norther shore, coming from the surrounding agricultural fields. This reduces the [reservoir's water quality (pollution, eutrophication, toxification)](https://link.springer.com/article/10.1134/S1875372814020048) which poses a risk for the in situ ecosystem.",
+          "The [Tsimlyansk Reservoir](https://www.britannica.com/place/Tsimlyansk-Reservoir) - a big reservoir on the Don River in Russia - is around 250 kilometers long and provides water for a hydropower station, as well as for the irrigation of the surrounding fields. The visualization aims to dynamically visualize the chlorophyll and sediment concentrations in water bodies, the two primary indicators of water quality. Chlorophyll content ranges in colors from dark blue (low chlorophyll content) through green to red (high chlorophyll content). Sediment concentrations are colored brown; opaque brown indicates high sediment content. High chlorophyll and sediment concentrations can both be found on the norther shore, coming from the surrounding agricultural fields. This reduces the [reservoir's water quality (pollution, eutrophication, toxification)](https://link.springer.com/article/10.1134/S1875372814020048) which poses a risk for the in situ ecosystem.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/aaDN) in EO Browser.",
       },
       {
         title: 'Salt lake Mackay, Australia',
@@ -1494,7 +1639,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'OCEAN',
         description:
-          'Lake Mackay or Wilkinkarra (in [Pitjantjatjara](https://ulurutoursaustralia.com.au/blog/the-culture-and-heritage-of-the-pitjantjatjara-in-central-australia/)) is the fourth largest lake in Australia, covering an area of 3.494 square kilometers. The particularity of this water body is that being an [ephemeral lake](https://www.sciencedirect.com/topics/earth-and-planetary-sciences/ephemeral-lake), it only fills with water after seasonal rainfall, although water can persist for several months after a major rain event. When inundated, the lake is of significant importance for [endemic waterbird populations](http://www.epa.wa.gov.au/sites/default/files/Referral_Documentation/App%20B.3_Waterbird%20Survey%20at%20Lake%20Mackay.pdf), who use the freshwater [claypans](https://www.merriam-webster.com/dictionary/claypan) as breeding grounds. Due to evaporation, minerals are carried to the surface, forming bright white salt pans that contrast with the darker brown islands scattered across the eastern half of the lake. On these islands and around the shoreline, bright orange longitudinal sand ridges form stunning lines from east to west across the landscape.',
+          'Lake Mackay or Wilkinkarra (in [Pitjantjatjara](https://ulurutoursaustralia.com.au/blog/the-culture-and-heritage-of-the-pitjantjatjara-in-central-australia/)) is the fourth largest lake in Australia, covering an area of 3.494 square kilometers. The particularity of this water body is that being an [ephemeral lake](https://www.sciencedirect.com/topics/earth-and-planetary-sciences/ephemeral-lake), it only fills with water after seasonal rainfall, although water can persist for several months after a major rain event. When inundated, the lake is of significant importance for [endemic waterbird populations](http://www.epa.wa.gov.au/sites/default/files/Referral_Documentation/App%20B.3_Waterbird%20Survey%20at%20Lake%20Mackay.pdf), who use the freshwater [claypans](https://www.merriam-webster.com/dictionary/claypan) as breeding grounds. Due to evaporation, minerals are carried to the surface, forming bright white salt pans that contrast with the darker brown islands scattered across the eastern half of the lake. On these islands and around the shoreline, bright orange longitudinal sand ridges form stunning lines from east to west across the landscape.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/fgNe) in EO Browser.',
       },
       {
         title: 'Shark Bay, Australia',
@@ -1526,7 +1671,7 @@ const EDUCATION_THEMES = [
         gain: '1.1',
         gamma: '1.2',
         description:
-          'Located 800 km north of Perth in the Indian Ocean, Shark Bay is a unique [UNESCO World Heritage](https://whc.unesco.org/en/about/) site. The bay is renown for having the largest [seagrass](https://ocean.si.edu/ocean-life/plants-algae/seagrass-and-seagrass-beds) meadow in the world (~4.000 square kilometers), forming a feeding ground for large populations of aquatic life, including [dugong](https://www.worldwildlife.org/species/dugong). The seagrass can be seen from space in the shallower areas of the bay, contrasting strongly with the dark brown sand on the surrounding land. The water in Shark Bay is up to twice as salty as the sea, forming one of few marine environments in the world with [hypersaline waters](https://www.sharkbay.org/nature/geology/salinity/) and hosts [stromatolites](https://www.bushheritage.org.au/species/stromatolites), colonies of algae that build mounds and are among the oldest forms of life on earth.',
+          'Located 800 km north of Perth in the Indian Ocean, Shark Bay is a unique [UNESCO World Heritage](https://whc.unesco.org/en/about/) site. The bay is renown for having the largest [seagrass](https://ocean.si.edu/ocean-life/plants-algae/seagrass-and-seagrass-beds) meadow in the world (~4.000 square kilometers), forming a feeding ground for large populations of aquatic life, including [dugong](https://www.worldwildlife.org/species/dugong). The seagrass can be seen from space in the shallower areas of the bay, contrasting strongly with the dark brown sand on the surrounding land. The water in Shark Bay is up to twice as salty as the sea, forming one of few marine environments in the world with [hypersaline waters](https://www.sharkbay.org/nature/geology/salinity/) and hosts [stromatolites](https://www.bushheritage.org.au/species/stromatolites), colonies of algae that build mounds and are among the oldest forms of life on earth.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/1jUW) in EO Browser.',
       },
       {
         title: 'Barrier Reef, New Caledonia (Enhanced True Color)',
@@ -1558,7 +1703,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'OCEAN',
         description:
-          'Coastal waves are a daily consequence of the so-called [sea breeze](https://eschooltoday.com/winds/land-breeze-and-sea-breeze.html). During the day, the land gets heated from the sun, getting warmer than the sea. As warmer air is less dense, it rises above the land, lowering the air pressure. The difference in air pressure creates cool winds, blowing from the sea towards the land. Italy attracts many tourists interested in [surfing](https://www.surf-forecast.com/breaks/Circoletto-Rome), especially in winter, when the waves are expected to be the highest. On December 22, 2019, however, the waves were extremely high due to the [storms Elsa and Fabien](https://www.accuweather.com/en/severe-weather/storms-elsa-and-fabien-unleash-damage-from-france-and-spain-to-italy/649871), which caused winds up to 200 kilometers per hour. The storms caused power outages, heavy flooding and a mini tornado, which destroyed 20 homes. The storm caused 9 fatalities and resulted in considerable damage across Portugal, Spain and France.',
+          'Coastal waves are a daily consequence of the so-called [sea breeze](https://eschooltoday.com/winds/land-breeze-and-sea-breeze.html). During the day, the land gets heated from the sun, getting warmer than the sea. As warmer air is less dense, it rises above the land, lowering the air pressure. The difference in air pressure creates cool winds, blowing from the sea towards the land. Italy attracts many tourists interested in [surfing](https://www.surf-forecast.com/breaks/Circoletto-Rome), especially in winter, when the waves are expected to be the highest. On December 22, 2019, however, the waves were extremely high due to the [storms Elsa and Fabien](https://www.accuweather.com/en/severe-weather/storms-elsa-and-fabien-unleash-damage-from-france-and-spain-to-italy/649871), which caused winds up to 200 kilometers per hour. The storms caused power outages, heavy flooding and a mini tornado, which destroyed 20 homes. The storm caused 9 fatalities and resulted in considerable damage across Portugal, Spain and France.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/o6Av) in EO Browser.',
       },
     ],
   },
@@ -1654,7 +1799,7 @@ const EDUCATION_THEMES = [
         themeId: 'SNOW',
         gain: '1.1',
         description:
-          '[Sermeq Kujalleq](https://www.atlasobscura.com/articles/worlds-fastest-glacier-sermeq-kujalleq), also called Jakobshavn glacier, is known as the world’s fastest glacier. It travels an average of 130 feet in 24 hours and calves more than 45 cubic kilometers of icebergs each year into the Ilulissat Icefjord. Its front is an enormous ice wall—stretching 91 meters at its peak, that constantly explodes. Icebergs break off the glacier accompanied by blasts and roars akin to a rocket launch. When they hit the sea below, the calved icebergs can create huge waves that threaten to swallow people, boats, and buildings. The icebergs from Sermeq Kujalleq have crashed so violently that they have even caused earthquakes. Because the glacier is so large, the breaks seem to occur in __slow motion__.',
+          '[Sermeq Kujalleq](https://www.atlasobscura.com/articles/worlds-fastest-glacier-sermeq-kujalleq), also called Jakobshavn glacier, is known as the world’s fastest glacier. It travels an average of 130 feet in 24 hours and calves more than 45 cubic kilometers of icebergs each year into the Ilulissat Icefjord. Its front is an enormous ice wall—stretching 91 meters at its peak, that constantly explodes. Icebergs break off the glacier accompanied by blasts and roars akin to a rocket launch. When they hit the sea below, the calved icebergs can create huge waves that threaten to swallow people, boats, and buildings. The icebergs from Sermeq Kujalleq have crashed so violently that they have even caused earthquakes. Because the glacier is so large, the breaks seem to occur in __slow motion__.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/kx5u) in EO Browser.',
       },
       {
         title: 'Glaciers of western Greeenland (Tonemapped Natural Color) ',
@@ -1686,7 +1831,7 @@ const EDUCATION_THEMES = [
         themeId: 'SNOW',
         gain: '1.1',
         description:
-          'Located in the southeast of Greenland the Helheim glacier is the fastest flowing glacier on the island’s eastern shore. It has an average width of ~6.5 km and calves into the [Sermilik Fjord]( https://earth.esa.int/web/earth-watching/image-of-the-week/content/-/article/helheim-glacier-greenland). In the last two decades the glacier front experienced rapid changes, first retreating ~6.5 km in the earlier 2000s before then partially recovering and gaining back more than ~3 km. [Learn more](https://www.nasa.gov/feature/goddard/2017/two-decades-of-changes-in-helheim-glacier).',
+          'Located in the southeast of Greenland the Helheim glacier is the fastest flowing glacier on the island’s eastern shore. It has an average width of ~6.5 km and calves into the [Sermilik Fjord]( https://earth.esa.int/web/earth-watching/image-of-the-week/content/-/article/helheim-glacier-greenland). In the last two decades the glacier front experienced rapid changes, first retreating ~6.5 km in the earlier 2000s before then partially recovering and gaining back more than ~3 km. [Learn more](https://www.nasa.gov/feature/goddard/2017/two-decades-of-changes-in-helheim-glacier).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/bhGD) in EO Browser.',
       },
       {
         title: 'Byrd Glacier, Antarctica (Highlight Optimized Natural Color)',
@@ -1787,6 +1932,12 @@ const EDUCATION_THEMES = [
     id: 'URBAN',
     content: [
       {
+        name: 'Urban (S1GRD)',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/31391b-YOUR-INSTANCEID-HERE',
+        preselected: true,
+      },
+      {
         name: 'Urban (S2L2A)',
         service: 'WMS',
         url: 'https://services.sentinel-hub.com/ogc/wms/bf6e66-YOUR-INSTANCEID-HERE',
@@ -1797,8 +1948,35 @@ const EDUCATION_THEMES = [
         service: 'WMS',
         url: 'https://services.sentinel-hub.com/ogc/wms/02e09c-YOUR-INSTANCEID-HERE',
       },
+      {
+        name: 'Urban (S3-SLSTR)',
+        service: 'WMS',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/0796de-YOUR-INSTANCEID-HERE',
+        preselected: true,
+      },
+      {
+        name: 'Urban (L8 USGS)',
+        service: 'WMS',
+        url: 'https://services-uswest2.sentinel-hub.com/ogc/wms/eb12c9-YOUR-INSTANCEID-HERE',
+        preselected: true,
+      },
     ],
     pins: [
+      {
+        title: 'Marshalling Yard Maschen in Hamburg, Germany',
+        lat: 53.4044,
+        lng: 10.0524,
+        zoom: 14,
+        datasetId: 'S2L2A',
+        layerId: '5_URBAN-LAND-INFRARED-COLOR',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/bf6e66-YOUR-INSTANCEID-HERE',
+        toTime: '2023-02-28',
+        evalscript: '',
+        evalscripturl: '',
+        themeId: 'URBAN',
+        description:
+          'With more than 100 separate siding tracks and an area of 2.8 square km, the freight train classification yard of Maschen is the largest of its kind in Europe. Located South of Hamburg, the station serves as a hub for international freight transport all over Europe. [Learn more](https://en.wikipedia.org/wiki/Maschen_Marshalling_Yard).',
+      },
       {
         title: 'Temara, Morocco',
         lat: 33.861,
@@ -2240,7 +2418,7 @@ const EDUCATION_THEMES = [
       {
         name: 'Vegetation (S3-OLCI)',
         service: 'WMS',
-        url: 'https://services.sentinel-hub.com/ogc/wms/89b5c4-YOUR-INSTANCEID-HERE',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/89b5c4-YOUR-INSTANCEID-HERE',
         preselected: true,
       },
       {
@@ -2292,7 +2470,7 @@ const EDUCATION_THEMES = [
         themeId: 'FORESTRY',
         gain: '1.4',
         description:
-          'The forests of Central Africa constitute the second largest rain forest complex in the world after the Amazon. These forests have always been a source of varied resources, services and primary materials for their populations, providing timber, wood energy, bushmeat, fish and other foods, medicinal plants and other diverse wood and non-wood products. Annual deforestation in ten Central African countries was of the order of 0.4 percent between 1990 and 2000. In Central African Republic alone, 30,000 hectares of forest are lost to deforestation each year. Deforestation and degradation of forest resources result from shifting cultivation and uncontrolled exploitation to satisfy the needs of both the local populations and the market for primary materials. Traditional slash-and-burn shifting agriculture and harvesting for fuelwood are by far the main causes of forest loss. Efforts to ensure the regeneration and conservation of these resources are ineffective in the context of poor governance and persistent poverty. Learn [more](http://www.fao.org/3/y5841e/y5841e08.htm).',
+          'The forests of Central Africa constitute the second largest rain forest complex in the world after the Amazon. These forests have always been a source of varied resources, services and primary materials for their populations, providing timber, wood energy, bushmeat, fish and other foods, medicinal plants and other diverse wood and non-wood products. Annual deforestation in ten Central African countries was of the order of 0.4 percent between 1990 and 2000. In Central African Republic alone, 30,000 hectares of forest are lost to deforestation each year. Deforestation and degradation of forest resources result from shifting cultivation and uncontrolled exploitation to satisfy the needs of both the local populations and the market for primary materials. Traditional slash-and-burn shifting agriculture and harvesting for fuelwood are by far the main causes of forest loss. Efforts to ensure the regeneration and conservation of these resources are ineffective in the context of poor governance and persistent poverty. Learn [more](http://www.fao.org/3/y5841e/y5841e08.htm).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/RAh8) in EO Browser.',
       },
       {
         title: 'Forestry in the Amazon rainforest (Enhanced True Color)',
@@ -2309,7 +2487,7 @@ const EDUCATION_THEMES = [
         gain: '3.3',
         gamma: '1.5',
         description:
-          "The Amazon is the world's biggest rainforest, larger than the next two largest rainforests — in the Congo Basin and Indonesia — combined. As of 2020, the Amazon has 526 million hectares of primary forest. One in ten known species on Earth live here. There is a clear link between the health of the Amazon and the health of the planet. The rain forests, which contain 90 – 140 billion metric tons of carbon, help stabilize local and global climate. Deforestation may release significant amounts of this carbon, which could have catastrophic consequences around the world. Despite its global importance, more than 1.4 million hectares of forest have been cleared since the 1970s due to deforestation and even larger area has been affected by selective logging and forest fires. Conversion for cattle grazing and industrial agricultural production (especially soy farms) are the primary drivers of forest loss. Additionally, climate change induced higher temperatures in the tropical Atlantic reduce rainfall, causing drought and increasing the susceptibility of the rainforest to fire. Computer models suggest that if current rates of warming continue, much of the Amazon could transition from rainforest to savanna, especially in the southern parts of the region. Read more [here](https://rainforests.mongabay.com/amazon/) and [here](https://www.worldwildlife.org/places/amazon).",
+          "The Amazon is the world's biggest rainforest, larger than the next two largest rainforests — in the Congo Basin and Indonesia — combined. As of 2020, the Amazon has 526 million hectares of primary forest. One in ten known species on Earth live here. There is a clear link between the health of the Amazon and the health of the planet. The rain forests, which contain 90 – 140 billion metric tons of carbon, help stabilize local and global climate. Deforestation may release significant amounts of this carbon, which could have catastrophic consequences around the world. Despite its global importance, more than 1.4 million hectares of forest have been cleared since the 1970s due to deforestation and even larger area has been affected by selective logging and forest fires. Conversion for cattle grazing and industrial agricultural production (especially soy farms) are the primary drivers of forest loss. Additionally, climate change induced higher temperatures in the tropical Atlantic reduce rainfall, causing drought and increasing the susceptibility of the rainforest to fire. Computer models suggest that if current rates of warming continue, much of the Amazon could transition from rainforest to savanna, especially in the southern parts of the region. Read more [here](https://rainforests.mongabay.com/amazon/) and [here](https://www.worldwildlife.org/places/amazon).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/qiNh) in EO Browser.",
       },
       {
         title: 'Sundarbans, Mangrove forest (EVI)',
@@ -2333,13 +2511,13 @@ const EDUCATION_THEMES = [
         zoom: 9,
         datasetId: 'S3OLCI',
         layerId: '3_OTCI',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/89b5c4-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/89b5c4-YOUR-INSTANCEID-HERE',
         toTime: '2020-01-27',
         evalscript: '',
         evalscripturl: '',
         themeId: 'FORESTRY',
         description:
-          '[Mangrove forests](https://oceanservice.noaa.gov/facts/mangroves.html) have exceptionally high biodiversity and are indispensable in erosion reduction. There are 80 different species of mangrove trees known, growing in low-oxygen soil, where slow moving waters accumulate fine sediments for the roots to grow in. The [Sundarbans Mangrove forest](https://whc.unesco.org/en/list/798/) covers 140,000 ha of land, making it one of the largest Mangrove forests in the world. It provides livelihood to many people in the area and is a home to, among others, 250 bird species and the endangered Royal Bengal Tiger. The forest is threatened by seasonal monsoons, cyclones and tidal waves, which cause salinization.',
+          '[Mangrove forests](https://oceanservice.noaa.gov/facts/mangroves.html) have exceptionally high biodiversity and are indispensable in erosion reduction. There are 80 different species of mangrove trees known, growing in low-oxygen soil, where slow moving waters accumulate fine sediments for the roots to grow in. The [Sundarbans Mangrove forest](https://whc.unesco.org/en/list/798/) covers 140,000 ha of land, making it one of the largest Mangrove forests in the world. It provides livelihood to many people in the area and is a home to, among others, 250 bird species and the endangered Royal Bengal Tiger. The forest is threatened by seasonal monsoons, cyclones and tidal waves, which cause salinization.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/YUq2) in EO Browser.',
       },
       {
         title: 'Russian Taiga (EVI)',
@@ -2379,6 +2557,12 @@ const EDUCATION_THEMES = [
     id: 'VOLCANOES',
     content: [
       {
+        name: 'Volcanoes (S1GRD)',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/31391b-YOUR-INSTANCEID-HERE',
+        preselected: true,
+      },
+      {
         name: 'Volcanoes (S2L2A)',
         service: 'WMS',
         url: 'https://services.sentinel-hub.com/ogc/wms/cb8d43-YOUR-INSTANCEID-HERE',
@@ -2390,9 +2574,15 @@ const EDUCATION_THEMES = [
         url: 'https://services.sentinel-hub.com/ogc/wms/ad8bbb-YOUR-INSTANCEID-HERE',
       },
       {
+        name: 'Volcanoes (Sentinel-5P)',
+        service: 'WMS',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/a730a0-YOUR-INSTANCEID-HERE',
+      },
+      {
         name: 'Volcanoes (L8 USGS)',
         service: 'WMS',
         url: 'https://services.sentinel-hub.com/ogc/wms/53f4f3-YOUR-INSTANCEID-HERE',
+        preselected: true,
       },
     ],
     pins: [
@@ -2524,6 +2714,12 @@ const EDUCATION_THEMES = [
     id: 'WILDFIRES',
     content: [
       {
+        name: 'Wildfires (S1GRD)',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/31391b-YOUR-INSTANCEID-HERE',
+        preselected: true,
+      },
+      {
         name: 'Wildfires (S2L2A)',
         service: 'WMS',
         url: 'https://services.sentinel-hub.com/ogc/wms/aae187-YOUR-INSTANCEID-HERE',
@@ -2537,18 +2733,18 @@ const EDUCATION_THEMES = [
       {
         name: 'Wildfires (S3-SLSTR)',
         service: 'WMS',
-        url: 'https://services.sentinel-hub.com/ogc/wms/616409-YOUR-INSTANCEID-HERE',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/616409-YOUR-INSTANCEID-HERE',
         preselected: true,
       },
       {
         name: 'Wildfires (S3-OLCI)',
         service: 'WMS',
-        url: 'https://services.sentinel-hub.com/ogc/wms/9acaad-YOUR-INSTANCEID-HERE',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/9acaad-YOUR-INSTANCEID-HERE',
       },
       {
         name: 'Sentinel-5P O3 / NO2 / ...',
         service: 'WMS',
-        url: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
       },
     ],
     pins: [
@@ -2565,7 +2761,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'WILDFIRES',
         description:
-          'In summer of 2017, [dozens of wildfires erupted](https://www.channelnewsasia.com/news/world/croatia-fights-dozens-of-fires-along-adriatic-coast-9144906) along the Adriatic coast. Soaring heat wave temperatures accompanied by a lack of rainfall led to a drought, which resulted in dry, hot forest floor, extremely vulnerable to wildfires. The cause of many wildfires were careless people, while strong winds made the situation worse by enabling fires to spread much faster. The firefighters struggled to contain the fires and keep them from dwellings. Altogether, an astonishing 83.000 hectares of forest burned down.',
+          'In summer of 2017, [dozens of wildfires erupted](https://www.channelnewsasia.com/news/world/croatia-fights-dozens-of-fires-along-adriatic-coast-9144906) along the Adriatic coast. Soaring heat wave temperatures accompanied by a lack of rainfall led to a drought, which resulted in dry, hot forest floor, extremely vulnerable to wildfires. The cause of many wildfires were careless people, while strong winds made the situation worse by enabling fires to spread much faster. The firefighters struggled to contain the fires and keep them from dwellings. Altogether, an astonishing 83.000 hectares of forest burned down.\n\n**Timelapse**: View [here](https://sentinelshare.page.link/s6Nj) in EO Browser.',
       },
       {
         title: 'Wildfires in Croatia, July 2017 (Burned Area Detection script)',
@@ -2595,7 +2791,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'WILDFIRES',
         description:
-          'The 2019 – 2020 Australian bushfire season, which stretched from June 2019 to March 2020, devastated portions of the country, scorching an estimated 186,155 square km (46 million acres), destroying more than 5,900 buildings (including 2,779 homes), and killing at least 34 people. [Nearly 3 billion animals](https://www.bbc.com/news/world-australia-53549936) were killed or displaced. Wildfires occur every summer in Australia (typically peaking in February), but the scale of the 2020 seasonal fires was unprecedented. A severe drought, which led into the hottest and driest year on record, combined with sustained high temperatures and windy conditions, created an exceedingly dangerous fire situation across many areas of the country. Hard-hit areas included New South Wales, Victoria, Tasmania, and South Australia. Over the past 20 years, the average percentage of Australia’s forests burned each year was 1 percent. During the 2019 – 2020 fire season, that figure was 21 percent. Climate change models predicted such severity of wildfires to become a reality no later than the next century. Learn more [here](https://www.directrelief.org/2020/06/six-months-after-australias-wildfires-recovery-continues/), [here](https://www.wired.com/story/the-terrible-consequences-of-australias-uber-bushfires/) and [here](https://www.wired.com/story/the-terrible-consequences-of-australias-uber-bushfires/).',
+          'The 2019 – 2020 Australian bushfire season, which stretched from June 2019 to March 2020, devastated portions of the country, scorching an estimated 186,155 square km (46 million acres), destroying more than 5,900 buildings (including 2,779 homes), and killing at least 34 people. [Nearly 3 billion animals](https://www.bbc.com/news/world-australia-53549936) were killed or displaced. Wildfires occur every summer in Australia (typically peaking in February), but the scale of the 2020 seasonal fires was unprecedented. A severe drought, which led into the hottest and driest year on record, combined with sustained high temperatures and windy conditions, created an exceedingly dangerous fire situation across many areas of the country. Hard-hit areas included New South Wales, Victoria, Tasmania, and South Australia. Over the past 20 years, the average percentage of Australia’s forests burned each year was 1 percent. During the 2019 – 2020 fire season, that figure was 21 percent. Climate change models predicted such severity of wildfires to become a reality no later than the next century. Learn more [here](https://www.directrelief.org/2020/06/six-months-after-australias-wildfires-recovery-continues/), [here](https://www.wired.com/story/the-terrible-consequences-of-australias-uber-bushfires/) and [here](https://www.wired.com/story/the-terrible-consequences-of-australias-uber-bushfires/).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/vT3o) in EO Browser.',
       },
       {
         title: 'Wildfires in Australia, January 2019 (Pierre Markuse script)',
@@ -2619,7 +2815,7 @@ const EDUCATION_THEMES = [
         zoom: 9,
         datasetId: 'S5_CO',
         layerId: 'CO_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-01-02',
         evalscript: '',
         evalscripturl: '',
@@ -2634,7 +2830,7 @@ const EDUCATION_THEMES = [
         zoom: 9,
         datasetId: 'S5_NO2',
         layerId: 'NO2_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2019-01-02',
         evalscript: '',
         evalscripturl: '',
@@ -2649,7 +2845,7 @@ const EDUCATION_THEMES = [
         zoom: 9,
         datasetId: 'S3SLSTR',
         layerId: 'F1_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/616409-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/616409-YOUR-INSTANCEID-HERE',
         toTime: '2019-01-02',
         evalscript: '',
         evalscripturl: '',
@@ -2694,7 +2890,7 @@ const EDUCATION_THEMES = [
         zoom: 9,
         datasetId: 'S5_CO',
         layerId: 'CO_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2018-08-05',
         evalscript: '',
         evalscripturl: '',
@@ -2709,7 +2905,7 @@ const EDUCATION_THEMES = [
         zoom: 9,
         datasetId: 'S5_NO2',
         layerId: 'NO2_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
         toTime: '2018-08-05',
         evalscript: '',
         evalscripturl: '',
@@ -2724,7 +2920,7 @@ const EDUCATION_THEMES = [
         zoom: 11,
         datasetId: 'S3SLSTR',
         layerId: 'F1_VISUALIZED',
-        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/616409-YOUR-INSTANCEID-HERE',
+        visualizationUrl: 'https://creodias.sentinel-hub.com/ogc/wms/616409-YOUR-INSTANCEID-HERE',
         toTime: '2018-08-06',
         evalscript: '',
         evalscripturl: '',
@@ -2745,7 +2941,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'WILDFIRES',
         description:
-          'Following weeks of dry weather and temperatures above 35°C, forest fires took hold in the Portuguese mainland on Friday and on the island of Madeira, on Monday. On Tuesday the flames encroached on Funchal, home to some 112,000 permanent residents and capital of an island that attracts more than a million tourists per year. The fires started on August 8, 2016. In the following days, the fires spread rapidly and the amount of smoke increased dramatically. By August 12, the fires were mostly extinguished, but they left large expanses of charred forest behind. The fire near Funchal killed 3 people, destroyed more than 150 homes, and forced more than 1,000 people to evacuate.  Fires were also blazing on the mainland with reports of a fourth death in central Portugal. A heat wave helped fuel the fires, but authorities think that some may have been set by arsonists with several arrests made. The government triggered the EU Civil Protection Mechanism, which enabled other European states to help. Read more [here](https://earthobservatory.nasa.gov/images/88590/fires-char-madeira) and [here](https://www.bbc.com/news/world-europe-37030217).',
+          'Following weeks of dry weather and temperatures above 35°C, forest fires took hold in the Portuguese mainland on Friday and on the island of Madeira, on Monday. On Tuesday the flames encroached on Funchal, home to some 112,000 permanent residents and capital of an island that attracts more than a million tourists per year. The fires started on August 8, 2016. In the following days, the fires spread rapidly and the amount of smoke increased dramatically. By August 12, the fires were mostly extinguished, but they left large expanses of charred forest behind. The fire near Funchal killed 3 people, destroyed more than 150 homes, and forced more than 1,000 people to evacuate.  Fires were also blazing on the mainland with reports of a fourth death in central Portugal. A heat wave helped fuel the fires, but authorities think that some may have been set by arsonists with several arrests made. The government triggered the EU Civil Protection Mechanism, which enabled other European states to help. Read more [here](https://earthobservatory.nasa.gov/images/88590/fires-char-madeira) and [here](https://www.bbc.com/news/world-europe-37030217).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/1U34) in EO Browser.',
       },
       {
         title: 'After wildfire, Funchal (Pierre Markuse script)',
@@ -2760,7 +2956,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         themeId: 'WILDFIRES',
         description:
-          'Following weeks of dry weather and temperatures above 35°C, forest fires took hold in the Portuguese mainland on Friday and on the island of Madeira, on Monday. On Tuesday the flames encroached on Funchal, home to some 112,000 permanent residents and capital of an island that attracts more than a million tourists per year. The fires started on August 8, 2016. In the following days, the fires spread rapidly and the amount of smoke increased dramatically. By August 12, the fires were mostly extinguished, but they left large expanses of charred forest behind. The fire near Funchal killed 3 people, destroyed more than 150 homes, and forced more than 1,000 people to evacuate.  Fires were also blazing on the mainland with reports of a fourth death in central Portugal. A heat wave helped fuel the fires, but authorities think that some may have been set by arsonists with several arrests made. The government triggered the EU Civil Protection Mechanism, which enabled other European states to help. Read more [here](https://earthobservatory.nasa.gov/images/88590/fires-char-madeira) and [here](https://www.bbc.com/news/world-europe-37030217).',
+          'Following weeks of dry weather and temperatures above 35°C, forest fires took hold in the Portuguese mainland on Friday and on the island of Madeira, on Monday. On Tuesday the flames encroached on Funchal, home to some 112,000 permanent residents and capital of an island that attracts more than a million tourists per year. The fires started on August 8, 2016. In the following days, the fires spread rapidly and the amount of smoke increased dramatically. By August 12, the fires were mostly extinguished, but they left large expanses of charred forest behind. The fire near Funchal killed 3 people, destroyed more than 150 homes, and forced more than 1,000 people to evacuate.  Fires were also blazing on the mainland with reports of a fourth death in central Portugal. A heat wave helped fuel the fires, but authorities think that some may have been set by arsonists with several arrests made. The government triggered the EU Civil Protection Mechanism, which enabled other European states to help. Read more [here](https://earthobservatory.nasa.gov/images/88590/fires-char-madeira) and [here](https://www.bbc.com/news/world-europe-37030217).\n\n**Timelapse**: View [here](https://sentinelshare.page.link/1U34) in EO Browser.',
       },
     ],
   },
@@ -2908,20 +3104,26 @@ export const DEFAULT_THEMES = [
       {
         name: 'Sentinel-3 SLSTR',
         service: 'WMS',
-        url: 'https://services.sentinel-hub.com/ogc/wms/786d82-YOUR-INSTANCEID-HERE',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/786d82-YOUR-INSTANCEID-HERE',
       },
 
       {
         name: 'Sentinel-3 OLCI',
         service: 'WMS',
-        url: 'https://services.sentinel-hub.com/ogc/wms/82f84f-YOUR-INSTANCEID-HERE',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/82f84f-YOUR-INSTANCEID-HERE',
         preselected: true,
       },
 
       {
         name: 'Sentinel-5P O3 / NO2 / ...',
         service: 'WMS',
-        url: 'https://services.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/2c5dc5-YOUR-INSTANCEID-HERE',
+      },
+
+      {
+        name: 'Harmonized Landsat Sentinel (HLS)',
+        service: 'WMS',
+        url: 'https://services.sentinel-hub.com/ogc/wms/a10a16-YOUR-INSTANCEID-HERE',
       },
 
       {
@@ -3013,8 +3215,32 @@ export const DEFAULT_THEMES = [
         url: 'https://creodias.sentinel-hub.com/ogc/wms/b851e1-YOUR-INSTANCEID-HERE',
       },
       {
+        name: 'Persistent Snow Area',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/65f9eb-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'Wet/Dry Snow',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/a9217e-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'SAR Wet Snow',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/d9e828-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'Fractional Snow Cover',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/2025fa-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'Fractional Snow Cover (Gap-filled)',
+        url: 'https://creodias.sentinel-hub.com/ogc/wms/b8b6e9-YOUR-INSTANCEID-HERE',
+      },
+      {
         name: 'Global Human Settlement',
         url: 'https://creodias.sentinel-hub.com/ogc/wms/dae04f-YOUR-INSTANCEID-HERE',
+      },
+      {
+        name: 'IO 10m Annual Land Use Land Cover (9-class)',
+        url: 'https://services.sentinel-hub.com/ogc/wms/963c9e-YOUR-INSTANCEID-HERE',
       },
     ],
   },

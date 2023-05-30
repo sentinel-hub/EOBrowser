@@ -28,6 +28,7 @@ import {
   formatDeprecatedPins,
   getPinsFromServer,
   getPinsFromSessionStorage,
+  getVisualizationUrl,
   removePinsFromServer,
   savePinsToServer,
   savePinsToSessionStorage,
@@ -43,6 +44,7 @@ import {
   MODE_THEMES_LIST,
   URL_THEMES_LIST,
   USER_INSTANCES_THEMES_LIST,
+  FUNCTIONALITY_TEMPORARILY_UNAVAILABLE_MSG,
 } from '../../const';
 import { ModalId } from '../../const';
 
@@ -351,7 +353,6 @@ class PinPanel extends Component {
       fromTime,
       toTime,
       datasetId,
-      visualizationUrl,
       layerId,
       evalscript,
       evalscripturl,
@@ -438,7 +439,7 @@ class PinPanel extends Component {
 
     let visualizationParams = {
       datasetId: datasetId,
-      visualizationUrl: visualizationUrl,
+      visualizationUrl: getVisualizationUrl(pin),
       fromTime: pinTimeFrom,
       toTime: pinTimeTo,
       visibleOnMap: true,
@@ -700,6 +701,16 @@ class PinPanel extends Component {
     const { pinItems, is3D } = this.props;
     const arePinsSelectable = operation === OPERATION_SHARE;
     const areAllPinsSelected = pinItems && selectedPins && selectedPins.length === pinItems.length;
+
+    if (!process.env.REACT_APP_EOB_BACKEND) {
+      return (
+        <div className="pin-panel">
+          <div className="pins-container">
+            <NotificationPanel type="info" msg={FUNCTIONALITY_TEMPORARILY_UNAVAILABLE_MSG} />
+          </div>
+        </div>
+      );
+    }
 
     const loggedIn = this.props.user ? true : false;
     const noPinMsg = t`No pins. Go to the Visualize tab to save a pin or upload a JSON file with saved pins.`;

@@ -5,6 +5,7 @@ import { t } from 'ttag';
 import store, { aoiSlice, mainMapSlice } from '../../../store';
 import { EOBUploadGeoFile } from '../../../junk/EOBUploadGeoFile/EOBUploadGeoFile';
 import { AOI_SHAPE } from '../../../const';
+import { UPLOAD_GEOMETRY_TYPE } from '../../../junk/EOBUploadGeoFile/EOBUploadGeoFile.utils';
 
 export const AOISelection = ({ aoiGeometry, aoiIsDrawing, mapBounds }) => {
   const [uploadDialog, setUploadDialog] = useState(false);
@@ -63,7 +64,7 @@ export const AOISelection = ({ aoiGeometry, aoiIsDrawing, mapBounds }) => {
                 className="fa fa-upload"
                 // jsx-a11y/anchor-is-valid
                 // eslint-disable-next-line
-                title={t`Upload data`}
+                title={t`Upload a file to create an area of interest`}
                 onClick={() => setUploadDialog(true)}
               />
 
@@ -98,7 +99,11 @@ export const AOISelection = ({ aoiGeometry, aoiIsDrawing, mapBounds }) => {
           )}
 
           {uploadDialog && (
-            <EOBUploadGeoFile onUpload={onFileUpload} onClose={() => setUploadDialog(false)} />
+            <EOBUploadGeoFile
+              onUpload={onFileUpload}
+              onClose={() => setUploadDialog(false)}
+              type={UPLOAD_GEOMETRY_TYPE.POLYGON}
+            />
           )}
         </div>
       </div>

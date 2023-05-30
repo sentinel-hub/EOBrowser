@@ -15,6 +15,7 @@ import { TimelapseImages } from './TimelapseImages';
 import { TimelapsePreview } from './TimelapsePreview';
 import { constructBBoxFromBounds, getLayerFromParams } from '../ImgDownload/ImageDownload.utils';
 import { constructGetMapParamsEffects } from '../../utils/effectsUtils';
+import { TERRAIN_VIEWER_IDS, setTerrainViewerId } from '../../TerrainViewer/TerrainViewer.const';
 
 import {
   getFlyoversToFetch,
@@ -26,9 +27,12 @@ import {
   fetchTimelapseImage,
   getTimelapseBounds,
   determineDefaultImageSize,
+  determineDefaultImageSize3D,
   generateTimelapseWithFFMPEG,
   getFlyOverVisualization,
   DEFAULT_IMAGE_DIMENSION,
+  isImageClearEnough,
+  isImageCoverageEnough,
 } from './Timelapse.utils';
 
 import './Timelapse.scss';
@@ -36,6 +40,18 @@ import { applyFilterMonthsToDateRange } from '../../junk/EOBCommon/utils/filterD
 import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { EXPORT_FORMAT, TRANSITION } from '../../const';
 import { NotificationPanel } from '../../Notification/NotificationPanel';
+
+import {
+  GENERATION_CANCELLED,
+  getTimelapseImagesFromTerrainViewer,
+  getTimelapsePreviewsFromTerrainViewer,
+} from '../../TerrainViewer/TerrainViewer.utils';
+import md5 from '../../utils/md5';
+
+const TIME_UNITS = {
+  SECONDS: 'seconds',
+  MILLISECONDS: 'milliseconds',
+};
 
 class Timelapse extends Component {
   state = {
@@ -52,35 +68,58 @@ class Timelapse extends Component {
     showSidebar: true,
     sidebarPopup: null,
     errorMessage: null,
+    generationCancelled: false,
   };
+  fetchUnsuitablePreviewsTimeoutId = null;
 
   async componentDidMount() {
-    const { fromTime, toTime, timelapseSharePreviewMode, auth, authToken } = this.props;
+    const { fromTime, toTime, timelapseSharePreviewMode, auth, authToken, is3D } = this.props;
 
     this.cancelToken = new CancelToken();
-    this.layer = await getLayerFromParams(
-      { ...this.props, fromTime: undefined, toTime: undefined },
-      this.cancelToken,
-      authToken || auth.anonToken,
-    );
 
-    if (!fromTime || !toTime) {
-      store.dispatch(timelapseSlice.actions.setInitialTime(this.props.visualizationToTime));
+    if (is3D) {
+      store.dispatch(timelapseSlice.actions.setMaxCCPercentAllowed(50));
+      store.dispatch(timelapseSlice.actions.setMinCoverageAllowed(80));
     }
 
-    if (timelapseSharePreviewMode) {
-      this.togglePreviewPlaying();
+    if (!authToken && !auth.anonToken) {
+      return;
     }
 
-    this.setState({ loadingLayer: false });
+    try {
+      this.layer = await getLayerFromParams(
+        { ...this.props, fromTime: undefined, toTime: undefined },
+        this.cancelToken,
+        authToken || auth.anonToken,
+      );
 
-    // update size on first load or if the ratio changes
-    const size = determineDefaultImageSize(this.props.pixelBounds, this.props.zoom, this.props.aoi);
-    if (!this.props.size || this.props.size.ratio.toFixed(3) !== size.ratio.toFixed(3)) {
-      store.dispatch(timelapseSlice.actions.setSize(size));
+      if (!fromTime || !toTime) {
+        store.dispatch(
+          timelapseSlice.actions.setInitialTime({
+            time: this.props.visualizationToTime,
+            interval: is3D ? 'week' : 'month',
+          }),
+        );
+      }
+
+      if (timelapseSharePreviewMode) {
+        this.togglePreviewPlaying();
+      }
+
+      this.setState({ loadingLayer: false });
+
+      // update size on first load or if the ratio changes
+      const size = this.props.is3D
+        ? determineDefaultImageSize3D(this.props.pixelBounds)
+        : determineDefaultImageSize(this.props.mapBounds, this.props.aoi);
+      if (!this.props.size || this.props.size.ratio.toFixed(3) !== size.ratio.toFixed(3)) {
+        store.dispatch(timelapseSlice.actions.setSize(size));
+      }
+
+      this.searchDatesAndFetchImages();
+    } catch (e) {
+      console.warn(e.message);
     }
-
-    this.searchDatesAndFetchImages();
   }
 
   componentDidUpdate(prevProps) {
@@ -100,9 +139,24 @@ class Timelapse extends Component {
     if (prevProps.timelapseFPS !== this.props.timelapseFPS) {
       this.updatePreviewLoop();
     }
+
+    if (
+      prevProps.maxCCPercentAllowed !== this.props.maxCCPercentAllowed ||
+      prevProps.minCoverageAllowed !== this.props.minCoverageAllowed
+    ) {
+      clearTimeout(this.fetchUnsuitablePreviewsTimeoutId);
+      const newTimeout = setTimeout(() => this.fetchPreviouslyUnsuitable3DPreviews(), 1000);
+      this.fetchUnsuitablePreviewsTimeoutId = newTimeout;
+    }
   }
 
   componentWillUnmount() {
+    clearTimeout(this.fetchUnsuitablePreviewsTimeoutId);
+    if (this.props.is3D) {
+      setTerrainViewerId(TERRAIN_VIEWER_IDS.MAIN);
+      document.getElementById('terrain-map-container').setAttribute('style', `width:100%;height:100%;`);
+      window.reload3DTextures(this.props.terrainViewerId);
+    }
     this.cancelToken.cancel();
     this.timer && clearInterval(this.timer);
   }
@@ -120,12 +174,12 @@ class Timelapse extends Component {
     store.dispatch(timelapseSlice.actions.setFilterMonths(months));
   };
 
-  onFetchAvailableDates = async (fromMoment, toMoment, bounds) => {
+  onFetchAvailableDates = async (fromMoment, toMoment) => {
     if (!this.layer) {
       return [];
     }
-    const { pixelBounds, zoom, aoi } = this.props;
-    const bbox = constructBBoxFromBounds(getTimelapseBounds(pixelBounds, zoom, aoi));
+    const { mapBounds, aoi } = this.props;
+    const bbox = constructBBoxFromBounds(getTimelapseBounds(mapBounds, aoi));
     const dates = await this.layer.findDatesUTC(bbox, fromMoment.toDate(), toMoment.toDate());
     return dates;
   };
@@ -221,13 +275,15 @@ class Timelapse extends Component {
       canWeFilterByCoverage = canWeFilterByCoverage && layerFlyovers[0].coveragePercent !== undefined;
     }
 
+    store.dispatch(timelapseSlice.actions.setIsSelectAllChecked(true));
+
     this.setState({
       supportsOrbitPeriod,
       canWeFilterByClouds,
       canWeFilterByCoverage,
     });
 
-    await this.fetchImages(flyoversToFetch.sort((a, b) => a.toTime - b.toTime));
+    await this.fetchImages({ flyoversToFetch: flyoversToFetch.sort((a, b) => a.toTime - b.toTime) });
   };
 
   searchDates = async (layer) => {
@@ -237,9 +293,9 @@ class Timelapse extends Component {
       images: null,
       activeImageIndex: null,
     });
-    const { pixelBounds, zoom, fromTime, toTime, filterMonths, selectedPeriod, aoi } = this.props;
+    const { mapBounds, fromTime, toTime, filterMonths, selectedPeriod, aoi } = this.props;
 
-    const bbox = constructBBoxFromBounds(getTimelapseBounds(pixelBounds, zoom, aoi));
+    const bbox = constructBBoxFromBounds(getTimelapseBounds(mapBounds, aoi));
     const intervals = applyFilterMonthsToDateRange(fromTime, toTime, filterMonths);
 
     const reqConfig = {
@@ -248,35 +304,40 @@ class Timelapse extends Component {
 
     let flyovers = [];
     let supportsOrbitPeriod;
+    let searchLayer = layer;
+    if (layer instanceof ProcessingDataFusionLayer) {
+      searchLayer = layer.layers[0].layer;
+    }
     for (const interval of intervals) {
       try {
+        flyovers = [
+          ...flyovers,
+          ...(await searchLayer.findFlyovers(
+            bbox,
+            interval.fromMoment,
+            interval.toMoment,
+            100,
+            100,
+            reqConfig,
+          )),
+        ];
         if (layer instanceof ProcessingDataFusionLayer) {
-          flyovers = [
-            ...flyovers,
-            ...(await layer.layers[0].layer.findFlyovers(
-              bbox,
-              interval.fromMoment,
-              interval.toMoment,
-              100,
-              100,
-              reqConfig,
-            )),
-          ].map((flyover) => ({
+          flyovers = flyovers.map((flyover) => ({
             ...flyover,
             fromTime:
               selectedPeriod === 'orbit' ? flyover.fromTime : moment.utc(flyover.fromTime).startOf('day'),
             toTime: selectedPeriod === 'orbit' ? flyover.toTime : moment.utc(flyover.toTime).endOf('day'),
           }));
-        } else {
-          flyovers = [
-            ...flyovers,
-            ...(await layer.findFlyovers(bbox, interval.fromMoment, interval.toMoment, 100, 100, reqConfig)),
-          ];
         }
         supportsOrbitPeriod = true;
       } catch (err) {
         try {
-          const dates = await layer.findDatesUTC(bbox, interval.fromMoment, interval.toMoment, reqConfig);
+          const dates = await searchLayer.findDatesUTC(
+            bbox,
+            interval.fromMoment,
+            interval.toMoment,
+            reqConfig,
+          );
           flyovers = [
             ...flyovers,
             ...dates.map((date) => ({
@@ -293,101 +354,203 @@ class Timelapse extends Component {
     return { flyovers, supportsOrbitPeriod };
   };
 
-  fetchImages = async (flyoversToFetch) => {
-    const {
-      auth,
-      maxCCPercentAllowed,
-      minCoverageAllowed,
-      showBorders,
-      isSelectAllChecked,
-      pixelBounds,
-      zoom,
-      aoi,
-    } = this.props;
-    const { canWeFilterByClouds, canWeFilterByCoverage } = this.state;
+  onImageLoad = ({ img, flyover, setDeferredImages = false }) => {
+    const { maxCCPercentAllowed, minCoverageAllowed, isSelectAllChecked } = this.props;
+    const { canWeFilterByClouds, canWeFilterByCoverage, images: currentImages } = this.state;
+    let images = currentImages || [];
 
-    const size = determineDefaultImageSize(pixelBounds, zoom, aoi);
-    let images = [];
+    const flyoverHash = md5(JSON.stringify(flyover));
 
-    const fetchTimelapseImages = flyoversToFetch.map((flyover) =>
-      fetchTimelapseImage({
+    if (setDeferredImages) {
+      for (let i = 0; i < images.length; i++) {
+        if (images[i].flyoverHash === flyoverHash) {
+          images[i].url = img;
+        }
+      }
+    } else {
+      const augmentedImage = {
+        url: img,
         layer: flyover.visualization.layer,
         datasetId: flyover.visualization.datasetId,
-        bounds: getTimelapseBounds(pixelBounds, zoom, aoi),
         fromTime: flyover.fromTime,
         toTime: flyover.toTime,
-        width: size.width,
-        height: size.height,
-        imageFormat: MimeTypes.JPEG,
-        cancelToken: this.cancelToken,
-        geometry: aoi.geometry,
         effects: flyover.visualization.effects,
-        getMapAuthToken: getGetMapAuthToken(auth),
-        showBorders: showBorders && !(aoi && aoi.bounds),
-      })
-        .then((image) => {
-          const augmentedImage = {
-            url: image.url,
+        customSelected: flyover.visualization.customSelected,
+        pin: flyover.visualization.pin,
+        isSelected: isSelectAllChecked,
+        averageCloudCoverPercent: flyover.meta && flyover.meta.averageCloudCoverPercent,
+        coveragePercent: flyover.coveragePercent,
+        visualizationIndex: flyover.visualizationIndex,
+        origFlyover: flyover,
+        flyoverHash: flyoverHash,
+      };
+      images = [...images, augmentedImage].sort(
+        (a, b) => a.toTime - b.toTime || a.visualizationIndex - b.visualizationIndex,
+      );
+    }
+
+    this.setState((prevState) => {
+      const activeImageIndex =
+        prevState.activeImageIndex !== null &&
+        isImageApplicable(
+          images[prevState.activeImageIndex],
+          canWeFilterByClouds,
+          canWeFilterByCoverage,
+          maxCCPercentAllowed,
+          minCoverageAllowed,
+        )
+          ? prevState.activeImageIndex
+          : findDefaultActiveImageIndex(
+              images,
+              canWeFilterByClouds,
+              canWeFilterByCoverage,
+              maxCCPercentAllowed,
+              minCoverageAllowed,
+            );
+
+      return {
+        images,
+        activeImageIndex,
+      };
+    });
+  };
+
+  fetchPreviouslyUnsuitable3DPreviews = () => {
+    const { images } = this.state;
+
+    if (!images) {
+      return;
+    }
+
+    const flyoversToFetch = images.filter((image) => image.url === null).map((image) => image.origFlyover);
+
+    if (flyoversToFetch.length > 0) {
+      this.fetchImages({ flyoversToFetch: flyoversToFetch, setDeferredImages: true });
+    }
+  };
+
+  fetchImages = async ({ flyoversToFetch, setDeferredImages = false }) => {
+    const { auth, showBorders, aoi, mapBounds, pixelBounds, is3D, maxCCPercentAllowed, minCoverageAllowed } =
+      this.props;
+    const { canWeFilterByClouds, canWeFilterByCoverage } = this.state;
+
+    const size = is3D ? determineDefaultImageSize3D(pixelBounds) : determineDefaultImageSize(mapBounds, aoi);
+
+    this.setState({
+      loadingImages: true,
+    });
+
+    if (is3D) {
+      const { terrainViewerSettings, terrainViewerId } = this.props;
+      const { z, rotV, sunTime, settings } = terrainViewerSettings;
+
+      const imagesToFetch = [];
+
+      for (let flyover of flyoversToFetch) {
+        this.onImageLoad({
+          img: null,
+          flyover: flyover,
+          setDeferredImages: setDeferredImages,
+        }); // We call the callback with `img: null` so the placeholder loader is rendered for applicable images that are loading
+        const image = {
+          layer: flyover.visualization.layer,
+          datasetId: flyover.visualization.datasetId,
+          bounds: getTimelapseBounds(mapBounds, aoi),
+          fromTime: flyover.fromTime,
+          toTime: flyover.toTime,
+          width: size.width,
+          height: size.height,
+          imageFormat: MimeTypes.JPEG,
+          cancelToken: this.cancelToken,
+          geometry: aoi.geometry,
+          effects: flyover.visualization.effects,
+          getMapAuthToken: getGetMapAuthToken(auth),
+          showBorders: showBorders && !(aoi && aoi.bounds),
+          origFlyover: flyover,
+        };
+        if (
+          isImageClearEnough(
+            flyover?.meta?.averageCloudCoverPercent,
+            canWeFilterByClouds,
+            maxCCPercentAllowed,
+          ) &&
+          isImageCoverageEnough(flyover?.coveragePercent, canWeFilterByCoverage, minCoverageAllowed)
+        ) {
+          imagesToFetch.push(image);
+        }
+      }
+
+      await new Promise(async (resolve) => {
+        await getTimelapsePreviewsFromTerrainViewer({
+          containerId: 'terrain-map-container',
+          z: z,
+          rotV: rotV,
+          sunTime: sunTime,
+          settings: settings,
+          images: imagesToFetch,
+          getMapParams: {
+            ...this.props,
+            format: MimeTypes.JPEG,
+          },
+          width: size.width,
+          height: size.height,
+          reqConfig: {
+            cancelToken: this.cancelToken,
+          },
+          callback: (img, flyover) =>
+            this.onImageLoad({ img: img, flyover: flyover, setDeferredImages: true }),
+          progress: (percent) => {
+            this.updateFetchAndEncodeProgress(percent, true);
+          },
+          timelapseTerrainViewerId: terrainViewerId,
+        });
+        resolve();
+      });
+    } else {
+      await Promise.all(
+        flyoversToFetch.map((flyover) =>
+          fetchTimelapseImage({
             layer: flyover.visualization.layer,
             datasetId: flyover.visualization.datasetId,
+            bounds: getTimelapseBounds(mapBounds, aoi),
             fromTime: flyover.fromTime,
             toTime: flyover.toTime,
+            width: size.width,
+            height: size.height,
+            imageFormat: MimeTypes.JPEG,
+            cancelToken: this.cancelToken,
+            geometry: aoi.geometry,
             effects: flyover.visualization.effects,
-            customSelected: flyover.visualization.customSelected,
-            pin: flyover.visualization.pin,
-            isSelected: isSelectAllChecked,
-            averageCloudCoverPercent: flyover.meta && flyover.meta.averageCloudCoverPercent,
-            coveragePercent: flyover.coveragePercent,
-            visualizationIndex: flyover.visualizationIndex,
-          };
-          images = [...images, augmentedImage].sort(
-            (a, b) => a.toTime - b.toTime || a.visualizationIndex - b.visualizationIndex,
-          );
-
-          this.setState((prevState) => {
-            const activeImageIndex =
-              prevState.activeImageIndex !== null &&
-              isImageApplicable(
-                images[prevState.activeImageIndex],
-                canWeFilterByClouds,
-                canWeFilterByCoverage,
-                maxCCPercentAllowed,
-                minCoverageAllowed,
-              )
-                ? prevState.activeImageIndex
-                : findDefaultActiveImageIndex(
-                    images,
-                    canWeFilterByClouds,
-                    canWeFilterByCoverage,
-                    maxCCPercentAllowed,
-                    minCoverageAllowed,
-                  );
-
-            return {
-              images,
-              activeImageIndex,
-            };
-          });
-        })
-        .catch((err) => {
-          if (!isCancelled(err)) {
-            console.warn('Unable to fetch timelapse image', err);
-            this.showErrorMessage(t`Unable to fetch timelapse image`);
-          }
-        }),
-    );
-
-    await Promise.all(fetchTimelapseImages);
-
+            getMapAuthToken: getGetMapAuthToken(auth),
+            showBorders: showBorders && !(aoi && aoi.bounds),
+          })
+            .then((image) => {
+              return this.onImageLoad({ img: image.url, flyover: flyover });
+            })
+            .catch((err) => {
+              if (!isCancelled(err)) {
+                console.warn('Unable to fetch timelapse image', err);
+                this.showErrorMessage(t`Unable to fetch timelapse image`);
+              }
+            }),
+        ),
+      );
+    }
     this.setState({
       loadingImages: false,
     });
   };
 
   setMaxCCPercentAllowed = (ccPercent) => {
+    const { minCoverageAllowed, is3D } = this.props;
+    const { loadingImages } = this.state;
+
+    if (is3D && loadingImages) {
+      return;
+    }
+
     store.dispatch(timelapseSlice.actions.setMaxCCPercentAllowed(ccPercent));
 
-    const { minCoverageAllowed } = this.props;
     this.setState((prevState) => {
       const { images, activeImageIndex, canWeFilterByClouds, canWeFilterByCoverage } = prevState;
       // If the currently active image doesn't fit new criteria, we selected the next possible one
@@ -410,9 +573,15 @@ class Timelapse extends Component {
   };
 
   setMinCoverageAllowed = (coveragePercent) => {
+    const { maxCCPercentAllowed, is3D } = this.props;
+    const { loadingImages } = this.state;
+
+    if (is3D && loadingImages) {
+      return;
+    }
+
     store.dispatch(timelapseSlice.actions.setMinCoverageAllowed(coveragePercent));
 
-    const { maxCCPercentAllowed } = this.props;
     this.setState((prevState) => {
       const { images, activeImageIndex, canWeFilterByClouds, canWeFilterByCoverage } = prevState;
       // If the currently active image doesn't fit new criteria, we selected the next possible one
@@ -506,17 +675,49 @@ class Timelapse extends Component {
     );
   };
 
-  updatePreviewLoop = () => {
-    const { timelapseFPS } = this.props;
-    const { isPreviewPlaying } = this.state;
+  calculateLastFrameDelay = (timelapseFPS, unit = TIME_UNITS.MILLISECONDS) => {
+    const ms = parseInt(timelapseFPS) <= 1 ? 2000 : 1000;
+    switch (unit) {
+      case TIME_UNITS.MILLISECONDS:
+        return ms;
+      case TIME_UNITS.SECONDS:
+        return ms / 1000;
 
-    this.timer && clearInterval(this.timer);
-
-    if (isPreviewPlaying) {
-      this.timer = setInterval(() => {
-        this.iterateOverImages();
-      }, 1000 / timelapseFPS);
+      default:
+        throw new Error(`Unit ${unit} is not supported`);
     }
+  };
+
+  updatePreviewLoop = () => {
+    const { timelapseFPS, delayLastFrame, timelapseSharePreviewMode } = this.props;
+    const { isPreviewPlaying, images } = this.state;
+
+    this.timer = cancelAnimationFrame(this.timer);
+
+    if (!isPreviewPlaying || timelapseSharePreviewMode) {
+      return;
+    }
+
+    let currentFrameStartTime = Date.now();
+
+    const animate = () => {
+      let currentTime = Date.now();
+      let elapsed = Math.ceil(currentTime - currentFrameStartTime);
+      let isLastFrameImage = images ? this.state.activeImageIndex === images.length - 1 : false;
+      let delay = this.calculateLastFrameDelay(timelapseFPS, TIME_UNITS.MILLISECONDS);
+      let frameDuration = Math.ceil(1000 / timelapseFPS);
+
+      const fpsInterval = delayLastFrame && isLastFrameImage ? delay : frameDuration;
+
+      if (elapsed > fpsInterval) {
+        currentFrameStartTime = currentTime - (elapsed % fpsInterval);
+
+        this.iterateOverImages();
+      }
+      this.timer = requestAnimationFrame(animate);
+    };
+
+    animate();
   };
 
   iterateOverImages = () => {
@@ -546,33 +747,55 @@ class Timelapse extends Component {
     store.dispatch(timelapseSlice.actions.setTransition(transition));
   };
 
+  extendImageUrlsLastFrame(imageUrls, timelapseFPS) {
+    let extendImageUrlsLastFrame = [...imageUrls];
+    const delay = this.calculateLastFrameDelay(timelapseFPS, TIME_UNITS.SECONDS);
+    const extraFrameCount = delay * timelapseFPS;
+
+    for (let i = 1; i <= extraFrameCount; i++) {
+      extendImageUrlsLastFrame.push(imageUrls.at(-1));
+    }
+
+    return extendImageUrlsLastFrame;
+  }
+
   generateTimelapse = async () => {
-    const { maxCCPercentAllowed, minCoverageAllowed, size } = this.props;
+    const { maxCCPercentAllowed, minCoverageAllowed, is3D, size, timelapseFPS, delayLastFrame } = this.props;
     const { images, canWeFilterByClouds, canWeFilterByCoverage } = this.state;
 
     // Cancel any previous requests
     this.cancelToken.cancel();
     this.cancelToken = new CancelToken();
 
+    this.setState({
+      generatingTimelapse: true,
+      generatingTimelapseProgress: null,
+    });
+
+    const filteredImages = images.filter((image) =>
+      isImageApplicable(
+        image,
+        canWeFilterByClouds,
+        canWeFilterByCoverage,
+        maxCCPercentAllowed,
+        minCoverageAllowed,
+      ),
+    );
+
     try {
-      this.setState({ generatingTimelapse: true });
+      const applicableImageUrls = is3D
+        ? await this.fetch3dImages(filteredImages, size)
+        : await this.refetchImages(filteredImages, size);
 
-      const filteredImages = images.filter((image) =>
-        isImageApplicable(
-          image,
-          canWeFilterByClouds,
-          canWeFilterByCoverage,
-          maxCCPercentAllowed,
-          minCoverageAllowed,
-        ),
-      );
+      const imageUrls = delayLastFrame
+        ? this.extendImageUrlsLastFrame(applicableImageUrls, timelapseFPS)
+        : applicableImageUrls;
 
-      const applicableImageUrls = await this.refetchImages(filteredImages, size);
-
-      return await this.encodeImages(applicableImageUrls);
-    } catch (err) {
-      if (!isCancelled(err)) {
-        console.warn('Unable to generate timelapse', err);
+      return await this.encodeImages(imageUrls, size);
+    } catch (error) {
+      if (isCancelled(error) || this.state.generationCancelled || error?.message === GENERATION_CANCELLED) {
+        this.setState({ generationCancelled: false });
+      } else {
         this.showErrorMessage(
           t`Could not generate timelapse animation file. Try using lower resolution or fewer frames.`,
         );
@@ -585,16 +808,56 @@ class Timelapse extends Component {
     }
   };
 
-  shouldRefetchImages = () => {
-    const { size } = this.props;
-    return size.width !== DEFAULT_IMAGE_DIMENSION || size.height !== DEFAULT_IMAGE_DIMENSION;
+  fetch3dImages = async (images, size) => {
+    const { terrainViewerSettings, terrainViewerId } = this.props;
+    const { z, sunTime, settings } = terrainViewerSettings;
+
+    const imageUrls = await getTimelapseImagesFromTerrainViewer({
+      containerId: 'terrain-map-container',
+      z: z,
+      sunTime: sunTime,
+      settings: settings,
+      images: images,
+      getMapParams: {
+        ...this.props,
+        format: MimeTypes.JPEG,
+      },
+      outputWidth: size.width,
+      outputHeight: size.height,
+      creationWidth: size.width,
+      creationHeight: size.height,
+      reqConfig: {
+        cancelToken: this.cancelToken,
+      },
+      timelapseTerrainViewerId: terrainViewerId,
+      isGenerationCancelled: this.isGenerationCancelled,
+      progress: (percent) => {
+        this.updateFetchAndEncodeProgress(percent, true);
+      },
+    });
+
+    return imageUrls;
   };
 
-  refetchImages = async (images) => {
-    const { size, pixelBounds, zoom, aoi, auth, showBorders } = this.props;
+  setGenerationCancelled = (generationCancelled) => {
+    this.cancelToken.cancel();
+    this.setState({ generationCancelled });
+  };
+
+  isGenerationCancelled = () => {
+    return this.state.generationCancelled;
+  };
+
+  shouldRefetchImages = () => {
+    const { is3D, size } = this.props;
+    return is3D || size.width !== DEFAULT_IMAGE_DIMENSION || size.height !== DEFAULT_IMAGE_DIMENSION;
+  };
+
+  refetchImages = async (images, size) => {
+    const { mapBounds, aoi, auth, showBorders } = this.props;
     let resolvedCounter = 0;
 
-    return await Promise.all(
+    const imageUrls = await Promise.all(
       images.map(async (image) => {
         if (!this.shouldRefetchImages()) {
           return image.url;
@@ -604,7 +867,7 @@ class Timelapse extends Component {
         let response = await fetchTimelapseImage({
           layer: image.layer,
           datasetId: image.datasetId,
-          bounds: getTimelapseBounds(pixelBounds, zoom, aoi),
+          bounds: getTimelapseBounds(mapBounds, aoi),
           fromTime: image.fromTime,
           toTime: image.toTime,
           width: size.width,
@@ -624,10 +887,12 @@ class Timelapse extends Component {
         return response && response.url;
       }),
     );
+
+    return imageUrls;
   };
 
-  encodeImages = async (imageUrls) => {
-    const { transition, datasetId, timelapseFPS, size, format, fadeDuration } = this.props;
+  encodeImages = async (imageUrls, size) => {
+    const { transition, datasetId, timelapseFPS, format, fadeDuration } = this.props;
 
     if (format === EXPORT_FORMAT.gif && transition === TRANSITION.none) {
       return generateTimelapseWithGifshot({
@@ -662,7 +927,9 @@ class Timelapse extends Component {
       progress = percent * 0.5 + (isFetch ? 0 : 0.5);
     }
 
-    this.setState({ generatingTimelapseProgress: progress });
+    this.setState({
+      generatingTimelapseProgress: progress,
+    });
   };
 
   onSidebarPopupToggle = (content) => {
@@ -728,6 +995,10 @@ class Timelapse extends Component {
     this.setState({ errorMessage });
   };
 
+  updateDelayLastFrame = (delayLastFrame) => {
+    store.dispatch(timelapseSlice.actions.setDelayLastFrame(delayLastFrame));
+  };
+
   render() {
     const {
       images,
@@ -766,6 +1037,8 @@ class Timelapse extends Component {
       size,
       format,
       fadeDuration,
+      delayLastFrame,
+      is3D,
     } = this.props;
 
     let { minDate, maxDate } = getMinMaxDates(datasetId);
@@ -858,6 +1131,7 @@ class Timelapse extends Component {
                     toggleAllImagesSelected={this.toggleAllImagesSelected}
                     setImageToActive={this.setImageToActive}
                     toggleShowBorders={this.toggleShowBorders}
+                    is3D={is3D}
                   />
                   {sidebarPopup === 'pins' ? (
                     <TimelapseSidebarPins
@@ -902,6 +1176,10 @@ class Timelapse extends Component {
               updateFadeDuration={this.updateFadeDuration}
               searchDatesAndFetchImages={this.searchDatesAndFetchImages}
               showErrorMessage={this.showErrorMessage}
+              delayLastFrame={delayLastFrame}
+              updateDelayLastFrame={this.updateDelayLastFrame}
+              is3D={is3D}
+              setGenerationCancelled={this.setGenerationCancelled}
             />
           </div>
         </div>
@@ -914,6 +1192,7 @@ const mapStoreToProps = (store) => ({
   zoom: store.mainMap.zoom,
   visualizationToTime: store.visualization.toTime,
   pixelBounds: store.mainMap.pixelBounds,
+  mapBounds: store.mainMap.bounds,
   aoi: store.aoi,
   datasetId: store.visualization.datasetId,
   layerId: store.visualization.layerId,
@@ -955,7 +1234,11 @@ const mapStoreToProps = (store) => ({
   pins: store.timelapse.pins,
   size: store.timelapse.size,
   format: store.timelapse.format,
+  terrainViewerSettings: store.terrainViewer.settings,
+  terrainViewerId: store.terrainViewer.id,
+  is3D: store.mainMap.is3D,
   fadeDuration: store.timelapse.fadeDuration,
+  delayLastFrame: store.timelapse.delayLastFrame,
 });
 
 export default connect(mapStoreToProps, null)(Timelapse);

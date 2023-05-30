@@ -124,6 +124,7 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
   ];
 
   initializeDatasets(layers, url, preselected) {
+    this.datasets = [];
     this.knownDatasets.forEach((ds) => {
       if (layers.find((l) => l.dataset === ds.shDataset)) {
         this.datasets.push(ds.datasetId);
@@ -206,6 +207,9 @@ export default class LandsatDataSourceHandler extends DataSourceHandler {
 
     datasets.forEach((datasetId) => {
       let searchLayer = this.allLayers.find((l) => l.dataset === this.getSentinelHubDataset(datasetId));
+      if (!searchLayer) {
+        return;
+      }
       searchLayer.maxCloudCoverPercent = maxCC;
 
       const ff = new FetchingFunction(

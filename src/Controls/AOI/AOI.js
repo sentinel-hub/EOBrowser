@@ -15,23 +15,12 @@ import {
   datasetHasAnyFISLayer,
   getDatasetLabel,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
-
-function boundsToGeoJSON(bounds) {
-  return {
-    geometry: {
-      type: 'Polygon',
-      coordinates: [
-        [
-          [bounds._southWest.lng, bounds._southWest.lat],
-          [bounds._northEast.lng, bounds._southWest.lat],
-          [bounds._northEast.lng, bounds._northEast.lat],
-          [bounds._southWest.lng, bounds._northEast.lat],
-          [bounds._southWest.lng, bounds._southWest.lat],
-        ],
-      ],
-    },
-  };
-}
+import {
+  appendPolygon,
+  getGeoJSONFromLeafletBounds,
+  getLeafletBoundsFromGeoJSON,
+} from '../../utils/geojson.utils';
+import { UPLOAD_GEOMETRY_TYPE } from '../../junk/EOBUploadGeoFile/EOBUploadGeoFile.utils';
 
 class AOI extends Component {
   state = {
@@ -47,8 +36,14 @@ class AOI extends Component {
     map.on('pm:create', (e) => {
       if (e.shape && e.shape === this.props.aoiShape) {
         // e.layer.toGeoJSON() is a GeoJSON Feature, we convert it to a GeoJSON geometry type
-        const geometry = e.layer.toGeoJSON().geometry;
-        store.dispatch(aoiSlice.actions.set({ geometry: geometry, bounds: e.layer.getBounds() }));
+        let geometry = e.layer.toGeoJSON().geometry;
+        if (this.props.aoiGeometry) {
+          geometry = appendPolygon(this.props.aoiGeometry, geometry);
+        }
+
+        store.dispatch(
+          aoiSlice.actions.set({ geometry: geometry, bounds: getLeafletBoundsFromGeoJSON(geometry) }),
+        );
         this.props.map.removeLayer(e.layer);
         this.enableEdit();
       }
@@ -57,7 +52,7 @@ class AOI extends Component {
 
   componentDidUpdate(prevProps) {
     if (!!this.props.aoiIsDrawing && !prevProps.aoiIsDrawing) {
-      this.onStartDrawingPolygon();
+      this.onStartDrawingPolygon(this.props.aoiShape);
     }
 
     if (!this.props.aoiIsDrawing && prevProps.aoiIsDrawing) {
@@ -94,24 +89,26 @@ class AOI extends Component {
 
       // aoiGeojson is a GeoJSON Feature or FeatureCollection, we convert it to a GeoJSON geometry type
       const geometry = aoiGeojson.geometry || aoiGeojson.features[0].geometry;
-      store.dispatch(aoiSlice.actions.set({ geometry: geometry, bounds: layer.getBounds() }));
+      store.dispatch(
+        aoiSlice.actions.set({ geometry: geometry, bounds: getLeafletBoundsFromGeoJSON(geometry) }),
+      );
       this.enableEdit();
     });
   };
 
-  onStartDrawingPolygon = () => {
+  onStartDrawingPolygon = (shape) => {
     let map = this.props.map;
     this.setState({
       drawingInProgress: true,
     });
-    map.pm.enableDraw(this.props.aoiShape, {
+    map.pm.enableDraw(shape, {
       finishOn: 'contextmenu',
       allowSelfIntersection: false,
     });
   };
 
   onResetAoi = () => {
-    this.props.map.pm.disableDraw(this.props.aoiShape);
+    this.props.map.pm.disableDraw();
     if (this.AOILayerRef) {
       this.props.map.removeLayer(this.AOILayerRef);
       this.AOILayerRef = null;
@@ -143,6 +140,7 @@ class AOI extends Component {
     const layer = L.geoJSON(geometry);
     store.dispatch(aoiSlice.actions.set({ geometry, bounds: layer.getBounds() }));
     this.props.map.fitBounds(layer.getBounds());
+    this.enableEdit();
   };
 
   openFISPanel = () => {
@@ -171,7 +169,7 @@ class AOI extends Component {
       this.props.mapBounds && this.state.drawingInProgress
         ? this.props.aoiGeometry
           ? this.props.aoiGeometry
-          : boundsToGeoJSON(this.props.mapBounds)
+          : getGeoJSONFromLeafletBounds(this.props.mapBounds)
         : null;
     return (
       <div
@@ -183,10 +181,14 @@ class AOI extends Component {
         <EOBAOIPanelButton
           disabled={false}
           aoiBounds={selectedBounds}
+          aoiGeometry={this.props.aoiGeometry}
           isAoiClip={this.state.drawingInProgress}
-          onDrawShape={(shape) =>
-            store.dispatch(aoiSlice.actions.startDrawing({ isDrawing: true, shape: shape }))
-          }
+          onDrawShape={(shape) => {
+            if (this.props.aoiIsDrawing) {
+              this.onStartDrawingPolygon(shape);
+            }
+            store.dispatch(aoiSlice.actions.startDrawing({ isDrawing: true, shape: shape }));
+          }}
           resetAoi={this.onResetAoi}
           centerOnFeature={this.centerMapOnFeature}
           onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
@@ -195,11 +197,13 @@ class AOI extends Component {
           selectedResult={this.generateSelectedResult()}
           presetLayerName={'True color'} // TO DO
           fisShadowLayer={true}
+          datasetId={this.props.datasetId}
         />
         {this.state.uploadDialog && (
           <EOBUploadGeoFile
             onUpload={this.onFileUpload}
             onClose={() => this.setState({ uploadDialog: false })}
+            type={UPLOAD_GEOMETRY_TYPE.POLYGON}
           />
         )}
       </div>

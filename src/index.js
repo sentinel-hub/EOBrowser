@@ -23,19 +23,18 @@ ReactDOM.render(
       <LanguageProvider>
         <DndProvider options={HTML5toTouch}>
           <AuthProvider>
-            <EnsureTermsPrivacy>
-              <URLParamsParser>
-                {(themeId, sharedPinsListId) => (
-                  <ThemesProvider themeIdFromUrlParams={themeId}>
-                    <GoogleAPIProvider>
-                      {({ googleAPI }) => (
-                        <App sharedPinsListIdFromUrlParams={sharedPinsListId} googleAPI={googleAPI} />
-                      )}
-                    </GoogleAPIProvider>
-                  </ThemesProvider>
-                )}
-              </URLParamsParser>
-            </EnsureTermsPrivacy>
+            <URLParamsParser>
+              {(themeId, sharedPinsListId) => (
+                <ThemesProvider themeIdFromUrlParams={themeId}>
+                  <GoogleAPIProvider>
+                    {({ googleAPI }) => (
+                      <App sharedPinsListIdFromUrlParams={sharedPinsListId} googleAPI={googleAPI} />
+                    )}
+                  </GoogleAPIProvider>
+                </ThemesProvider>
+              )}
+            </URLParamsParser>
+            <EnsureTermsPrivacy></EnsureTermsPrivacy>
           </AuthProvider>
         </DndProvider>
       </LanguageProvider>

@@ -13,6 +13,7 @@ export default class Landsat45AWSDataSourceHandler extends LandsatDataSourceHand
   datasource = DATASOURCES.AWS_LANDSAT45;
   searchGroupLabel = 'Landsat 4-5 TM';
   searchGroupKey = 'landsat45-aws';
+  preselectedDatasets = new Set([AWS_LTML2]);
   datasetSearchLabels = {
     [AWS_LTML1]: t`Level 1`,
     [AWS_LTML2]: t`Level 2`,

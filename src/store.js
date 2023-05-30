@@ -13,6 +13,7 @@ import {
   SEARCH_PANEL_TABS,
 } from './const';
 import { DEMInstanceType } from '@sentinel-hub/sentinelhub-js';
+import { COMPARE_SPLIT } from './Tools/ComparePanel/ComparePanel';
 
 export const aoiSlice = createSlice({
   name: 'aoi',
@@ -36,6 +37,27 @@ export const aoiSlice = createSlice({
     },
     clearMap: (state, action) => {
       state.clearMap = action.payload;
+    },
+  },
+});
+
+export const loiSlice = createSlice({
+  name: 'loi',
+  initialState: {
+    geometry: null,
+    bounds: null,
+    lastEdited: null,
+  },
+  reducers: {
+    set: (state, action) => {
+      state.geometry = action.payload.geometry;
+      state.bounds = action.payload.bounds;
+      state.lastEdited = new Date().toISOString();
+    },
+    reset: (state) => {
+      state.geometry = null;
+      state.bounds = null;
+      state.lastEdited = null;
     },
   },
 });
@@ -608,6 +630,7 @@ export const tabsSlice = createSlice({
 export const compareLayersSlice = createSlice({
   name: 'compare',
   initialState: {
+    compareMode: COMPARE_SPLIT,
     comparedLayers: [],
     comparedOpacity: [],
     comparedClipping: [],
@@ -620,6 +643,9 @@ export const compareLayersSlice = createSlice({
       state.newCompareLayersCount = state.newCompareLayersCount + 1;
       state.comparedOpacity = [1.0, ...state.comparedOpacity];
       state.comparedClipping = [[0, 1], ...state.comparedClipping];
+    },
+    setCompareMode: (state, action) => {
+      state.compareMode = action.payload;
     },
     setComparedLayers: (state, action) => {
       state.comparedLayers = action.payload;
@@ -682,6 +708,12 @@ export const compareLayersSlice = createSlice({
       const newComparedClipping = [...state.comparedClipping];
       newComparedClipping.splice(index, 1);
       state.comparedClipping = newComparedClipping;
+    },
+    restoreComparedLayers: (state, action) => {
+      state.comparedLayers = action.payload.layers.map((l) => ({ id: uuid(), ...l }));
+      state.compareMode = action.payload.compareMode;
+      state.comparedOpacity = action.payload.comparedOpacity;
+      state.comparedClipping = action.payload.comparedClipping;
     },
   },
 });
@@ -766,6 +798,7 @@ export const timelapseSlice = createSlice({
     size: null,
     format: EXPORT_FORMAT.gif,
     fadeDuration: 0.5,
+    delayLastFrame: false,
   },
   reducers: {
     set: (state, action) => {
@@ -793,6 +826,7 @@ export const timelapseSlice = createSlice({
       state.size = null;
       state.format = EXPORT_FORMAT.gif;
       state.fadeDuration = 0.5;
+      state.delayLastFrame = false;
     },
     toggleTimelapseAreaPreview: (state) => {
       state.displayTimelapseAreaPreview = !state.displayTimelapseAreaPreview;
@@ -801,8 +835,8 @@ export const timelapseSlice = createSlice({
       state.displayTimelapseAreaPreview = action.payload;
     },
     setInitialTime: (state, action) => {
-      state.fromTime = action.payload.clone().subtract(1, 'month');
-      state.toTime = action.payload.clone();
+      state.fromTime = action.payload.time.clone().subtract(1, action.payload.interval);
+      state.toTime = action.payload.time.clone();
     },
     setFromTime: (state, action) => {
       state.fromTime = action.payload;
@@ -856,6 +890,9 @@ export const timelapseSlice = createSlice({
     },
     setFadeDuration: (state, action) => {
       state.fadeDuration = action.payload;
+    },
+    setDelayLastFrame: (state, action) => {
+      state.delayLastFrame = action.payload;
     },
   },
 });
@@ -931,8 +968,40 @@ export const commercialDataSlice = createSlice({
   },
 });
 
+export const spectralExplorerSlice = createSlice({
+  name: 'spectralExplorer',
+  initialState: {
+    selectedSeries: {},
+  },
+  reducers: {
+    setSelectedSeries: (state, action) => {
+      const { datasetId, series } = action.payload;
+      state.selectedSeries = { ...state.selectedSeries, [datasetId]: series };
+    },
+    reset: (state) => {
+      state.series = {};
+    },
+  },
+});
+
+export const elevationProfileSlice = createSlice({
+  name: 'elevationProfile',
+  initialState: {
+    highlightedPoint: null,
+  },
+  reducers: {
+    setHighlightedPoint: (state, action) => {
+      state.highlightedPoint = action.payload.geometry;
+    },
+    reset: (state) => {
+      state.highlightedPoint = null;
+    },
+  },
+});
+
 const reducers = combineReducers({
   aoi: aoiSlice.reducer,
+  loi: loiSlice.reducer,
   poi: poiSlice.reducer,
   mainMap: mainMapSlice.reducer,
   notification: notificationSlice.reducer,
@@ -949,6 +1018,8 @@ const reducers = combineReducers({
   index: indexSlice.reducer,
   terrainViewer: terrainViewerSlice.reducer,
   commercialData: commercialDataSlice.reducer,
+  spectralExplorer: spectralExplorerSlice.reducer,
+  elevationProfile: elevationProfileSlice.reducer,
 });
 
 const store = configureStore({

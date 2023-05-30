@@ -25,6 +25,7 @@ Note that because the code relies on a specific SentinelHub clientId which is no
 * Run `npm run build` to build the application sources
 * Run `npm run translate` to add strings to the translation files
 * Run `npm run debug-translations` to replace all translation strings with "XXXXXX"
+* Run `npm run update-previews` to create layer preview images
 
 ## Multilanguage support
 
@@ -39,7 +40,9 @@ Your language is missing and you want to help to translate it? Contact us at inf
 - German: ESERO Austria/ESERO Germany
 - Greek: [GET](https://www.getmap.eu/?lang=en)
 - Latvian: Valters Žeižis
-- Polish: ESERO Poland
+- Polish: [ESERO Poland](https://esero.kopernik.org.pl/)/[Copernicus Science Centre](https://www.kopernik.org.pl/)
+- Portuguese: [ESERO Portugal](https://www.esero.pt/)
 - Slovenian: Krištof Oštir ([Faculty of Civil and Geodetic Engineering](https://www.en.fgg.uni-lj.si/), University of Ljubljana) with financial support from the Slovenian Research Agency research core funding No. P2-0406 Earth observation and geoinformatics
 - Spanish: ESERO Spain
 - Swedish: [Heureka - The Finnish Science Centre](https://www.heureka.fi/about-heureka/?lang=en)
+- Ukrainian: [GIS & RS laboratory of Junior Academy of Sciences of Ukraine](https://man.gov.ua/en/)

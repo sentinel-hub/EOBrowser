@@ -21,7 +21,7 @@ const EnvisatTooltip = () => {
   return (
     <div>
       <div className="data-source-group-tooltip-description">
-        <ReactMarkdown source={getMarkdown()} />
+        <ReactMarkdown source={getMarkdown()} linkTarget="_blank" />
       </div>
       <div className="data-source-group-tooltip-credits">
         <div>{t`Credits:`}</div>

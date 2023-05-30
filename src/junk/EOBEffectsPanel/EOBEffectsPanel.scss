@@ -140,7 +140,7 @@
     /* stylelint-enable */
   }
 
-  @media screen and (max-width: 400px) {
+  @media screen and (max-width: $breakpoint-400) {
     .effect-container {
       flex-direction: column;
       padding-bottom: 20px;

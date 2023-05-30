@@ -27,8 +27,26 @@ import {
   isEffectRangeSetAndNotDefault,
 } from '../../utils/effectsUtils';
 import { getLayerFromParams } from '../../Controls/ImgDownload/ImageDownload.utils';
+import {
+  S3OLCI,
+  S3SLSTR,
+  S5_AER_AI,
+  S5_CH4,
+  S5_CLOUD,
+  S5_CO,
+  S5_HCHO,
+  S5_NO2,
+  S5_O3,
+  S5_OTHER,
+  S5_SO2,
+} from '../SearchPanel/dataSourceHandlers/dataSourceConstants';
 
 const PINS_LC_NAME = 'eob-pins';
+
+const SH_SERVICE_HOSTNAMES_V3 = {
+  SERVICES: 'https://services.sentinel-hub.com/',
+  CREODIAS: 'https://creodias.sentinel-hub.com/',
+};
 
 // check if the pin was already converted by this version of EOB3
 const needsConversion = (pin) => {
@@ -377,12 +395,18 @@ export function getPinsFromSessionStorage() {
   return establishCorrectDataFusionFormatInPins(formattedPins);
 }
 
-export async function createShareLink(pins) {
+export async function saveSharedPinsToServer(pins) {
   const url = `${process.env.REACT_APP_EOB_BACKEND}sharedpins`;
   const { data } = await axios.post(url, {
     items: pins,
   });
-  return `${process.env.REACT_APP_ROOT_URL}?sharedPinsListId=${data.id}`;
+
+  return data.id;
+}
+
+export async function createShareLink(pins) {
+  const sharedPinsListId = await saveSharedPinsToServer(pins);
+  return `${process.env.REACT_APP_ROOT_URL}?sharedPinsListId=${sharedPinsListId}`;
 }
 
 export async function getSharedPins(sharedPinsListId) {
@@ -479,7 +503,9 @@ export async function importSharedPins(sharedPinsListId) {
 
 // Creates a sentinelhub-js Layer instance from the pin. Known limitation:
 export async function layerFromPin(pin, reqConfig) {
-  const { datasetId, visualizationUrl, layerId, evalscript, evalscripturl, dataFusion } = pin;
+  const { datasetId, layerId, evalscript, evalscripturl, dataFusion } = pin;
+
+  const visualizationUrl = getVisualizationUrl(pin);
 
   const dsh = getDataSourceHandler(datasetId);
   const shJsDataset = dsh ? dsh.getSentinelHubDataset(datasetId) : null;
@@ -510,6 +536,30 @@ export async function layerFromPin(pin, reqConfig) {
   }
   return layer;
 }
+
+export const getVisualizationUrl = ({ visualizationUrl, datasetId }) => {
+  // historically some S3 and S5P datasets were configured with 'services' hostnames. we're trying to fix this here now
+  if (isS3orS5(datasetId)) {
+    return visualizationUrl.replace(SH_SERVICE_HOSTNAMES_V3.SERVICES, SH_SERVICE_HOSTNAMES_V3.CREODIAS);
+  }
+  return visualizationUrl;
+};
+
+export const isS3orS5 = (datasetId) => {
+  return [
+    S5_O3,
+    S5_NO2,
+    S5_SO2,
+    S5_CO,
+    S5_HCHO,
+    S5_CH4,
+    S5_AER_AI,
+    S5_CLOUD,
+    S5_OTHER,
+    S3OLCI,
+    S3SLSTR,
+  ].includes(datasetId);
+};
 
 export const isOnEqualDate = (date1, date2) => {
   const date1Moment = moment.utc(date1);

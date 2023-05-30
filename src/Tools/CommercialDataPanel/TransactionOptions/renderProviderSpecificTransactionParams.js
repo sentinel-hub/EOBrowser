@@ -98,6 +98,52 @@ const renderPlanetScopeTransactionParams = (
   );
 };
 
+const renderPlanetSkySatTransactionParams = (
+  actionInProgress,
+  searchParams,
+  transactionOptions,
+  setTransactionOptions,
+) => {
+  return (
+    <>
+      <div className="row">
+        <label title={t`Harmonize to`}>{t`Harmonize to`}</label>
+        <div>
+          <select
+            className="dropdown"
+            disabled={
+              !!actionInProgress ||
+              !isPlanetHarmonizationSupported(searchParams.itemType, searchParams.productBundle)
+            }
+            value={transactionOptions.harmonizeTo}
+            onChange={(e) => {
+              setTransactionOptions({ ...transactionOptions, harmonizeTo: e.target.value });
+            }}
+          >
+            <option key={PlanetScopeHarmonization.NONE} value={PlanetScopeHarmonization.NONE}>
+              {PlanetScopeHarmonization.NONE}
+            </option>
+          </select>
+          <OrderInputTooltip inputId="harmonizeData" />
+        </div>
+      </div>
+      <div className="row">
+        <label title={t`Planet API Key`}>{t`Planet API Key`}</label>
+        <div>
+          <input
+            type="text"
+            disabled={!!actionInProgress}
+            defaultValue={transactionOptions.planetApiKey}
+            onChange={(e) => setTransactionOptions({ ...transactionOptions, planetApiKey: e.target.value })}
+            placeholder={t`Your Planet API key`}
+          ></input>
+          <OrderInputTooltip inputId="planetApiKey" />
+        </div>
+      </div>
+    </>
+  );
+};
+
 export const renderProviderSpecificTransactionParams = (
   dataProvider,
   { actionInProgress, searchParams, transactionOptions, setTransactionOptions },
@@ -105,6 +151,13 @@ export const renderProviderSpecificTransactionParams = (
   switch (dataProvider) {
     case TPDICollections.PLANET_SCOPE:
       return renderPlanetScopeTransactionParams(
+        actionInProgress,
+        searchParams,
+        transactionOptions,
+        setTransactionOptions,
+      );
+    case TPDICollections.PLANET_SKYSAT:
+      return renderPlanetSkySatTransactionParams(
         actionInProgress,
         searchParams,
         transactionOptions,

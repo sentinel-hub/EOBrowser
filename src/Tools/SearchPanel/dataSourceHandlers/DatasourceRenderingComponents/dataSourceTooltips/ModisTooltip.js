@@ -12,7 +12,7 @@ observation of land (bands 1-7).
 
 **Revisit time:** Global coverage in 1 – 2 days with both Aqua and Terra satellites.
 
-**Data availability:** Since January 2013.
+**Data availability:** From January 2013 to February 2023.
 
 **Common usage:** Monitoring of land, clouds, ocean colour at a global scale.
 `;

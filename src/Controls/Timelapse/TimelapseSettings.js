@@ -15,10 +15,13 @@ export default function TimelapseSettings({
   updateFormat,
   updateFadeDuration,
   toggleDownloadPanel,
+  delayLastFrame,
+  updateDelayLastFrame,
 }) {
   const [localSize, setLocalSize] = useState(size);
   const [localFormat, setLocalFormat] = useState(format);
   const [localFadeDuration, setLocalFadeDuration] = useState(fadeDuration);
+  const [checkedDelayLastFrame, setCheckedDelayLastFrame] = useState(delayLastFrame);
 
   function onUpdateWidth(width) {
     setLocalSize({ ...localSize, width, height: Math.round(width / size.ratio) });
@@ -28,11 +31,16 @@ export default function TimelapseSettings({
     setLocalSize({ ...localSize, width: Math.round(height * size.ratio), height });
   }
 
+  function handleDelayLastFrameChange() {
+    setCheckedDelayLastFrame(!checkedDelayLastFrame);
+  }
+
   function onSaveButtonClick() {
     updateSize(localSize);
     updateFormat(localFormat);
     updateFadeDuration(localFadeDuration);
     toggleDownloadPanel(false);
+    updateDelayLastFrame(checkedDelayLastFrame);
   }
 
   return (
@@ -40,11 +48,14 @@ export default function TimelapseSettings({
       className="settings"
       visible={true}
       customStyles={{
-        width: '350px',
+        width: '380px',
         height: 'auto',
         bottom: 'auto',
         top: '50%',
         transform: 'translateY(-50%)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
       }}
       onClose={() => toggleDownloadPanel(false)}
     >
@@ -96,6 +107,15 @@ export default function TimelapseSettings({
             setValue={setLocalFadeDuration}
           />
           <span className="unit">[0.1-1]</span>
+        </div>
+        <div className={'settings-row'}>
+          <label className="label">{t`Delay last frame`}:</label>
+          <input
+            className={'delay-last-image-checkbox'}
+            type="checkbox"
+            checked={checkedDelayLastFrame}
+            onChange={handleDelayLastFrameChange}
+          />
         </div>
         <div className="settings-row">
           <label className="label">{t`Format`}:</label>

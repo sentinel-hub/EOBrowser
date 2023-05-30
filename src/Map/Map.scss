@@ -27,7 +27,7 @@
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
   }
 
-  @media (max-width: 1200px) {
+  @media (max-width: $breakpoint-1200) {
     .maptiler-logo {
       bottom: 25px;
     }
@@ -37,7 +37,7 @@
     }
   }
 
-  @media (max-width: 890px) {
+  @media (max-width: $breakpoint-890) {
     .maptiler-logo {
       bottom: 48px;
     }
@@ -47,7 +47,7 @@
     }
   }
 
-  @media (max-width: 400px) {
+  @media (max-width: $breakpoint-400) {
     .maptiler-logo {
       bottom: 46px;
     }
@@ -60,7 +60,7 @@
         color: #fff;
         border-radius: 0;
         border: none;
-        margin-right: 110px;
+        margin-right: 60px;
         box-shadow: $boxShadow;
 
         .leaflet-control-layers-toggle {
@@ -116,7 +116,7 @@
 
 .search-box-wrapper {
   position: absolute;
-  right: 160px;
+  right: 310px;
   top: 10px;
   display: flex;
   align-items: center;
@@ -132,6 +132,10 @@
   color: white;
   z-index: 500;
 
+  @media (max-width: $breakpoint-700) {
+    right: 160px;
+  }
+
   &.position-with-3d {
     right: 60px;
   }
@@ -140,6 +144,7 @@
 /* stylelint-disable */
 .poi-wrapper > .poiPanel,
 .aoi-wrapper > .aoiPanel,
+.loi-wrapper > .loiPanel,
 .measure-wrapper > .measurePanel,
 .timelapse-wrapper > .timelapsePanelButton {
   z-index: 400;

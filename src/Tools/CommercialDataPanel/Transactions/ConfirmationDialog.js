@@ -4,6 +4,7 @@ import { EOBButton } from '../../../junk/EOBCommon/EOBButton/EOBButton';
 import { t } from 'ttag';
 
 import './ConfirmationDialog.scss';
+import { NotificationPanel } from '../../../Notification/NotificationPanel';
 
 export const ConfirmationDialog = (confirmAction, setConfirmAction) => {
   return (
@@ -22,6 +23,7 @@ export const ConfirmationDialog = (confirmAction, setConfirmAction) => {
             <div key={index}>{messageLine}</div>
           ))}
         </div>
+        {confirmAction.warning && <NotificationPanel msg={confirmAction.warning()} />}
         <div className="buttons">
           <EOBButton text={t`OK`} onClick={confirmAction.action}></EOBButton>
           {!!confirmAction.showCancel && (

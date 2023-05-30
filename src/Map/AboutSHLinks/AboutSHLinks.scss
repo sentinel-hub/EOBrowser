@@ -26,13 +26,13 @@
     }
   }
 
-  @media screen and (max-width: 940px) {
+  @media screen and (max-width: $breakpoint-940) {
     #about-sh-links {
       font-size: 10px;
     }
   }
 
-  @media screen and (max-width: 890px) {
+  @media screen and (max-width: $breakpoint-890) {
     #about-sh-links {
       transform: translateX(0);
       left: 0;

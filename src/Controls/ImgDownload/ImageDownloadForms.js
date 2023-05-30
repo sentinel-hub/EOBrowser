@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
-import { CRS_EPSG4326, CRS_EPSG3857 } from '@sentinel-hub/sentinelhub-js';
+import React from 'react';
+import { CRS_EPSG3857, CRS_EPSG4326 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
 
 import BasicForm from './BasicForm';
 import AnalyticalForm from './AnalyticalForm';
 import PrintForm from './PrintForm';
 import TerrainViewerForm from './TerrainViewerForm';
-import { IMAGE_FORMATS } from './consts';
+import { IMAGE_FORMATS, RESOLUTION_OPTIONS, RESOLUTION_DIVISORS, AVAILABLE_CRS } from './consts';
 import { EOBButton } from '../../junk/EOBCommon/EOBButton/EOBButton';
-import { getDimensionsInMeters } from './ImageDownload.utils';
+import { constructBBoxFromBounds, getDimensionsInMeters, getImageDimensions } from './ImageDownload.utils';
 import store, { notificationSlice } from '../../store';
+import { MAX_SH_IMAGE_SIZE } from '../../const';
+import { getUtmCrsFromBbox } from '../../utils/utm';
+import ImageDownloadPreview from './ImageDownloadPreview';
+import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
 export const TABS = {
   BASIC: 'basic',
@@ -18,76 +22,83 @@ export const TABS = {
   TERRAIN_VIEWER: '3d',
 };
 
+function checkZoomLevel(datasetId, zoom) {
+  const dsh = getDataSourceHandler(datasetId);
+  if (dsh) {
+    const leafletZoomConfig = dsh.getLeafletZoomConfig(datasetId);
+    return (
+      leafletZoomConfig &&
+      leafletZoomConfig.min !== null &&
+      leafletZoomConfig.min !== undefined &&
+      zoom >= leafletZoomConfig.min
+    );
+  }
+  return false;
+}
+
 export function ImageDownloadForms(props) {
-  const [basicFormState, setBasicFormState] = useState({
-    showLegend: false,
-    showCaptions: true,
-    userDescription: '',
-    addMapOverlays: true,
-    imageFormat: IMAGE_FORMATS.JPG,
-  });
-  const [analyticalFormState, setAnalyticalFormState] = useState({
-    imageFormat: IMAGE_FORMATS.JPG,
-    selectedCrs: props.hasAOI ? CRS_EPSG4326.authId : CRS_EPSG3857.authId,
-    showLogo: props.allowShowLogoAnalytical,
-    resolutionDivisor: 2,
-    selectedLayers: props.currentLayerId ? [props.currentLayerId] : [],
-    selectedBands: [],
-    customSelected: props.isCurrentLayerCustom,
-    addDataMask: false,
-    clipExtraBandsTiff: true,
-  });
-  const [printFormState, setPrintFormState] = useState({
-    showCaptions: true,
-    showLegend: false,
-    userDescription: '',
-    imageFormat: IMAGE_FORMATS.JPG,
-    resolutionDpi: 300,
-    imageWidthInches: 33.1,
-  });
-  const [terrainViewerFormState, setTerrainViewerFormState] = useState({
-    showLegend: false,
-    showCaptions: true,
-    userDescription: '',
-    imageFormat: IMAGE_FORMATS.JPG,
-    width: props.defaultWidth,
-    height: props.defaultHeight,
-  });
+  const {
+    selectedTab,
+    hasLegendData,
+    loading,
+    allLayers,
+    allBands,
+    isCurrentLayerCustom,
+    supportedImageFormats,
+    addingMapOverlaysPossible,
+    defaultWidth,
+    defaultHeight,
+    isDataFusionEnabled,
+    allowShowLogoAnalytical,
+    areEffectsSet,
+    hasAoi,
+    aoiBounds,
+    mapBounds,
+    isUserLoggedIn,
+    basicFormState,
+    analyticalFormState,
+    printFormState,
+    terrainViewerFormState,
+    updateFormData,
+    updateSelectedBands,
+    updateSelectedLayers,
+    setBasicFormState,
+    setAnalyticalFormState,
+    setPrintFormState,
+    setTerrainViewerFormState,
+    datasetId,
+    zoom,
+  } = props;
 
-  function updateSelectedLayers(layers) {
-    setAnalyticalFormState({
-      ...analyticalFormState,
-      selectedLayers: layers,
-    });
-  }
-
-  function updateSelectedBands(bands) {
-    setAnalyticalFormState({
-      ...analyticalFormState,
-      selectedBands: bands,
-    });
-  }
-
-  function updateFormData(field, newValue, setState) {
-    setState((prevState) => ({
-      ...prevState,
-      [field]: newValue,
-    }));
-  }
+  const bounds = hasAoi ? aoiBounds : mapBounds;
+  const { width: imageWidth, height: imageHeight } = getImageSize();
 
   function onErrorMessage(message) {
     store.dispatch(notificationSlice.actions.displayError(message));
   }
 
-  function renderImageSize(resolutionDivisor) {
+  function getImageSize() {
+    const { selectedCrs, customResolution, selectedResolution } = analyticalFormState;
+
+    if (selectedResolution === RESOLUTION_OPTIONS.CUSTOM) {
+      return getImageDimensions(bounds, customResolution, selectedCrs);
+    }
+
     const { defaultWidth, defaultHeight } = props;
-    return `${Math.floor(defaultWidth / resolutionDivisor)} x ${Math.floor(
-      defaultHeight / resolutionDivisor,
-    )} px`;
+    const resolutionDivisor = RESOLUTION_DIVISORS[selectedResolution].value;
+    return {
+      width: Math.floor(defaultWidth / resolutionDivisor),
+      height: Math.floor(defaultHeight / resolutionDivisor),
+    };
   }
 
-  function renderCRSResolution(resolutionDivisor, selectedCrs) {
-    const { bounds, defaultWidth, defaultHeight } = props;
+  function renderImageSize() {
+    return `${imageWidth} x ${imageHeight} px`;
+  }
+
+  function renderCRSResolution(selectedResolution, selectedCrs) {
+    const { defaultWidth, defaultHeight } = props;
+    const resolutionDivisor = RESOLUTION_DIVISORS[selectedResolution].value;
     if (selectedCrs === CRS_EPSG4326.authId) {
       const widthDegrees = bounds.getEast() - bounds.getWest();
       const heightDegrees = bounds.getNorth() - bounds.getSouth();
@@ -113,7 +124,7 @@ export function ImageDownloadForms(props) {
         </div>
       );
     }
-    const { width } = getDimensionsInMeters(bounds);
+    const { width } = getDimensionsInMeters(bounds, selectedCrs);
     const resolution = (width * resolutionDivisor) / defaultWidth;
     const formattedResolution = resolution >= 2 ? Math.floor(resolution) : resolution.toFixed(1);
     return t`Projected resolution: ${formattedResolution} m/px`;
@@ -175,23 +186,15 @@ export function ImageDownloadForms(props) {
     return null;
   }
 
-  const {
-    selectedTab,
-    hasLegendData,
-    loading,
-    allLayers,
-    allBands,
-    isCurrentLayerCustom,
-    supportedImageFormats,
-    addingMapOverlaysPossible,
-    defaultWidth,
-    defaultHeight,
-    isDataFusionEnabled,
-    allowShowLogoAnalytical,
-    areEffectsSet,
-    hasAOI,
-    isUserLoggedIn,
-  } = props;
+  function getCrsOptions() {
+    const utmAuthId = getUtmCrsFromBbox(constructBBoxFromBounds(bounds));
+    const availableCrs = [
+      AVAILABLE_CRS[CRS_EPSG3857.authId],
+      AVAILABLE_CRS[CRS_EPSG4326.authId],
+      AVAILABLE_CRS[utmAuthId],
+    ];
+    return availableCrs;
+  }
 
   const isAnalyticalModeAndNothingSelected =
     selectedTab === TABS.ANALYTICAL &&
@@ -201,6 +204,12 @@ export function ImageDownloadForms(props) {
 
   const isAnalyticalModeAndLayersNotLoaded = selectedTab === TABS.ANALYTICAL && allLayers.length === 0;
 
+  const isAnalyticalModeAndOnlyRawBands =
+    analyticalFormState.selectedLayers.length === 0 &&
+    analyticalFormState.selectedBands.length > 0 &&
+    selectedTab === TABS.ANALYTICAL &&
+    !analyticalFormState.customSelected;
+
   const isDataFusionAndKMZSelected =
     selectedTab === TABS.ANALYTICAL &&
     isDataFusionEnabled &&
@@ -209,6 +218,23 @@ export function ImageDownloadForms(props) {
 
   const areEffectsSetAndFormatNotJpgPng =
     selectedTab === TABS.ANALYTICAL && areEffectsSet && !isJPGorPNG(analyticalFormState.imageFormat);
+
+  const areImageDimensionsValid =
+    selectedTab !== TABS.ANALYTICAL ||
+    (imageWidth <= MAX_SH_IMAGE_SIZE &&
+      imageHeight <= MAX_SH_IMAGE_SIZE &&
+      imageWidth >= 1 &&
+      imageHeight >= 1);
+
+  const isZoomLevelOK = checkZoomLevel(datasetId, zoom) || selectedTab === TABS.PRINT;
+
+  const disabledImagePreviewDownload =
+    isAnalyticalModeAndNothingSelected ||
+    isDataFusionAndKMZSelected ||
+    isAnalyticalModeAndLayersNotLoaded ||
+    areEffectsSetAndFormatNotJpgPng ||
+    !isZoomLevelOK ||
+    isAnalyticalModeAndOnlyRawBands;
 
   return (
     <div className="image-download-forms">
@@ -225,6 +251,7 @@ export function ImageDownloadForms(props) {
           onErrorMessage={onErrorMessage}
           isUserLoggedIn={isUserLoggedIn}
           isBasicForm={true}
+          hasAoi={hasAoi}
         />
       )}
       {selectedTab === TABS.ANALYTICAL && (
@@ -237,11 +264,13 @@ export function ImageDownloadForms(props) {
           allBands={allBands}
           isCurrentLayerCustom={isCurrentLayerCustom}
           renderImageSize={renderImageSize}
+          areImageDimensionsValid={areImageDimensionsValid}
           renderCRSResolution={renderCRSResolution}
           onErrorMessage={onErrorMessage}
           supportedImageFormats={supportedImageFormats}
           allowShowLogoAnalytical={allowShowLogoAnalytical}
-          hasAOI={hasAOI}
+          hasAoi={hasAoi}
+          getCrsOptions={getCrsOptions}
         />
       )}
       {selectedTab === TABS.PRINT && (
@@ -266,15 +295,29 @@ export function ImageDownloadForms(props) {
           isUserLoggedIn={isUserLoggedIn}
         />
       )}
+
+      {!disabledImagePreviewDownload && (
+        <ImageDownloadPreview
+          analyticalFormLayers={analyticalFormState.selectedLayers}
+          selectedTab={selectedTab}
+          hasAoi={hasAoi}
+          cropToAoi={selectedTab === TABS.BASIC ? basicFormState.cropToAoi : hasAoi}
+          drawAoiGeoToImg={selectedTab === TABS.BASIC ? basicFormState.drawAoiGeoToImg : false}
+          disabledDownload={disabledImagePreviewDownload}
+        />
+      )}
+
       <EOBButton
         fluid
         loading={loading}
         disabled={
           loading ||
+          !areImageDimensionsValid ||
           isAnalyticalModeAndNothingSelected ||
           isDataFusionAndKMZSelected ||
           isAnalyticalModeAndLayersNotLoaded ||
-          areEffectsSetAndFormatNotJpgPng
+          areEffectsSetAndFormatNotJpgPng ||
+          !isZoomLevelOK
         }
         onClick={() => onDownloadImage(selectedTab)}
         icon="download"

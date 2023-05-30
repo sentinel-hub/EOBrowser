@@ -18,6 +18,7 @@ import {
 } from './Tools/SearchPanel/dataSourceHandlers/dataSourceConstants.js';
 
 export const ModalId = {
+  ELEVATION_PROFILE: 'ElevationProfile',
   IMG_DOWNLOAD: 'ImgDownload',
   TIMELAPSE: 'Timelapse',
   FIS: 'FIS',
@@ -26,6 +27,7 @@ export const ModalId = {
   TERRAIN_VIEWER: 'TerrainViewer',
   PRIVATE_THEMEID_LOGIN: 'PrivateThemeIdLogin',
   TERMS_AND_PRIVACY_CONSENT: 'TermsAndPrivacy',
+  SPECTRAL_EXPLORER: 'SpectralExplorer',
 };
 
 export const MODE_THEMES_LIST = 'mode';
@@ -134,6 +136,15 @@ export const DEM_3D_CUSTOM_TO_DATASOURCE = {
   [DEMInstanceType.COPERNICUS_90]: DEM_COPERNICUS_90,
 };
 
+export const DEM_3D_MAX_ZOOM = {
+  [DEMInstanceType.MAPZEN]: 18,
+  NASA_ASTER_GDEM: 18,
+  [DEMInstanceType.COPERNICUS_30]: 14,
+  [DEMInstanceType.COPERNICUS_90]: 14,
+};
+
+export const DEFAULT_DEM_SOURCE = DEMInstanceType.MAPZEN;
+
 export const EQUATOR_LENGTH = 40075016.685578488;
 
 export const DATASOURCES = {
@@ -147,6 +158,7 @@ export const DATASOURCES = {
   AWS_LANDSAT8: 'Landsat8AWS',
   AWS_LANDSAT15: 'Landsat15AWS',
   AWS_LANDSAT45: 'Landsat45AWS',
+  AWS_HLS: 'HLSAWS',
   ENVISAT_MERIS: 'Envisat Meris',
   AWS_LANDSAT7_ETM: 'Landsat7ETMAWS',
   GIBS: 'GIBS',
@@ -191,7 +203,10 @@ export const defaultEffects = {
   demSource3D: DEMInstanceType.MAPZEN,
 };
 
-export const STATISTICS_MANDATORY_OUTPUTS = ['eobrowserStats', 'dataMask'];
+export const DATAMASK_OUTPUT = 'dataMask';
+export const EOBROWSERSTATS_OUTPUT = 'eobrowserStats';
+export const ALL_BANDS_OUTPUT = 'bands';
+export const STATISTICS_MANDATORY_OUTPUTS = [EOBROWSERSTATS_OUTPUT, DATAMASK_OUTPUT];
 
 export const LOCAL_STORAGE_PRIVACY_CONSENT_KEY = 'eobrowser-privacy-consent';
 
@@ -204,3 +219,6 @@ export const OrderType = {
   PRODUCTS: 'PRODUCTS',
   QUERY: 'QUERY',
 };
+
+export const FUNCTIONALITY_TEMPORARILY_UNAVAILABLE_MSG =
+  'This functionality is temporarily unavailable due to updates. Please try again later.';

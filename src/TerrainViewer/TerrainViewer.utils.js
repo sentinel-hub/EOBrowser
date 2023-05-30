@@ -4,6 +4,8 @@ import {
   MimeTypes,
   drawBlobOnCanvas,
   canvasToBlob,
+  BBox,
+  CRS_EPSG3857,
   DEMInstanceType,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
@@ -11,13 +13,17 @@ import L from 'leaflet';
 import proj4 from 'proj4';
 
 import { addImageOverlays, getTitle } from '../Controls/ImgDownload/ImageDownload.utils';
-import { getDataSourceHandler } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import { TERRAIN_VIEWER_IDS, setTerrainViewerId } from './TerrainViewer.const';
+import {
+  checkIfCustom,
+  getDataSourceHandler,
+} from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { findMatchingLayerMetadata } from '../Tools/VisualizationPanel/legendUtils';
 import store, { mainMapSlice, terrainViewerSlice } from '../store';
 import { wgs84ToMercator } from '../junk/EOBCommon/utils/coords';
-import { toRad } from '../junk/EOB3TimelapsePanel/timelapseUtils';
 import { getBoundsZoomLevel } from '../utils/coords';
-import { EQUATOR_LENGTH } from '../const';
+import { DEFAULT_DEM_SOURCE, DEM_3D_MAX_ZOOM, EQUATOR_LENGTH } from '../const';
+import { addLabelsAndLogos, dateTimeDisplayFormat } from '../Controls/Timelapse/Timelapse.utils';
 
 let mapTileRequestDelay = 1;
 const mapTileRequestList = [];
@@ -35,7 +41,7 @@ function mapTileRequestExecutor() {
   }
 }
 
-function getMapTileUrl(
+function getMapTileUrl({
   layer,
   params,
   minX,
@@ -47,9 +53,9 @@ function getMapTileUrl(
   callback,
   reqConfig,
   onTileError,
-) {
+}) {
   mapTileRequestList.push(() => {
-    getMapTileUrlInternal(
+    getMapTileUrlInternal({
       layer,
       params,
       minX,
@@ -61,7 +67,7 @@ function getMapTileUrl(
       callback,
       reqConfig,
       onTileError,
-    );
+    });
   });
 
   if (mapTileRequestTimerId == null) {
@@ -69,41 +75,7 @@ function getMapTileUrl(
   }
 }
 
-export function getMapTile(
-  layer,
-  getMapParams,
-  minX,
-  minY,
-  maxX,
-  maxY,
-  width,
-  height,
-  callback,
-  reqConfig,
-  onTileError,
-) {
-  mapTileRequestList.push(() => {
-    getMapTileUrlInternal(
-      layer,
-      getMapParams,
-      minX,
-      minY,
-      maxX,
-      maxY,
-      width,
-      height,
-      callback,
-      reqConfig,
-      onTileError,
-    );
-  });
-
-  if (mapTileRequestTimerId == null) {
-    mapTileRequestTimerId = setTimeout(mapTileRequestExecutor, mapTileRequestDelay);
-  }
-}
-
-function getMapTileUrlInternal(
+export function getMapTile({
   layer,
   params,
   minX,
@@ -115,7 +87,41 @@ function getMapTileUrlInternal(
   callback,
   reqConfig,
   onTileError,
-) {
+}) {
+  mapTileRequestList.push(() => {
+    getMapTileUrlInternal({
+      layer,
+      params,
+      minX,
+      minY,
+      maxX,
+      maxY,
+      width,
+      height,
+      callback,
+      reqConfig,
+      onTileError,
+    });
+  });
+
+  if (mapTileRequestTimerId == null) {
+    mapTileRequestTimerId = setTimeout(mapTileRequestExecutor, mapTileRequestDelay);
+  }
+}
+
+function getMapTileUrlInternal({
+  layer,
+  params,
+  minX,
+  minY,
+  maxX,
+  maxY,
+  width,
+  height,
+  callback,
+  reqConfig,
+  onTileError,
+}) {
   const apiType = layer.supportsApiType(ApiType.PROCESSING)
     ? ApiType.PROCESSING
     : layer.supportsApiType(ApiType.WMTS)
@@ -123,7 +129,7 @@ function getMapTileUrlInternal(
     : ApiType.WMS;
   layer
     .getMap(params, apiType, reqConfig)
-    .then((blob) => {
+    .then(async (blob) => {
       mapTileRequestDelay = Math.max(1, 0.5 * mapTileRequestDelay); // reduce the delay
       let url = URL.createObjectURL(blob);
       callback(url);
@@ -136,7 +142,19 @@ function getMapTileUrlInternal(
         if (mapTileRequestDelay > maxDelayBeforeSwitch) {
           reqConfig.authToken = null;
         }
-        getMapTileUrl(layer, params, minX, minY, maxX, maxY, width, height, callback, reqConfig, onTileError);
+        getMapTileUrl({
+          layer,
+          params,
+          minX,
+          minY,
+          maxX,
+          maxY,
+          width,
+          height,
+          callback,
+          reqConfig,
+          onTileError,
+        });
       } else {
         if (!isCancelled(error)) {
           onTileError(error);
@@ -261,6 +279,237 @@ export function getEyeHeightFromBounds(bounds) {
   }
 }
 
+function getPreviewCreationSize(width, height, rotV) {
+  let nPixelsInPreviews = 3000;
+  if (rotV < 30) {
+    nPixelsInPreviews = Math.tan((30 - rotV) * 0.0174532925) * 100000;
+  }
+  const ratio = width / height;
+  let creationHeight = Math.sqrt(nPixelsInPreviews / ratio);
+  let creationWidth = Math.round(creationHeight * ratio);
+  creationHeight = Math.round(creationHeight);
+  return { creationWidth: creationWidth, creationHeight: creationHeight };
+}
+
+export async function getTimelapsePreviewsFromTerrainViewer({
+  containerId,
+  z,
+  rotV,
+  sunTime,
+  settings,
+  images,
+  getMapParams,
+  width,
+  height,
+  reqConfig = {},
+  progress,
+  callback = () => {},
+  timelapseTerrainViewerId,
+}) {
+  const { creationWidth, creationHeight } = getPreviewCreationSize(width, height, rotV);
+
+  await getTimelapseImagesFromTerrainViewer({
+    containerId: containerId,
+    z: z,
+    sunTime: sunTime,
+    settings: settings,
+    images: images,
+    getMapParams: getMapParams,
+    outputWidth: width,
+    outputHeight: height,
+    creationWidth: creationWidth,
+    creationHeight: creationHeight,
+    reqConfig: reqConfig,
+    progress: progress,
+    callback: callback,
+    timelapseTerrainViewerId: timelapseTerrainViewerId,
+  });
+}
+
+function getAppropriateSupportedUnderzoom(z) {
+  // Sentinel Hub has meters/pixel limits. In small previews smaller images are requested. This means higher meters/pixel and if our eye height is large enough, so we could fail to load any SH textures
+  // We avoid making requests over the limit that would fail by having minZoom for every collection and returning mapTiler image if requested zoom is lower
+  // To avoid that, we allow "underzoom", and we will fetch images of size 512*underzoom x  512*underzoom instead of required 512x512 and then resize them afterwards
+  return z > 12000 ? Math.min(Math.ceil((z - 12000) / 10000), 4) : 0;
+}
+
+export const GENERATION_CANCELLED = 'Generation cancelled';
+
+export async function getTimelapseImagesFromTerrainViewer({
+  containerId,
+  z,
+  sunTime,
+  settings,
+  images,
+  getMapParams,
+  outputWidth,
+  outputHeight,
+  creationWidth,
+  creationHeight,
+  reqConfig = {},
+  progress,
+  timelapseTerrainViewerId,
+  isGenerationCancelled,
+  callback,
+}) {
+  progress(0);
+
+  setTerrainViewerId(TERRAIN_VIEWER_IDS.TIMELAPSE);
+
+  document
+    .getElementById(containerId)
+    .setAttribute('style', `width:${creationWidth}px;height:${creationHeight}px;`);
+
+  window.set3DSunTime(timelapseTerrainViewerId, sunTime);
+  window.set3DSettings(timelapseTerrainViewerId, settings);
+
+  const supportUnderzoomBy = getAppropriateSupportedUnderzoom(z);
+
+  const outputImages = [];
+
+  for (const [index, image] of images.entries()) {
+    if (isGenerationCancelled && isGenerationCancelled()) {
+      throw new Error(GENERATION_CANCELLED);
+    }
+
+    const imageUrl = await getImageFromTerrainViewer({
+      terrainViewerId: timelapseTerrainViewerId,
+      layer: image.layer,
+      datasetId: image.datasetId,
+      getMapParams: { ...getMapParams, fromTime: image.fromTime, toTime: image.toTime },
+      width: outputWidth,
+      height: outputHeight,
+      reqConfig: reqConfig,
+      supportUnderzoomBy: supportUnderzoomBy,
+    });
+
+    const dsh = getDataSourceHandler(image.datasetId);
+
+    const objectURL = await addLabelsAndLogos(
+      dateTimeDisplayFormat(image.fromTime),
+      imageUrl,
+      outputWidth,
+      outputHeight,
+      null,
+      dsh?.isCopernicus(),
+      dsh?.isSentinelHub() || checkIfCustom(image.datasetId),
+    );
+
+    outputImages.push(objectURL);
+
+    if (callback) {
+      callback(objectURL, image.origFlyover);
+    }
+
+    progress((index + 1) / images.length);
+  }
+
+  return outputImages;
+}
+
+function getZoomAdjustmentForLatitude(minX, minY, maxX, maxY) {
+  // minZoom set for the collection is based on the zoom level at equator
+  // Higher latitudes are more stretched, so meters/pixel is lower
+  const coords = proj4('EPSG:3857', 'EPSG:4326', [(minX + maxX) / 2, (minY + maxY) / 2]);
+  const lat = (Math.PI * Math.abs(coords[1])) / 180;
+  const metersPerPixelRatio = getEarthCircumferenceAtLat(lat) / EQUATOR_LENGTH;
+  return Math.log2(metersPerPixelRatio);
+}
+
+async function getImageFromTerrainViewer({
+  terrainViewerId,
+  layer,
+  datasetId,
+  getMapParams,
+  width: imageWidth,
+  height: imageHeight,
+  reqConfig,
+  supportUnderzoomBy,
+}) {
+  window.get3DMapTileUrlFunctions[TERRAIN_VIEWER_IDS.TIMELAPSE] = (
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width,
+    height,
+    callback,
+  ) => {
+    let minZoom = 7;
+    if (datasetId) {
+      minZoom = getDataSourceHandler(datasetId).getLeafletZoomConfig(datasetId).min;
+    }
+    const tileCoord = getTileCoord(minX, minY, maxX, maxY);
+    const mapTilerUrl = getMaptilerUrl(tileCoord);
+
+    let scaling = 1;
+    const minZoomDiff = getZoomAdjustmentForLatitude(minX, minY, maxX, maxY);
+
+    if (tileCoord.zoomLevel <= minZoom + minZoomDiff) {
+      if (
+        supportUnderzoomBy &&
+        minZoom - tileCoord.zoomLevel >= 0 &&
+        minZoom - tileCoord.zoomLevel < supportUnderzoomBy
+      ) {
+        scaling = minZoom - tileCoord.zoomLevel + 1;
+      } else {
+        callback(mapTilerUrl);
+        return;
+      }
+    }
+
+    const getMapParams2 = {
+      bbox: new BBox(CRS_EPSG3857, minX, minY, maxX, maxY),
+      format: MimeTypes.JPEG,
+      width: scaling * width,
+      height: scaling * height,
+      fromTime: getMapParams.fromTime.toDate(),
+      toTime: getMapParams.toTime.toDate(),
+      preview: 2,
+    };
+    getMapTile({
+      layer,
+      params: getMapParams2,
+      minX,
+      minY,
+      maxX,
+      maxY,
+      width,
+      height,
+      callback,
+      reqConfig,
+      onTileError: (err) => console.error(err),
+    });
+  };
+
+  await new Promise((resolve) => {
+    window.on3DLoadingStateChangedFunctions[TERRAIN_VIEWER_IDS.TIMELAPSE] = (isLoading, type) => {
+      if (type === 'OVERALL' && !isLoading) {
+        resolve();
+      }
+    };
+    window.reload3DTextures(terrainViewerId);
+  });
+  const imageUrl = await window.print3D(terrainViewerId, imageWidth, imageHeight);
+  return imageUrl;
+}
+
+export function getTileCoord(minX, minY, maxX, maxY) {
+  const zoomLevel = Math.max(
+    0,
+    Math.min(19, 1 + Math.floor(Math.log(EQUATOR_LENGTH / ((maxX - minX) * 1.001)) / Math.log(2))),
+  );
+  const numTiles = 1 << zoomLevel;
+  const tileX = Math.floor(((minX + maxX + EQUATOR_LENGTH) * numTiles) / (2 * EQUATOR_LENGTH));
+  const tileY = numTiles - 1 - Math.floor(((minY + maxY + EQUATOR_LENGTH) * numTiles) / (2 * EQUATOR_LENGTH));
+
+  return { tileX, tileY, zoomLevel };
+}
+
+export function getMaptilerUrl({ tileX, tileY, zoomLevel }) {
+  return `https://api.maptiler.com/maps/streets/256/${zoomLevel}/${tileX}/${tileY}.png?key=${process.env.REACT_APP_MAPTILER_KEY}`;
+}
+
 function getEarthCircumferenceAtLat(lat) {
   const equatorialRadius = 6378137.0;
   const polarRadius = 6356752.314;
@@ -333,6 +582,10 @@ export function getEyeHeightFromZoom(lat, zoom, width) {
   return widthMeters / 2;
 }
 
+function toRad(degree) {
+  return (degree * Math.PI) / 180;
+}
+
 export function getTileXAndTileY(zoomLevel, minX, minY, maxX, maxY) {
   const numTiles = 1 << zoomLevel;
   const tileX = Math.floor(((minX + maxX + EQUATOR_LENGTH) * numTiles) / (2 * EQUATOR_LENGTH));
@@ -343,4 +596,12 @@ export function getTileXAndTileY(zoomLevel, minX, minY, maxX, maxY) {
 
 export function is3DDemSourceCustom(demSource3D) {
   return demSource3D === DEMInstanceType.COPERNICUS_30 || demSource3D === DEMInstanceType.COPERNICUS_90;
+}
+
+export function getDem3DMaxZoomLevel(demSource3D) {
+  return DEM_3D_MAX_ZOOM[demSource3D || DEFAULT_DEM_SOURCE];
+}
+
+export function getDemProviderType(demSource3D) {
+  return demSource3D ? (is3DDemSourceCustom(demSource3D) ? 'CUSTOM' : demSource3D) : DEFAULT_DEM_SOURCE;
 }

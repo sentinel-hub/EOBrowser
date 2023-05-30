@@ -6,6 +6,7 @@ import { TimelapsePreview } from './TimelapsePreview';
 
 const images = [
   {
+    url: 'image-url-1',
     isSelected: true,
     coveragePercent: 100,
     averageCloudCoverPercent: 10,
@@ -13,6 +14,7 @@ const images = [
     layer: {},
   },
   {
+    url: 'image-url-2',
     isSelected: true,
     coveragePercent: 91,
     averageCloudCoverPercent: 51,
@@ -20,6 +22,7 @@ const images = [
     layer: {},
   },
   {
+    url: 'image-url-3',
     isSelected: false,
     coveragePercent: 82,
     averageCloudCoverPercent: 92,
@@ -27,6 +30,7 @@ const images = [
     layer: {},
   },
   {
+    url: 'image-url-4',
     isSelected: false,
     coveragePercent: 43,
     averageCloudCoverPercent: 53,
@@ -34,6 +38,7 @@ const images = [
     layer: {},
   },
   {
+    url: 'image-url-5',
     isSelected: false,
     coveragePercent: 34,
     averageCloudCoverPercent: 44,

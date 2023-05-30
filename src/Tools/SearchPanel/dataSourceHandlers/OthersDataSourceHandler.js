@@ -6,29 +6,43 @@ import DataSourceHandler from './DataSourceHandler';
 import GenericSearchGroup from './DatasourceRenderingComponents/searchGroups/GenericSearchGroup';
 import { CNESLandCoverTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/CNESLandCoverTooltip';
 import { WorldCoverTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/ESAWorldCoverTooltip';
+import { CopernicusGlobalSurfaceWaterTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/CopernicusGlobalSurfaceWaterTooltip';
 import { GHSTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/GlobalHumanSettlementTooltip';
+import { IOLULCTooltip } from './DatasourceRenderingComponents/dataSourceTooltips/IOLULCTooltip';
 
 import HelpTooltip from './DatasourceRenderingComponents/HelpTooltip';
 
 import { FetchingFunction } from '../search';
-import { CNES_LAND_COVER, ESA_WORLD_COVER, GLOBAL_HUMAN_SETTLEMENT } from './dataSourceConstants';
+import {
+  CNES_LAND_COVER,
+  ESA_WORLD_COVER,
+  GLOBAL_HUMAN_SETTLEMENT,
+  COPERNICUS_GLOBAL_SURFACE_WATER,
+  IO_LULC_10M_ANNUAL,
+} from './dataSourceConstants';
 import { CNES_LAND_COVER_BANDS } from './datasourceAssets/CNESLandCoverBands';
 import { ESA_WORLD_COVER_BANDS } from './datasourceAssets/copernicusWorldCoverBands';
+import { COPERNICUS_GLOBAL_SURFACE_WATER_BANDS } from './datasourceAssets/copernicusGlobalSurfaceWaterBands';
 import { GHS_BANDS } from './datasourceAssets/GHSBands';
-import { convertGeoJSONToEPSG4326 } from '../../../utils/coords';
+import { IO_LULC_10M_ANNUAL_BANDS } from './datasourceAssets/IOLULCBands';
 import { DATASOURCES } from '../../../const';
+import { reprojectGeometry } from '../../../utils/reproject';
 
 export default class OthersDataSourceHandler extends DataSourceHandler {
   getDatasetSearchLabels = () => ({
     [CNES_LAND_COVER]: 'CNES Land Cover Map',
     [ESA_WORLD_COVER]: 'ESA WorldCover',
+    [COPERNICUS_GLOBAL_SURFACE_WATER]: 'Global Surface Water',
     [GLOBAL_HUMAN_SETTLEMENT]: 'Global Human Settlement',
+    [IO_LULC_10M_ANNUAL]: 'IO Land Use Land Cover Map',
   });
 
   urls = {
     [CNES_LAND_COVER]: [],
     [ESA_WORLD_COVER]: [],
+    [COPERNICUS_GLOBAL_SURFACE_WATER]: [],
     [GLOBAL_HUMAN_SETTLEMENT]: [],
+    [IO_LULC_10M_ANNUAL]: [],
   };
   datasets = [];
   allLayers = [];
@@ -43,8 +57,16 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
       min: 8,
       max: 20,
     },
+    [COPERNICUS_GLOBAL_SURFACE_WATER]: {
+      min: 3,
+      max: 16,
+    },
     [GLOBAL_HUMAN_SETTLEMENT]: {
       min: 5,
+      max: 18,
+    },
+    [IO_LULC_10M_ANNUAL]: {
+      min: 4,
       max: 18,
     },
   };
@@ -52,13 +74,17 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
   KNOWN_COLLECTIONS = {
     [CNES_LAND_COVER]: ['9baa27-YOUR-INSTANCEID-HERE'],
     [ESA_WORLD_COVER]: ['0b940c-YOUR-INSTANCEID-HERE'],
+    [COPERNICUS_GLOBAL_SURFACE_WATER]: ['9a525f-YOUR-INSTANCEID-HERE'],
     [GLOBAL_HUMAN_SETTLEMENT]: ['3dbeea-YOUR-INSTANCEID-HERE'],
+    [IO_LULC_10M_ANNUAL]: ['0ed263-YOUR-INSTANCEID-HERE'],
   };
 
   KNOWN_COLLECTIONS_LOCATIONS = {
     [CNES_LAND_COVER]: LocationIdSHv3.awsEuCentral1,
     [ESA_WORLD_COVER]: LocationIdSHv3.awsEuCentral1,
+    [COPERNICUS_GLOBAL_SURFACE_WATER]: LocationIdSHv3.creo,
     [GLOBAL_HUMAN_SETTLEMENT]: LocationIdSHv3.creo,
+    [IO_LULC_10M_ANNUAL]: LocationIdSHv3.awsEuCentral1,
   };
 
   willHandle(service, url, name, layers, preselected) {
@@ -122,10 +148,22 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
             <WorldCoverTooltip />
           </HelpTooltip>
         );
+      case COPERNICUS_GLOBAL_SURFACE_WATER:
+        return (
+          <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+            <CopernicusGlobalSurfaceWaterTooltip />
+          </HelpTooltip>
+        );
       case GLOBAL_HUMAN_SETTLEMENT:
         return (
           <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
             <GHSTooltip />
+          </HelpTooltip>
+        );
+      case IO_LULC_10M_ANNUAL:
+        return (
+          <HelpTooltip direction="right" closeOnClickOutside={true} className="padOnLeft">
+            <IOLULCTooltip />
           </HelpTooltip>
         );
       default:
@@ -161,7 +199,7 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
   convertToStandardTiles = (data, datasetId) => {
     const tiles = data.map((t) => {
       if (t.geometry && t.geometry.crs && t.geometry.crs.properties.name !== CRS_EPSG4326.urn) {
-        convertGeoJSONToEPSG4326(t.geometry);
+        reprojectGeometry(t.geometry, { toCrs: CRS_EPSG4326.authId });
       }
       return {
         sensingTime: t.sensingTime,
@@ -190,8 +228,12 @@ export default class OthersDataSourceHandler extends DataSourceHandler {
         return CNES_LAND_COVER_BANDS;
       case ESA_WORLD_COVER:
         return ESA_WORLD_COVER_BANDS;
+      case COPERNICUS_GLOBAL_SURFACE_WATER:
+        return COPERNICUS_GLOBAL_SURFACE_WATER_BANDS;
       case GLOBAL_HUMAN_SETTLEMENT:
         return GHS_BANDS;
+      case IO_LULC_10M_ANNUAL:
+        return IO_LULC_10M_ANNUAL_BANDS;
       default:
         return [];
     }

@@ -35,7 +35,10 @@ const CollectionsCache = new Map();
 
 const createCollectionsCacheKey = (user, searchParams) => {
   const cacheKeys = [user.access_token, searchParams.dataProvider];
-  if (searchParams.dataProvider === TPDICollections.PLANET_SCOPE) {
+  if (
+    searchParams.dataProvider === TPDICollections.PLANET_SCOPE ||
+    searchParams.dataProvider === TPDICollections.PLANET_SKYSAT
+  ) {
     cacheKeys.push(searchParams.itemType);
     cacheKeys.push(searchParams.productBundle);
   }
@@ -97,7 +100,11 @@ export const CollectionSelection = ({
       }
       const regex = new RegExp(DefaultCollections[provider], 'i');
       const defaultCollection = userCollections.find((collection) => regex.test(collection.name));
-      return defaultCollection ? defaultCollection.id : CollectionSelectionType.CREATE;
+      return defaultCollection
+        ? defaultCollection.id
+        : userCollections.length
+        ? userCollections[0].id
+        : CollectionSelectionType.CREATE;
     }
 
     return collectionId;

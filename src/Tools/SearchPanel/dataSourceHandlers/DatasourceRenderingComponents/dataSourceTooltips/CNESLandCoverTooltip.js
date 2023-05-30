@@ -15,7 +15,7 @@ The **CNES Land Cover Map** (Occupation des Sols, OSO) produces land classificat
 const CNESLandCoverTooltip = () => (
   <div>
     <div className="data-source-group-tooltip-description">
-      <ReactMarkdown source={CNESLandCoverMarkdown()} />
+      <ReactMarkdown source={CNESLandCoverMarkdown()} linkTarget="_blank" />
     </div>
     <div className="data-source-group-tooltip-credits">
       <div>{t`Credits:`}</div>

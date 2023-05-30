@@ -10,7 +10,7 @@
   text-align: center;
   margin-top: 25px;
 
-  @media screen and (max-width: 450px) {
+  @media screen and (max-width: $breakpoint-450) {
     &.expanded {
       flex-direction: column;
       align-items: flex-start;

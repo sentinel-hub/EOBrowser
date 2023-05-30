@@ -3,11 +3,11 @@ import { withLeaflet, Rectangle, Tooltip, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import { t } from 'ttag';
 
-import { createTimelapseBbox } from '../../junk/EOB3TimelapsePanel/timelapseUtils';
 import store, { modalSlice, timelapseSlice } from '../../store';
 import { ModalId } from '../../const';
 
 import './TimelapseAreaPreview.scss';
+import { getTimelapseBounds } from './Timelapse.utils';
 
 class TimelapseAreaPreview extends Component {
   state = {
@@ -44,15 +44,10 @@ class TimelapseAreaPreview extends Component {
     this.props.leaflet.map.fire('viewreset');
   };
 
-  calculateBounds = (lat, lng, zoom, mapBounds) => {
-    const [x1, y1, x2, y2] = createTimelapseBbox(lat, lng, zoom, mapBounds);
-    return [L.latLng(y1, x1), L.latLng(y2, x2)];
-  };
-
   render() {
-    const { lat, lng, zoom, mapBounds } = this.state;
+    const { lat, lng, mapBounds } = this.state;
     return (
-      <Rectangle bounds={this.calculateBounds(lat, lng, zoom, mapBounds)} interactive={false}>
+      <Rectangle bounds={getTimelapseBounds(mapBounds)} interactive={false}>
         <Marker
           onClick={this.startTimelapse}
           position={[lat, lng]}

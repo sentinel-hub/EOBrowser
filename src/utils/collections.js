@@ -15,7 +15,7 @@ export function getCollectionInformation(collectionId, locationId, subType) {
   };
   const baseUrl = SHV3_LOCATIONS_ROOT_URL[locationId];
   return axios.get(
-    `${baseUrl}api/v1/catalog/collections/${subType === 'BATCH' ? 'batch' : 'byoc'}-${collectionId}`,
+    `${baseUrl}api/v1/catalog/1.0.0/collections/${subType === 'BATCH' ? 'batch' : 'byoc'}-${collectionId}`,
     requestConfig,
   );
 }
