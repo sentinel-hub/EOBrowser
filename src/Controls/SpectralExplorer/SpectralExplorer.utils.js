@@ -10,8 +10,16 @@ import {
   getStatisticsProvider,
 } from '@sentinel-hub/sentinelhub-js';
 import moment from 'moment';
-import { getGeometryNotSetMsg, getLayerNotSelectedMsg } from '../../junk/ConstMessages';
+import {
+  getDateNotSetMsg,
+  getErrorFetchingDataMsg,
+  getGeometryNotSetMsg,
+  getLayerNotSelectedMsg,
+  getLoggedInErrorMsg,
+} from '../../junk/ConstMessages';
 import { getDatasourceNotSupportedMsg } from '../../junk/ConstMessages';
+import { refetchWithDefaultToken } from '../../utils/fetching.utils';
+import { AOI_STRING, POI_STRING } from '../controls.utils';
 
 const SPECTRAL_EXPLORER_ENABLED = true;
 
@@ -20,6 +28,9 @@ const spectralExplorerLabels = {
   errorDatasetNotSet: getLayerNotSelectedMsg,
   errorNotSupported: getDatasourceNotSupportedMsg,
   errorGeometryNotSet: getGeometryNotSetMsg,
+  errorDateNotSet: getDateNotSetMsg,
+  errorLogIn: getLoggedInErrorMsg,
+  errorParameterNotSet: (parameter) => t`Parameter ${parameter} is not set`,
   reflectance: () => t`Reflectance`,
   wavelength: () => t`Wavelength (nm)`,
 };
@@ -79,15 +90,43 @@ const createEvalscriptForDataset = (datasetId) => {
   return evalscript;
 };
 
+const validatateInputParameters = ({ datasetId, geometry, fromTime, toTime }) => {
+  if (!datasetId) {
+    throw new Error(
+      `${getErrorFetchingDataMsg()}: ${spectralExplorerLabels.errorParameterNotSet('Dataset')}`,
+    );
+  }
+
+  if (!isSpectralExplorerSupported(datasetId)) {
+    throw new Error(`${getErrorFetchingDataMsg()}: ${spectralExplorerLabels.errorNotSupported()}`);
+  }
+
+  if (!geometry) {
+    throw new Error(
+      `${getErrorFetchingDataMsg()}: ${spectralExplorerLabels.errorParameterNotSet('Geometry')}`,
+    );
+  }
+
+  if (!fromTime || !toTime) {
+    throw new Error(`${getErrorFetchingDataMsg()}: ${spectralExplorerLabels.errorParameterNotSet('Date')}`);
+  }
+};
+
 const getBandsValues = async ({
   datasetId,
-
   geometry,
   visualizationUrl,
   cancelToken,
   fromTime,
   toTime,
+  userToken,
 }) => {
+  validatateInputParameters({
+    datasetId,
+    geometry,
+    fromTime,
+    toTime,
+  });
   const crs = CRS_EPSG3857;
 
   const reqConfig = { ...reqConfigMemoryCache, cancelToken: cancelToken };
@@ -136,28 +175,37 @@ const getBandsValues = async ({
   };
 
   const statProvider = getStatisticsProvider(StatisticsProviderType.STAPI);
-  const response = await statProvider.getStatistics(
-    `${statisticsLayer.getShServiceHostname()}api/v1/statistics`,
-    payload,
-    reqConfig,
+
+  const response = await refetchWithDefaultToken(
+    (reqConfig) =>
+      statProvider.getStatistics(
+        `${statisticsLayer.getShServiceHostname()}api/v1/statistics`,
+        payload,
+        reqConfig,
+      ),
+
+    { ...reqConfig, ...(userToken ? { authToken: userToken } : {}) },
   );
 
   const result = response.data?.[0]?.outputs?.[ALL_BANDS_OUTPUT]?.bands || [];
+
   let bandsValues = null;
   if (Object.keys(result).length === bands.length) {
-    bandsValues = Object.keys(result).map((key, index) => ({
-      name: bands[index].name,
-      stats: result[key].stats,
-    }));
+    bandsValues = Object.keys(result)
+      .map((key, index) => ({
+        name: bands[index].name,
+        stats: result[key].stats,
+      }))
+      .filter((b) => !!getCentralWaveLength(b.name, bands));
   }
   return bandsValues;
 };
 
 const getTitleForGeometryType = (geometryType) => {
   switch (geometryType) {
-    case 'aoi':
+    case AOI_STRING:
       return t`Area of interest`;
-    case 'poi':
+    case POI_STRING:
       return t`Point of interest`;
     default:
       return geometryType;
@@ -165,6 +213,12 @@ const getTitleForGeometryType = (geometryType) => {
 };
 
 const createSeriesId = ({ geometryType, datasetId }) => `${geometryType}-${datasetId}`;
+
+const getCentralWaveLength = (name, bands) => {
+  const band = bands.find((b) => b.name === name);
+
+  return band?.centralWL;
+};
 
 export {
   SPECTRAL_EXPLORER_ENABLED,
@@ -174,4 +228,5 @@ export {
   getBandsValues,
   getTitleForGeometryType,
   createSeriesId,
+  getCentralWaveLength,
 };

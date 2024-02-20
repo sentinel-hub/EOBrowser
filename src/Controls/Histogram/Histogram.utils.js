@@ -39,7 +39,8 @@ export async function getLayerName(visualizationUrl, layerId, cancelToken) {
 // When width and height do not exceed the limit, the function requests 1 image and
 // returns an array with 1 element for the sake of consistency.
 async function getTiffImages(layer, props, cancelToken) {
-  const { bounds, fromTime, toTime, pixelBounds, aoiGeometry, datasetId } = props;
+  const { bounds, fromTime, toTime, pixelBounds, aoiGeometry, datasetId, userToken, closeHistogramModal } =
+    props;
 
   const { width: defaultWidth, height: defaultHeight } = getImageDimensionFromBoundsWithCap(
     bounds,
@@ -75,12 +76,14 @@ async function getTiffImages(layer, props, cancelToken) {
   const reqConfig = {
     cancelToken: cancelToken,
     cache: { expiresIn: 0 },
+    ...(userToken ? { authToken: userToken } : {}),
   };
 
   if (width <= MAX_SH_IMAGE_SIZE && height <= MAX_SH_IMAGE_SIZE) {
     const blob = await refetchWithDefaultToken(
       (reqConfig) => layer.getMap(getMapParams, ApiType.PROCESSING, reqConfig),
       reqConfig,
+      closeHistogramModal,
     );
     return [blob];
   }
@@ -109,6 +112,7 @@ async function getTiffImages(layer, props, cancelToken) {
       const blobPromise = refetchWithDefaultToken(
         (reqConfig) => layer.getMap(paramsChunk, ApiType.PROCESSING, reqConfig),
         reqConfig,
+        closeHistogramModal,
       );
       blobPromises.push(blobPromise);
     }
@@ -178,6 +182,9 @@ export async function getDataForIndex(props, cancelToken) {
 }
 
 async function getHistogramFromTiffs(blobs) {
+  if (!blobs?.length || !blobs.every((b) => !!b)) {
+    return null;
+  }
   const numOfDigits = 3;
   let combinedData = [];
 

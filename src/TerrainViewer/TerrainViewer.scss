@@ -26,6 +26,10 @@
   display: flex;
   justify-content: center;
 
+  &.is3d {
+    top: 310px;
+  }
+
   .icon {
     color: $primaryCol;
     cursor: pointer;

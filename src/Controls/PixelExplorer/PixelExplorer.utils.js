@@ -12,6 +12,7 @@ import {
   getRequestGeometry,
   getStatisticsLayer,
 } from '../FIS/FIS.utils';
+import { refetchWithDefaultToken } from '../../utils/fetching.utils';
 
 const PIXEL_EXPLORER_ENABLED = true;
 const PIXEL_VALUE_OUTPUT = EOBROWSERSTATS_OUTPUT;
@@ -27,7 +28,12 @@ const initializeStatisticsLayer = async ({
   datasetId,
   fromTime,
   toTime,
+  user,
 }) => {
+  if (!user?.userdata) {
+    return { enabled: false, statisticsLayer: null };
+  }
+
   if (!(PIXEL_EXPLORER_ENABLED && geometry && visualizationUrl)) {
     return { enabled: false, statisticsLayer: null };
   }
@@ -84,7 +90,7 @@ const formatIndexValue = (value) => {
 const getIndexValue = async (
   statisticsLayer,
   supportStatisticalApi,
-  { fromTime, toTime, cancelToken, requestGeometry, crs, recommendedResolution },
+  { fromTime, toTime, cancelToken, requestGeometry, crs, recommendedResolution, userToken },
 ) => {
   const outputName = PIXEL_VALUE_OUTPUT;
 
@@ -98,10 +104,15 @@ const getIndexValue = async (
     output: outputName,
   };
   let indexValue = null;
-  const response = await statisticsLayer.getStats(
-    statsParams,
-    { ...reqConfigMemoryCache, cancelToken: cancelToken },
-    supportStatisticalApi ? StatisticsProviderType.STAPI : StatisticsProviderType.FIS,
+  const response = await refetchWithDefaultToken(
+    (reqConfig) =>
+      statisticsLayer.getStats(
+        statsParams,
+        reqConfig,
+        supportStatisticalApi ? StatisticsProviderType.STAPI : StatisticsProviderType.FIS,
+      ),
+
+    { ...reqConfigMemoryCache, cancelToken: cancelToken, ...(userToken ? { authToken: userToken } : {}) },
   );
 
   if (supportStatisticalApi) {
@@ -114,7 +125,7 @@ const getIndexValue = async (
 
 const getStatisticalIndexValue = async (
   statisticsLayer,
-  { datasetId, geometry, fromTime, toTime, cancelToken },
+  { datasetId, geometry, fromTime, toTime, cancelToken, userToken },
 ) => {
   const crs = CRS_EPSG3857;
   const recommendedResolution = getRecommendedResolutionForDatasetId(datasetId, geometry);
@@ -126,6 +137,7 @@ const getStatisticalIndexValue = async (
     requestGeometry,
     crs,
     recommendedResolution,
+    userToken,
   });
 };
 

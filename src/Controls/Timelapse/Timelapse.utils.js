@@ -170,11 +170,8 @@ export async function fetchTimelapseImage(params) {
 
   if (showBorders) {
     const bbox = constructBBoxFromBounds(bounds);
-    const maxSupportedDimension = 2048;
     blob = await addOverlays(
       blob,
-      maxSupportedDimension,
-      maxSupportedDimension,
       [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
       [timelapseBorders],
       width,
@@ -355,7 +352,11 @@ function getRoundingFactor(imageWidthInMeters) {
 function timelapseBorders(width, height, bbox) {
   return {
     sortIndex: 1,
-    url: `https://api.maptiler.com/maps/${process.env.REACT_APP_MAPTILER_MAP_ID_BORDERS}/static/${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}/${width}x${height}.png?key=${process.env.REACT_APP_MAPTILER_KEY}&attribution=false`,
+    url: `https://api.maptiler.com/maps/${import.meta.env.VITE_MAPTILER_MAP_ID_BORDERS}/static/${bbox[0]},${
+      bbox[1]
+    },${bbox[2]},${bbox[3]}/${width}x${height}.png?key=${
+      import.meta.env.VITE_MAPTILER_KEY
+    }&attribution=false&padding=0`,
     params: {},
   };
 }
@@ -434,7 +435,7 @@ export const isImageCoverageEnough = (coveragePercent, canWeFilterByCoverage, mi
 
 export const generateS3PreSignedPost = async (access_token, filename) => {
   try {
-    const url = `${process.env.REACT_APP_EOB_BACKEND}generatepresignedpost`;
+    const url = `${import.meta.env.VITE_EOB_BACKEND}generatepresignedpost`;
     const requestParams = {
       responseType: 'json',
       headers: {
@@ -673,8 +674,14 @@ async function getOverlayImageBlob(width, height, bbox, overlayLayer) {
   return new Blob([res.data], { type: 'image/jpeg' });
 }
 
+const maxSupportedDimension = 2048;
+
+const getMaxSupportedDimension = (size) => {
+  return size ? (size < maxSupportedDimension ? size : maxSupportedDimension) : maxSupportedDimension;
+};
+
 // draw all layers defined in overlayLayers over original image imgBlob
-async function addOverlays(imgBlob, width, height, bbox, overlayLayers, timelapseWidth, timelapseHeight) {
+async function addOverlays(imgBlob, bbox, overlayLayers, timelapseWidth, timelapseHeight) {
   try {
     //draw original image on canvas
     const canvas = document.createElement('canvas');
@@ -688,7 +695,12 @@ async function addOverlays(imgBlob, width, height, bbox, overlayLayers, timelaps
     const overlayImages = [];
     await Promise.all(
       overlayLayers.map(async (overlayLayer) => {
-        const overlayImageBlob = await getOverlayImageBlob(width, height, bbox, overlayLayer);
+        const overlayImageBlob = await getOverlayImageBlob(
+          getMaxSupportedDimension(canvas.width),
+          getMaxSupportedDimension(canvas.height),
+          bbox,
+          overlayLayer,
+        );
         overlayImages.push({
           idx: overlayLayer.idx,
           imgBlob: overlayImageBlob,
@@ -700,7 +712,9 @@ async function addOverlays(imgBlob, width, height, bbox, overlayLayers, timelaps
     await Promise.all(
       overlayImages
         .sort((a, b) => a.sortIndex - b.sortIndex)
-        .map(async (image) => await drawBlobOnCanvas(context, image.imgBlob)),
+        .map(
+          async (image) => await drawBlobOnCanvas(context, image.imgBlob, 0, 0, canvas.width, canvas.height),
+        ),
     );
 
     //export canvas back to blob

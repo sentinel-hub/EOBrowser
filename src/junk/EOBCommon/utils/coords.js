@@ -133,7 +133,7 @@ export function getRecommendedResolution(boundsGeojson, selectedResult) {
 }
 
 export function getMapDOMSize() {
-  const mapDOMElement = document.getElementById('mapId');
+  const mapDOMElement = document.getElementById('map');
   return {
     width: mapDOMElement ? mapDOMElement.clientWidth : window.innerWidth,
     height: mapDOMElement ? mapDOMElement.clientHeight : window.innerHeight,

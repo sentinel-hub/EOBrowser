@@ -7,6 +7,10 @@
     margin-bottom: 6px;
     padding: 7px 0 2px 0;
 
+    > div {
+      display: flex;
+    }
+
     .aoi-selection {
       display: flex;
       flex-direction: row;

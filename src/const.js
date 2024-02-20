@@ -16,6 +16,8 @@ import {
   DEM_COPERNICUS_30,
   DEM_COPERNICUS_90,
 } from './Tools/SearchPanel/dataSourceHandlers/dataSourceConstants.js';
+import { PlanetPVType } from '@sentinel-hub/sentinelhub-js';
+import { PlanetPVId } from '@sentinel-hub/sentinelhub-js';
 
 export const ModalId = {
   ELEVATION_PROFILE: 'ElevationProfile',
@@ -28,6 +30,7 @@ export const ModalId = {
   PRIVATE_THEMEID_LOGIN: 'PrivateThemeIdLogin',
   TERMS_AND_PRIVACY_CONSENT: 'TermsAndPrivacy',
   SPECTRAL_EXPLORER: 'SpectralExplorer',
+  RESTRICTED_ACCESS: 'RestrictedAccess',
 };
 
 export const MODE_THEMES_LIST = 'mode';
@@ -98,6 +101,12 @@ export const SEARCH_PANEL_TABS = {
   SEARCH_TAB: 0,
   COMMERCIAL_DATA_TAB: 1,
   HIGHLIGHTS_TAB: 2,
+};
+
+export const SEARCH_PANEL_TABS_HASH = {
+  [SEARCH_PANEL_TABS.SEARCH_TAB]: '#search',
+  [SEARCH_PANEL_TABS.COMMERCIAL_DATA_TAB]: '#commercial-data',
+  [SEARCH_PANEL_TABS.HIGHLIGHTS_TAB]: '#highlights',
 };
 
 export const TABS = {
@@ -222,3 +231,66 @@ export const OrderType = {
 
 export const FUNCTIONALITY_TEMPORARILY_UNAVAILABLE_MSG =
   'This functionality is temporarily unavailable due to updates. Please try again later.';
+
+export const SH_ACCOUNT_TYPE = {
+  FREE: 1,
+  TRIAL: 11000,
+  EXPLORATION: 12000,
+  BASIC: 13000,
+  ENTERPRISE: 14000,
+  ENTERPRISE_S: 14001,
+  ENTERPRISE_L: 14002,
+  ROOT: 20000,
+};
+
+export const SH_PAYING_ACCOUNT_TYPES = [
+  SH_ACCOUNT_TYPE.EXPLORATION,
+  SH_ACCOUNT_TYPE.BASIC,
+  SH_ACCOUNT_TYPE.ENTERPRISE,
+  SH_ACCOUNT_TYPE.ENTERPRISE_S,
+  SH_ACCOUNT_TYPE.ENTERPRISE_L,
+  SH_ACCOUNT_TYPE.ROOT,
+];
+
+// Templates for Planetary Variables user configurations
+export const PLANETARY_VARIABLES_TYPE_CONFIGURATION_IDS = {
+  [PlanetPVType.BiomassProxy]: 'd8cd73-YOUR-INSTANCEID-HERE',
+  [PlanetPVType.LandSurfaceTemperature]: 'e3e9b0-YOUR-INSTANCEID-HERE',
+  [PlanetPVType.SoilWaterContent]: '46d34e-YOUR-INSTANCEID-HERE',
+};
+
+export const PLANETARY_VARIABLES_ID_CONFIGURATION_IDS = {
+  [PlanetPVId.CANOPY_HEIGHT_V1_0_0_30]: 'b1fe05-YOUR-INSTANCEID-HERE',
+  [PlanetPVId.CANOPY_COVER_V1_0_0_30]: 'f49d16-YOUR-INSTANCEID-HERE',
+  [PlanetPVId.ABOVEGROUND_CARBON_DENSITY_V1_0_0_30]: '9629ce-YOUR-INSTANCEID-HERE',
+  [PlanetPVId.DAY_OF_YEAR_V1_0_0_30]: '5d9398-YOUR-INSTANCEID-HERE',
+};
+
+export const FATHOM_TRACK_EVENT_LIST = {
+  SEARCH_BUTTON: 'Search button clicked',
+  COMMERCIAL_SEARCH_BUTTON: 'Commercial search button clicked',
+  THEME_OPTION_SELECTED: 'Theme selected',
+  HIGHLIGHT_OPTION_SELECTED: 'Highlight selected',
+  ADD_TO_PINS_BUTTON: 'Add to Pins button clicked',
+  ADD_TO_COMPARE_BUTTON: 'Add to Compare button clicked',
+  PIN_OPTION_SELECTED: 'Pin visualized from pins tab',
+  RGB_BANDS_CHANGED: 'Bands in custom composite changed',
+  INDEX_BANDS_CHANGED: 'Bands in custom index changed',
+  CUSTOM_SCRIPT_REFRESH_EVALSCRIPT_BUTTON: 'Refresh evalscript button clicked',
+  SHOW_TUTORIAL_BUTTON: 'Tutorial button clicked',
+  BASIC_DOWNLOAD_BUTTON: 'Basic download button clicked',
+  ANALYTICAL_DOWNLOAD_BUTTON: 'Analytical download button clicked',
+  HIGH_RES_DOWNLOAD_BUTTON: 'High-res download button clicked',
+  START_TIMELAPSE: 'Create timelapse play button clicked',
+  TIMELAPSE_DOWNLOAD_BUTTON: 'Timelapse download button clicked',
+  TIMELAPSE_SHARE_BUTTON: 'Timelapse Share button clicked',
+  HISTOGRAM_WIDGET: 'Histogram widget clicked and loaded',
+  EDUCATION_MODE_SELECTED: 'Education mode selected',
+  '2D_MODE_WIDGET': '2D icon clicked',
+  '3D_MODE_WIDGET': '3D icon clicked',
+  STATISTICAL_INFO_CHART_ICON_CLICKED: 'Statistical info icon clicked',
+  SPECTRAL_EXPLORER_CHART_ICON_CLICKED: 'Spectral explorer icon clicked',
+  ELEVATION_PROFILE_CHART_ICON_CLICKED: 'Elevation profile icon clicked',
+  VISUALIZE_BUTTON: 'Visualize button clicked',
+  VISUALIZATION_LAYER_CHANGED: 'Visualization Layer changed',
+};

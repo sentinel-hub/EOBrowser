@@ -114,6 +114,7 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
     terrainViewerSettings,
     modalId,
     timelapse,
+    kc_idp_hint,
   } = props;
   currentLat = Math.round(100000 * currentLat) / 100000;
   currentLng = Math.round(100000 * currentLng) / 100000;
@@ -151,6 +152,9 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
   }
   if (layerId) {
     params.layerId = layerId;
+  }
+  if (kc_idp_hint) {
+    params.kc_idp_hint = kc_idp_hint;
   }
 
   if (selectedTabIndex === TABS.VISUALIZE_TAB) {
@@ -568,4 +572,14 @@ export function getThemeName(theme) {
 
 export async function fetchEvalscriptFromEvalscripturl(evalscripturl) {
   return request.get(evalscripturl);
+}
+
+export function handleFathomTrackEvent(event, value) {
+  const trackedEvent = value ? `${event}: ${value}` : event;
+
+  if (window.fathom?.trackEvent) {
+    window.fathom.trackEvent(trackedEvent);
+  } else {
+    console.error('Fathom is not properly initialized or trackEvent method is not available.');
+  }
 }

@@ -1,9 +1,113 @@
 import { CRS_EPSG4326, LayersFactory } from '@sentinel-hub/sentinelhub-js';
+import FileSaver from 'file-saver';
+import JSZip from 'jszip';
+import moment from 'moment';
 import { reqConfigMemoryCache, STATISTICS_MANDATORY_OUTPUTS } from '../../const';
-import { getDataSourceHandler } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
+import {
+  getDataSourceHandler,
+  getDatasetLabel,
+} from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getRecommendedResolution, switchGeometryCoordinates } from '../../utils/coords';
 import { checkAllMandatoryOutputsExist } from '../../utils/parseEvalscript';
 import { reprojectGeometry } from '../../utils/reproject';
+
+function getNicename({ extension, datasetId, layerId, customSelected, fromTime, toTime }) {
+  return `${getDatasetLabel(datasetId)}-${
+    customSelected ? 'Custom' : layerId
+  }-${fromTime.toISOString()}-${toTime.toISOString()}.${extension}`;
+}
+
+function filterDataAfterTime(data, fromTime) {
+  const filteredData = {};
+  for (let band of data) {
+    filteredData[band.title] = band.coordinates.filter((v) => moment(v.date).isSameOrAfter(fromTime));
+  }
+  return filteredData;
+}
+
+export const handleZipCSVExport = async (data, times, isCloudCoverageDataAvailable, comparedLayers) => {
+  const zip = new JSZip();
+  for (let i = 0; i < data.length; i++) {
+    const comparedLayer = comparedLayers.find((cLayer) => data[i].title.includes(cLayer.id));
+    const name = getCSVName({
+      times: times,
+      id: comparedLayer.id,
+      layerId: comparedLayer.layerId,
+      datasetId: comparedLayer.datasetId,
+      customSelected: !!comparedLayer.evalscript,
+    });
+    const csv = getCSVContent({
+      times: times,
+      id: comparedLayer.id,
+      data: [data[i]],
+      isCloudCoverageDataAvailable: isCloudCoverageDataAvailable,
+    });
+
+    // swap out the id of the compared layer for the actual layerId in the column names
+    const fixedCsv = csv.replaceAll(comparedLayer.id, comparedLayer.layerId);
+
+    const csvBlob = new Blob([fixedCsv]);
+    zip.file(name, csvBlob);
+  }
+
+  if (Object.keys(zip.files).length > 0) {
+    const content = await zip.generateAsync({ type: 'blob' });
+    const zipFilename = 'Compared_layers_statistical_info.zip';
+    FileSaver.saveAs(content, zipFilename);
+  }
+};
+
+export const handleSingleCSVExport = (
+  data,
+  times,
+  isCloudCoverageDataAvailable,
+  datasetId,
+  layerId,
+  customSelected,
+) => {
+  const name = getCSVName({
+    times: times,
+    id: layerId,
+    layerId: layerId,
+    datasetId: datasetId,
+    customSelected: customSelected,
+  });
+  const csv = getCSVContent({
+    times: times,
+    id: layerId,
+    data: data,
+    isCloudCoverageDataAvailable: isCloudCoverageDataAvailable,
+  });
+
+  FileSaver.saveAs(new Blob([csv]), name);
+};
+
+export function getCSVName({ times, id, layerId, datasetId, customSelected }) {
+  const fromTime = times.from[id];
+  const toTime = times.to[id];
+  const nicename = getNicename({
+    extension: 'csv',
+    datasetId: datasetId,
+    layerId: layerId,
+    customSelected: customSelected,
+    fromTime: fromTime,
+    toTime: toTime,
+  });
+
+  return nicename;
+}
+
+export function getCSVContent({ times, id, data, isCloudCoverageDataAvailable }) {
+  const fromTime = times.from[id];
+  const filteredData = filterDataAfterTime(data, fromTime);
+
+  let dropColumns = ['seriesIndex'];
+  if (!isCloudCoverageDataAvailable) {
+    dropColumns.push('cloudCoveragePercent');
+  }
+
+  return constructCSVFromData(filteredData, dropColumns);
+}
 
 export function constructCSVFromData(data, dropColumns) {
   const keys = Object.keys(data);

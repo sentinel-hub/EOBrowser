@@ -109,9 +109,13 @@ function tileList(zoom, center, tileSize) {
 
       // Wrap tiles with negative coordinates.
       c.column = c.column % maxTilesInRow;
-      if (c.column < 0) c.column = maxTilesInRow + c.column;
+      if (c.column < 0) {
+        c.column = maxTilesInRow + c.column;
+      }
 
-      if (c.row < 0 || c.row >= maxTilesInRow) continue;
+      if (c.row < 0 || c.row >= maxTilesInRow) {
+        continue;
+      }
       coords.tiles.push({
         z: c.zoom,
         x: c.column,

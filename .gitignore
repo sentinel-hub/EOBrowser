@@ -5,7 +5,7 @@
 
 # misc
 /build
-.env
+.env*
 .npm
 .gitlab
 

@@ -77,24 +77,18 @@
     }
 
     .leaflet-bottom.leaflet-left {
+      font-size: 11px;
+
       a:not(.leaflet-control-attribution) {
         div {
           left: 500px;
         }
       }
     }
-  }
 
-  // Prevent visible tile borders on some browsers/devices - https://github.com/Leaflet/Leaflet/issues/3575#issuecomment-688644225
-  .leaflet-tile-container {
-    img[style*="width: 512px"] {
-      width: 512.5px !important;
-      height: 512.5px !important;
-    }
-
-    img[style*="width: 256px"] {
-      width: 256.5px !important;
-      height: 256.5px !important;
+    .leaflet-control-scale-line {
+      font-size: 11px;
+      text-shadow: none;
     }
   }
 }

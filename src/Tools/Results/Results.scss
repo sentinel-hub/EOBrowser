@@ -176,18 +176,39 @@ $headerPadding: 10px;
       text-align: center;
     }
 
-    .rodal .results-panel {
-      height: calc(100% - 20px);
-      overflow: auto;
-      background: $mainDark;
+    .rodal {
+      .results-header {
+        display: flex;
+        flex-direction: column;
+        margin: 0 10px;
 
-      .results-heading {
-        background: $mainDark;
-        padding-left: 0;
+        .title {
+          font-size: 16px;
+          font-weight: $fontWeightBold;
+        }
+
+        .paragraph {
+          font-size: 14px;
+          padding: 10px 0;
+          border-bottom: 2px solid $primaryCol;
+        }
       }
 
-      .result-item {
-        background: $mainMedium;
+      .results-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: calc(100% - 70px);
+        overflow: auto;
+        background-color: $mainDark;
+        padding: 0;
+        margin: 0 10px;
+
+        .result-item {
+          display: flex;
+          flex-direction: column;
+          margin: 0 10px 0 0;
+        }
       }
     }
 

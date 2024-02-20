@@ -14,7 +14,21 @@ import {
   COPERNICUS_HRSI_SWS,
   COPERNICUS_HRSI_FSC,
   COPERNICUS_HRSI_GFSC,
+  COPERNICUS_HRSI_RLIE_S1,
+  COPERNICUS_HRSI_RLIE_S2,
+  COPERNICUS_HRSI_RLIE_S1_S2,
+  DEM_MAPZEN,
+  DEM_COPERNICUS_30,
+  DEM_COPERNICUS_90,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
+
+import { S5O3Markdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
+import { S5NO2Markdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
+import { S5SO2Markdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
+import { S5COMarkdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
+import { S5HCHOMarkdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
+import { S5CH4Markdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
+import { S5AERAIMarkdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
 
 export const PREDEFINED_LAYERS_METADATA = [
   {
@@ -84,8 +98,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 2000, color: '#800000', label: '2000 [ppb]' },
       ],
     },
-    description: () =>
-      t`# Methane (CH4)\n\n\n\nMethane is, after carbon dioxide, the most important contributor to the anthropogenically (caused by human activity) enhanced greenhouse effect. Measurements are provided in parts per billion (ppb) with a spatial resolution of 7 km x 3.5 km.\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/methane)`,
+    description: S5CH4Markdown,
   },
 
   {
@@ -103,8 +116,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 0.001, color: '#800000', label: '1E-3 [mol / m^2]' },
       ],
     },
-    description: () =>
-      t`# Formaldehyde (HCHO)\n\n\n\nLong term satellite observations of tropospheric formaldehyde (HCHO) are essential to support air quality and chemistry-climate related studies from the regional to the global scale. The seasonal and inter-annual variations of the formaldehyde distribution are principally related to temperature changes and fire events, but also to changes in anthropogenic (human-made) activities. Its lifetime being of the order of a few hours, HCHO concentrations in the boundary layer can be directly related to the release of short-lived hydrocarbons, which mostly cannot be observed directly from space. Measurements are in mol per square meter (mol/ m^2).\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/formaldehyde)`,
+    description: S5HCHOMarkdown,
   },
 
   {
@@ -122,8 +134,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 0.01, color: '#800000', label: '1E-2 [mol / m^2]' },
       ],
     },
-    description: () =>
-      t`# Sulfur Dioxide (SO2)\n\n\n\nSulphur dioxide enters the Earth’s atmosphere through both natural and anthropogenic (human made) processes. It plays a role in chemistry on a local and global scale and its impact ranges from short term pollution to effects on climate. Only about 30% of the emitted SO2 comes from natural sources; the majority is of anthropogenic origin. Sentinel-5P/TROPOMI instrument samples the Earth’s surface with a revisit time of one day with a spatial resolution of 3.5 x 7 km which allows the resolution of fine details including the detection of smaller SO2 plumes. Measurements are in mol per square meter (mol/ m^2).\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/sulphur-dioxide)`,
+    description: S5SO2Markdown,
   },
 
   {
@@ -141,8 +152,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 0.36, color: '#800000', label: '0.36 [mol / m^2]' },
       ],
     },
-    description: () =>
-      t`# Ozone (O3)\n\n\n\nOzone is of crucial importance for the equilibrium of the Earth atmosphere. In the stratosphere, the ozone layer shields the biosphere from dangerous solar ultraviolet radiation. In the troposphere, it acts as an efficient cleansing agent, but at high concentration it also becomes harmful to the health of humans, animals, and vegetation. Ozone is also an important greenhouse-gas contributor to ongoing climate change. Since the discovery of the Antarctic ozone hole in the 1980s and the subsequent Montreal Protocol regulating the production of chlorine-containing ozone-depleting substances, ozone has been routinely monitored from the ground and from space. Measurements are in mol per square meter (mol/ m^2)\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/total-ozone-column)`,
+    description: S5O3Markdown,
   },
 
   {
@@ -160,8 +170,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 0.0001, color: '#800000', label: '1.0E-4 [mol / m^2]' },
       ],
     },
-    description: () =>
-      t`# Nitrogen Dioxide (NO2)\n\n\n\nNitrogen dioxide (NO2) and nitrogen oxide (NO) together are usually referred to as nitrogen oxides. They are important trace gases in the Earth’s atmosphere, present in both the troposphere and the stratosphere. They enter the atmosphere as a result of anthropogenic activities (particularly fossil fuel combustion and biomass burning) and natural processes (such as microbiological processes in soils, wildfires and lightning). Measurements are in mol per square meter (mol/ m^2).\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/nitrogen-dioxide)`,
+    description: S5NO2Markdown,
   },
 
   {
@@ -179,8 +188,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 0.1, color: '#800000', label: '0.1 [mol / m^2]' },
       ],
     },
-    description: () =>
-      t`# Carbon Monoxide (CO)\n\n\n\nCarbon monoxide (CO) is an important atmospheric trace gas. In certain urban areas, it is a major atmospheric pollutant. Main sources of CO are combustion of fossil fuels, biomass burning, and atmospheric oxidation of methane and other hydrocarbons. The carbon monoxide total column is measured in mol per square meter (mol/ m^2).\n\n\n\nMore info [here.](http://www.tropomi.eu/data-products/carbon-monoxide)`,
+    description: S5COMarkdown,
   },
 
   {
@@ -201,8 +209,7 @@ export const PREDEFINED_LAYERS_METADATA = [
         { position: 5, color: '#800000', label: '5' },
       ],
     },
-    description: () =>
-      t`# Aerosol Index\n\nThe Aerosol Index (AI) is a qualitative index indicating the presence of elevated layers of aerosols in the atmosphere. It can be used to detect the presence of UV absorbing aerosols such as desert dust and volcanic ash plumes. Positive values (from light blue to red) indicate the presence of UV-absorbing aerosol. This index is calculated for two pairs of wavelengths: 340/380 nm and 354/388 nm.\n\nMore info [here.](https://earth.esa.int/web/sentinel/technical-guides/sentinel-5p/level-2/aerosol-index)`,
+    description: S5AERAIMarkdown,
   },
 
   {
@@ -463,9 +470,6 @@ export const PREDEFINED_LAYERS_METADATA = [
       { datasourceId: 'AWS_LOTL2', layerId: '4-NDVI' },
       { datasourceId: 'AWS_LTML1', layerId: '4_NDVI' },
       { datasourceId: 'AWS_LTML2', layerId: '4_NDVI' },
-      { datasourceId: 'ESA_L8', layerId: '3_NDVI' },
-      { datasourceId: 'ESA_L7', layerId: '3_NDVI' },
-      { datasourceId: 'ESA_L5', layerId: '3_NDVI' },
       { datasourceId: 'MODIS', layerId: 'NDVI' },
       { datasourceId: 'S2L1C', layerId: '6_NDVI' },
       { datasourceId: 'S2L2A', layerId: '6_NDVI' },
@@ -779,15 +783,6 @@ export const PREDEFINED_LAYERS_METADATA = [
     description: () =>
       t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://earthobservatory.nasa.gov/features/FalseColor/page6.php)`,
   },
-  {
-    match: [
-      { datasourceId: 'ESA_L5', layerId: '2_FALSE_COLOR' },
-      { datasourceId: 'ESA_L7', layerId: '2_FALSE_COLOR' },
-    ],
-
-    description: () =>
-      t`# False color composite\n\nA false color composite uses at least one non-visible wavelength to image Earth. The false color composite using near infrared, red and green bands is very popular (a band is a region of the electromagnetic spectrum; a satellite sensor can image Earth in different bands). The false colour composite is most commonly used to assess plant density and health, since plants reflect near infrared and green light, while they absorb red. Cities and exposed ground are grey or tan, and water appears blue or black.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/Landsat-57/composites/) and [here.](https://earthobservatory.nasa.gov/features/FalseColor)`,
-  },
 
   {
     match: [{ datasourceId: 'ENVISAT_MERIS', layerId: 'FALSE_COLOR' }],
@@ -809,20 +804,6 @@ export const PREDEFINED_LAYERS_METADATA = [
 
     description: () =>
       t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Sentinel-2 has 13 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/sentinel-2/true_color/) and [here.](http://www.fis.uni-bonn.de/en/recherchetools/infobox/professionals/remote-sensing-systems/spectroscopy).`,
-  },
-
-  {
-    match: [{ datasourceId: 'ESA_L5', layerId: '1_TRUE_COLOR' }],
-
-    description: () =>
-      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 5 has 7 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/Landsat-57/composites/) and [here.](https://www.usgs.gov/land-resources/nli/landsat/landsat-5?qt-science_support_page_related_con=0#qt-science_support_page_related_con)`,
-  },
-
-  {
-    match: [{ datasourceId: 'ESA_L7', layerId: '1_TRUE_COLOR' }],
-
-    description: () =>
-      t`# True color composite\n\nSensors carried by satellites can image Earth in different regions of the electromagnetic spectrum. Each region in the spectrum is referred to as a band. Landsat 7 has 8 bands. True color composite uses visible light bands red, green and blue in the corresponding red, green and blue color channels, resulting in a natural colored product, that is a good representation of the Earth as humans would see it naturally.\n\n\n\nMore info [here](https://custom-scripts.sentinel-hub.com/Landsat-57/composites/) and [here.](https://www.usgs.gov/land-resources/nli/landsat/landsat-7?qt-science_support_page_related_con=0#qt-science_support_page_related_con)`,
   },
 
   {
@@ -1467,7 +1448,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Discrete Classification Map\n\n\n\nThis layer visualises Global Land Cover discrete classification map with 23 classes defined using the UN-FAO Land Cover Classification System (LCCS) and with color scheme defined in the Product User Manual. Map [here.](https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_PUM_LC100m-V3_I3.3.pdf)`,
+      t`# Discrete Classification Map\n\n\n\nThis layer visualises Global Land Cover discrete classification map with 23 classes defined using the UN-FAO Land Cover Classification System (LCCS) and with color scheme defined in the Product User Manual. Map [here.](https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_PUM_LC100m-V3_I3.4.pdf)`,
   },
 
   {
@@ -1503,7 +1484,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Forest Types\n\n\n\nVisualized forest types based on 6 classes, as defined in the UN-FAO Land Cover Classification System (LCCS). More [here.](https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_PUM_LC100m-V3_I3.3.pdf).`,
+      t`# Forest Types\n\n\n\nVisualized forest types based on 6 classes, as defined in the UN-FAO Land Cover Classification System (LCCS). More [here.](https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_PUM_LC100m-V3_I3.4.pdf).`,
   },
 
   {
@@ -1695,7 +1676,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Corine Land Cover (CLC)\n\n\n\nIn this Corine Land Cover layer, all 44 classes are shown. Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+      t`# Corine Land Cover (CLC)\n\n\n\nIn this Corine Land Cover layer, all 44 classes are shown. Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine/corine_land_cover/).`,
   },
 
   {
@@ -1751,7 +1732,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Corine Land Cover (CLC) - Artificial Surfaces\n\n\n\nIn this Corine Land Cover layer, only the 11 artificial surface classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+      t`# Corine Land Cover (CLC) - Artificial Surfaces\n\n\n\nIn this Corine Land Cover layer, only the 11 artificial surface classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine/corine_land_cover/).`,
   },
 
   {
@@ -1807,7 +1788,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Corine Land Cover (CLC) - Agricultural Areas\n\n\n\nIn this Corine Land Cover layer, only the 11 agricultural classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+      t`# Corine Land Cover (CLC) - Agricultural Areas\n\n\n\nIn this Corine Land Cover layer, only the 11 agricultural classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine/corine_land_cover/).`,
   },
 
   {
@@ -1867,7 +1848,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Corine Land Cover (CLC) - Forest and Seminatural Areas\n\n\n\nIn this Corine Land Cover layer, only the 12 Forest and Seminatural Area classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+      t`# Corine Land Cover (CLC) - Forest and Seminatural Areas\n\n\n\nIn this Corine Land Cover layer, only the 12 Forest and Seminatural Area classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine/corine_land_cover/).`,
   },
 
   {
@@ -1900,7 +1881,7 @@ export const PREDEFINED_LAYERS_METADATA = [
     },
     description: () =>
       t`# Corine Land Cover (CLC) - Wetlands\n\n\n\nIn this Corine Land Cover layer, only the 5 Wetland classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). 
-      Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+      Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine/corine_land_cover/).`,
   },
 
   {
@@ -1936,7 +1917,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Corine Land Cover (CLC) - Water Bodies\n\n\n\nIn this Corine Land Cover layer, only the 6 Water body classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover/).`,
+      t`# Corine Land Cover (CLC) - Water Bodies\n\n\n\nIn this Corine Land Cover layer, only the 6 Water body classes are shown, based on the classification [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/html). Learn about each class [here](https://land.copernicus.eu/user-corner/technical-library/corine-land-cover-nomenclature-guidelines/docs/pdf/CLC2018_Nomenclature_illustrated_guide_20190510.pdf) and see the evalscript with all the classes [here](https://custom-scripts.sentinel-hub.com/copernicus_services/corine/corine_land_cover/).`,
   },
 
   {
@@ -2128,7 +2109,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`#  Corine Land Cover - Accounting\n\n\n\nThis script visualises CORINE Land Cover (CLC) Accounting Layers according to the official CORINE Land Cover color scheme. CLC Accounting Layers are CLC status layers modified for the purpose of consistent statistical analysis in the land cover change accounting system at EEA. For more information about the layer, visit [this website](https://custom-scripts.sentinel-hub.com/copernicus_services/corine_land_cover_accounting_layer/).`,
+      t`#  Corine Land Cover - Accounting\n\n\n\nThis script visualises CORINE Land Cover (CLC) Accounting Layers according to the official CORINE Land Cover color scheme. CLC Accounting Layers are CLC status layers modified for the purpose of consistent statistical analysis in the land cover change accounting system at EEA. For more information about the layer, visit [this website](https://custom-scripts.sentinel-hub.com/custom-scripts/copernicus_services/corine/corine_land_cover_accounting_layer/).`,
   },
 
   {
@@ -2141,7 +2122,7 @@ export const PREDEFINED_LAYERS_METADATA = [
 
       This script visualises the built-up probabilities stretched to 0-255.
 
-      For more information about the layer, visit [this website](https://custom-scripts.sentinel-hub.com/copernicus_services/global-human-settlement-layer-ghs-built-s2/).`,
+      For more information about the layer, visit [this website](https://custom-scripts.sentinel-hub.com/other_collections/global-human-settlement-layer/global-human-settlement-layer-ghs-built-s2/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_WATER_BODIES', layerId: 'WATER-BODIES-OCCURENCE' }],
@@ -2176,7 +2157,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Water Bodies - Occurrence\n\n\n\nThis layer displays the 6 occurrence levels of the Quality layer (QUAL), providing information on the seasonal dynamics of the detected water bodies. QUAL is generated from water body occurrence statistics computed from previous monthly Water Bodies products. The occurrence statistics is ranked from low occurrence to permanent occurrence. More information [here](https://collections.sentinel-hub.com/water-bodies/readme.html), and [here](https://custom-scripts.sentinel-hub.com/copernicus_services/water-bodies-occurence/#).`,
+      t`# Water Bodies - Occurrence\n\n\n\nThis layer displays the 6 occurrence levels of the Quality layer (QUAL), providing information on the seasonal dynamics of the detected water bodies. QUAL is generated from water body occurrence statistics computed from previous monthly Water Bodies products. The occurrence statistics is ranked from low occurrence to permanent occurrence. More information [here](https://collections.sentinel-hub.com/water-bodies/readme.html), and [here](https://custom-scripts.sentinel-hub.com/copernicus_services/water-bodies/water-bodies-occurence/).`,
   },
 
   {
@@ -2206,7 +2187,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       },
     ],
     description: () =>
-      t`# Global Surface Water - Occurrence\n\n\n\nThe layer shows the (intra- and inter-annual) variations of surface water presence in the time range between March 1984 and December 2021. Permanent water areas with 100% occurrence over the 38 years are shown in blue, while lighter shades of pink and purple indicate lower degrees of water presence. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_occurrence/).`,
+      t`# Global Surface Water - Occurrence\n\n\n\nThe layer shows the (intra- and inter-annual) variations of surface water presence in the time range between March 1984 and December 2021. Permanent water areas with 100% occurrence over the 38 years are shown in blue, while lighter shades of pink and purple indicate lower degrees of water presence. Learn more [here](https://custom-scripts.sentinel-hub.com/custom-scripts/other_collections/global-surface-water/global_surface_water_occurrence/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '2_CHANGE-INTENSITY' }],
@@ -2240,7 +2221,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       },
     ],
     description: () =>
-      t`# Global Surface Water - Occurrence Change Intensity\n\n\n\nThe layer visualises changes in water occurrence between two different epochs, the first ranging from March 1984 to December 1999, and the other covering the period from January 2000 to December 2021. Areas with increase in water occurrence are visualized in different shades of green, areas with no change are colored black and areas with decrease are shown in shades of red. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_change/).`,
+      t`# Global Surface Water - Occurrence Change Intensity\n\n\n\nThe layer visualises changes in water occurrence between two different epochs, the first ranging from March 1984 to December 1999, and the other covering the period from January 2000 to December 2021. Areas with increase in water occurrence are visualized in different shades of green, areas with no change are colored black and areas with decrease are shown in shades of red. Learn more [here](https://custom-scripts.sentinel-hub.com/custom-scripts/other_collections/global-surface-water/global_surface_water_change/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '3_SEASONALITY' }],
@@ -2269,7 +2250,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       },
     ],
     description: () =>
-      t`# Global Surface Water - Seasonality\n\n\n\nThe Seasonality layer provides information on the distribution of surface water in 2021. Permanent water bodies (water was present for 12 months) are colored in dark blue and seasonal water (water was present for less than 12 months) in gradually lighter shades of blue, with the lightest blue showing areas where water was present for only 1 month. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_seasonality/).`,
+      t`# Global Surface Water - Seasonality\n\n\n\nThe Seasonality layer provides information on the distribution of surface water in 2021. Permanent water bodies (water was present for 12 months) are colored in dark blue and seasonal water (water was present for less than 12 months) in gradually lighter shades of blue, with the lightest blue showing areas where water was present for only 1 month. Learn more [here](https://custom-scripts.sentinel-hub.com/custom-scripts/other_collections/global-surface-water/global_surface_water_seasonality/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '4_RECURRENCE' }],
@@ -2298,7 +2279,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       },
     ],
     description: () =>
-      t`# Global Surface Water - Recurrence\n\n\n\nThe Recurrence layer shows how frequently water returned to a particular location in a defined water period between 1984 and 2021. Orange color indicates low recurrence (water returned to the area infrequently), and light blue color indicates high recurrence (water returned to the area frequently). Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_recurrence/).`,
+      t`# Global Surface Water - Recurrence\n\n\n\nThe Recurrence layer shows how frequently water returned to a particular location in a defined water period between 1984 and 2021. Orange color indicates low recurrence (water returned to the area infrequently), and light blue color indicates high recurrence (water returned to the area frequently). Learn more [here](https://custom-scripts.sentinel-hub.com/custom-scripts/other_collections/global-surface-water/global_surface_water_recurrence/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '5_TRANSITIONS' }],
@@ -2356,7 +2337,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Global Surface Water - Transitions\n\n\n\nThe Transitions layer is derived from a comparison between the first and last year in the 38-year time period. It visualises conversions between seasonal and permanent water. For example, "lost seasonal" means, that previously seasonal water was converted to land, "new seasonal" means that land has been converted to seasonal waters and so on. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_transitions/) and learn what each class means [here](https://global-surface-water.appspot.com/faq).`,
+      t`# Global Surface Water - Transitions\n\n\n\nThe Transitions layer is derived from a comparison between the first and last year in the 38-year time period. It visualises conversions between seasonal and permanent water. For example, "lost seasonal" means, that previously seasonal water was converted to land, "new seasonal" means that land has been converted to seasonal waters and so on. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global-surface-water/global_surface_water_transitions/) and learn what each class means [here](https://global-surface-water.appspot.com/faq).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_GLOBAL_SURFACE_WATER', layerId: '6_EXTENT' }],
@@ -2378,7 +2359,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Global Surface Water - Extent\n\n\n\nThis layer visualizes water in blue. It combines all the other layers and visualizes all the locations for which water presence has ever been detected over the 38-year period. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global_surface_water_extent/).`,
+      t`# Global Surface Water - Extent\n\n\n\nThis layer visualizes water in blue. It combines all the other layers and visualizes all the locations for which water presence has ever been detected over the 38-year period. Learn more [here](https://custom-scripts.sentinel-hub.com/other_collections/global-surface-water/global_surface_water_extent/).`,
   },
   {
     match: [{ datasourceId: 'COPERNICUS_WATER_BODIES', layerId: 'WATER-BODIES' }],
@@ -2393,7 +2374,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Water Bodies\n\n\n\nThis layer visualizes the Water Bodies detection layer (WB), which shows water bodies detected using the Modified Normalized Difference Water Index (MNDWI) derived from Sentinel-2 Level 1C data. More information [here](https://collections.sentinel-hub.com/water-bodies/readme.html), and [here](https://custom-scripts.sentinel-hub.com/copernicus_services/water-bodies/).`,
+      t`# Water Bodies\n\n\n\nThis layer visualizes the Water Bodies detection layer (WB), which shows water bodies detected using the Modified Normalized Difference Water Index (MNDWI) derived from Sentinel-2 Level 1C data. More information [here](https://collections.sentinel-hub.com/water-bodies/readme.html), and [here](https://custom-scripts.sentinel-hub.com/copernicus_services/water-bodies/water-bodies-visualisation/).`,
   },
 
   {
@@ -3026,7 +3007,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# CNES Land cover map\n\n\n\nThe CNES Land Cover Map (Occupation des Sols, OSO) produces land classification for Metropolitan France at 10 m spatial resolution based on Sentinel-2 L2A data within the Theia Land Cover CES framework. Maps for 2020, 2019, and 2018 use a 23-categories nomenclature. For earlier maps in 2017 and 2016, a fully compatible 17-classes nomenclature is employed.\n\n\n\nFind more information [here](https://custom-scripts.sentinel-hub.com/other_collections/cnes_land_cover_classification/).`,
+      t`# CNES Land cover map\n\n\n\nThe CNES Land Cover Map (Occupation des Sols, OSO) produces land classification for Metropolitan France at 10 m spatial resolution based on Sentinel-2 L2A data within the Theia Land Cover CES framework. Maps for 2020, 2019, and 2018 use a 23-categories nomenclature. For earlier maps in 2017 and 2016, a fully compatible 17-classes nomenclature is employed.\n\n\n\nFind more information [here](https://custom-scripts.sentinel-hub.com/other_collections/cnes/cnes_land_cover_classification/).`,
   },
   {
     match: [{ datasourceId: CNES_LAND_COVER, layerId: 'CNES-LAND-COVER-CLASSIFIER-CONFIDENCE' }],
@@ -3044,7 +3025,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# CNES land cover classifier confidence visualisation\n\n\n\nThe script visualises the information on the classifier confidence with values ranging from 1 to 100.\n\n\n\nFind more information [here](https://custom-scripts.sentinel-hub.com/other_collections/cnes_land_cover_confidence/).`,
+      t`# CNES land cover classifier confidence visualisation\n\n\n\nThe script visualises the information on the classifier confidence with values ranging from 1 to 100.\n\n\n\nFind more information [here](https://custom-scripts.sentinel-hub.com/other_collections/cnes/cnes_land_cover_confidence/).`,
   },
   {
     match: [{ datasourceId: CNES_LAND_COVER, layerId: 'CNES-LAND-COVER-VALIDITY' }],
@@ -3062,7 +3043,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# CNES land cover validity visualisation\n\n\n\nThe script visualises the information on the number of cloudless images for validity.\n\n\n\nFind more information [here](https://custom-scripts.sentinel-hub.com/other_collections/cnes_land_cover_validity/).`,
+      t`# CNES land cover validity visualisation\n\n\n\nThe script visualises the information on the number of cloudless images for validity.\n\n\n\nFind more information [here](https://custom-scripts.sentinel-hub.com/other_collections/cnes/cnes_land_cover_validity/).`,
   },
   {
     match: [{ datasourceId: ESA_WORLD_COVER, layerId: 'WORLDCOVER-MAP' }],
@@ -3116,7 +3097,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# ESA WorldCover Map\n\n\n\nThe WorldCover product displays a global land cover map with 11 different land cover classes produced at 10m resolution based on combination of both Sentinel-1 and Sentinel-2 data. In areas where Sentinel-2 images are covered by clouds for an extended period of time, Sentinel-1 data provides complimentary information on the structural characteristics of the observed land cover. Therefore, the combination of Sentinel-1 and Sentinel-2 data makes it possible to update the land cover map almost in real time. Find more information [here](https://custom-scripts.sentinel-hub.com/other_collections/worldcover/).`,
+      t`# ESA WorldCover Map\n\n\n\nThe WorldCover product displays a global land cover map with 11 different land cover classes produced at 10m resolution based on combination of both Sentinel-1 and Sentinel-2 data. In areas where Sentinel-2 images are covered by clouds for an extended period of time, Sentinel-1 data provides complimentary information on the structural characteristics of the observed land cover. Therefore, the combination of Sentinel-1 and Sentinel-2 data makes it possible to update the land cover map almost in real time. Find more information [here](https://custom-scripts.sentinel-hub.com/other_collections/esa-worldcover/worldcover/).`,
   },
   {
     match: [{ datasourceId: IO_LULC_10M_ANNUAL, layerId: 'IO-LAND-USE-LAND-COVER-MAP' }],
@@ -3162,7 +3143,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# 10m Annual Land Use Land Cover (9-class)\n\n\n\nThe 10m Annual Land Use Land Cover (LULC) Map is produced by Impact Observatory, Microsoft, and Esri collaboratively. The data collection is derived from ESA Sentinel-2 imagery at 10m resolution globally using Impact Ovservatory's state of the art deep learning AI land classification model which is trained by billions of human-labeled image pixels. There are 9 LULC classes generated by the algorithm, including Built, Crops, Trees, Water, Rangeland, Flooded Vegetation, Snow/Ice, Bare Ground, and Clouds. Find more information [here](https://custom-scripts.sentinel-hub.com/other_collections/impact-observatory-lulc/).`,
+      t`# 10m Annual Land Use Land Cover (9-class)\n\n\n\nThe 10m Annual Land Use Land Cover (LULC) Map is produced by Impact Observatory, Microsoft, and Esri collaboratively. The data collection is derived from ESA Sentinel-2 imagery at 10m resolution globally using Impact Ovservatory's state of the art deep learning AI land classification model which is trained by billions of human-labeled image pixels. There are 9 LULC classes generated by the algorithm, including Built, Crops, Trees, Water, Rangeland, Flooded Vegetation, Snow/Ice, Bare Ground, and Clouds. Find more information [here](https://custom-scripts.sentinel-hub.com/other_collections/impact-observatory/impact-observatory-lulc/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HR_VPP_SEASONAL_TRAJECTORIES, layerId: 'PPI-VISUALIZATION' }],
@@ -3183,7 +3164,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Yearly Time-Series of the Plant Phenology Index\n\n\n\nPPI (Plant Phenology Index) is a physically-based vegetation index derived from radiative transfer equation and is calculated from red and Near-Infrared (NIR) spectral bands. It is linearly related to the green leaf area index, and can be used to track canopy green foliage dynamics and therefore provides an efficient approach to retrieving plant phenology. Seasonal Trajectories PPI product is a filtered yearly time series of PPI, providing the vegetation status for each pixel on a regular 10-day time step. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/st-ppi/).`,
+      t`# Yearly Time-Series of the Plant Phenology Index\n\n\n\nPPI (Plant Phenology Index) is a physically-based vegetation index derived from radiative transfer equation and is calculated from red and Near-Infrared (NIR) spectral bands. It is linearly related to the green leaf area index, and can be used to track canopy green foliage dynamics and therefore provides an efficient approach to retrieving plant phenology. Seasonal Trajectories PPI product is a filtered yearly time series of PPI, providing the vegetation status for each pixel on a regular 10-day time step. Find more information [here](https://custom-scripts.sentinel-hub.com/custom-scripts/copernicus_services/hrvpp/st-ppi/).`,
   },
   {
     match: [
@@ -3207,7 +3188,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Amplitude Parameter\n\n\n\nThis layer visualizes the seasonal amplitude parameter of the VPP (Vegetation Phenology and Productivity) parameter. It is calculated as a difference between the MAXV (season maximum value) and MINV (season minimum value) parameters. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-amplitude-ampl/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+      t`# Amplitude Parameter\n\n\n\nThis layer visualizes the seasonal amplitude parameter of the VPP (Vegetation Phenology and Productivity) parameter. It is calculated as a difference between the MAXV (season maximum value) and MINV (season minimum value) parameters. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vpp-amplitude-ampl) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
   },
   {
     match: [
@@ -3231,7 +3212,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Start of Season Values\n\n\n\nThis layer visualizes the SOSV parameter of the VPP (Vegetation Phenology and Productivity) parameter. SOSV represents the PPI (plant phenology index) value of the start-of-season day. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-start-of-season-value-sosv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+      t`# Start of Season Values\n\n\n\nThis layer visualizes the SOSV parameter of the VPP (Vegetation Phenology and Productivity) parameter. SOSV represents the PPI (plant phenology index) value of the start-of-season day. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vpp-start-of-season-value-sosv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
   },
   {
     match: [
@@ -3255,7 +3236,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# End of Season Values\n\n\n\nThis layer visualizes the EOSV parameter of the VPP (Vegetation Phenology and Productivity) parameter. EOSV is a PPI (plant phenology index) value of the end-of-season day. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-end-of-season-value-eosv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+      t`# End of Season Values\n\n\n\nThis layer visualizes the EOSV parameter of the VPP (Vegetation Phenology and Productivity) parameter. EOSV is a PPI (plant phenology index) value of the end-of-season day. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vpp-end-of-season-value-eosv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
   },
   {
     match: [
@@ -3279,7 +3260,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Season Minimum Value\n\n\n\nThis layer visualizes the MINV parameter of the VPP (Vegetation Phenology and Productivity) parameter. MINV represents the average PPI (plant phenology index) value of the minima on the left and right sides of each season. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-season-minimum-value-minv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+      t`# Season Minimum Value\n\n\n\nThis layer visualizes the MINV parameter of the VPP (Vegetation Phenology and Productivity) parameter. MINV represents the average PPI (plant phenology index) value of the minima on the left and right sides of each season. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vpp-season-minimum-value-minv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
   },
   {
     match: [
@@ -3303,7 +3284,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Season Maximum Value\n\n\n\nThis layer visualizes the MAXV parameter of the VPP (Vegetation Phenology and Productivity) parameter. MAXV represents the PPI (plant phenology index) value at the day of the season maximum. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-season-maximum-value-maxv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+      t`# Season Maximum Value\n\n\n\nThis layer visualizes the MAXV parameter of the VPP (Vegetation Phenology and Productivity) parameter. MAXV represents the PPI (plant phenology index) value at the day of the season maximum. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vpp-season-maximum-value-maxv/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
   },
   {
     match: [
@@ -3337,7 +3318,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Slope of the Greening Period\n\n\n\nThis layer visualizes the LSLOPE parameter of the VPP (Vegetation Phenology and Productivity) parameter. LSLOPE represents the slope of the PPI (plant phenology index) of the greening-up period. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-slope-of-greening-up-period-lslope/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+      t`# Slope of the Greening Period\n\n\n\nThis layer visualizes the LSLOPE parameter of the VPP (Vegetation Phenology and Productivity) parameter. LSLOPE represents the slope of the PPI (plant phenology index) of the greening-up period. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vpp-slope-of-greening-up-period-lslope/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
   },
   {
     match: [
@@ -3371,7 +3352,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Slope of the Senescent Period\n\n\n\nThis layer visualizes the RSLOPE parameter of the VPP (Vegetation Phenology and Productivity) parameter. RSLOPE represents the slope of the PPI (plant phenology index) of the senescent period. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-slope-of-senescent-period-rslope/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+      t`# Slope of the Senescent Period\n\n\n\nThis layer visualizes the RSLOPE parameter of the VPP (Vegetation Phenology and Productivity) parameter. RSLOPE represents the slope of the PPI (plant phenology index) of the senescent period. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vpp-slope-of-senescent-period-rslope/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
   },
   {
     match: [
@@ -3395,7 +3376,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Seasonal Productivity Parameter\n\n\n\nThis layer visualizes the SPROD parameter of the VPP (Vegetation Phenology and Productivity) parameter. SPROD represents seasonal productivity. It is calculated as the sum of all daily PPI (plant phenology index) values between SOSD (start-of-season day) and EOSD (end-of-season day). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-seasonal-productivity-sprod/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+      t`# Seasonal Productivity Parameter\n\n\n\nThis layer visualizes the SPROD parameter of the VPP (Vegetation Phenology and Productivity) parameter. SPROD represents seasonal productivity. It is calculated as the sum of all daily PPI (plant phenology index) values between SOSD (start-of-season day) and EOSD (end-of-season day). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vpp-seasonal-productivity-sprod/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
   },
   {
     match: [
@@ -3419,7 +3400,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Total Productivity Parameter\n\n\n\nThis layer visualizes the TPROD parameter of the VPP (Vegetation Phenology and Productivity) parameter. TPROD represents total productivity. It is calculated as a sum of all daily PPI (plant phenology index) values, minus their base level value. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vpp-total-productivity-tprod/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
+      t`# Total Productivity Parameter\n\n\n\nThis layer visualizes the TPROD parameter of the VPP (Vegetation Phenology and Productivity) parameter. TPROD represents total productivity. It is calculated as a sum of all daily PPI (plant phenology index) values, minus their base level value. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vpp-total-productivity-tprod/) and [here](https://land.copernicus.eu/pan-european/biophysical-parameters/high-resolution-vegetation-phenology-and-productivity).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_PSA, layerId: 'PERSISTENT-SNOW-AREA' }],
@@ -3441,7 +3422,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Persistent Snow Area\n\n\n\nThis script visualises Persistent Snow Area (PSA). The PSA product is generated annually from FSC products and provides the extent of persistent snow cover (the areas where snow is present throughout the hydrological year). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-psa-psa/).`,
+      t`# Persistent Snow Area\n\n\n\nThis script visualises Persistent Snow Area (PSA). The PSA product is generated annually from FSC products and provides the extent of persistent snow cover (the areas where snow is present throughout the hydrological year). Find more information [here](https://custom-scripts.sentinel-hub.com/custom-scripts/copernicus_services/hrsi/hrsi-psa-psa/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_PSA, layerId: 'PERSISTENT-SNOW-AREA-QUALITY' }],
@@ -3475,7 +3456,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Persistent Snow Area Quality\n\n\n\nThis script visualises the Persistent Snow Area Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-psa-psa-quality/).`,
+      t`# Persistent Snow Area Quality\n\n\n\nThis script visualises the Persistent Snow Area Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/custom-scripts/copernicus_services/hrsi/hrsi-psa-psa-quality/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_WDS, layerId: 'SNOW-STATE-CLASSIFICATION' }],
@@ -3521,7 +3502,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Wet / Dry Snow - Snow State Classification \n\n\n\nThis script visualises the Wet / Dry Snow - Snow State Classification (WDS SSC). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-wds-ssc/).`,
+      t`# Wet / Dry Snow - Snow State Classification \n\n\n\nThis script visualises the Wet / Dry Snow - Snow State Classification (WDS SSC). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-wds-ssc/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_WDS, layerId: 'SNOW-STATE-CLASSIFICATION-QUALITY' }],
@@ -3555,7 +3536,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Wet / Dry Snow - Snow State Classification Quality\n\n\n\nThis script visualises the Wet / Dry Snow - Snow State Classification (WDS QCSSC) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-wds-ssc-quality/).`,
+      t`# Wet / Dry Snow - Snow State Classification Quality\n\n\n\nThis script visualises the Wet / Dry Snow - Snow State Classification (WDS QCSSC) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-wds-ssc-quality/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_SWS, layerId: 'SAR-WET-SNOW' }],
@@ -3597,7 +3578,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# SAR Wet Snow - Wet Snow in high Mountains areas\n\n\n\nThis script visualises SAR Wet Snow in high Mountains - Wet Snow classification in high Mountains (SWS WSM). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-sws-wet-snow-classification-high-mountains/).`,
+      t`# SAR Wet Snow - Wet Snow in high Mountains areas\n\n\n\nThis script visualises SAR Wet Snow in high Mountains - Wet Snow classification in high Mountains (SWS WSM). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-sws-wet-snow-classification-high-mountains/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_SWS, layerId: 'SAR-WET-SNOW-QUALITY' }],
@@ -3631,7 +3612,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# SAR Wet Snow - Wet Snow in high Mountains Quality\n\n\n\nThis script visualises SAR Wet Snow in high Mountains - Wet Snow classification in high Mountains Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-sws-wet-snow-classification-high-mountains-quality/).`,
+      t`# SAR Wet Snow - Wet Snow in high Mountains Quality\n\n\n\nThis script visualises SAR Wet Snow in high Mountains - Wet Snow classification in high Mountains Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-sws-wet-snow-classification-high-mountains-quality/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_FSC, layerId: 'FRACTIONAL-SNOW-COVER-ON-GROUND' }],
@@ -3690,7 +3671,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Fractional Snow Cover - On-ground\n\n\n\nThis script visualises Fractional Snow Cover - On-ground Fractional Snow Cover (%) (FSCOG). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-fsc-on-ground-fsi/).`,
+      t`# Fractional Snow Cover - On-ground\n\n\n\nThis script visualises Fractional Snow Cover - On-ground Fractional Snow Cover (%) (FSCOG). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-fsc-on-ground-fsi/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_FSC, layerId: 'FRACTIONAL-SNOW-COVER-ON-GROUND-QUALITY' }],
@@ -3724,7 +3705,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Fractional Snow Cover - On-ground Quality\n\n\n\nThis script visualises the Fractional Snow Cover - On-ground Fractional Snow Cover (%) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-fsc-on-ground-fsi-quality/).`,
+      t`# Fractional Snow Cover - On-ground Quality\n\n\n\nThis script visualises the Fractional Snow Cover - On-ground Fractional Snow Cover (%) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-fsc-on-ground-fsi-quality/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_FSC, layerId: 'FRACTIONAL-SNOW-COVER-TOP-OF-CANOPY' }],
@@ -3783,7 +3764,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Fractional Snow Cover - Top of Canopy\n\n\n\nThis script visualises Fractional Snow Cover - Top of Canopy Fractional Snow Cover (%) (FSCTOC). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-fsc-top-of-canopy-fsi/).`,
+      t`# Fractional Snow Cover - Top of Canopy\n\n\n\nThis script visualises Fractional Snow Cover - Top of Canopy Fractional Snow Cover (%) (FSCTOC). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-fsc-top-of-canopy-fsi/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_FSC, layerId: 'FRACTIONAL-SNOW-COVER-TOP-OF-CANOPY-QUALITY' }],
@@ -3817,7 +3798,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Fractional Snow Cover - Top of Canopy Quality\n\n\n\nThis script visualises the Fractional Snow Cover - Top of Canopy Fractional Snow Cover (%) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-fsc-top-of-canopy-fsi-quality/).`,
+      t`# Fractional Snow Cover - Top of Canopy Quality\n\n\n\nThis script visualises the Fractional Snow Cover - Top of Canopy Fractional Snow Cover (%) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-fsc-top-of-canopy-fsi-quality/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_FSC, layerId: 'FRACTIONAL-SNOW-COVER-NDSI' }],
@@ -3876,7 +3857,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Fractional Snow Cover - NDSI\n\n\n\nThis script visualises Fractional Snow Cover NDSI. The product provides the NDSI values in the detected snow area, i.e. area where FSCTOC > 0%. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-fsc-ndsi/).`,
+      t`# Fractional Snow Cover - NDSI\n\n\n\nThis script visualises Fractional Snow Cover NDSI. The product provides the NDSI values in the detected snow area, i.e. area where FSCTOC > 0%. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-fsc-ndsi/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_GFSC, layerId: 'GAP-FILLED-FRACTIONAL-SNOW-COVER' }],
@@ -3935,7 +3916,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Fractional Snow Cover (Gap-filled)\n\n\n\nThis script visualises Daily cumulative Gap-filled Fractional Snow Cover - Fractional Snow Cover (%). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-gfsc-fsc/).`,
+      t`# Fractional Snow Cover (Gap-filled)\n\n\n\nThis script visualises Daily cumulative Gap-filled Fractional Snow Cover - Fractional Snow Cover (%). Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-gfsc-fsc/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HRSI_GFSC, layerId: 'GAP-FILLED-FRACTIONAL-SNOW-COVER-QUALITY' }],
@@ -3969,7 +3950,187 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Fractional Snow Cover (Gap-filled) Quality\n\n\n\nThis script visualises the Daily cumulative Gap-filled Fractional Snow Cover - Fractional Snow Cover (%) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi-gfsc-fsc-quality/).`,
+      t`# Fractional Snow Cover (Gap-filled) Quality\n\n\n\nThis script visualises the Daily cumulative Gap-filled Fractional Snow Cover - Fractional Snow Cover (%) Quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-gfsc-fsc-quality/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_RLIE_S1, layerId: 'RIVER-AND-LAKE-ICE-EXTENT-S1' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#0000FE',
+          label: 'Open water',
+        },
+        {
+          color: '#00E8FF',
+          label: 'Snow-covered or snow-free ice',
+        },
+        {
+          color: '#FFFFFF',
+          label: 'No Data',
+        },
+      ],
+    },
+    description: () =>
+      t`# River and Lake Ice Extent - Sentinel-1\n\n\nThis script visualises the River and Lake Ice Extent based on synthetic aperture radar data from the S1 constellation. The product is generated for the entire EEA38+UK zone. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-rlie-s1/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_RLIE_S1, layerId: 'RIVER-AND-LAKE-ICE-EXTENT-S1-QUALITY' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00a600',
+          label: 'High quality',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Medium quality',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Low quality',
+        },
+        {
+          color: '#ff0000',
+          label: 'Minimal quality',
+        },
+        {
+          color: '#FFFFFF',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# River and Lake Ice Extent - Sentinel-1 Quality\n\n\nThis script visualises the Sentinel 1-based River and Lake Ice Extent quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-rlie-s1-quality/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_RLIE_S2, layerId: 'RIVER-AND-LAKE-ICE-EXTENT-S2' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#0000FE',
+          label: 'Open water',
+        },
+        {
+          color: '#00E8FF',
+          label: 'Snow-covered or snow-free ice',
+        },
+        {
+          color: '#FF0000',
+          label: 'Other features',
+        },
+        {
+          color: '#7B7B7B',
+          label: 'Cloud or cloud shadows',
+        },
+        {
+          color: '#FFFFFF',
+          label: 'No Data',
+        },
+      ],
+    },
+    description: () =>
+      t`# River and Lake Ice Extent - Sentinel-2\n\n\nThis script visualises the River and Lake Ice Extent based on optical satellite data from the Sentinel-2 constellation. The product is generated for the entire EEA38+UK zone. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-rlie-s2/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_RLIE_S2, layerId: 'RIVER-AND-LAKE-ICE-EXTENT-S2-QUALITY' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00a600',
+          label: 'High quality',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Medium quality',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Low quality',
+        },
+        {
+          color: '#ff0000',
+          label: 'Minimal quality',
+        },
+        {
+          color: '#7B7B7B',
+          label: 'Cloud or cloud shadows',
+        },
+        {
+          color: '#FFFFFF',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# River and Lake Ice Extent - Sentinel-2 Quality\n\n\nThis script visualises the Sentinel 2-based River and Lake Ice Extent quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-rlie-s2-quality/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_RLIE_S1_S2, layerId: 'RIVER-AND-LAKE-ICE-EXTENT-S1S2' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#0000FE',
+          label: 'Open water',
+        },
+        {
+          color: '#00E8FF',
+          label: 'Snow-covered or snow-free ice',
+        },
+        {
+          color: '#FF0000',
+          label: 'Other features',
+        },
+        {
+          color: '#7B7B7B',
+          label: 'Cloud or cloud shadows',
+        },
+        {
+          color: '#FFFFFF',
+          label: 'No Data',
+        },
+      ],
+    },
+    description: () =>
+      t`# River and Lake Ice Extent S1 and S2\n\n\nThis script visualises the River and Lake Ice Extent generated as a combination of RLIE S1 and RLIE S2 products acquired on the same date for the entire EEA38+UK zone. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-rlie-s1s2/).`,
+  },
+  {
+    match: [{ datasourceId: COPERNICUS_HRSI_RLIE_S1_S2, layerId: 'RIVER-AND-LAKE-ICE-EXTENT-S1S2-QUALITY' }],
+    legend: {
+      type: 'discrete',
+      items: [
+        {
+          color: '#00a600',
+          label: 'High quality',
+        },
+        {
+          color: '#a6e64d',
+          label: 'Medium quality',
+        },
+        {
+          color: '#f2a64d',
+          label: 'Low quality',
+        },
+        {
+          color: '#ff0000',
+          label: 'Minimal quality',
+        },
+        {
+          color: '#7B7B7B',
+          label: 'Cloud or cloud shadows',
+        },
+        {
+          color: '#FFFFFF',
+          label: 'No data',
+        },
+      ],
+    },
+    description: () =>
+      t`# River and Lake Ice Extent S1 and S2 Quality\n\n\nThis script visualises the Sentinel 1 and 2-based River and Lake Ice Extent quality layer. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrsi/hrsi-rlie-s1s2-quality/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HR_VPP_VEGETATION_INDICES, layerId: 'FAPAR-VISUALIZATION' }],
@@ -3990,8 +4151,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Fraction of Absorbed Photosynthetically Active Radiation
-      \n\n\n\nFAPAR corresponds to the fraction of photosynthetically active radiation absorbed by the canopy. The index describes only the green parts of the canopy and is very useful for assessing the primary productivity of canopies. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vi-fapar/).`,
+      t`# Fraction of Absorbed Photosynthetically Active Radiation\n\n\n\n\nFAPAR corresponds to the fraction of photosynthetically active radiation absorbed by the canopy. The index describes only the green parts of the canopy and is very useful for assessing the primary productivity of canopies. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vi-fapar/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HR_VPP_VEGETATION_INDICES, layerId: 'LAI-VISUALIZATION' }],
@@ -4012,7 +4172,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Leaf Area Index\n\n\n\LAI is defined as one half of the total area of photosynthetically active elements of the canopy per unit horizontal ground area. The LAI provided by HRVPP corresponds to actual LAI of all the canopy layers, including all green contributors. Practically, the LAI quantifies the thickness of the vegetation cover. Deeper green colors indicate thicker vegetation cover. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vi-lai/#).`,
+      t`# Leaf Area Index\n\n\n\LAI is defined as one half of the total area of photosynthetically active elements of the canopy per unit horizontal ground area. The LAI provided by HRVPP corresponds to actual LAI of all the canopy layers, including all green contributors. Practically, the LAI quantifies the thickness of the vegetation cover. Deeper green colors indicate thicker vegetation cover. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vi-lai/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HR_VPP_VEGETATION_INDICES, layerId: 'NDVI-VISUALIZATION' }],
@@ -4035,7 +4195,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Normalized Difference Vegetation Index\n\n\n\nNDVI quantifies vegetation photosynthetic capacity by measuring the difference between the Near-Infrared (NIR) (which vegetation strongly reflects) and red spectral bands (which vegetation absorbs). It is commonly used to monitor vegetation cover and density. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vi-ndvi/).`,
+      t`# Normalized Difference Vegetation Index\n\n\n\nNDVI quantifies vegetation photosynthetic capacity by measuring the difference between the Near-Infrared (NIR) (which vegetation strongly reflects) and red spectral bands (which vegetation absorbs). It is commonly used to monitor vegetation cover and density. Find more information [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vi-ndvi/).`,
   },
   {
     match: [{ datasourceId: COPERNICUS_HR_VPP_VEGETATION_INDICES, layerId: 'PPI-VISUALIZATION' }],
@@ -4056,7 +4216,7 @@ export const PREDEFINED_LAYERS_METADATA = [
       ],
     },
     description: () =>
-      t`# Plant Phenology Index\n\n\n\nPPI (Plant Phenology Index) is a physically-based vegetation index derived from radiative transfer equation and is calculated from red and Near-Infrared (NIR) spectral bands. PPI is linearly related to the green leaf area index, and can be used to track canopy green foliage dynamics and therefore provides an efficient approach to retrieving plant phenology. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/vi-ppi/#) and [here](https://land.copernicus.eu/user-corner/technical-library/product-user-manual-of-vegetation-indices/).`,
+      t`# Plant Phenology Index\n\n\n\nPPI (Plant Phenology Index) is a physically-based vegetation index derived from radiative transfer equation and is calculated from red and Near-Infrared (NIR) spectral bands. PPI is linearly related to the green leaf area index, and can be used to track canopy green foliage dynamics and therefore provides an efficient approach to retrieving plant phenology. Learn more [here](https://custom-scripts.sentinel-hub.com/copernicus_services/hrvpp/vi-ppi/) and [here](https://land.copernicus.eu/user-corner/technical-library/product-user-manual-of-vegetation-indices/).`,
   },
 
   // HLS collection
@@ -4136,5 +4296,339 @@ export const PREDEFINED_LAYERS_METADATA = [
     match: [{ datasourceId: 'S1_AWS_IW_VVVH', layerId: '5_WATER-SURFACE-ROUGHNESS-VISUALIZATION' }],
     description: () =>
       t`# Water Surface Roughness Visualization \n\nThe script visualizes the Water Surface Roughness from Sentinel-1 data. It helps in maritime monitoring (ship monitoring, oil pollution monitoring, sea currents,...).\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/sentinel-1/water_surface_roughness_visualization/)`,
+  },
+
+  {
+    match: [{ datasourceId: DEM_MAPZEN, layerId: '1_TOPOGRAPHIC' }],
+    legend: {
+      type: 'continuous',
+      minPosition: -5000,
+      maxPosition: 9000,
+      gradients: [
+        { position: '-4549', color: 'rgb(3%,3%,45%)', label: '-5.000' },
+        { position: '-4549', color: 'rgb(16%,19%,53%)' },
+        { position: '-4098', color: 'rgb(16%,19%,53%)' },
+        { position: '-4098', color: 'rgb(28%,35%,63%)' },
+        { position: '-3647', color: 'rgb(28%,35%,63%)', label: '-500' },
+        { position: '-3647', color: 'rgb(41%,50%,73%)' },
+        { position: '-3196', color: 'rgb(41%,50%,73%)' },
+        { position: '-3196', color: 'rgb(66%,82%,92%)' },
+        { position: '-2745', color: 'rgb(66%,82%,92%)' },
+        { position: '-2745', color: 'rgb(9%,33%,3%)', label: '0' },
+        { position: '-2294', color: 'rgb(9%,33%,3%)' },
+        { position: '-2294', color: 'rgb(12%,37%,8%)' },
+        { position: '-1843', color: 'rgb(12%,37%,8%)' },
+        { position: '-1843', color: 'rgb(15%,41%,13%)', label: '25' },
+        { position: '-1392', color: 'rgb(15%,41%,13%)' },
+        { position: '-1392', color: 'rgb(18%,45%,18%)' },
+        { position: '-941', color: 'rgb(18%,45%,18%)' },
+        { position: '-941', color: 'rgb(21%,49%,23%)' },
+        { position: '-490', color: 'rgb(21%,49%,23%)' },
+        { position: '-490', color: 'rgb(30%,58%,25%)', label: '100' },
+        { position: '-39', color: 'rgb(30%,58%,25%)' },
+        { position: '-39', color: 'rgb(37%,64%,33%)' },
+        { position: '412', color: 'rgb(37%,64%,33%)' },
+        { position: '412', color: 'rgb(45%,70%,40%)', label: '300' },
+        { position: '863', color: 'rgb(45%,70%,40%)' },
+        { position: '863', color: 'rgb(48%,73%,44%)' },
+        { position: '1314', color: 'rgb(48%,73%,44%)', label: '500' },
+        { position: '1314', color: 'rgb(52%,76%,48%)' },
+        { position: '1765', color: 'rgb(52%,76%,48%)' },
+        { position: '1765', color: 'rgb(59%,81%,56%)' },
+        { position: '2216', color: 'rgb(59%,81%,56%)' },
+        { position: '2216', color: 'rgb(65%,84%,61%)' },
+        { position: '2667', color: 'rgb(65%,84%,61%)' },
+        { position: '2667', color: 'rgb(67%,87%,63%)' },
+        { position: '3118', color: 'rgb(67%,87%,63%)' },
+        { position: '3118', color: 'rgb(99%,93%,75%)', label: '1.000' },
+        { position: '3569', color: 'rgb(99%,93%,75%)' },
+        { position: '3569', color: 'rgb(92%,85%,69%)' },
+        { position: '4020', color: 'rgb(92%,85%,69%)' },
+        { position: '4020', color: 'rgb(84%,77%,62%)' },
+        { position: '4471', color: 'rgb(84%,77%,62%)' },
+        { position: '4471', color: 'rgb(76%,69%,54%)' },
+        { position: '4922', color: 'rgb(76%,69%,54%)' },
+        { position: '4922', color: 'rgb(68%,61%,46%)' },
+        { position: '5373', color: 'rgb(68%,61%,46%)' },
+        { position: '5373', color: 'rgb(60%,53%,38%)', label: '3.500' },
+        { position: '5824', color: 'rgb(60%,53%,38%)' },
+        { position: '5824', color: 'rgb(53%,45%,30%)' },
+        { position: '6275', color: 'rgb(53%,45%,30%)' },
+        { position: '6275', color: 'rgb(45%,38%,22%)' },
+        { position: '6726', color: 'rgb(45%,38%,22%)' },
+        { position: '6726', color: 'rgb(37%,30%,15%)' },
+        { position: '7177', color: 'rgb(37%,30%,15%)' },
+        { position: '7177', color: 'rgb(29%,22%,7%)' },
+        { position: '7628', color: 'rgb(29%,22%,7%)' },
+        { position: '7628', color: 'rgb(90%,90%,90%)', label: '6.000' },
+        { position: '8079', color: 'rgb(90%,90%,90%)' },
+        { position: '8079', color: 'rgb(95%,95%,95%)' },
+        { position: '8530', color: 'rgb(95%,95%,95%)' },
+        { position: '8530', color: 'rgb(100%,100%,100%)' },
+        { position: '8981', color: 'rgb(100%,100%,100%)', label: '9.000 [m]' },
+      ],
+    },
+    description: () =>
+      t`# Topographic Visualization\n\n\n\nThis script returns a visualisation with green colours representing lowland elevations and earth colours as mountainous elevations. The script uses discrete classes rather than the continuous visualisations in the other DEM layers.\n\nIt is possible to set custom min and max values in the evalscript by setting defaultVis to false and setting the min and max variables to the desired values.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/dem/dem-topographic/)`,
+  },
+  {
+    match: [
+      { datasourceId: DEM_COPERNICUS_30, layerId: '1_TOPOGRAPHIC' },
+      { datasourceId: DEM_COPERNICUS_90, layerId: '1_TOPOGRAPHIC' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: -346,
+      maxPosition: 9342,
+      gradients: [
+        { position: '-333', color: 'rgb(6%,6%,55%)' },
+        { position: '0', color: 'rgb(6%,6%,55%)' },
+        { position: '0', color: 'rgb(9%,33%,3%)', label: '0' },
+        { position: '346', color: 'rgb(9%,33%,3%)' },
+        { position: '346', color: 'rgb(12%,37%,8%)' },
+        { position: '692', color: 'rgb(12%,37%,8%)' },
+        { position: '692', color: 'rgb(15%,41%,13%)', label: '25' },
+        { position: '1038', color: 'rgb(15%,41%,13%)' },
+        { position: '1038', color: 'rgb(18%,45%,18%)' },
+        { position: '1384', color: 'rgb(18%,45%,18%)' },
+        { position: '1384', color: 'rgb(21%,49%,23%)' },
+        { position: '1730', color: 'rgb(21%,49%,23%)' },
+        { position: '1730', color: 'rgb(24%,53%,24%)', label: '100' },
+        { position: '2076', color: 'rgb(24%,53%,24%)' },
+        { position: '2076', color: 'rgb(30%,58%,25%)' },
+        { position: '2422', color: 'rgb(30%,58%,25%)' },
+        { position: '2422', color: 'rgb(37%,64%,33%)', label: '300' },
+        { position: '2768', color: 'rgb(37%,64%,33%)' },
+        { position: '2768', color: 'rgb(45%,70%,40%)' },
+        { position: '3114', color: 'rgb(45%,70%,40%)' },
+        { position: '3114', color: 'rgb(48%,73%,44%)', label: '500' },
+        { position: '3460', color: 'rgb(48%,73%,44%)' },
+        { position: '3460', color: 'rgb(52%,76%,48%)' },
+        { position: '3806', color: 'rgb(52%,76%,48%)' },
+        { position: '3806', color: 'rgb(59%,81%,56%)' },
+        { position: '4152', color: 'rgb(59%,81%,56%)' },
+        { position: '4152', color: 'rgb(65%,84%,61%)' },
+        { position: '4498', color: 'rgb(65%,84%,61%)' },
+        { position: '4498', color: 'rgb(67%,87%,63%)' },
+        { position: '4844', color: 'rgb(67%,87%,63%)' },
+        { position: '4844', color: 'rgb(99%,93%,75%)', label: '1.000' },
+        { position: '5190', color: 'rgb(99%,93%,75%)' },
+        { position: '5190', color: 'rgb(92%,85%,69%)' },
+        { position: '5536', color: 'rgb(92%,85%,69%)' },
+        { position: '5536', color: 'rgb(84%,77%,62%)' },
+        { position: '5882', color: 'rgb(84%,77%,62%)' },
+        { position: '5882', color: 'rgb(76%,69%,54%)' },
+        { position: '6228', color: 'rgb(76%,69%,54%)' },
+        { position: '6228', color: 'rgb(68%,61%,46%)' },
+        { position: '6574', color: 'rgb(68%,61%,46%)' },
+        { position: '6574', color: 'rgb(60%,53%,38%)', label: '3.500' },
+        { position: '6920', color: 'rgb(60%,53%,38%)' },
+        { position: '6920', color: 'rgb(53%,45%,30%)' },
+        { position: '7266', color: 'rgb(53%,45%,30%)' },
+        { position: '7266', color: 'rgb(45%,38%,22%)' },
+        { position: '7612', color: 'rgb(45%,38%,22%)' },
+        { position: '7612', color: 'rgb(37%,30%,15%)' },
+        { position: '7958', color: 'rgb(37%,30%,15%)' },
+        { position: '7958', color: 'rgb(29%,22%,7%)' },
+        { position: '8304', color: 'rgb(29%,22%,7%)' },
+        { position: '8304', color: 'rgb(90%,90%,90%)', label: '6.000' },
+        { position: '8650', color: 'rgb(90%,90%,90%)' },
+        { position: '8650', color: 'rgb(95%,95%,95%)' },
+        { position: '8996', color: 'rgb(95%,95%,95%)' },
+        { position: '8996', color: 'rgb(100%,100%,100%)' },
+        { position: '9342', color: 'rgb(100%,100%,100%)', label: '9.000 [m]' },
+      ],
+    },
+    description: () =>
+      t`# Topographic Visualization\n\n\n\nThis script returns a visualisation with green colours representing lowland elevations and earth colours as mountainous elevations. The script uses discrete classes rather than the continuous visualisations in the other DEM layers.\n\nIt is possible to set custom min and max values in the evalscript by setting defaultVis to false and setting the min and max variables to the desired values.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/dem/dem-topographic/)`,
+  },
+  {
+    match: [{ datasourceId: DEM_MAPZEN, layerId: 'COLOR' }],
+    legend: {
+      type: 'continuous',
+      minPosition: -12000,
+      maxPosition: 9000,
+      gradients: [
+        { position: '-12000', color: 'rgb(0%,0%,1%)', label: '-12.000' },
+        { position: '-11000', color: 'rgb(11%,0%,35%)' },
+        { position: '-10000', color: 'rgb(11%,11%,47%)' },
+        { position: '-9000', color: 'rgb(15%,19%,70%)', label: '-1.000' },
+        { position: '-8000', color: 'rgb(23%,23%,90%)' },
+        { position: '-7000', color: 'rgb(23%,31%,96%)', label: '-200' },
+        { position: '-6000', color: 'rgb(35%,33%,98%)' },
+        { position: '-5000', color: 'rgb(47%,47%,92%)', label: '-20' },
+        { position: '-4000', color: 'rgb(62%,62%,100%)' },
+        { position: '-3000', color: 'rgb(78%,78%,78%)', label: '0' },
+        { position: '-2000', color: 'rgb(39%,22%,23%)' },
+        { position: '-1000', color: 'rgb(47%,18%,15%)', label: '10' },
+        { position: '0', color: 'rgb(54%,29%,15%)' },
+        { position: '1000', color: 'rgb(66%,37%,0%)', label: '200' },
+        { position: '2000', color: 'rgb(47%,22%,35%)' },
+        { position: '3000', color: 'rgb(82%,57%,70%)', label: '400' },
+        { position: '4000', color: 'rgb(54%,43%,0%)' },
+        { position: '5000', color: 'rgb(47%,54%,70%)', label: '1.000' },
+        { position: '6000', color: 'rgb(62%,66%,94%)' },
+        { position: '7000', color: 'rgb(74%,78%,98%)', label: '5.000' },
+        { position: '8000', color: 'rgb(86%,94%,100%)' },
+        { position: '9000', color: 'rgb(100%,100%,100%)', label: '9.000 [m]' },
+      ],
+    },
+    description: () =>
+      t`# Color Visualization\n\n\n\nThis script returns a color visualization of a digital elevation model, assigning continuous colors to the elevation borders.\n\nIt is possible to set custom min and max values in the evalscript by setting defaultVis to false and setting the min and max variables to the desired values.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/dem/dem-color/)`,
+  },
+  {
+    match: [
+      { datasourceId: DEM_COPERNICUS_30, layerId: 'COLOR' },
+      { datasourceId: DEM_COPERNICUS_90, layerId: 'COLOR' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: -5000,
+      maxPosition: 9000,
+      gradients: [
+        { position: '-4500', color: 'rgb(100%,100%,100%)', label: 'Below Sea Level' },
+        { position: '-3000', color: 'rgb(78%,78%,78%)', label: '0' },
+        { position: '-2000', color: 'rgb(39%,22%,23%)' },
+        { position: '-1000', color: 'rgb(47%,18%,15%)', label: '10' },
+        { position: '0', color: 'rgb(54%,29%,15%)' },
+        { position: '1000', color: 'rgb(66%,37%,0%)', label: '200' },
+        { position: '2000', color: 'rgb(47%,22%,35%)' },
+        { position: '3000', color: 'rgb(82%,57%,70%)', label: '400' },
+        { position: '4000', color: 'rgb(54%,43%,0%)' },
+        { position: '5000', color: 'rgb(47%,54%,70%)', label: '1.000' },
+        { position: '6000', color: 'rgb(62%,66%,94%)' },
+        { position: '7000', color: 'rgb(74%,78%,98%)', label: '5.000' },
+        { position: '8000', color: 'rgb(86%,94%,100%)' },
+        { position: '9000', color: 'rgb(100%,100%,100%)', label: '9.000 [m]' },
+      ],
+    },
+    description: () =>
+      t`# Color Visualization\n\n\n\nThis script returns a color visualization of a digital elevation model, assigning continuous colors to the elevation borders.\n\nIt is possible to set custom min and max values in the evalscript by setting defaultVis to false and setting the min and max variables to the desired values.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/dem/dem-color/)`,
+  },
+  {
+    match: [{ datasourceId: DEM_MAPZEN, layerId: 'GRAYSCALE' }],
+    legend: {
+      type: 'continuous',
+      minPosition: -5000,
+      maxPosition: 9000,
+      gradients: [
+        { position: '-12000', color: 'rgb(0%,0%,0%)', label: '-12.000' },
+        { position: '-11000', color: 'rgb(9%,9%,9%)' },
+        { position: '-10000', color: 'rgb(21%,21%,21%)' },
+        { position: '-9000', color: 'rgb(24%,24%,24%)', label: '-1.000' },
+        { position: '-8000', color: 'rgb(27%,27%,27%)' },
+        { position: '-7000', color: 'rgb(29%,29%,29%)', label: '-200' },
+        { position: '-6000', color: 'rgb(31%,31%,31%)' },
+        { position: '-5000', color: 'rgb(33%,33%,33%)', label: '-20' },
+        { position: '-4000', color: 'rgb(35%,35%,35%)' },
+        { position: '-3000', color: 'rgb(39%,39%,39%)', label: '0' },
+        { position: '-2000', color: 'rgb(43%,43%,43%)' },
+        { position: '-1000', color: 'rgb(51%,51%,51%)', label: '10' },
+        { position: '0', color: 'rgb(54%,54%,54%)' },
+        { position: '1000', color: 'rgb(62%,62%,62%)', label: '200' },
+        { position: '2000', color: 'rgb(70%,70%,70%)' },
+        { position: '3000', color: 'rgb(78%,78%,78%)', label: '400' },
+        { position: '4000', color: 'rgb(84%,84%,84%)' },
+        { position: '5000', color: 'rgb(88%,88%,88%)', label: '1.000' },
+        { position: '6000', color: 'rgb(92%,92%,92%)' },
+        { position: '7000', color: 'rgb(96%,96%,96%)', label: '5.000' },
+        { position: '8000', color: 'rgb(98%,98%,98%)' },
+        { position: '9000', color: 'rgb(100%,100%,100%)', label: '9.000 [m]' },
+      ],
+    },
+    description: () =>
+      t`# Grayscale Visualization\n\n\n\nThis script returns a grayscale visualization of a digital elevation model, assigning continuous colors to the elevation borders.\n\nIt is possible to set custom min and max values in the evalscript by setting defaultVis to false and setting the min and max variables to the desired values.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/dem/dem-grayscale/)`,
+  },
+  {
+    match: [
+      { datasourceId: DEM_COPERNICUS_30, layerId: 'GRAYSCALE' },
+      { datasourceId: DEM_COPERNICUS_90, layerId: 'GRAYSCALE' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: -5000,
+      maxPosition: 9000,
+      gradients: [
+        { position: '-4500', color: 'rgb(35%,35%,35%)', label: 'Below Sea Level' },
+        { position: '-3000', color: 'rgb(39%,39%,39%)', label: '0' },
+        { position: '-2000', color: 'rgb(43%,43%,43%)' },
+        { position: '-1000', color: 'rgb(51%,51%,51%)', label: '10' },
+        { position: '0', color: 'rgb(54%,54%,54%)' },
+        { position: '1000', color: 'rgb(62%,62%,62%)', label: '200' },
+        { position: '2000', color: 'rgb(70%,70%,70%)' },
+        { position: '3000', color: 'rgb(78%,78%,78%)', label: '400' },
+        { position: '4000', color: 'rgb(84%,84%,84%)' },
+        { position: '5000', color: 'rgb(88%,88%,88%)', label: '1.000' },
+        { position: '6000', color: 'rgb(92%,92%,92%)' },
+        { position: '7000', color: 'rgb(96%,96%,96%)', label: '5.000' },
+        { position: '8000', color: 'rgb(98%,98%,98%)' },
+        { position: '9000', color: 'rgb(100%,100%,100%)', label: '9.000 [m]' },
+      ],
+    },
+    description: () =>
+      t`# Grayscale Visualization\n\n\n\nThis script returns a grayscale visualization of a digital elevation model, assigning continuous colors to the elevation borders.\n\nIt is possible to set custom min and max values in the evalscript by setting defaultVis to false and setting the min and max variables to the desired values.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/dem/dem-grayscale/)`,
+  },
+  {
+    match: [{ datasourceId: DEM_MAPZEN, layerId: 'SEPIA' }],
+    legend: {
+      type: 'continuous',
+      minPosition: -12000,
+      maxPosition: 9000,
+      gradients: [
+        { position: '-12000', color: 'rgb(0%,0%,0%)', label: '-12.000' },
+        { position: '-11000', color: 'rgb(2%,0%,2%)' },
+        { position: '-10000', color: 'rgb(5%,3%,0%)' },
+        { position: '-9000', color: 'rgb(9%,5%,1%)', label: '-1.000' },
+        { position: '-8000', color: 'rgb(13%,7%,2%)' },
+        { position: '-7000', color: 'rgb(17%,10%,3%)', label: '-200' },
+        { position: '-6000', color: 'rgb(23%,13%,3%)' },
+        { position: '-5000', color: 'rgb(31%,18%,5%)', label: '-20' },
+        { position: '-4000', color: 'rgb(35%,20%,6%)' },
+        { position: '-3000', color: 'rgb(39%,22%,6%)', label: '0' },
+        { position: '-2000', color: 'rgb(43%,25%,7%)' },
+        { position: '-1000', color: 'rgb(51%,29%,9%)', label: '10' },
+        { position: '0', color: 'rgb(54%,32%,9%)' },
+        { position: '1000', color: 'rgb(62%,36%,11%)', label: '200' },
+        { position: '2000', color: 'rgb(70%,41%,12%)' },
+        { position: '3000', color: 'rgb(78%,45%,13%)', label: '400' },
+        { position: '4000', color: 'rgb(84%,49%,14%)' },
+        { position: '5000', color: 'rgb(88%,51%,15%)', label: '1.000' },
+        { position: '6000', color: 'rgb(92%,54%,16%)' },
+        { position: '7000', color: 'rgb(96%,56%,16%)', label: '5.000' },
+        { position: '8000', color: 'rgb(98%,57%,17%)' },
+        { position: '9000', color: 'rgb(100%,58%,17%)', label: '9.000 [m]' },
+      ],
+    },
+    description: () =>
+      t`# Sepia Visualization\n\n\n\nThis script returns a sepia visualization of a digital elevation model, assigning continuous colors to the elevation borders.\n\nIt is possible to set custom min and max values in the evalscript by setting defaultVis to false and setting the min and max variables to the desired values.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/dem/dem-sepia/)`,
+  },
+  {
+    match: [
+      { datasourceId: DEM_COPERNICUS_30, layerId: 'SEPIA' },
+      { datasourceId: DEM_COPERNICUS_90, layerId: 'SEPIA' },
+    ],
+    legend: {
+      type: 'continuous',
+      minPosition: -5000,
+      maxPosition: 9000,
+      gradients: [
+        { position: '-4500', color: 'rgb(35%,20%,6%)', label: 'Below Sea Level' },
+        { position: '-3000', color: 'rgb(39%,22%,6%)', label: '0' },
+        { position: '-2000', color: 'rgb(43%,25%,7%)' },
+        { position: '-1000', color: 'rgb(51%,29%,9%)', label: '10' },
+        { position: '0', color: 'rgb(54%,32%,9%)' },
+        { position: '1000', color: 'rgb(62%,36%,11%)', label: '200' },
+        { position: '2000', color: 'rgb(70%,41%,12%)' },
+        { position: '3000', color: 'rgb(78%,45%,13%)', label: '400' },
+        { position: '4000', color: 'rgb(84%,49%,14%)' },
+        { position: '5000', color: 'rgb(88%,51%,15%)', label: '1.000' },
+        { position: '6000', color: 'rgb(92%,54%,16%)' },
+        { position: '7000', color: 'rgb(96%,56%,16%)', label: '5.000' },
+        { position: '8000', color: 'rgb(98%,57%,17%)' },
+        { position: '9000', color: 'rgb(100%,58%,17%)', label: '9.000 [m]' },
+      ],
+    },
+    description: () =>
+      t`# Sepia Visualization\n\n\n\nThis script returns a sepia visualization of a digital elevation model, assigning continuous colors to the elevation borders.\n\nIt is possible to set custom min and max values in the evalscript by setting defaultVis to false and setting the min and max variables to the desired values.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/dem/dem-sepia/)`,
   },
 ];

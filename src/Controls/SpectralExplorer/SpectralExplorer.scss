@@ -1,21 +1,10 @@
 @import '../../variables.scss';
 
 .spectral-explorer {
-  padding: 10px;
   color: $textCol;
-  font-size: 0.8em;
   display: flex;
   flex-direction: column;
   height: 100%;
-
-  .title-bar {
-    display: flex;
-
-    h3.title {
-      margin: 14px 0 0 20px;
-      flex-grow: 1;
-    }
-  }
 
   .fetching {
     margin: 0 20px;
@@ -45,6 +34,8 @@
   }
 
   .content {
+    padding: 0 10px;
+    font-size: 0.8em;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -152,6 +143,7 @@
       .values-table {
         overflow-x: auto;
         width: 100%;
+        max-height: 400px;
 
         table {
           border-collapse: collapse;

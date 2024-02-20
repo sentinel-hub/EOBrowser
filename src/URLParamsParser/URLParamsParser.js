@@ -19,6 +19,7 @@ import store, {
   modalSlice,
   compareLayersSlice,
   tabsSlice,
+  authSlice,
 } from '../store';
 import { b64DecodeUnicode } from '../utils/base64MDN';
 
@@ -181,6 +182,7 @@ class URLParamsParser extends React.Component {
       compareMode,
       comparedOpacity,
       comparedClipping,
+      kc_idp_hint,
     } = params;
 
     let { lat: parsedLat, lng: parsedLng, zoom: parsedZoom } = parsePosition(lat, lng, zoom);
@@ -290,6 +292,10 @@ class URLParamsParser extends React.Component {
         );
         store.dispatch(tabsSlice.actions.setTabIndex(4));
       })();
+    }
+
+    if (kc_idp_hint) {
+      store.dispatch(authSlice.actions.setKcIdpHint(kc_idp_hint));
     }
   };
 

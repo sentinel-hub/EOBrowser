@@ -5,7 +5,11 @@ import {
   AirbusProcessingLevel,
   MaxarSensor,
   PlanetItemType,
+  PlanetPVId,
+  PlanetPVType,
   PlanetProductBundle,
+  PlanetSupportedPVIds,
+  PlanetSupportedProductBundles,
   TPDICollections,
 } from '@sentinel-hub/sentinelhub-js';
 
@@ -13,8 +17,8 @@ import { SelectInput } from './SelectInput';
 import { SliderInput } from './SliderInput';
 import { ToggleInput } from './ToggleInput';
 import { createSelectOptions } from '../commercialData.utils';
-import { PlanetSupportedProductBundles } from '@sentinel-hub/sentinelhub-js';
 import { Link } from './Link';
+import { TextInput } from './TextInput';
 
 export const minDateRange = moment.utc('1982-01-01');
 export const maxDateRange = moment.utc().add(10, 'years').endOf('year');
@@ -45,6 +49,13 @@ export const providerSpecificSearchParameters = {
       showIcons: false,
       unit: '%',
     },
+    {
+      id: 'planetApiKey',
+      label: () => t`Planet API Key`,
+      render: TextInput,
+      placeholder: t`Your Planet API key`,
+      trialAccount: true,
+    },
   ],
   [TPDICollections.PLANET_SKYSAT]: [
     {
@@ -68,6 +79,28 @@ export const providerSpecificSearchParameters = {
       max: 100,
       showIcons: false,
       unit: '%',
+    },
+    {
+      id: 'planetApiKey',
+      label: () => t`Planet API Key`,
+      render: TextInput,
+      placeholder: t`Your Planet API key`,
+      trialAccount: true,
+    },
+  ],
+  [TPDICollections.PLANETARY_VARIABLES]: [
+    {
+      id: 'type',
+      label: () => t`Source Type`,
+      render: SelectInput,
+      options: createSelectOptions(PlanetPVType),
+    },
+    {
+      id: 'id',
+      label: () => t`Source ID`,
+      render: SelectInput,
+      options: createSelectOptions(PlanetPVId),
+      filterOptions: (option, { type }) => PlanetSupportedPVIds[type]?.includes(option.value),
     },
   ],
   [TPDICollections.MAXAR_WORLDVIEW]: [

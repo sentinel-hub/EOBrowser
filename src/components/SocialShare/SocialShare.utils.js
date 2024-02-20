@@ -5,7 +5,9 @@ import { getDataSourceHashtags } from '../../Tools/SearchPanel/dataSourceHandler
 const DEFAULT_HASHTAGS = 'EOBrowser,EarthObservation,RemoteSensing';
 
 export function sendFirebaseRequest(urlLocation) {
-  const url = `https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=${process.env.REACT_APP_FIREBASE_API_KEY}`;
+  const url = `https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=${
+    import.meta.env.VITE_FIREBASE_API_KEY
+  }`;
   let longDynamicLink = 'https://sentinelshare.page.link/?link=' + encodeURIComponent(urlLocation);
 
   return axios({

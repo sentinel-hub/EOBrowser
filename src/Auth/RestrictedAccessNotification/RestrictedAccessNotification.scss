@@ -1,0 +1,43 @@
+@import '../../variables.scss';
+
+.restricted-access-notification {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    padding: 0 40px;
+    gap: 25px;
+
+    h3,
+    p {
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    a {
+      color: #b6bf00;
+      cursor: pointer;
+    }
+  }
+
+  .buttons {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+
+    .eob-btn {
+      text-align: center;
+      min-width: 175px;
+    }
+  }
+}

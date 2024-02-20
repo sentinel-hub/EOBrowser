@@ -19,10 +19,10 @@ import {
   getDataSourceHandler,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { findMatchingLayerMetadata } from '../Tools/VisualizationPanel/legendUtils';
-import store, { mainMapSlice, terrainViewerSlice } from '../store';
+import store, { mainMapSlice, modalSlice, terrainViewerSlice } from '../store';
 import { wgs84ToMercator } from '../junk/EOBCommon/utils/coords';
 import { getBoundsZoomLevel } from '../utils/coords';
-import { DEFAULT_DEM_SOURCE, DEM_3D_MAX_ZOOM, EQUATOR_LENGTH } from '../const';
+import { DEFAULT_DEM_SOURCE, DEM_3D_MAX_ZOOM, EQUATOR_LENGTH, ModalId } from '../const';
 import { addLabelsAndLogos, dateTimeDisplayFormat } from '../Controls/Timelapse/Timelapse.utils';
 
 let mapTileRequestDelay = 1;
@@ -53,6 +53,7 @@ function getMapTileUrl({
   callback,
   reqConfig,
   onTileError,
+  userToken,
 }) {
   mapTileRequestList.push(() => {
     getMapTileUrlInternal({
@@ -67,6 +68,7 @@ function getMapTileUrl({
       callback,
       reqConfig,
       onTileError,
+      userToken,
     });
   });
 
@@ -87,6 +89,7 @@ export function getMapTile({
   callback,
   reqConfig,
   onTileError,
+  userToken,
 }) {
   mapTileRequestList.push(() => {
     getMapTileUrlInternal({
@@ -101,6 +104,7 @@ export function getMapTile({
       callback,
       reqConfig,
       onTileError,
+      userToken,
     });
   });
 
@@ -121,6 +125,7 @@ function getMapTileUrlInternal({
   callback,
   reqConfig,
   onTileError,
+  userToken,
 }) {
   const apiType = layer.supportsApiType(ApiType.PROCESSING)
     ? ApiType.PROCESSING
@@ -154,7 +159,11 @@ function getMapTileUrlInternal({
           callback,
           reqConfig,
           onTileError,
+          userToken,
         });
+      } else if (httpStatus === 403 && reqConfig.authToken === userToken) {
+        store.dispatch(modalSlice.actions.addModal({ modal: ModalId.RESTRICTED_ACCESS }));
+        callback(null);
       } else {
         if (!isCancelled(error)) {
           onTileError(error);
@@ -507,7 +516,9 @@ export function getTileCoord(minX, minY, maxX, maxY) {
 }
 
 export function getMaptilerUrl({ tileX, tileY, zoomLevel }) {
-  return `https://api.maptiler.com/maps/streets/256/${zoomLevel}/${tileX}/${tileY}.png?key=${process.env.REACT_APP_MAPTILER_KEY}`;
+  return `https://api.maptiler.com/maps/streets/256/${zoomLevel}/${tileX}/${tileY}.png?key=${
+    import.meta.env.VITE_MAPTILER_KEY
+  }`;
 }
 
 function getEarthCircumferenceAtLat(lat) {

@@ -30,7 +30,7 @@ import { findMatchingLayerMetadata } from '../../Tools/VisualizationPanel/legend
 import { IMAGE_FORMATS, IMAGE_FORMATS_INFO } from './consts';
 
 import { constructDataFusionLayer } from '../../junk/EOBCommon/utils/dataFusion';
-import { wgs84ToMercator } from '../../junk/EOBCommon/utils/coords';
+import { getMapDOMSize, wgs84ToMercator } from '../../junk/EOBCommon/utils/coords';
 import { getMapOverlayXYZ, getGlOverlay } from '../../junk/EOBCommon/utils/getMapOverlayXYZ';
 import {
   getEvalscriptSetup,
@@ -899,9 +899,9 @@ export const drawCaptions = async (
   logos = true,
   drawCopernicusLogo = true,
 ) => {
-  const width = ctx.canvas.width;
+  const { width: mapWidth } = getMapDOMSize();
   const scalebarPartitionWidth = scaleBar
-    ? Math.max(getScalebarWidth(ctx, scaleBar, width), ctx.canvas.width * 0.33)
+    ? Math.max(getScalebarWidth(ctx, scaleBar, mapWidth), ctx.canvas.width * 0.33)
     : ctx.canvas.width * 0.33;
   const copyrightPartitionWidth = (ctx.canvas.width - scalebarPartitionWidth) * 0.6 - PARTITION_PADDING;
   const logosPartitionWidth = (ctx.canvas.width - scalebarPartitionWidth) * 0.4 - PARTITION_PADDING;
@@ -914,7 +914,7 @@ export const drawCaptions = async (
     drawDescription(ctx, TOP_RECT_SIZE.width, TOP_RECT_SIZE.height, title, userDescription);
   }
   if (scaleBar) {
-    drawScalebar(ctx, scaleBar, width);
+    drawScalebar(ctx, scaleBar, mapWidth);
   }
   if (logos) {
     await drawLogos(ctx, logosPartitionWidth, bottomYAxis, drawCopernicusLogo);

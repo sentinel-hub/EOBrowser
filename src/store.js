@@ -168,6 +168,7 @@ export const authSlice = createSlice({
       terms_privacy_accepted: false,
     },
     anonToken: null,
+    kc_idp_hint: null,
   },
   reducers: {
     setUser: (state, action) => {
@@ -185,6 +186,9 @@ export const authSlice = createSlice({
     },
     setTermsPrivacyAccepted: (state, action) => {
       state.terms_privacy_accepted = action.payload;
+    },
+    setKcIdpHint: (state, action) => {
+      state.kc_idp_hint = action.payload;
     },
   },
 });

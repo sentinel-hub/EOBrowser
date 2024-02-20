@@ -160,6 +160,10 @@ $searchBorderColour: #6d7300;
     clear: both;
   }
 
+  .hidden {
+    display: none;
+  }
+
   .discover-tabs {
     display: flex;
     flex-wrap: wrap;

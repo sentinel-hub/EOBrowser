@@ -1,0 +1,38 @@
+@import "../variables.scss";
+
+.private-theme-modal {
+  margin-left: 20px;
+  margin-right: 20px;
+  color: $textCol;
+
+  .private-theme-title {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 18px;
+  }
+
+  .private-theme-text {
+    margin-bottom: 16px;
+  }
+
+  .private-theme-buttons {
+    display: flex;
+    gap: 1rem;
+
+    .login-btn,
+    .no-login-btn {
+      text-align: center;
+      flex: 1 0 40%;
+    }
+
+    .login-btn {
+      color: $textColor;
+    }
+
+    .no-login-btn {
+      color: $primaryCol;
+      background-color: $mainDark;
+      border: 2px solid $primaryCol;
+    }
+  }
+}

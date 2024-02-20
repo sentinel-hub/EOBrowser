@@ -15,7 +15,7 @@ import { DEFAULT_THEMES } from '../src/assets/default_themes';
 import { EDUCATION_THEMES } from '../src/assets/education_themes';
 import { filterLayers, filterLayersProbaV } from '../src/Tools/SearchPanel/dataSourceHandlers/filter';
 import { getS5ProductType } from '../src/Tools/SearchPanel/dataSourceHandlers/datasourceAssets/getS5ProductType';
-import md5 from '../src/utils/md5';
+import { md5 } from 'js-md5';
 import dotenv from 'dotenv';
 import {
   PROBAV_S1,
@@ -145,7 +145,7 @@ async function updatePreviews(previewsDir, previewsIndexFile) {
         let layers = await LayersFactory.makeLayers(contentPart.url, (layerId) =>
           filterLayers(layerId, contentPart.layersExclude, contentPart.layersInclude),
         );
-        if (contentPart.url.includes('proba-v-mep.esa.int')) {
+        if (contentPart.url.includes('services.terrascope.be')) {
           const dataset = {
             dataset: {
               id: DATASOURCES.PROBAV,
@@ -202,7 +202,11 @@ async function updatePreviews(previewsDir, previewsIndexFile) {
           const apiType = layer.supportsApiType(ApiType.PROCESSING) ? ApiType.PROCESSING : ApiType.WMS;
           let j;
           for (j = 0; j < candidates.length; j++) {
-            const { bbox, fromTime, toTime } = candidates[j];
+            let { bbox, fromTime, toTime } = candidates[j];
+
+            if (layer.dataset.id === DATASOURCES.PROBAV) {
+              fromTime = null;
+            }
 
             const getMapParams = {
               bbox: bbox,

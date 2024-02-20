@@ -3,65 +3,8 @@
 .histogram-modal {
   z-index: 1002;
   position: absolute;
-  top: 410px;
-  right: 60px;
-  padding: 10px;
-  width: 500px;
-  min-height: 300px;
   background-color: $mainDark;
   color: #fff;
-
-  @media screen and (max-height: $breakpoint-720) {
-    & {
-      bottom: 10px;
-      top: auto;
-    }
-  }
-
-  @media screen and (max-height: $breakpoint-400) {
-    & {
-      bottom: 10px;
-      top: 10px;
-      overflow-y: auto;
-    }
-  }
-
-  @media screen and (max-width: $breakpoint-600) {
-    & {
-      left: 10px;
-      right: auto;
-      width: calc(100vw - 90px);
-      overflow-x: auto;
-    }
-  }
-
-  .title-bar {
-    display: flex;
-
-    h3.title {
-      margin: 14px 0 0 20px;
-      flex-grow: 1;
-    }
-
-    @media screen and (max-width: $breakpoint-600) {
-      & {
-        flex-direction: column;
-
-        .recalculate-button {
-          margin-left: 14px;
-        }
-      }
-    }
-  }
-
-  .close-btn {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    cursor: pointer;
-    padding: 5px;
-    font-size: 1rem;
-  }
 
   .loading-holder {
     display: flex;
@@ -86,6 +29,8 @@
 
   .histogram {
     cursor: crosshair;
+    display: flex;
+    justify-content: center;
   }
 
   svg.visualization-layer {
@@ -102,6 +47,12 @@
     line.axis-baseline {
       shape-rendering: crispEdges;
       stroke: #eee;
+    }
+
+    .data-visualization {
+      .pieces {
+        fill: #fff;
+      }
     }
   }
 
@@ -133,5 +84,6 @@
   .recalculate-button {
     color: $mainDark;
     float: right;
+    margin-right: 20px;
   }
 }

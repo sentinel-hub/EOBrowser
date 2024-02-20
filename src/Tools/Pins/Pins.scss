@@ -374,8 +374,7 @@
     float: right;
   }
 
-  &.gu-mirror,
-  &.gu-transit {
+  &.dragging {
     color: #fff;
     opacity: 0.8;
     background-color: $mainDark !important;

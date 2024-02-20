@@ -35,11 +35,15 @@ export const filterLayers = (layerId, layersExclude, layersInclude) => {
 export const filterLayersProbaV = (layerId, datasetId) => {
   switch (datasetId) {
     case PROBAV_S1:
-      return ['PROBAV_S1_TOA_333M', 'PROBAV_S1_TOC_333M'].includes(layerId);
+      return ['PROBAV_S1_TOA_333M_COG_V2', 'PROBAV_S1_TOC_333M_COG_V2'].includes(layerId);
     case PROBAV_S5:
-      return ['PROBAV_S5_TOA_100M', 'PROBAV_S5_TOC_100M', 'PROBAV_S5_TOC_100M_NIR'].includes(layerId);
+      return [
+        'PROBAV_S5_TOA_100M_COG_V2',
+        'PROBAV_S5_TOC_100M_COG_V2',
+        'PROBAV_S5_TOC_NIR_100M_COG_V2',
+      ].includes(layerId);
     case PROBAV_S10:
-      return ['PROBAV_S10_TOC_333M', 'PROBAV_S10_TOC_333M_NIR'].includes(layerId);
+      return ['PROBAV_S10_TOC_333M_COG_V2', 'PROBAV_S10_TOC_NIR_333M_COG_V2'].includes(layerId);
     default:
       return true;
   }

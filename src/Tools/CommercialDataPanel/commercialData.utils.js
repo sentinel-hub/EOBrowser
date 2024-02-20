@@ -5,6 +5,7 @@ import intersect from '@turf/intersect';
 import moment from 'moment';
 import inside from 'turf-inside';
 import { t } from 'ttag';
+import jwt_dec from 'jwt-decode';
 import {
   TPDICollections,
   TPDProvider,
@@ -14,15 +15,27 @@ import {
   CRS_EPSG4326,
   AirbusConstellation,
   PlanetItemType,
+  setTPDIServiceBaseURL,
 } from '@sentinel-hub/sentinelhub-js';
 import { constructBBoxFromBounds } from '../../Controls/ImgDownload/ImageDownload.utils.js';
 import store, { mainMapSlice, visualizationSlice, tabsSlice, themesSlice } from '../../store';
-import { TRANSACTION_TYPE, USER_INSTANCES_THEMES_LIST, OrderType } from '../../const';
+import {
+  TRANSACTION_TYPE,
+  USER_INSTANCES_THEMES_LIST,
+  OrderType,
+  SH_PAYING_ACCOUNT_TYPES,
+  PLANETARY_VARIABLES_TYPE_CONFIGURATION_IDS,
+  PLANETARY_VARIABLES_ID_CONFIGURATION_IDS,
+  SH_ACCOUNT_TYPE,
+} from '../../const';
 import { getBoundsZoomLevel } from '../../utils/coords';
 import { isRectangle, isPolygon } from '../../utils/geojson.utils.js';
+import { PlanetPVType } from '@sentinel-hub/sentinelhub-js';
+import { PlanetPVId } from '@sentinel-hub/sentinelhub-js';
 
-const SH_ACCOUNT_TRIAL = 11000;
-const SH_DOMAIN_SERVICE = 1;
+const SH_SERVICES_URL = import.meta.env.VITE_SH_SERVICES_URL;
+
+setTPDIServiceBaseURL(SH_SERVICES_URL);
 
 export const extractErrorMessage = (error) => {
   const errors = [];
@@ -130,9 +143,7 @@ export const formatNumberAsRoundedUnit = (value, precision = 2, unit = '%', null
     return nullValueLabel;
   }
 
-  return !isNaN(value)
-    ? `${Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision)}${!!unit ? unit : ''}`
-    : '';
+  return !isNaN(value) ? `${roundToNDigits(value, precision)}${!!unit ? unit : ''}` : '';
 };
 
 export const calculateAOICoverage = (aoiGeometry, productGeometry) => {
@@ -151,40 +162,70 @@ export const checkUserAccount = async (user) => {
   if (!user || !user.access_token || !user.userdata) {
     return {
       payingAccount: false,
+      trialAccount: false,
       quotasEnabled: false,
     };
   }
 
-  const headers = {
-    Authorization: `Bearer ${user.access_token}`,
-    'Content-Type': 'application/json',
-  };
   const requestConfig = {
-    headers: headers,
+    headers: {
+      Authorization: `Bearer ${user.access_token}`,
+      'Content-Type': 'application/json',
+    },
   };
 
-  let hasPayingAccount = false;
+  const accountId = jwt_dec(user.access_token)?.account;
+  const shServicesAccountInfoEndpoint = `${SH_SERVICES_URL}/ims/accounts/${accountId}/account-info`;
 
-  const res = await axios.get(
-    `https://services.sentinel-hub.com/oauth/users/${user.userdata.sub}/accounts`,
-    requestConfig,
-  );
-
-  if (res.data && res.data.member && Array.isArray(res.data.member)) {
-    const domain = res.data.member.find((member) => member.domainId === SH_DOMAIN_SERVICE);
-    if (domain) {
-      hasPayingAccount = domain.type !== SH_ACCOUNT_TRIAL;
-    }
-  }
+  const accountInfo = await axios.get(shServicesAccountInfoEndpoint, requestConfig);
+  const isPayingAccount = accountInfo?.data?.type && SH_PAYING_ACCOUNT_TYPES.includes(accountInfo.data.type);
+  const isTrialAccount = accountInfo?.data?.type === SH_ACCOUNT_TYPE.TRIAL;
 
   const quotas = await TPDI.getQuotas({
     authToken: user.access_token,
   });
 
   return {
-    payingAccount: hasPayingAccount,
+    payingAccount: isPayingAccount,
+    trialAccount: isTrialAccount,
     quotasEnabled: quotas && quotas.length > 0,
   };
+};
+
+const getConfigurationForPVTypeAndId = (type, id) => {
+  if (PLANETARY_VARIABLES_TYPE_CONFIGURATION_IDS[type]) {
+    return PLANETARY_VARIABLES_TYPE_CONFIGURATION_IDS[type];
+  }
+
+  if (PLANETARY_VARIABLES_ID_CONFIGURATION_IDS[id]) {
+    return PLANETARY_VARIABLES_ID_CONFIGURATION_IDS[id];
+  }
+};
+
+export const cloneConfiguration = async (user, transaction) => {
+  try {
+    const configId = getConfigurationForPVTypeAndId(
+      transaction.input?.data[0]?.type,
+      transaction.input?.data[0]?.id,
+    );
+
+    const shServicesCloneEndpoint = `${SH_SERVICES_URL}/configuration/v1/wms/instances/${configId}/clone`;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${user.access_token}`,
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const cloneResponse = await axios.post(shServicesCloneEndpoint, {}, config);
+    cloneResponse?.data?.layers.forEach((layer) => {
+      layer.datasourceDefaults.collectionId = transaction.collectionId;
+
+      axios.put(layer['@id'], layer, config);
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export const getBoundsAndLatLng = (geometry) => {
@@ -230,7 +271,7 @@ export const fetchUserBYOCLayers = async (user, instances = []) => {
         responseType: 'json',
         headers: headers,
       };
-      const url = `https://services.sentinel-hub.com/configuration/v1/wms/instances/${instance.id}/layers`;
+      const url = `${SH_SERVICES_URL}/configuration/v1/wms/instances/${instance.id}/layers`;
       return axios.get(url, requestConfig);
     } catch (err) {
       console.error('Error fetching layers for instance', instance.id, err);
@@ -347,19 +388,24 @@ export async function showDataOnMap(order, layer) {
 }
 
 export const getProvider = (dataProvider) => {
-  let provider;
-  if (dataProvider === TPDICollections.AIRBUS_SPOT || dataProvider === TPDICollections.AIRBUS_PLEIADES) {
-    provider = TPDProvider.AIRBUS;
-  } else if (dataProvider === TPDICollections.MAXAR_WORLDVIEW) {
-    provider = TPDProvider.MAXAR;
-  } else if (
-    dataProvider === TPDICollections.PLANET_SCOPE ||
-    dataProvider === TPDICollections.PLANET_SKYSAT
-  ) {
-    provider = TPDProvider.PLANET;
+  switch (dataProvider) {
+    case TPDICollections.AIRBUS_SPOT:
+    case TPDICollections.AIRBUS_PLEIADES:
+      return TPDProvider.AIRBUS;
+    case TPDICollections.MAXAR_WORLDVIEW:
+      return TPDProvider.MAXAR;
+    case TPDICollections.PLANET_SCOPE:
+    case TPDICollections.PLANET_SKYSAT:
+      return TPDProvider.PLANET;
+    case TPDICollections.PLANETARY_VARIABLES:
+      return TPDProvider.PLANETARY_VARIABLES;
+    default:
   }
-  return provider;
 };
+
+export function isPlanetaryVariableTypeAndId(type, id) {
+  return Object.values(PlanetPVType).includes(type) && Object.values(PlanetPVId).includes(id);
+}
 
 export const getTpdiCollectionFromTransaction = (transaction) => {
   const provider = transaction.provider;
@@ -368,15 +414,26 @@ export const getTpdiCollectionFromTransaction = (transaction) => {
     return TPDICollections[`${TPDProvider.AIRBUS}_${constellation}`];
   }
   if (provider === TPDProvider.PLANET) {
-    const itemType = PlanetItemType[transaction.input.data[0].itemType];
-    switch (itemType) {
-      case PlanetItemType.PSScene:
-      case PlanetItemType.PSScene4Band:
-        return TPDICollections.PLANET_SCOPE;
-      case PlanetItemType.SkySatCollect:
-        return TPDICollections.PLANET_SKYSAT;
-      default:
-        throw new Error(`${itemType} not found in PlanetItemType`);
+    if (transaction.input.data[0].itemType) {
+      const itemType = PlanetItemType[transaction.input.data[0].itemType];
+      switch (itemType) {
+        case PlanetItemType.PSScene:
+        case PlanetItemType.PSScene4Band:
+          return TPDICollections.PLANET_SCOPE;
+        case PlanetItemType.SkySatCollect:
+          return TPDICollections.PLANET_SKYSAT;
+        default:
+          throw new Error(`${itemType} not found in PlanetItemType`);
+      }
+    }
+    if (transaction.input.data[0].type && transaction.input.data[0].id) {
+      const type = transaction.input.data[0].type;
+      const id = transaction.input.data[0].id;
+      if (isPlanetaryVariableTypeAndId(type, id)) {
+        return TPDICollections.PLANETARY_VARIABLES;
+      } else {
+        throw new Error(`${type} and ${id} not found in PlanetPVType and PlanetPVId`);
+      }
     }
   }
   if (provider === TPDProvider.MAXAR) {
@@ -401,35 +458,68 @@ export function createSearchParams(searchParams, aoiGeometry) {
   if (params.dataProvider === TPDICollections.AIRBUS_PLEIADES) {
     params.constellation = AirbusConstellation.PHR;
   }
+
   return params;
 }
 
-export function getTransactionSize(aoiGeometry, options, selectedProducts = [], searchResults = []) {
+function getProductOrderArea(aoiGeometry, productId, allProducts = []) {
+  const product = allProducts.find((p) => p.id === productId);
+  let productArea = 0;
+  if (product) {
+    const intersection = intersect(aoiGeometry, product.geometry);
+    if (intersection) {
+      productArea = geo_area.geometry(intersection.geometry);
+    }
+  }
+  return productArea;
+}
+
+//when ordering products, size is sum of intersections between products and aoi
+export function getProductsOrderSize(provider, aoiGeometry, selectedProducts = [], searchResults = []) {
+  if (!provider) {
+    return 0;
+  }
+
+  if (!selectedProducts || selectedProducts.length === 0) {
+    return 0;
+  }
+
+  if (!searchResults || searchResults.length === 0) {
+    return 0;
+  }
+
+  const allProducts = searchResults.map((feature) => extractDataFromFeature(provider, feature));
+  const orderSize = selectedProducts.reduce(
+    (acc, productId) => acc + getProductOrderArea(aoiGeometry, productId, allProducts),
+    0,
+  );
+
+  return roundToNDigits(orderSize / 1000000, 2);
+}
+
+export function getTransactionSize(
+  provider,
+  aoiGeometry,
+  options,
+  selectedProducts = [],
+  searchResults = [],
+) {
   if (!aoiGeometry) {
     return 0;
   }
 
   if (!options) {
-    return (
-      Math.round((parseFloat(geo_area.geometry(aoiGeometry)) / 1000000) * Math.pow(10, 2)) / Math.pow(10, 2)
-    );
+    return roundToNDigits(geo_area.geometry(aoiGeometry) / 1000000, 2);
   }
 
   switch (options.type) {
     case OrderType.PRODUCTS:
-      //order size is number of products * area
-      return selectedProducts && selectedProducts.length
-        ? (selectedProducts.length *
-            Math.round((parseFloat(geo_area.geometry(aoiGeometry)) / 1000000) * Math.pow(10, 2))) /
-            Math.pow(10, 2)
-        : 0;
+      return getProductsOrderSize(provider, aoiGeometry, selectedProducts, searchResults);
+
     case OrderType.QUERY:
       //approx order size equals area of interest * number of results
-      return (
-        (searchResults.length *
-          Math.round((parseFloat(geo_area.geometry(aoiGeometry)) / 1000000) * Math.pow(10, 2))) /
-        Math.pow(10, 2)
-      );
+      return searchResults.length * roundToNDigits(geo_area.geometry(aoiGeometry) / 1000000, 2);
+
     default:
       return 0;
   }
@@ -457,4 +547,8 @@ export function openGeocentoLink(searchParams, geometry) {
   const params = [...(aoiParam ? [aoiParam] : []), ...(timeParam ? [timeParam] : [])];
 
   window.open(`${GEOCENTO_URL}#mapviewer:${params.join('&')}`);
+}
+
+export function roundToNDigits(num, nFrac = 2) {
+  return Math.round(num * Math.pow(10, nFrac)) / Math.pow(10, nFrac);
 }

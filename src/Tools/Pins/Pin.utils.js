@@ -9,7 +9,7 @@ import store, { tabsSlice } from '../../store';
 import { DEFAULT_THEMES } from '../../assets/default_themes.js';
 import { VERSION_INFO } from '../../VERSION';
 import { b64DecodeUnicode } from '../../utils/base64MDN';
-import { getTokenFromLocalStorage } from '../../Auth/authHelpers';
+import { getUserTokenFromLocalStorage } from '../../Auth/authHelpers';
 import { getDataSourceHandler, getDatasetLabel } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
 import {
@@ -276,7 +276,7 @@ export function convertToNewFormat(pin) {
 }
 
 async function getPinsFromBackend(access_token) {
-  const url = `${process.env.REACT_APP_EOB_BACKEND}userpins`;
+  const url = `${import.meta.env.VITE_EOB_BACKEND}userpins`;
   const requestParams = {
     responseType: 'json',
     headers: {
@@ -294,7 +294,7 @@ export async function getPinsFromServer() {
 
 async function removePinsFromBackend(ids) {
   const access_token = store.getState().auth.user.access_token;
-  const url = `${process.env.REACT_APP_EOB_BACKEND}userpins`;
+  const url = `${import.meta.env.VITE_EOB_BACKEND}userpins`;
   const requestParams = {
     responseType: 'json',
     headers: {
@@ -323,7 +323,7 @@ async function savePinsToBackend(pins, replace = false) {
     return p;
   });
 
-  const url = `${process.env.REACT_APP_EOB_BACKEND}userpins`;
+  const url = `${import.meta.env.VITE_EOB_BACKEND}userpins`;
   const requestParams = {
     responseType: 'json',
     headers: {
@@ -396,7 +396,7 @@ export function getPinsFromSessionStorage() {
 }
 
 export async function saveSharedPinsToServer(pins) {
-  const url = `${process.env.REACT_APP_EOB_BACKEND}sharedpins`;
+  const url = `${import.meta.env.VITE_EOB_BACKEND}sharedpins`;
   const { data } = await axios.post(url, {
     items: pins,
   });
@@ -406,11 +406,11 @@ export async function saveSharedPinsToServer(pins) {
 
 export async function createShareLink(pins) {
   const sharedPinsListId = await saveSharedPinsToServer(pins);
-  return `${process.env.REACT_APP_ROOT_URL}?sharedPinsListId=${sharedPinsListId}`;
+  return `${import.meta.env.VITE_ROOT_URL}?sharedPinsListId=${sharedPinsListId}`;
 }
 
 export async function getSharedPins(sharedPinsListId) {
-  const url = `${process.env.REACT_APP_EOB_BACKEND}sharedpins/${sharedPinsListId}`;
+  const url = `${import.meta.env.VITE_EOB_BACKEND}sharedpins/${sharedPinsListId}`;
   const { data } = await axios.get(url);
   return data;
 }
@@ -461,7 +461,7 @@ export function getPinsFromStorage(user) {
 }
 
 export async function importSharedPins(sharedPinsListId) {
-  const isUserLoggedIn = await getTokenFromLocalStorage();
+  const isUserLoggedIn = await getUserTokenFromLocalStorage();
   const [existingPins] = await Promise.all([getPinsFromStorage(isUserLoggedIn)]);
   const sharedPins = await getSharedPins(sharedPinsListId);
 

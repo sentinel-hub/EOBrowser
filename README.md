@@ -19,7 +19,6 @@ Note that because the code relies on a specific SentinelHub clientId which is no
 * use your instance ids in `*_themes.js`
 * Run `npm install`
 * Run `npm start` to run the application locally
-* Run `npm run storybook` to run storybook locally for testing components independently
 * Run `npm run prettier` to prettify `js`, `json`, `css` and `scss` files
 * Run `npm run lint` to lint `js`, `json`, `css` and `scss` files
 * Run `npm run build` to build the application sources

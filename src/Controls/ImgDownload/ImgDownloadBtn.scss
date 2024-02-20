@@ -15,6 +15,10 @@
   box-shadow: 0 2px 5px #000;
   text-align: center;
 
+  &.is3d {
+    top: 210px;
+  }
+
   .disabled {
     opacity: 0.5;
   }
