@@ -28,7 +28,7 @@ import {
 } from '../../const';
 import Results from '../Results/Results';
 import Highlights from './Highlights/Highlights';
-import { handleFathomTrackEvent, getThemeName } from '../../utils';
+import { handleFathomTrackEvent, getThemeName, isKnownTheme } from '../../utils';
 import CommercialData from '../CommercialDataPanel/CommercialData';
 import { withRouter } from 'react-router-dom';
 
@@ -37,13 +37,13 @@ const NO_THEME = 'no-theme-selected';
 class SearchPanel extends Component {
   state = {
     searchError: null,
-    fromMoment: moment.utc().subtract(1, 'month').startOf('day'),
-    toMoment: moment.utc(),
+    fromMoment: this.getThemeTimeRange().fromMoment,
+    toMoment: this.getThemeTimeRange().toMoment,
     datepickerIsExpanded: false,
     filterMonths: null,
     searchInProgress: false,
     resultsPanelSelected: false,
-    shouldShowThemesError: true,
+    shouldShowThemesError: false,
   };
 
   async componentDidUpdate(prevProps) {
@@ -65,6 +65,13 @@ class SearchPanel extends Component {
       if (selectedTabIndex) {
         this.setSelectedTab(parseInt(selectedTabIndex));
       }
+    }
+
+    if (prevProps.selectedThemeId !== this.props.selectedThemeId) {
+      this.setState({
+        fromMoment: this.getThemeTimeRange().fromMoment,
+        toMoment: this.getThemeTimeRange().toMoment,
+      });
     }
   }
 
@@ -144,7 +151,9 @@ class SearchPanel extends Component {
       return;
     } else if (!results.length) {
       this.setState({
-        searchError: { msg: t`No products found` },
+        searchError: {
+          msg: t`Please extend the time range and/or select a larger area on the map by zooming out.`,
+        },
       });
       return;
     }
@@ -172,18 +181,30 @@ class SearchPanel extends Component {
   };
 
   handleSelectTheme = async (e, themes) => {
-    const { id: selectedThemeId, list: selectedThemesListId, highlights } = themes[e.target.value];
+    const { selectedModeId } = this.props;
+    const { id: selectedThemeId, list: selectedThemesListId, highlights, fromTime } = themes[e.target.value];
 
     if (selectedThemeId === EXPIRED_ACCOUNT_DUMMY_INSTANCE_ID) {
       const errorMessage = t`Your user instances could not be loaded as your Sentinel Hub account was not set up/expired. You can still use EO Browser but you will not be able to use personal user instances. To be able to set up personal user instances you can apply for a 30-days free trial or consider subscribing to one of the plans: `;
       const errorLink = 'https://apps.sentinel-hub.com/dashboard/#/account/billing';
-      store.dispatch(notificationSlice.actions.displayPanelError({ message: errorMessage, link: errorLink }));
+      store.dispatch(
+        notificationSlice.actions.displayPanelError({
+          message: errorMessage,
+          link: errorLink,
+        }),
+      );
     } else {
       store.dispatch(notificationSlice.actions.displayPanelError(null));
     }
+
     this.setState({
       searchError: null,
     });
+    if (fromTime) {
+      this.setState({
+        fromMoment: moment.utc(fromTime),
+      });
+    }
     store.dispatch(
       themesSlice.actions.setSelectedThemeId({
         selectedThemeId: selectedThemeId,
@@ -196,27 +217,55 @@ class SearchPanel extends Component {
     }
     this.props.resetSearch();
 
-    handleFathomTrackEvent(FATHOM_TRACK_EVENT_LIST.THEME_OPTION_SELECTED, selectedThemeId);
+    handleFathomTrackEvent(
+      FATHOM_TRACK_EVENT_LIST.THEME_OPTION_SELECTED,
+      isKnownTheme(selectedThemeId, selectedModeId)
+        ? selectedThemeId
+        : FATHOM_TRACK_EVENT_LIST.PRIVATE_USER_THEME,
+    );
   };
 
-  renderThemeSelect = (isEducationModeSelected = false) => {
+  getThemeTimeRange() {
+    let timeRange = {
+      fromMoment: moment.utc().subtract(1, 'month').startOf('day'),
+      toMoment: moment.utc(),
+    };
+    const { selectedThemeId, selectedModeId } = this.props;
+    if (selectedThemeId) {
+      const isEducationModeSelected = selectedModeId === EDUCATION_MODE.id;
+
+      const { selectedThemeIndex, themes } = this.getSelectedThemeIndex(isEducationModeSelected);
+      const { fromTime, toTime } = themes[selectedThemeIndex] ? themes[selectedThemeIndex] : {};
+      if (fromTime) {
+        timeRange.fromMoment = moment.utc(fromTime);
+      }
+      if (toTime) {
+        timeRange.toMoment = moment.utc(toTime);
+      }
+    }
+    return timeRange;
+  }
+
+  getSelectedThemeIndex = (isEducationModeSelected) => {
     let {
       anonToken,
-      user,
       modeThemesList,
       userInstancesThemesList,
       urlThemesList,
       selectedThemeId,
       selectedThemesListId,
     } = this.props;
+
     let themes;
     urlThemesList = urlThemesList.map((t) => ({ ...t, list: URL_THEMES_LIST }));
     userInstancesThemesList = userInstancesThemesList.map((t) => ({
       ...t,
       list: USER_INSTANCES_THEMES_LIST,
     }));
-    modeThemesList = modeThemesList.map((t) => ({ ...t, list: MODE_THEMES_LIST }));
-
+    modeThemesList = modeThemesList.map((t) => ({
+      ...t,
+      list: MODE_THEMES_LIST,
+    }));
     if (!anonToken) {
       themes = userInstancesThemesList;
     } else if (isEducationModeSelected) {
@@ -230,17 +279,28 @@ class SearchPanel extends Component {
     const selectedThemeIndex = themes.findIndex(
       (t) => t.id === selectedThemeId && t.list === selectedThemesListId,
     );
+
+    return { selectedThemeIndex, themes };
+  };
+
+  renderThemeSelect = (isEducationModeSelected = false) => {
+    const { selectedThemeId, user } = this.props;
+    const { selectedThemeIndex, themes } = this.getSelectedThemeIndex(isEducationModeSelected);
+
     return (
       <div className="theme-select top">
-        <div className="top-label">
+        <div className="theme-select-label">
           {t`Theme`}
           {!isEducationModeSelected && (
-            <ExternalLink
-              className="configurations-settings"
-              href="https://apps.sentinel-hub.com/dashboard/#/configurations"
-            >
-              <i className="fa fa-cog" title={t`Manage configuration instances`} />
-            </ExternalLink>
+            <div title={t`Manage configuration instances`}>
+              <ExternalLink
+                className="dashboard-button"
+                href="https://apps.sentinel-hub.com/dashboard/#/configurations"
+              >
+                <i className="fa fa-cog" />
+                {t`Dashboard`}
+              </ExternalLink>
+            </div>
           )}
         </div>
         {!user && !isEducationModeSelected && <p>{t`Login to use custom configuration instances.`}</p>}

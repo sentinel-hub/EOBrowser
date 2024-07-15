@@ -7,8 +7,13 @@ import {
   DEMInstanceTypeOrthorectification,
   BackscatterCoeff,
   DEMInstanceType,
+  PlanetItemType,
+  PlanetProductBundle,
+  AirbusConstellation,
 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 
 import { DEFAULT_THEMES } from './assets/default_themes.js';
 import { EDUCATION_THEMES } from './assets/education_themes.js';
@@ -31,6 +36,9 @@ export const ModalId = {
   TERMS_AND_PRIVACY_CONSENT: 'TermsAndPrivacy',
   SPECTRAL_EXPLORER: 'SpectralExplorer',
   RESTRICTED_ACCESS: 'RestrictedAccess',
+  PRIVATE_PSD_LOGIN: 'PrivatePSDLogin',
+  PSD_NOT_ELIGIBLE_USER: 'PSDNotEligibleUser',
+  EDUCATION_MODE_REDIRECT: 'EducationModeRedirect',
 };
 
 export const MODE_THEMES_LIST = 'mode';
@@ -174,6 +182,7 @@ export const DATASOURCES = {
   DEM: 'DEM',
   COPERNICUS: 'Copernicus Services',
   PLANET_NICFI: 'Planet NICFI',
+  PLANET_SANDBOX_DATA: 'PlanetSandboxData',
   CUSTOM: 'CUSTOM',
   OTHER: 'OTHER',
 };
@@ -214,8 +223,10 @@ export const defaultEffects = {
 
 export const DATAMASK_OUTPUT = 'dataMask';
 export const EOBROWSERSTATS_OUTPUT = 'eobrowserStats';
+export const EOBROWSERSTATS_OUTPUT_POI = 'eobrowserStatsPOI';
 export const ALL_BANDS_OUTPUT = 'bands';
 export const STATISTICS_MANDATORY_OUTPUTS = [EOBROWSERSTATS_OUTPUT, DATAMASK_OUTPUT];
+export const STATISTICS_MANDATORY_OUTPUTS_POI = [EOBROWSERSTATS_OUTPUT_POI, DATAMASK_OUTPUT];
 
 export const LOCAL_STORAGE_PRIVACY_CONSENT_KEY = 'eobrowser-privacy-consent';
 
@@ -233,38 +244,89 @@ export const FUNCTIONALITY_TEMPORARILY_UNAVAILABLE_MSG =
   'This functionality is temporarily unavailable due to updates. Please try again later.';
 
 export const SH_ACCOUNT_TYPE = {
-  FREE: 1,
   TRIAL: 11000,
-  EXPLORATION: 12000,
-  BASIC: 13000,
-  ENTERPRISE: 14000,
-  ENTERPRISE_S: 14001,
-  ENTERPRISE_L: 14002,
+  TRIAL_PLANET: 11001,
   ROOT: 20000,
 };
 
-export const SH_PAYING_ACCOUNT_TYPES = [
-  SH_ACCOUNT_TYPE.EXPLORATION,
-  SH_ACCOUNT_TYPE.BASIC,
-  SH_ACCOUNT_TYPE.ENTERPRISE,
-  SH_ACCOUNT_TYPE.ENTERPRISE_S,
-  SH_ACCOUNT_TYPE.ENTERPRISE_L,
-  SH_ACCOUNT_TYPE.ROOT,
-];
+export const SH_TRIAL_ACCOUNT_TYPES = [SH_ACCOUNT_TYPE.TRIAL, SH_ACCOUNT_TYPE.TRIAL_PLANET];
 
 // Templates for Planetary Variables user configurations
-export const PLANETARY_VARIABLES_TYPE_CONFIGURATION_IDS = {
-  [PlanetPVType.BiomassProxy]: 'd8cd73-YOUR-INSTANCEID-HERE',
-  [PlanetPVType.LandSurfaceTemperature]: 'e3e9b0-YOUR-INSTANCEID-HERE',
-  [PlanetPVType.SoilWaterContent]: '46d34e-YOUR-INSTANCEID-HERE',
+export const PLANETARY_VARIABLES_TYPE_CONFIGURATION = {
+  [PlanetPVType.BiomassProxy]: {
+    id: 'd8cd73-YOUR-INSTANCEID-HERE',
+    name: 'My Planetary Variables - Crop Biomass',
+  },
+  [PlanetPVType.LandSurfaceTemperature]: {
+    id: 'e3e9b0-YOUR-INSTANCEID-HERE',
+    name: 'My Planetary Variables - Land Surface Temperature',
+  },
+  [PlanetPVType.SoilWaterContent]: {
+    id: '46d34e-YOUR-INSTANCEID-HERE',
+    name: 'My Planetary Variables - Soil Water Content',
+  },
 };
 
-export const PLANETARY_VARIABLES_ID_CONFIGURATION_IDS = {
-  [PlanetPVId.CANOPY_HEIGHT_V1_0_0_30]: 'b1fe05-YOUR-INSTANCEID-HERE',
-  [PlanetPVId.CANOPY_COVER_V1_0_0_30]: 'f49d16-YOUR-INSTANCEID-HERE',
-  [PlanetPVId.ABOVEGROUND_CARBON_DENSITY_V1_0_0_30]: '9629ce-YOUR-INSTANCEID-HERE',
-  [PlanetPVId.DAY_OF_YEAR_V1_0_0_30]: '5d9398-YOUR-INSTANCEID-HERE',
+export const PLANETARY_VARIABLES_ID_CONFIGURATION = {
+  [PlanetPVId.CANOPY_HEIGHT_V1_1_0_30]: {
+    id: 'b1fe05-YOUR-INSTANCEID-HERE',
+    name: 'My Planetary Variables - Canopy Height',
+  },
+  [PlanetPVId.CANOPY_COVER_V1_1_0_30]: {
+    id: 'f49d16-YOUR-INSTANCEID-HERE',
+    name: 'My Planetary Variables - Canopy Cover',
+  },
+  [PlanetPVId.ABOVEGROUND_CARBON_DENSITY_V1_1_0_30]: {
+    id: '9629ce-YOUR-INSTANCEID-HERE',
+    name: 'My Planetary Variables - Aboveground Carbon Density',
+  },
 };
+
+export const PLANET_TEMPLATE_CONFIGURATION = {
+  [PlanetItemType.PSScene]: {
+    [PlanetProductBundle.ANALYTIC]: {
+      id: 'e72f1c-YOUR-INSTANCEID-HERE',
+      name: 'My PlanetScope Data - PSScene without_udm2',
+    },
+    [PlanetProductBundle.ANALYTIC_UDM2]: {
+      id: 'e72f1c-YOUR-INSTANCEID-HERE',
+      name: 'My PlanetScope Data - PSScene analytic_udm2',
+    },
+    [PlanetProductBundle.ANALYTIC_8B_SR_UDM2]: {
+      id: 'e72f1c-YOUR-INSTANCEID-HERE',
+      name: 'My PlanetScope Data - PSScene analytic_8b_sr_udm2',
+    },
+    [PlanetProductBundle.ANALYTIC_8B_UDM2]: {
+      id: 'e72f1c-YOUR-INSTANCEID-HERE',
+      name: 'My PlanetScope Data - PSScene analytic_8b_udm2',
+    },
+  },
+  [PlanetItemType.SkySatCollect]: {
+    [PlanetProductBundle.ANALYTIC_UDM2]: {
+      id: '04da76-YOUR-INSTANCEID-HERE',
+      name: 'My SkySat Data - Multispectral udm2',
+    },
+    [PlanetProductBundle.ANALYTIC_SR_UDM2]: {
+      id: '04da76-YOUR-INSTANCEID-HERE',
+      name: 'My SkySat Data - Multispectral sr_udm2',
+    },
+    [PlanetProductBundle.PANCHROMATIC]: {
+      id: 'e0f4c5-YOUR-INSTANCEID-HERE',
+      name: 'My SkySat Data - Panchromatic',
+    },
+  },
+};
+
+export const MAXAR_TEMPLATE_CONFIGURATION = {
+  id: '268131-YOUR-INSTANCEID-HERE',
+  name: 'Maxar WorldView',
+};
+export const AIRBUS_TEMPLATE_CONFIGURATION = {
+  [AirbusConstellation.PHR]: { id: '07409a-YOUR-INSTANCEID-HERE', name: 'Airbus Pleiades template' },
+  [AirbusConstellation.SPOT]: { id: 'ddb295-YOUR-INSTANCEID-HERE', name: 'Airbus SPOT template' },
+};
+
+export const PLANET_SANDBOX_THEME_ID = 'PLANET_SANDBOX';
 
 export const FATHOM_TRACK_EVENT_LIST = {
   SEARCH_BUTTON: 'Search button clicked',
@@ -286,6 +348,8 @@ export const FATHOM_TRACK_EVENT_LIST = {
   TIMELAPSE_SHARE_BUTTON: 'Timelapse Share button clicked',
   HISTOGRAM_WIDGET: 'Histogram widget clicked and loaded',
   EDUCATION_MODE_SELECTED: 'Education mode selected',
+  EDUCATION_MODE_COPERNICUS_BROWSER: 'Education mode redirected to Copernicus Browser',
+  EDUCATION_MODE_CANCELED: 'Education mode canceled, not redirected to Copernicus Browser',
   '2D_MODE_WIDGET': '2D icon clicked',
   '3D_MODE_WIDGET': '3D icon clicked',
   STATISTICAL_INFO_CHART_ICON_CLICKED: 'Statistical info icon clicked',
@@ -293,4 +357,25 @@ export const FATHOM_TRACK_EVENT_LIST = {
   ELEVATION_PROFILE_CHART_ICON_CLICKED: 'Elevation profile icon clicked',
   VISUALIZE_BUTTON: 'Visualize button clicked',
   VISUALIZATION_LAYER_CHANGED: 'Visualization Layer changed',
+  SANDBOX_DATA_SHOW_TUTORIAL_ON_INITIAL_PROMPTING: 'Record sandbox tutorial initial prompting',
+  SANDBOX_DATA_SHOW_TUTORIAL_ON_USER_CLICK: 'Record sandbox tutorial through tutorial button',
+  SANDBOX_DATA_SHOW_TUTORIAL_ON_DEEP_LINK: 'Record sandbox tutorial through deep link',
+  PRIVATE_USER_THEME: 'Private user theme',
+  PRIVATE_USER_LAYER: 'Private user layer',
+  PLANETARY_SANDBOX_DATA_TUTORIAL_COMPLETED: 'Planet Sandbox Data tutorial completed',
+  PLANETARY_SANDBOX_DATA_TUTORIAL_DROPPED: 'Planet Sandbox Data tutorial dropped in step',
 };
+
+export const REACT_MARKDOWN_REHYPE_PLUGINS = [
+  rehypeRaw,
+  [
+    rehypeSanitize,
+    {
+      ...defaultSchema,
+      attributes: {
+        ...defaultSchema?.attributes,
+        '*': ['className'],
+      },
+    },
+  ],
+];

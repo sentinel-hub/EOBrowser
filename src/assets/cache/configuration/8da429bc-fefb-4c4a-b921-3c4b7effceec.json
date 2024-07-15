@@ -1,0 +1,257 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE/layers/__FIS_4_NDVI",
+        "id": "__FIS_4_NDVI",
+        "title": "__FIS_4_NDVI",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\nfunction evaluatePixel(samples) {\n    let val = index(samples.B04, samples.B03);\n    return [val, samples.dataMask];\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\n        \"B03\",\n        \"B04\",\n        \"dataMask\"\n      ]\n    }],\n    output: {\n      bands: 2\n    }\n  }\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-05-13T06:36:35.265358Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1/sources/15"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 100,
+            "type": "LTML1"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE/layers/__FIS_5_NDWI",
+        "id": "__FIS_5_NDWI",
+        "title": "__FIS_5_NDWI",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\nfunction evaluatePixel(samples) {\n    let val = index(samples.B02, samples.B04);\n    return [val, samples.dataMask];\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\n        \"B02\",\n        \"B04\",\n        \"dataMask\"\n      ]\n    }],\n    output: {\n      bands: 2\n    }\n  }\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-05-13T07:25:29.488117Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1/sources/15"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "LTML1"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE/layers/__FIS_THERMAL",
+        "id": "__FIS_THERMAL",
+        "title": "__FIS_THERMAL",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\nfunction evaluatePixel(samples) {\n    let val = samples.B06;\n    return [val, samples.dataMask];\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\n        \"B06\",\n        \"dataMask\"\n      ]\n    }],\n    output: {\n      bands: 2\n    }\n  }\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-05-18T10:02:27.176359Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1/sources/15"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 100,
+            "tiers": "ALL_TIERS",
+            "type": "LTML1"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE/layers/1_TRUE_COLOR",
+        "id": "1_TRUE_COLOR",
+        "title": "True color",
+        "description": "Based on the combination of bands 3, 2, 1",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\nlet minVal = 0.0;\nlet maxVal = 0.4;\n\nlet viz = new HighlightCompressVisualizer(minVal, maxVal);\n\nfunction evaluatePixel(samples) {\n    let val = [samples.B03, samples.B02, samples.B01];\n    val = viz.processList(val);\n    val.push(samples.dataMask);\n    return val;\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\n        \"B01\",\n        \"B02\",\n        \"B03\",\n        \"dataMask\"\n      ]\n    }],\n    output: {\n      bands: 4\n    }\n  }\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-05-12T13:42:56.203230Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1/sources/15"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "type": "LTML1"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE/layers/3_FALSE_COLOR",
+        "id": "3_FALSE_COLOR",
+        "title": "False color",
+        "description": "Based on the combination of bands 4, 3, 2",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\nlet minVal = 0.0;\nlet maxVal = 0.4;\n\nlet viz = new HighlightCompressVisualizer(minVal, maxVal);\n\nfunction evaluatePixel(samples) {\n    let val = [samples.B04, samples.B03, samples.B02];\n    val = viz.processList(val);\n    val.push(samples.dataMask);\n    return val;\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\n        \"B02\",\n        \"B03\",\n        \"B04\",\n        \"dataMask\"\n      ]\n    }],\n    output: {\n      bands: 4\n    }\n  }\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-05-12T13:44:16.299358Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1/sources/15"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "type": "LTML1"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE/layers/4_NDVI",
+        "id": "4_NDVI",
+        "title": "NDVI",
+        "description": "Based on the combination of bands (B04-B03)/(B04+B03)",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"B03\", \"B04\", \"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n  let val = index(samples.B04, samples.B03);\n  let imgVals = null;\n  // The library for tiffs works well only if there is only one channel returned.\n  // So we encode the \"no data\" as NaN here and ignore NaNs on frontend.\n  const indexVal = samples.dataMask === 1 && val >= -1 && val <= 1 ? val : NaN;\n\n  if (val < -1.1) imgVals = [0, 0, 0, samples.dataMask];\n  else if (val < -0.2) imgVals = [0.75, 0.75, 0.75, samples.dataMask];\n  else if (val < -0.1) imgVals = [0.86, 0.86, 0.86, samples.dataMask];\n  else if (val < 0) imgVals = [1, 1, 0.88, samples.dataMask];\n  else if (val < 0.025) imgVals = [1, 0.98, 0.8, samples.dataMask];\n  else if (val < 0.05) imgVals = [0.93, 0.91, 0.71, samples.dataMask];\n  else if (val < 0.075) imgVals = [0.87, 0.85, 0.61, samples.dataMask];\n  else if (val < 0.1) imgVals = [0.8, 0.78, 0.51, samples.dataMask];\n  else if (val < 0.125) imgVals = [0.74, 0.72, 0.42, samples.dataMask];\n  else if (val < 0.15) imgVals = [0.69, 0.76, 0.38, samples.dataMask];\n  else if (val < 0.175) imgVals = [0.64, 0.8, 0.35, samples.dataMask];\n  else if (val < 0.2) imgVals = [0.57, 0.75, 0.32, samples.dataMask];\n  else if (val < 0.25) imgVals = [0.5, 0.7, 0.28, samples.dataMask];\n  else if (val < 0.3) imgVals = [0.44, 0.64, 0.25, samples.dataMask];\n  else if (val < 0.35) imgVals = [0.38, 0.59, 0.21, samples.dataMask];\n  else if (val < 0.4) imgVals = [0.31, 0.54, 0.18, samples.dataMask];\n  else if (val < 0.45) imgVals = [0.25, 0.49, 0.14, samples.dataMask];\n  else if (val < 0.5) imgVals = [0.19, 0.43, 0.11, samples.dataMask];\n  else if (val < 0.55) imgVals = [0.13, 0.38, 0.07, samples.dataMask];\n  else if (val < 0.6) imgVals = [0.06, 0.33, 0.04, samples.dataMask];\n  else imgVals = [0, 0.27, 0, samples.dataMask];\n\n  return {\n    default: imgVals,\n    index: [indexVal],\n    eobrowserStats: [val],\n    dataMask: [samples.dataMask],\n  };\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-05-13T06:31:45.663903Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1/sources/15"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "tiers": "ALL_TIERS",
+            "type": "LTML1"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE/layers/5_NDWI",
+        "id": "5_NDWI",
+        "title": "NDWI",
+        "description": "Based on the combination of bands (B02-B04)/(B02+B04)",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//ndwi\nconst colorRamp1 = [\n  [0, 0xffffff],\n  [1, 0x008000],\n];\nconst colorRamp2 = [\n  [0, 0xffffff],\n  [1, 0x0000cc],\n];\n\nlet viz1 = new ColorRampVisualizer(colorRamp1);\nlet viz2 = new ColorRampVisualizer(colorRamp2);\n\nfunction setup() {\n  return {\n    input: [\"B02\", \"B04\", \"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n  let val = index(samples.B02, samples.B04);\n  let imgVals = null;\n  // The library for tiffs works well only if there is only one channel returned.\n  // So we encode the \"no data\" as NaN here and ignore NaNs on frontend.\n  const indexVal = samples.dataMask === 1 ? val : NaN;\n\n  if (val < -0) {\n    imgVals = [...viz1.process(-val), samples.dataMask];\n  } else {\n    imgVals = [...viz2.process(Math.sqrt(Math.sqrt(val))), samples.dataMask];\n  }\n  return {\n    default: imgVals,\n    index: [indexVal],\n    eobrowserStats: [val],\n    dataMask: [samples.dataMask],\n  };\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-05-13T06:40:16.764231Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1/sources/15"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "tiers": "ALL_TIERS",
+            "type": "LTML1"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE/layers/THERMAL",
+        "id": "THERMAL",
+        "title": "THERMAL",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\nconst blue_red = [\n  [223, 0x003d99],\n  [253, 0x2e82ff],\n  [263, 0x80b3ff],\n  [272, 0xe0edff],\n  [273, 0xffffff],\n  [274, 0xfefce7],\n  [283, 0xfde191],\n  [293, 0xf69855],\n  [303, 0xec6927],\n  [323, 0xaa2d1d],\n  [363, 0x650401],\n  [373, 0x3d0200],\n];\n\nconst viz = new ColorRampVisualizer(blue_red);\n\nfunction evaluatePixel(samples) {\n  let val = samples.B06;\n  const imgVals = [...viz.process(val), samples.dataMask];\n  return {\n    default: imgVals,\n    eobrowserStats: [val],\n    dataMask: [samples.dataMask],\n  };\n}\n\nfunction setup() {\n  return {\n    input: [\n      {\n        bands: [\"B06\", \"dataMask\"],\n      },\n    ],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8da429-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-05-18T07:50:28.978196Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LTML1/sources/15"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BILINEAR",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "tiers": "ALL_TIERS",
+            "type": "LTML1"
+        }
+    }
+]

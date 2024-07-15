@@ -1,0 +1,48 @@
+{
+    "title": "EOB3 Landsat 1-5 MSS L1 API",
+    "layers": [
+        {
+            "id": "__FIS_NDVI",
+            "name": "__FIS_NDVI",
+            "description": "",
+            "dataset": "LMSSL1",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_NDWI",
+            "name": "__FIS_NDWI",
+            "description": "",
+            "dataset": "LMSSL1",
+            "legendUrl": null
+        },
+        {
+            "id": "FALSE-COLOR-NEAR-INFRARED",
+            "name": "False Color Near Infrared",
+            "description": "Based on combination of bands B04 (NIR), B02 (Red), B01 (Green)",
+            "dataset": "LMSSL1",
+            "legendUrl": null
+        },
+        {
+            "id": "FALSE-COLOR-ULTRA-RED",
+            "name": "False Color Ultra Red ",
+            "description": "Based on combination of bands B03 (Ultra Red), B02 (Red), B01 (Green)",
+            "dataset": "LMSSL1",
+            "legendUrl": null
+        },
+        {
+            "id": "NDVI",
+            "name": "NDVI",
+            "description": "Normalized difference vegetation index: (B04 - B02) / (B04 + B02)",
+            "dataset": "LMSSL1",
+            "legendUrl": null
+        },
+        {
+            "id": "NDWI",
+            "name": "NDWI",
+            "description": "Normalized difference water index: (B01 - B04) / (B01 + B04)",
+            "dataset": "LMSSL1",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

@@ -1,0 +1,33 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8a1d53-YOUR-INSTANCEID-HERE/layers/WORLDCOVER-MAP",
+        "id": "WORLDCOVER-MAP",
+        "title": "ESA WorldCover Map",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n// This custom script visualises WorldCover map \n\nfunction setup() {\n  return {\n    input: [\"Map\", \"dataMask\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\n\nconst map = [\n    [10, 0x006400], // Tree cover\n    [20, 0xffbb22], // Shrubland\n    [30, 0xffff4c], // Grassland\n    [40, 0xf096ff], // Cropland\n    [50, 0xfa0000], // Built up\n    [60, 0xb4b4b4], // Bare / sparse vegetation\n    [70, 0xf0f0f0], //\tSnow and Ice\n    [80, 0x0064c8], //\tPermanent water bodies\n    [90, 0x0096a0], //\tHerbaceous wetland\n    [95, 0x00cf75], //\tMangroves\n    [100, 0xfae6a0], //\tMoss and lichen\n    \n  ];\n\nconst visualizer = new ColorMapVisualizer(map);\n\nfunction evaluatePixel(sample) {\n  return [visualizer.process(sample.Map)[0], visualizer.process(sample.Map)[1], visualizer.process(sample.Map)[2], sample.dataMask];\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/8a1d53-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-10-18T15:53:56.309415Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "0b940c-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

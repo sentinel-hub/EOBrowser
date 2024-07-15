@@ -10,21 +10,15 @@
     color: $primaryCol;
   }
 
+  .free-signup {
+    text-align: center;
+    margin: -3px 0 8px;
+    font-size: 14px;
+  }
+
   .footer-info {
-    .free-signup {
-      text-align: center;
-      margin: -3px 0 8px;
-      font-size: 14px;
-    }
-
-    .esa-logo {
-      float: right;
-      margin-top: -9px;
-
-      img {
-        width: 20px;
-      }
-    }
+    display: flex;
+    justify-content: space-between;
   }
 
   @media screen and (max-width: $breakpoint-768) {

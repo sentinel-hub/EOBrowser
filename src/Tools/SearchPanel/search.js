@@ -4,8 +4,9 @@ import { BBox, CRS_EPSG4326 } from '@sentinel-hub/sentinelhub-js';
 import { dataSourceHandlers } from './dataSourceHandlers/dataSourceHandlers';
 
 import { t } from 'ttag';
+import store from '../../store';
 
-export function applyFilterMonthsToDateRange(fromMoment, toMoment, filterMonths) {
+function applyFilterMonthsToDateRange(fromMoment, toMoment, filterMonths) {
   /*
     This function takes a date range and the months that are allowed, and returns an array
     of resulting (valid) date ranges.
@@ -278,8 +279,10 @@ function getTiles(
       bounds.getEast(),
       bounds.getNorth(),
     );
+    let authToken = store.getState().auth.user.access_token;
+    let searchProps = authToken ? { authToken } : {};
     searchLayer
-      .findTiles(bbox, fromTime, toTime, maxCount, offset)
+      .findTiles(bbox, fromTime, toTime, maxCount, offset, searchProps)
       .then((response) => {
         const tiles = convertToStandardTiles(response.tiles, datasetId);
         resolve({

@@ -2,8 +2,8 @@ import { useLocale, addLocale } from 'ttag';
 import moment from 'moment';
 import axios from 'axios';
 
-export const LOCAL_STORAGE_KEY = 'eobrowser_lang';
-export const DEFAULT_LANG = 'en';
+const LOCAL_STORAGE_KEY = 'eobrowser_lang';
+const DEFAULT_LANG = 'en';
 export const SUPPORTED_LANGUAGES = [
   { langCode: 'en', text: 'English', flagCode: 'GB' },
   { langCode: 'da', text: 'Dansk', flagCode: 'DK' },
@@ -13,6 +13,7 @@ export const SUPPORTED_LANGUAGES = [
   { langCode: 'fr', text: 'Français', flagCode: 'FR' },
   { langCode: 'el', text: 'ελληνικά', flagCode: 'GR' },
   { langCode: 'lv', text: 'latviešu', flagCode: 'LV' },
+  { langCode: 'lt', text: 'lietuvių', flagCode: 'LT' },
   { langCode: 'pl', text: 'polski', flagCode: 'PL' },
   { langCode: 'pt', text: 'português', flagCode: 'PT' },
   { langCode: 'sl', text: 'slovenščina', flagCode: 'SI' },

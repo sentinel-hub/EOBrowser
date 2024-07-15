@@ -2,7 +2,7 @@ import { coordEach } from '@turf/meta';
 import { featureCollection } from '@turf/helpers';
 import geo_area from '@mapbox/geojson-area';
 
-export function isCoordsEmpty(geojsonFeature) {
+function isCoordsEmpty(geojsonFeature) {
   let coordsEmpty = false;
   coordEach(geojsonFeature, (currentCoord, coordIndex, featureIndex, multiFeatureIndex, geometryIndex) => {
     if (!currentCoord) {
@@ -72,6 +72,50 @@ export function getBoundsZoomLevel(bounds) {
   const lngZoom = zoom(window.innerWidth, WORLD_DIM.width, lngFraction);
 
   return Math.min(latZoom, lngZoom, ZOOM_MAX);
+}
+
+export function getBounds(geometry) {
+  let minLat = Infinity,
+    maxLat = -Infinity,
+    minLng = Infinity,
+    maxLng = -Infinity;
+
+  const loopPolygon = (polygon) => {
+    polygon.forEach((ring) => {
+      ring.forEach((coord) => {
+        var lng = coord[0],
+          lat = coord[1];
+        if (lat < minLat) {
+          minLat = lat;
+        }
+        if (lat > maxLat) {
+          maxLat = lat;
+        }
+        if (lng < minLng) {
+          minLng = lng;
+        }
+        if (lng > maxLng) {
+          maxLng = lng;
+        }
+      });
+    });
+  };
+
+  if (geometry.type === 'Polygon') {
+    loopPolygon(geometry.coordinates);
+  } else if (geometry.type === 'MultiPolygon') {
+    geometry.coordinates.forEach((polygon) => {
+      loopPolygon(polygon);
+    });
+  } else {
+    return null;
+  }
+
+  // Now you have the bounds
+  return [
+    [minLat, minLng],
+    [maxLat, maxLng],
+  ];
 }
 
 export function switchGeometryCoordinates(geometry) {

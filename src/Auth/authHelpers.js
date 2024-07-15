@@ -2,74 +2,127 @@ import jwt_dec from 'jwt-decode';
 import axios from 'axios';
 import { t } from 'ttag';
 
-import { getUrlParams } from '../utils';
 import store, { authSlice, notificationSlice } from '../store';
+import Keycloak from 'keycloak-js';
+import { removeURLParameter } from '../utils';
 
-export const LOCAL_STORAGE_KC_NONCE = 'eobrowser_nonce'; // duplicated in public/oauthCallback.html
-export const LOCAL_STORAGE_AUTH_KEY = 'eobrowser_oauth'; // duplicated in public/oauthCallback.html
-export const LOCAL_STORAGE_ANON_AUTH_KEY = 'eobrowser_anon_auth';
+const LOCAL_STORAGE_ANON_AUTH_KEY = 'eobrowser_anon_auth';
 
+export const UPDATE_BEFORE_EXPIRY_USER_TOKEN = 3 * 60 * 1000; //minutes*seconds*miliseconds
 export const UPDATE_BEFORE_EXPIRY_ANON_TOKEN = 10 * 1000; //seconds*miliseconds
 
-const KC_IDP_HINT_PLANET = 'planet';
-
-const oauth = {
+const keycloak = new Keycloak({
+  url: import.meta.env.VITE_AUTH_BASEURL + 'auth',
+  realm: 'main',
   clientId: import.meta.env.VITE_CLIENTID,
-  accessTokenUri: import.meta.env.VITE_AUTH_BASEURL + 'auth/realms/main/protocol/openid-connect/token',
-  authorizationUri: import.meta.env.VITE_AUTH_BASEURL + 'auth/realms/main/protocol/openid-connect/auth',
-  redirectUri: `${import.meta.env.VITE_ROOT_URL}oauthCallback.html`,
+});
+
+const setAuthenticatedUser = () => {
+  const userPayload = {
+    userdata: keycloak.idTokenParsed,
+    access_token: keycloak.token,
+    token_expiration: keycloak.tokenParsed.exp * 1000,
+  };
+  store.dispatch(authSlice.actions.setUser(userPayload));
 };
 
-// nonce should not get changed in case user is redirected to EOB from signup email validation
-let kcNonce = localStorage.getItem(LOCAL_STORAGE_KC_NONCE);
-if (!kcNonce) {
-  kcNonce = Math.round(Math.random() * Math.pow(10, 16)).toString();
-  localStorage.setItem(LOCAL_STORAGE_KC_NONCE, kcNonce);
+export const initKeycloak = async () => {
+  try {
+    const authenticated = await keycloak.init({
+      onLoad: 'check-sso',
+      checkLoginIframe: false,
+    });
+
+    if (authenticated) {
+      setAuthenticatedUser();
+    }
+    return authenticated;
+  } catch (error) {
+    console.error('Failed to initialize keycloak adapter:', error);
+    return false;
+  }
+};
+
+export const doLogin = async (idpHint) => {
+  let options = {};
+  // If idpHint was provided, remove it from the url before logging in
+  if (idpHint) {
+    const urlWithoutIdpHint = removeURLParameter(window.location.href, 'kc_idp_hint');
+    window.history.replaceState({}, document.title, urlWithoutIdpHint);
+    options = { idpHint };
+  }
+
+  try {
+    const authenticated = await keycloak.login(options);
+
+    if (authenticated) {
+      setAuthenticatedUser();
+    }
+    return authenticated;
+  } catch (error) {
+    store.dispatch(notificationSlice.actions.displayError(t`An error has occurred during login process`));
+    return false;
+  }
+};
+
+export const isUserAuthenticated = () => {
+  return keycloak.authenticated;
+};
+
+// Refresh user token
+export const refreshUserToken = async () => {
+  try {
+    const refreshed = await keycloak.updateToken();
+    if (refreshed) {
+      setAuthenticatedUser();
+    }
+    return refreshed;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const scheduleTokenRefresh = (expires_at, updateBeforeExpiry, refreshTimeout, refresh = () => {}) => {
+  const now = Date.now();
+  const expires_in = expires_at - now;
+
+  const timeout = Math.max(expires_in - updateBeforeExpiry, 0);
+  if (refreshTimeout) {
+    clearTimeout(refreshTimeout);
+  }
+  //schedule refresh
+  refreshTimeout = setTimeout(() => {
+    refresh();
+  }, timeout);
+
+  return refreshTimeout;
+};
+
+export async function doLogout() {
+  try {
+    await keycloak.logout();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    store.dispatch(authSlice.actions.resetUser());
+  }
 }
 
 export const getSignUpUrl = () => {
-  const url = import.meta.env.VITE_AUTH_BASEURL + 'auth/realms/main/protocol/openid-connect/registrations';
-  const params = {
-    response_type: 'token id_token',
-    client_id: import.meta.env.VITE_CLIENTID,
-    redirect_uri: oauth.redirectUri,
-    kc_locale: 'en',
-    scope: 'openid',
-    nonce: kcNonce,
-  };
-
-  return url + '?' + new URLSearchParams(params);
-};
-
-const getOAuthURL = () => {
-  const { kc_idp_hint } = getUrlParams();
-  const params = {
-    response_type: 'token id_token',
-    redirect_uri: oauth.redirectUri,
-    client_id: oauth.clientId,
-    nonce: kcNonce,
-  };
-  if (kc_idp_hint === KC_IDP_HINT_PLANET) {
-    params.kc_idp_hint = kc_idp_hint;
+  try {
+    const options = {
+      redirectUri: window.location.origin + window.location.pathname,
+    };
+    return keycloak.createRegisterUrl(options);
+  } catch (error) {
+    console.error('Failed create registration url:', error);
+    return '#';
   }
-
-  return oauth.authorizationUri + '?' + new URLSearchParams(params);
 };
 
-export const openLoginWindow = async () => {
-  return new Promise((resolve, reject) => {
-    window.authorizationCallback = { resolve, reject };
-    window.open(getOAuthURL(), 'popupWindow', 'width=800,height=600');
-  }).then((token) => {
-    const idToken = decodeIdToken(token);
-    if (idToken.nonce !== kcNonce) {
-      throw new Error('Auth service returned nonce that is not equal to the nonce that was sent to it.');
-    }
-
-    saveUserTokenToLocalStorage(token);
-    return token;
-  });
-};
+/**
+ * Anonymous token helpers
+ */
 
 const getTokenFromLocalStorage = async (key) => {
   const token = await localStorage.getItem(key);
@@ -85,25 +138,16 @@ const getTokenFromLocalStorage = async (key) => {
   }
 };
 
-export const getUserTokenFromLocalStorage = () => getTokenFromLocalStorage(LOCAL_STORAGE_AUTH_KEY);
 export const getAnonTokenFromLocalStorage = () => getTokenFromLocalStorage(LOCAL_STORAGE_ANON_AUTH_KEY);
 
 const saveTokenToLocalStorage = (key, token) => {
   localStorage.setItem(key, JSON.stringify(token));
 };
 
-export const saveUserTokenToLocalStorage = (token) => saveTokenToLocalStorage(LOCAL_STORAGE_AUTH_KEY, token);
 export const saveAnonTokenToLocalStorage = (token) =>
   saveTokenToLocalStorage(LOCAL_STORAGE_ANON_AUTH_KEY, token);
 
-const removeTokenFromLocalStorage = (key) => {
-  localStorage.removeItem(key);
-};
-
-export const removeUserTokenFromLocalStorage = () => removeTokenFromLocalStorage(LOCAL_STORAGE_AUTH_KEY);
-export const removeAnonTokenFromLocalStorage = () => removeTokenFromLocalStorage(LOCAL_STORAGE_ANON_AUTH_KEY);
-
-export const isTokenExpired = (token) => {
+const isTokenExpired = (token) => {
   if (!token) {
     return true;
   }
@@ -112,9 +156,6 @@ export const isTokenExpired = (token) => {
   const expirationDate = getTokenExpiration(token);
   return expirationDate < now;
 };
-
-export const decodeToken = (token) => jwt_dec(token.access_token);
-export const decodeIdToken = (token) => jwt_dec(token.id_token);
 
 export const getTokenExpiration = (token) => {
   try {
@@ -127,21 +168,6 @@ export const getTokenExpiration = (token) => {
     console.error('Error decoding token', e.message);
   }
   return 0;
-};
-
-export const scheduleTokenRefresh = (expires_at, updateBeforeExpiry, refreshTimeout, refresh = () => {}) => {
-  const now = Date.now();
-  const expires_in = expires_at - now;
-
-  const timeout = Math.max(expires_in - updateBeforeExpiry, 0);
-  if (refreshTimeout) {
-    clearTimeout(refreshTimeout);
-  }
-  //schedule refresh
-
-  refreshTimeout = setTimeout(() => {
-    refresh();
-  }, timeout);
 };
 
 export const fetchAnonTokenUsingService = async (anonTokenServiceUrl, body) => {
@@ -158,41 +184,3 @@ export const fetchAnonTokenUsingService = async (anonTokenServiceUrl, body) => {
   }
   return null;
 };
-
-export async function doLogin() {
-  try {
-    const token = await openLoginWindow();
-    store.dispatch(
-      authSlice.actions.setUser({
-        userdata: decodeToken(token),
-        access_token: token.access_token,
-        token_expiration: token.expires_in,
-      }),
-    );
-  } catch (e) {
-    console.error(e);
-    store.dispatch(notificationSlice.actions.displayError(t`An error has occurred during login process`));
-  }
-}
-
-function onLogOut() {
-  removeUserTokenFromLocalStorage();
-  store.dispatch(authSlice.actions.resetUser());
-}
-
-export async function doLogout() {
-  try {
-    const userToken = await getUserTokenFromLocalStorage();
-    axios.get(import.meta.env.VITE_AUTH_BASEURL + 'auth/realms/main/protocol/openid-connect/logout', {
-      withCredentials: true,
-      params: {
-        client_id: import.meta.env.VITE_CLIENTID,
-        id_token_hint: userToken && userToken.id_token,
-      },
-    });
-  } catch (e) {
-    console.error(e);
-  } finally {
-    onLogOut();
-  }
-}

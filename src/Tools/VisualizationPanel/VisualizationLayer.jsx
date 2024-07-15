@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
-import rehypeSanitize from 'rehype-sanitize';
 import { gettext, t } from 'ttag';
 
 import Legend from './Legend';
@@ -17,6 +15,7 @@ import {
 import { md5 } from 'js-md5';
 import previews from '../../previews.json';
 import { PLANET_NICFI } from '../SearchPanel/dataSourceHandlers/dataSourceConstants';
+import { REACT_MARKDOWN_REHYPE_PLUGINS } from '../../const';
 
 const EMPTY_IMAGE_DATA_URI = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
@@ -118,10 +117,10 @@ export default class VisualizationLayer extends Component {
               {longDescription && (
                 <div className="layer-description">
                   <ReactMarkdown
-                    rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                    rehypePlugins={REACT_MARKDOWN_REHYPE_PLUGINS}
                     children={longDescription}
                     components={{
-                      link: (props) => <ExternalLink href={props.href}>{props.children}</ExternalLink>,
+                      a: (props) => <ExternalLink href={props.href}>{props.children}</ExternalLink>,
                     }}
                   />
                 </div>

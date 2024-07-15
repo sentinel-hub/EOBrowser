@@ -65,7 +65,7 @@ class ImageDownloadBtn extends Component {
 
   render() {
     const { enabled, errorMessage } = this.checkIfEnabled();
-    const title = t`Download image` + ` ${errorMessage ? `(${errorMessage})` : ''}`;
+    const title = t`Download image` + ` ${errorMessage ? `\n(${errorMessage})` : ''}`;
 
     return (
       <div

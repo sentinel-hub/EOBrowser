@@ -12,6 +12,8 @@ import {
   PlanetItemType,
   PlanetPVType,
   PlanetPVId,
+  PlanetARPSType,
+  PlanetARPSId,
 } from '@sentinel-hub/sentinelhub-js';
 
 import './CommercialDataPanel.scss';
@@ -20,8 +22,9 @@ import Quotas from './Quotas/Quotas';
 import { Results } from './Results/Results';
 import Transactions from './Transactions/Transactions';
 import TransactionOptions from './TransactionOptions/TransactionOptions';
-import Search, { getTPDICollectionsWithLabels } from './Search/Search';
-import { GEOCENTO_EARTHIMAGES, providerSpecificSearchParameters } from './Search/config';
+import Search from './Search/Search';
+import { GEOCENTO_EARTHIMAGES } from './const.js';
+import { providerSpecificSearchParameters } from './Search/config';
 import { CollectionSelectionType } from './TransactionOptions/CollectionSelection';
 import { ConfirmationDialog } from './Transactions/ConfirmationDialog';
 import {
@@ -30,6 +33,7 @@ import {
   extractErrorMessage,
   createSearchParams,
   openGeocentoLink,
+  getTPDICollectionsWithLabels,
 } from './commercialData.utils';
 import { TRANSACTION_TYPE, OrderType, FATHOM_TRACK_EVENT_LIST } from '../../const';
 import store, { commercialDataSlice } from '../../store';
@@ -39,7 +43,7 @@ import ReactMarkdown from 'react-markdown';
 import { TPDProvider } from '@sentinel-hub/sentinelhub-js';
 import { handleFathomTrackEvent } from '../../utils';
 
-export const Tabs = {
+const Tabs = {
   SEARCH_OPTIONS: 0,
   RESULTS: 1,
   ORDER_OPTIONS: 2,
@@ -63,7 +67,7 @@ const defaultPlanetPVId = {
   [PlanetPVType.BiomassProxy]: PlanetPVId.BIOMASS_PROXY_V3_0_10,
   [PlanetPVType.LandSurfaceTemperature]: PlanetPVId.LST_AMSR2_V1_0_100,
   [PlanetPVType.SoilWaterContent]: PlanetPVId.SWC_AMSR2_C_V1_0_100,
-  [PlanetPVType.ForestCarbonDiligence30m]: PlanetPVId.CANOPY_HEIGHT_V1_0_0_30,
+  [PlanetPVType.ForestCarbonDiligence30m]: PlanetPVId.CANOPY_HEIGHT_V1_1_0_30,
 };
 
 export const isPlanetHarmonizationSupported = (itemType, productBundle) => {
@@ -86,6 +90,11 @@ export const isPlanetHarmonizationSupported = (itemType, productBundle) => {
 
 const defaultSearchParamsForProvider = (dataProvider) => {
   switch (dataProvider) {
+    case TPDICollections.PLANET_ARPS:
+      return {
+        type: PlanetARPSType.AnalysisReadyPlanetScope,
+        id: PlanetARPSId.PS_ARD_SR_DAILY,
+      };
     case TPDICollections.PLANET_SCOPE:
       return {
         itemType: PlanetItemType.PSScene,
@@ -106,28 +115,21 @@ const defaultSearchParamsForProvider = (dataProvider) => {
   }
 };
 
+const defaultDataProvider = TPDICollections.PLANET_SCOPE;
+
 const defaultSearchParams = {
   advancedOptions: false,
-  dataProvider: TPDICollections.AIRBUS_SPOT,
   fromTime: moment.utc().subtract(3, 'months').startOf('day'),
   toTime: moment.utc().endOf('day'),
-};
-
-const defaultSearchParamsPlanet = {
-  ...defaultSearchParams,
-  dataProvider: TPDICollections.PLANET_SCOPE,
-  ...defaultSearchParamsForProvider(TPDICollections.PLANET_SCOPE),
+  dataProvider: defaultDataProvider,
+  ...defaultSearchParamsForProvider(defaultDataProvider),
 };
 
 const getDefaultSearchParams = (userAccountInfo) => {
   const TPDICollectionsWithLabels = getTPDICollectionsWithLabels(userAccountInfo);
 
-  if (TPDICollectionsWithLabels.map((c) => c.value).includes(defaultSearchParams.dataProvider)) {
+  if (TPDICollectionsWithLabels.map((c) => c.value).includes(defaultDataProvider)) {
     return defaultSearchParams;
-  }
-
-  if (TPDICollectionsWithLabels.map((c) => c.value).includes(defaultSearchParamsPlanet.dataProvider)) {
-    return defaultSearchParamsPlanet;
   }
 
   throw new Error('No matching default search params found');
@@ -188,6 +190,7 @@ const CommercialDataPanel = ({
   location,
   displaySearchResults,
   userAccountInfo,
+  impersonatedAccountId,
 }) => {
   const [selectedAccordion, setSelectedAccordion] = useState(0);
   const [searchParams, setSearchParams] = useState(getDefaultSearchParams(userAccountInfo));
@@ -201,11 +204,36 @@ const CommercialDataPanel = ({
   const [quotas, setQuotas] = useState([]);
   const [areQuotasLoading, setAreQuotasLoading] = useState(false);
   const [quotasError, setQuotasError] = useState(null);
+
+  const COLLECTIONS_ON_SUBSCRIPTION = [TPDICollections.PLANETARY_VARIABLES, TPDICollections.PLANET_ARPS];
+  const isCollectionOnSubscription = (value) => COLLECTIONS_ON_SUBSCRIPTION.includes(value);
+
+  const COLLECTIONS_WITH_NONE_HARMONIZATION = [TPDICollections.PLANET_SCOPE, TPDICollections.PLANET_SKYSAT];
+  const isCollectionWithNoneHarmonization = (value) => COLLECTIONS_WITH_NONE_HARMONIZATION.includes(value);
+
   const [transactionType, setTransactionType] = useState(
-    searchParams.dataProvider === TPDICollections.PLANETARY_VARIABLES
+    isCollectionOnSubscription(searchParams.dataProvider)
       ? TRANSACTION_TYPE.SUBSCRIPTION
       : TRANSACTION_TYPE.ORDER,
   );
+
+  const areUserActionsEnabledInResults = (provider) => {
+    const collection = getTPDICollectionsWithLabels(userAccountInfo).find((v) => v.value === provider);
+    if (!collection) {
+      return false;
+    }
+
+    if (!collection.requiresQuotas) {
+      return !collection.requiresQuotas;
+    }
+
+    const quotaForCollection = userAccountInfo.quotas.find((q) => q.collectionId === provider);
+    if (!quotaForCollection) {
+      return false;
+    }
+
+    return quotaForCollection.quotaSqkm > 0;
+  };
 
   const setSearchResults = (payload) => {
     store.dispatch(commercialDataSlice.actions.setSearchResults(payload));
@@ -226,19 +254,24 @@ const CommercialDataPanel = ({
 
         //reset transaction params on data provider change
         if (prevState[name] !== value) {
-          setTransactionOptions({
-            ...defaultTransactionOptions,
-            ...(value === TPDICollections.PLANET_SCOPE ||
-              (value === TPDICollections.PLANET_SKYSAT && {
-                harmonizeTo: PlanetScopeHarmonization.NONE,
-              })),
-          });
+          const newTransactionOptions = { ...defaultTransactionOptions };
+
+          if (isCollectionWithNoneHarmonization(value)) {
+            newTransactionOptions.harmonizeTo = PlanetScopeHarmonization.NONE;
+          }
+
+          const TPDICollectionWithLabel = getTPDICollectionsWithLabels(userAccountInfo).find(
+            (v) => v.value === value,
+          );
+          if (TPDICollectionWithLabel && TPDICollectionWithLabel.requiresPlanetKey) {
+            newTransactionOptions.planetApiKey = transactionOptions.planetApiKey ?? user.userdata.pl_api_key;
+          }
+
+          setTransactionOptions(newTransactionOptions);
         }
 
         setTransactionType(
-          value === TPDICollections.PLANETARY_VARIABLES
-            ? TRANSACTION_TYPE.SUBSCRIPTION
-            : TRANSACTION_TYPE.ORDER,
+          isCollectionOnSubscription(value) ? TRANSACTION_TYPE.SUBSCRIPTION : TRANSACTION_TYPE.ORDER,
         );
 
         //reset selected products
@@ -299,6 +332,10 @@ const CommercialDataPanel = ({
     try {
       const params = createSearchParams(searchParams, aoiGeometry);
 
+      if (impersonatedAccountId) {
+        params.accountId = impersonatedAccountId;
+      }
+
       if (params.dataProvider === GEOCENTO_EARTHIMAGES) {
         openGeocentoLink(searchParams, aoiGeometry);
         return;
@@ -309,6 +346,10 @@ const CommercialDataPanel = ({
       if (provider === TPDProvider.PLANETARY_VARIABLES) {
         toggleAccordion(Tabs.ORDER_OPTIONS, true);
         return;
+      }
+
+      if (provider === TPDProvider.PLANET && transactionOptions.planetApiKey) {
+        params.planetApiKey = transactionOptions.planetApiKey;
       }
 
       const requestsConfig = {
@@ -413,6 +454,7 @@ const CommercialDataPanel = ({
     setSearchParams(getDefaultSearchParams(userAccountInfo));
     setSelectedProducts([]);
     setTransactionOptions(defaultTransactionOptions);
+    setTransactionOptions({ ...transactionOptions, planetApiKey: user.userdata.pl_api_key });
     store.dispatch(commercialDataSlice.actions.reset());
   };
 
@@ -425,7 +467,16 @@ const CommercialDataPanel = ({
           authToken: user.access_token,
         };
         const result = await TPDI.getQuotas(requestsConfig);
-        setQuotas(result.sort((a, b) => a.collectionId.localeCompare(b.collectionId)));
+        const collsWithLabels = getTPDICollectionsWithLabels(userAccountInfo);
+
+        setQuotas(
+          result
+            .sort((a, b) => a.collectionId.localeCompare(b.collectionId))
+            .filter((q) => {
+              const col = collsWithLabels.find((c) => c.value === q.collectionId);
+              return col && col.requiresQuotas;
+            }),
+        );
       } catch (err) {
         console.error(err);
         setQuotasError(t`Unable to get quotas: ${err.message}`);
@@ -456,7 +507,7 @@ const CommercialDataPanel = ({
           onSearch={onSearch}
           searchInProgress={actionInProgress}
           searchError={actionError}
-          searchText={searchParams.dataProvider === TPDProvider.PLANETARY_VARIABLES ? t`Continue` : undefined}
+          searchText={isCollectionOnSubscription(searchParams.dataProvider) ? t`Continue` : undefined}
           userAccountInfo={userAccountInfo}
         />
       </Accordion>
@@ -480,6 +531,7 @@ const CommercialDataPanel = ({
           location={location}
           displaySearchResults={displaySearchResults}
           userAccountInfo={userAccountInfo}
+          userActionsEnabled={areUserActionsEnabledInResults(searchParams.dataProvider)}
         />
       </Accordion>
       <Accordion
@@ -544,6 +596,7 @@ const mapStoreToProps = (store) => ({
   location: store.commercialData.location,
   displaySearchResults: store.commercialData.displaySearchResults,
   selectedLanguage: store.language.selectedLanguage,
+  impersonatedAccountId: store.auth.impersonatedUser.accountId,
 });
 
 export default connect(mapStoreToProps, null)(CommercialDataPanel);

@@ -1,0 +1,250 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE/layers/FALSE-COLOR",
+        "id": "FALSE-COLOR",
+        "title": "False Color",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//False Color\n\nfunction setup() {\n  return {\n    input: [\"red\", \"green\", \"nir\", \"dataMask\", \"alpha\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(sample) {\n  return [sample.nir/3000,\n          sample.red/3000,\n          sample.green/3000,\n          sample.dataMask * sample.alpha];\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-21T08:50:58.499462Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "c48c01-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE/layers/NDVI",
+        "id": "NDVI",
+        "title": "NDVI",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//NDVI\n\nfunction setup() {\n  return {\n    input: [{ bands: [ \"red\", \"nir\", \"dataMask\", \"alpha\" ] }],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n      { id: \"eobrowserStats\", bands: 2, sampleType: \"FLOAT32\" },\n      { id: \"dataMask\", bands: 1 },\n    ]\n  }\n}\n\nfunction evaluatePixel(samples) {\n    let ndvi = (samples.nir-samples.red)/(samples.nir+samples.red);\n    const indexVal = samples.dataMask === 1 ? ndvi : NaN;\n    let id_default = colorBlend(ndvi,\n      [0.0, 0.5, 1.0],\n      [\n        [1,0,0, samples.dataMask * samples.alpha],\n        [1,1,0,samples.dataMask * samples.alpha],\n        [0.1,0.31,0,samples.dataMask * samples.alpha],\n      ]\n    );\n\n    return {\n      default: id_default,\n      index: [indexVal],\n      eobrowserStats: [indexVal, samples.dataMask],\n      dataMask: [samples.dataMask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-04-10T09:05:53.503160Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "c48c01-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE/layers/NDWI",
+        "id": "NDWI",
+        "title": "NDWI",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//NDWI\n\nfunction setup() {\n  return {\n    input: [{ bands: [ \"green\", \"nir\", \"dataMask\", \"alpha\" ] }],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n      { id: \"eobrowserStats\", bands: 2, sampleType: \"FLOAT32\" },\n      { id: \"dataMask\", bands: 1 },\n    ]\n  }\n}\n\nfunction evaluatePixel(samples) {\n    let val = (samples.green-samples.nir)/(samples.green+samples.nir);\n    const indexVal = samples.dataMask === 1 ? val : NaN;\n    const clear = samples.dataMask * samples.alpha;\n\n    let id_default = colorBlend(val,\n       [-1, -0.5, -0.2, 0, 0.2, 0.5, 1.0],\n       [\n         [1,0,1,clear],\n         [1,0.5,0,clear],\n         [1,1,0,clear],\n         [0.2,1,0.5,clear],\n         [0,0,1,clear],\n         [0,0,0.3,clear],\n         [0,0,0,clear],\n       ]\n    );\n\n    return {\n      default: id_default,\n      index: [indexVal],\n      eobrowserStats: [indexVal, samples.dataMask],\n      dataMask: [samples.dataMask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-04-10T09:06:15.635957Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "c48c01-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE/layers/PIXEL-PROVENANCE",
+        "id": "PIXEL-PROVENANCE",
+        "title": "Pixel Provenance",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//NDVI\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\n        \"provenance\",\n        \"dataMask\",\n        \"alpha\"\n      ]\n    }],\n    output: {\n      bands: 4\n    }\n  }\n}\n\nfunction evaluatePixel(samples) {\n    let palette = [\n        [166,206,227],\n        [31,120,180],\n        [178,223,138],\n        [51,160,44],\n        [251,154,153],\n        [227,26,28],\n        [253,191,111],\n        [255,127,0],\n        [202,178,214],\n        [106,61,154],\n        [255,255,153],\n        [177,89,40]\n    ];\n    let alpha = samples.dataMask * samples.alpha;\n    let i = samples.provenance % palette.length;\n    let rgb = palette[i].map((x) => x / 255);\n    rgb.push(alpha);\n    return rgb\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-21T08:51:43.305442Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "c48c01-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE/layers/TRUE-COLOR",
+        "id": "TRUE-COLOR",
+        "title": "True Color",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//True Color\n\nfunction setup() {\n  return {\n    input: [\"red\", \"green\", \"blue\", \"dataMask\", \"alpha\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(sample) {\n  return [sample.red/3000,\n          sample.green/3000,\n          sample.blue/3000,\n          sample.dataMask * sample.alpha];\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-21T08:51:53.942142Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "c48c01-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE/layers/TRUE-COLOR-UDM2-TRANSPARENCY",
+        "id": "TRUE-COLOR-UDM2-TRANSPARENCY",
+        "title": "True Color UDM2 Transparency",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//True Color\n\nfunction setup() {\n  return {\n    input: [\"red\", \"green\", \"blue\", \"dataMask\", \"clear\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(sample) {\n  return [sample.red/3000,\n          sample.green/3000,\n          sample.blue/3000,\n          sample.dataMask * sample.clear];\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-21T08:52:03.928933Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "c48c01-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE/layers/UDM2-CONFIDENCE",
+        "id": "UDM2-CONFIDENCE",
+        "title": "UDM2 Confidence",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//confidence\n\nfunction setup() {\n  return {\n    input: [\"confidence\"],\n    output: { bands: 1, sampleType: \"UINT8\" }\n  };\n}\n\nfunction evaluatePixel(sample) {\n  return [sample.confidence];\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-21T08:52:14.033214Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "c48c01-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE/layers/UDM2-MASK-CLASSIFICATION",
+        "id": "UDM2-MASK-CLASSIFICATION",
+        "title": "UDM2 Mask Classification",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//UDM2 Cloud Classification\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\n        \"clear\",\n        \"snow\",\n        \"shadow\",\n        \"haze_light\",\n        \"haze_heavy\",\n        \"cloud\"\n      ]\n    }],\n    output: {\n      bands: 4\n    }\n  }\n}\n\nfunction evaluatePixel(samples) {\n\n  if (samples.snow == 1){\n    return[0,0.5,1,1] // blue\n  }\n  if (samples.shadow == 1){\n    return[0.4,0.4,0.4,1] //grey\n  }\n  if (samples.haze_light == 1){\n    return[0,0.9,1,1] //sky blue\n  }\n   if (samples.haze_heavy == 1){\n    return[1,0.7,1,1] //light pink\n  }\n  if (samples.cloud == 1){\n    return[0.7,0.7,0.7,1] //white\n  }\n  else{\n    return[0,0,0,0]\n  }\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/64e817-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-21T08:52:25.344473Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "c48c01-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

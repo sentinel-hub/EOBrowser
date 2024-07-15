@@ -1,15 +1,15 @@
 import round from 'lodash.round';
 
-export const componentToHex = (c) => {
+const componentToHex = (c) => {
   let hex = c.toString(16);
   return hex.length === 1 ? '0' + hex : hex;
 };
 
-export const rgbToHex = (rgb) => {
+const rgbToHex = (rgb) => {
   return '#' + componentToHex(rgb[0]) + componentToHex(rgb[1]) + componentToHex(rgb[2]);
 };
 
-export const hexToRgb = (hex) => {
+const hexToRgb = (hex) => {
   hex = hex.replace('0x', '');
   const bigint = parseInt(hex, 16);
   const r = (bigint >> 16) & 255;

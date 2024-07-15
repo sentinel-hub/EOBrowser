@@ -12,7 +12,7 @@ import {
 
 import { BAND_UNIT } from '../dataSourceConstants';
 
-export const L8_BANDS = [
+const L8_BANDS = [
   {
     name: 'B01',
     getDescription: () => t`Band 1 - Coastal/Aerosol - 433-453 nm`,

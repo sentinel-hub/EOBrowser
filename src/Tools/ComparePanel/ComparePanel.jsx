@@ -9,9 +9,8 @@ import ComparedLayer from './ComparedLayer';
 import './ComparePanel.scss';
 import { saveSharedPinsToServer } from '../Pins/Pin.utils';
 import SocialShare from '../../components/SocialShare/SocialShare';
+import { COMPARE_OPACITY, COMPARE_SPLIT } from './compareConstants';
 
-export const COMPARE_SPLIT = t`split`;
-export const COMPARE_OPACITY = t`opacity`;
 const NO_COMPARE_LAYERS_MESSAGE = () => t`No layers to compare.`;
 
 class ComparePanel extends Component {

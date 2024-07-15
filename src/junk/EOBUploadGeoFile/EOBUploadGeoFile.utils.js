@@ -247,7 +247,6 @@ const loadFileContent = async (file, format) => {
 export {
   uploadGeoFileErrorMessages,
   getFileExtension,
-  isFileTypeSupported,
   parseContent,
   loadFileContent,
   UPLOAD_GEOMETRY_TYPE,

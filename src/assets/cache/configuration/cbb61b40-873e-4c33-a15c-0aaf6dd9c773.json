@@ -1,0 +1,95 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/cbb61b-YOUR-INSTANCEID-HERE/layers/CNES-LAND-COVER-CLASSIFICATION",
+        "id": "CNES-LAND-COVER-CLASSIFICATION",
+        "title": "CNES Land Cover Classification",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n// This scripts visualise land cover over Metropolitan France\n\n// Set up input and output settings\nfunction setup() {\n    return {\n      input: [{\n        bands: [\n          \"OCS\"\n        ]\n      }],\n      output: {\n        bands: 4\n      }\n    }\n  }\n\n//EvaluatePixel function - return corresponding color based on CNES Land Cover nomenclature and colouring scheme\nfunction evaluatePixel(samples) {\n    const val = samples.OCS;\n    if (val == 1) {\n        return [1, 0, 1, 1];\n    } else if (val == 2) {\n        return [1, 85/255, 1, 1];\n    } else if (val == 3) {\n        return [1, 170/255, 1, 1];\n    } else if (val == 4) {\n        return [0, 1, 1, 1];\n    } else if (val == 5) {\n        return [1, 1, 0, 1];\n    } else if (val == 6) {\n        return [208/255, 1, 0, 1];\n    } else if (val == 7) {\n        return [161/255, 214/255, 0, 1];\n    } else if (val == 8) {\n        return [1, 171/255, 68/255, 1];\n    } else if (val == 9) {\n        return [214/255, 214/255, 0, 1];\n    } else if (val == 10) {\n        return [1, 85/255, 0, 1];\n    } else if (val == 11) {\n        return [197/255, 1, 1, 1];\n    } else if (val == 12) {\n        return [170/255, 170/255, 97/255, 1];\n    } else if (val == 13) {\n        return [170/255, 170/255, 0, 1, 1];\n    } else if (val == 14) {\n        return [170/255, 170/255, 1, 1];\n    } else if (val == 15) {\n        return [85/255, 0, 0, 1];\n    } else if (val == 16) {\n        return [0, 156/255, 0, 1];\n    } else if (val == 17) {\n        return [0, 50/255, 0, 1];\n    } else if (val == 18) {\n        return [170/255, 250/255, 0, 1];\n    } else if (val == 19) {\n        return [85/255, 170/255, 127/255, 1];\n    } else if (val == 20) {\n        return [1, 0, 0, 1];\n    } else if (val == 21) {\n        return [1, 184/255, 2/255, 1];\n    } else if (val == 22) {\n        return [190/255, 190/255, 190/255, 1];\n    } else if (val == 23) {\n        return [0, 0, 1, 1];\n    } else if (val == 0 || val == 255) {\n        return [1, 1, 1, 0];\n    } else {\n        return [0, 0, 0, 1];\n    }\n  }"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/cbb61b-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-02-28T13:58:23.213878Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9baa27-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/cbb61b-YOUR-INSTANCEID-HERE/layers/CNES-LAND-COVER-CLASSIFIER-CONFIDENCE",
+        "id": "CNES-LAND-COVER-CLASSIFIER-CONFIDENCE",
+        "title": "CNES Land Cover Classifier Confidence",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n// This script visualise the confidence of classifier\n\n// Set up input and output settings\nfunction setup() {\n    return {\n      input: [{\n        bands: [\n          \"OCS_Confidence\"\n        ]\n      }],\n      output: {\n        bands: 4\n      }\n    }\n  }\n  \n  // Create color map\n  const ramps = [\n    [1, 0x000000],\n    [100, 0x00c800 ],\n  ];\n  \n  // Create visualiser\n  const visualizer = new ColorRampVisualizer(ramps);\n  \n  \n  //EvaluatePixel function\n  function evaluatePixel(samples) {\n    let val = samples.OCS_Confidence;\n    let rgb_triplet = visualizer.process(val);\n    if (val == 0 || val > 100) {\n        rgb_triplet.push(0) // Masked data out of range\n    } else {\n        rgb_triplet.push(1) // Display visualiser for data within a valid range of confidence\n    }\n    return rgb_triplet;\n  }"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/cbb61b-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-02-28T13:59:21.332665Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9baa27-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/cbb61b-YOUR-INSTANCEID-HERE/layers/CNES-LAND-COVER-VALIDITY",
+        "id": "CNES-LAND-COVER-VALIDITY",
+        "title": "CNES Land Cover Validity",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n// This script visualise land cover validity\n\n// Set up input and output settings\nfunction setup() {\n  return {\n    input: [{\n      bands: [\n        \"OCS_Validity\"\n      ]\n    }],\n    output: {\n      bands: 4\n    }\n  }\n}\n\n// Create color map\nconst ramps = [\n  [1, 0x000000],\n  [45, 0xe60000 ],\n];\n\n// Create visualiser\nconst visualizer = new ColorRampVisualizer(ramps);\n\n//EvaluatePixel function\nfunction evaluatePixel(samples) {\n  let val = samples.OCS_Validity;\n  let rgb_triplet = visualizer.process(val);\n  if (val == 0) {\n      rgb_triplet.push(0) // Masked no data pixels\n  } else {\n      rgb_triplet.push(1) // Display visualiser for pixels with data\n  }\n  return rgb_triplet;\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/cbb61b-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-02-28T14:00:31.780077Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9baa27-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

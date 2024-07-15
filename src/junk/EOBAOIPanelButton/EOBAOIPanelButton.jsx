@@ -39,7 +39,9 @@ export class EOBAOIPanelButton extends React.Component {
         // jsx-a11y/anchor-is-valid
         // eslint-disable-next-line
         <a
-          onClick={() => this.props.onDrawShape(AOI_SHAPE.rectangle)}
+          onClick={() => {
+            this.props.onDrawShape(AOI_SHAPE.rectangle);
+          }}
           title={t`Draw rectangular area of interest for image downloads and timelapse`}
         >
           <i className={`far fa-square`} />
@@ -49,7 +51,9 @@ export class EOBAOIPanelButton extends React.Component {
         // jsx-a11y/anchor-is-valid
         // eslint-disable-next-line
         <a
-          onClick={() => this.props.onDrawShape(AOI_SHAPE.polygon)}
+          onClick={() => {
+            this.props.onDrawShape(AOI_SHAPE.polygon);
+          }}
           title={t`Draw polygonal area of interest for image downloads and timelapse`}
         >
           <i className={`fa fa-pencil`} />

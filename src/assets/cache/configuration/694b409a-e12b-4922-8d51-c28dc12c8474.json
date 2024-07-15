@@ -1,0 +1,422 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HH-DECIBEL-GAMMA0",
+        "id": "EW-DH-HH-DECIBEL-GAMMA0",
+        "title": "HH - decibel gamma0",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HH\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  const value = Math.max(0, Math.log(sample.HH) * 0.21714724095 + 1);\n  return [value, value, value, sample.dataMask];\n}\n\n// ---\n/*\n// displays HH in decibels from -20 to 0\n// the following is simplified below\n// var log = 10 * Math.log(HH) / Math.LN10;\n// var val = Math.max(0, (log + 20) / 20);\n\nreturn [Math.max(0, Math.log(HH) * 0.21714724095 + 1)];\n*/"
+            }
+        ],
+        "orderHint": 60,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-17T14:21:58.829452Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HH-DECIBEL-GAMMA0-ORTHORECTIFIED",
+        "id": "EW-DH-HH-DECIBEL-GAMMA0-ORTHORECTIFIED",
+        "title": "HH - decibel gamma0 - orthorectified",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HH\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  const value = Math.max(0, Math.log(sample.HH) * 0.21714724095 + 1);\n  return [value, value, value, sample.dataMask];\n}\n\n// ---\n/*\n// displays HH in decibels from -20 to 0\n// the following is simplified below\n// var log = 10 * Math.log(HH) / Math.LN10;\n// var val = Math.max(0, (log + 20) / 20);\n\nreturn [Math.max(0, Math.log(HH) * 0.21714724095 + 1)];\n*/"
+            }
+        ],
+        "orderHint": 50,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-17T14:21:58.824433Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "backCoeff": "GAMMA0_ELLIPSOID",
+            "orthorectify": true,
+            "demInstance": "COPERNICUS",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HH-DECIBEL-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+        "id": "EW-DH-HH-DECIBEL-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+        "title": "HH - decibel gamma0 - radiometric terrain corrected",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HH\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  const value = Math.max(0, Math.log(sample.HH) * 0.21714724095 + 1);\n  return [value, value, value, sample.dataMask];\n}\n\n// ---\n/*\n// displays HH in decibels from -20 to 0\n// the following is simplified below\n// var log = 10 * Math.log(HH) / Math.LN10;\n// var val = Math.max(0, (log + 20) / 20);\n\nreturn [Math.max(0, Math.log(HH) * 0.21714724095 + 1)];\n*/"
+            }
+        ],
+        "orderHint": 50,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-01-28T14:41:41.894692Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "backCoeff": "GAMMA0_TERRAIN",
+            "orthorectify": true,
+            "demInstance": "COPERNICUS",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HH-LINEAR-GAMMA0",
+        "id": "EW-DH-HH-LINEAR-GAMMA0",
+        "title": "HH - linear gamma0",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HH\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  return [2 * sample.HH, 2 * sample.HH, 2 * sample.HH, sample.dataMask];\n}\n\n// ---\n//return [2*HH];"
+            }
+        ],
+        "orderHint": 20,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-17T14:21:58.813787Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HH-LINEAR-GAMMA0-ORTHORECTIFIED",
+        "id": "EW-DH-HH-LINEAR-GAMMA0-ORTHORECTIFIED",
+        "title": "HH - linear gamma0 - orthorectified",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HH\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  return [2 * sample.HH, 2 * sample.HH, 2 * sample.HH, sample.dataMask];\n}\n\n// ---\n//return [2*HH];"
+            }
+        ],
+        "orderHint": 10,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-17T14:21:58.810004Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "backCoeff": "GAMMA0_ELLIPSOID",
+            "orthorectify": true,
+            "demInstance": "COPERNICUS",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HH-LINEAR-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+        "id": "EW-DH-HH-LINEAR-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+        "title": "HH - linear gamma0 - radiometric terrain corrected",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HH\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  return [2 * sample.HH, 2 * sample.HH, 2 * sample.HH, sample.dataMask];\n}\n\n// ---\n//return [2*HH];"
+            }
+        ],
+        "orderHint": 10,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-01-28T14:37:35.552560Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "backCoeff": "GAMMA0_TERRAIN",
+            "orthorectify": true,
+            "demInstance": "COPERNICUS",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HV-DECIBEL-GAMMA0",
+        "id": "EW-DH-HV-DECIBEL-GAMMA0",
+        "title": "HV - decibel gamma0",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HV\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  const value = Math.max(0, Math.log(sample.HV) * 0.21714724095 + 1);\n  return [value, value, value, sample.dataMask];\n}\n\n// ---\n/*\n// displays HV in decibels from -20 to 0\n// the following is simplified below\n// var log = 10 * Math.log(HV) / Math.LN10;\n// var val = Math.max(0, (log + 20) / 20);\n\nreturn [Math.max(0, Math.log(HV) * 0.21714724095 + 1)];\n*/"
+            }
+        ],
+        "orderHint": 80,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-17T14:21:58.844133Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HV-DECIBEL-GAMMA0-ORTHORECTIFIED",
+        "id": "EW-DH-HV-DECIBEL-GAMMA0-ORTHORECTIFIED",
+        "title": "HV - decibel gamma0 - orthorectified",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HV\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  const value = Math.max(0, Math.log(sample.HV) * 0.21714724095 + 1);\n  return [value, value, value, sample.dataMask];\n}\n\n// ---\n/*\n// displays HV in decibels from -20 to 0\n// the following is simplified below\n// var log = 10 * Math.log(HV) / Math.LN10;\n// var val = Math.max(0, (log + 20) / 20);\n\nreturn [Math.max(0, Math.log(HV) * 0.21714724095 + 1)];\n*/"
+            }
+        ],
+        "orderHint": 70,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-17T14:21:58.839101Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "backCoeff": "GAMMA0_ELLIPSOID",
+            "orthorectify": true,
+            "demInstance": "COPERNICUS",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HV-DECIBEL-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+        "id": "EW-DH-HV-DECIBEL-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+        "title": "HV - decibel gamma0 - radiometric terrain corrected",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HV\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  const value = Math.max(0, Math.log(sample.HV) * 0.21714724095 + 1);\n  return [value, value, value, sample.dataMask];\n}\n\n// ---\n/*\n// displays HV in decibels from -20 to 0\n// the following is simplified below\n// var log = 10 * Math.log(HV) / Math.LN10;\n// var val = Math.max(0, (log + 20) / 20);\n\nreturn [Math.max(0, Math.log(HV) * 0.21714724095 + 1)];\n*/"
+            }
+        ],
+        "orderHint": 70,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-01-28T14:39:03.434157Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "backCoeff": "GAMMA0_TERRAIN",
+            "orthorectify": true,
+            "demInstance": "COPERNICUS",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HV-LINEAR-GAMMA0",
+        "id": "EW-DH-HV-LINEAR-GAMMA0",
+        "title": "HV - linear gamma0",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HV\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  return [2 * sample.HV, 2 * sample.HV, 2 * sample.HV, sample.dataMask];\n}\n\n// ---\n//return [2*HV];"
+            }
+        ],
+        "orderHint": 40,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-17T14:21:58.820956Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HV-LINEAR-GAMMA0-ORTHORECTIFIED",
+        "id": "EW-DH-HV-LINEAR-GAMMA0-ORTHORECTIFIED",
+        "title": "HV - linear gamma0 - orthorectified",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HV\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  return [2 * sample.HV, 2 * sample.HV, 2 * sample.HV, sample.dataMask];\n}\n\n// ---\n//return [2*HV];"
+            }
+        ],
+        "orderHint": 30,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-17T14:21:58.816797Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "backCoeff": "GAMMA0_ELLIPSOID",
+            "orthorectify": true,
+            "demInstance": "COPERNICUS",
+            "type": "S1GRD"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE/layers/EW-DH-HV-LINEAR-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+        "id": "EW-DH-HV-LINEAR-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+        "title": "HV - linear gamma0 - radiometric terrain corrected",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"HV\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\n\nfunction evaluatePixel(sample) {\n  return [2 * sample.HV, 2 * sample.HV, 2 * sample.HV, sample.dataMask];\n}\n\n// ---\n//return [2*HV];"
+            }
+        ],
+        "orderHint": 30,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/694b40-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-01-28T14:38:13.736081Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S1GRD/sources/3"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "resolution": "MEDIUM",
+            "acquisitionMode": "EW",
+            "polarization": "DH",
+            "backCoeff": "GAMMA0_TERRAIN",
+            "orthorectify": true,
+            "demInstance": "COPERNICUS",
+            "type": "S1GRD"
+        }
+    }
+]

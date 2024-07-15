@@ -1,0 +1,90 @@
+{
+    "title": "EOB3 Landsat 7 ETM+ L2 API",
+    "layers": [
+        {
+            "id": "__FIS_MOISTURE-INDEX",
+            "name": "__FIS_MOISTURE-INDEX",
+            "description": "",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_NDVI",
+            "name": "__FIS_NDVI",
+            "description": "",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_NDWI",
+            "name": " __FIS_NDWI",
+            "description": "",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_THERMAL",
+            "name": "__FIS_THERMAL",
+            "description": "",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "1_TRUE_COLOR",
+            "name": "True Color",
+            "description": "Based on combination of bands B03, B02, B01",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "2_TONEMAPPED_NATURAL_COLOR",
+            "name": "Highlight Optimized Natural Color",
+            "description": "Enhanced natural color visualization",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "FALSE-COLOR",
+            "name": "False color",
+            "description": "Based on combination of bands B04, B03, B02",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "MOISTURE-INDEX",
+            "name": "Moisture Index",
+            "description": "Normalized difference moisture index: (B04 - B05) / (B04 + B05)",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "NDVI",
+            "name": "NDVI",
+            "description": "Normalized difference vegetation index: (B04 - B03) / (B04 + B03)",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "NDWI",
+            "name": "NDWI",
+            "description": "Normalized difference water index: (B02 - B04) / (B02 + B04)",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "SWIR",
+            "name": "SWIR",
+            "description": "Based on combination of bands B07 (SWIR2), B05 (SWIR1), B04 (Red)",
+            "dataset": "LETML2",
+            "legendUrl": null
+        },
+        {
+            "id": "THERMAL",
+            "name": "Thermal",
+            "description": "Thermal visualization based on band B06",
+            "dataset": "LETML2",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

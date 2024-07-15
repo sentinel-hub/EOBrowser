@@ -59,11 +59,15 @@ class ResultItem extends React.Component {
               <>
                 <div className="detail" title={t`Sensing date`}>
                   <i className="fa fa-calendar" />
-                  {moment.utc(sensingTime).format('YYYY-MM-DD')}
+                  {sensingTime !== null
+                    ? moment.utc(sensingTime).format('YYYY-MM-DD')
+                    : t`No acquisition date`}
                 </div>
                 <div className="detail" title={t`Sensing time`}>
                   <i className="fa fa-clock-o" />
-                  {moment.utc(sensingTime).format('HH:mm:ss')} UTC
+                  {sensingTime !== null
+                    ? `${moment.utc(sensingTime).format('HH:mm:ss')}  UTC`
+                    : t`No acquisition date`}
                 </div>
               </>
             )}

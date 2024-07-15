@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TPDICollections } from '@sentinel-hub/sentinelhub-js';
 import { EOBButton } from '../../../junk/EOBCommon/EOBButton/EOBButton';
 import { NotificationPanel } from '../../../Notification/NotificationPanel';
@@ -51,6 +51,8 @@ const OrderOptions = ({
   handleSearchParamChange,
   userAccountInfo,
 }) => {
+  const [planetApiKeyHidden, setPlanetApiKeyHidden] = useState(true);
+
   const validateInputs = () => {
     //order name must be entered
     const { name, type, limit, planetApiKey } = transactionOptions;
@@ -207,6 +209,8 @@ const OrderOptions = ({
           transactionOptions: transactionOptions,
           searchParams: searchParams,
           setTransactionOptions: setTransactionOptions,
+          planetApiKeyHidden: planetApiKeyHidden,
+          setPlanetApiKeyHidden: setPlanetApiKeyHidden,
         })}
       {searchParams.dataProvider === TPDICollections.PLANET_SKYSAT &&
         getTransactionSize(

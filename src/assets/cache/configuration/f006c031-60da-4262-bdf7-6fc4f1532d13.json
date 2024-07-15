@@ -1,0 +1,95 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/f006c0-YOUR-INSTANCEID-HERE/layers/ABOVEGROUND-CARBON-DENSITY",
+        "id": "ABOVEGROUND-CARBON-DENSITY",
+        "title": "Aboveground Carbon Density",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// To set custom max and min values, set\n// defaultVis to false and choose your max and\n// min values. The color map will then be scaled\n// to those max and min values\nconst defaultVis = true;\nconst max = 175;\nconst min = 0;\n\nfunction setup() {\n    return {\n        input: [\"ACD\", \"dataMask\"],\n        output: [\n            { id: \"default\", bands: 4 },\n            { id: \"index\", bands: 1, sampleType: \"INT16\" },\n            { id: \"eobrowserStats\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"dataMask\", bands: 1 },\n        ],\n    };\n}\n\nfunction updateMap(max, min) {\n    const numIntervals = map.length;\n    const intervalLength = (max - min) / (numIntervals - 1);\n    for (let i = 0; i < numIntervals; i++) {\n        map[i][0] = max - intervalLength * i;\n    }\n}\n\nconst map = [\n    [175, 0xe5dd26],\n    [155, 0xced62f],\n    [140, 0x9ec54a],\n    [125, 0x63b16e],\n    [110, 0x38a183],\n    [95, 0x1b8583],\n    [80, 0x1e8589],\n    [65, 0x206378],\n    [50, 0x2e4c67],\n    [35, 0x2a3f62],\n    [20, 0x2d1a4e],\n    [5, 0x2e164c],\n    [0, 0x360245],\n];\n\nif (!defaultVis) updateMap(max, min);\nconst visualizer = new ColorRampVisualizer(map);\n\nfunction evaluatePixel(sample) {\n    let val = sample.ACD;\n    let imgVals = visualizer.process(val);\n\n    return {\n        default: imgVals.concat(sample.dataMask),\n        index: [val],\n        eobrowserStats: [val],\n        dataMask: [sample.dataMask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/f006c0-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-18T13:37:12.607114Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "cc31ca-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/f006c0-YOUR-INSTANCEID-HERE/layers/CANOPY-COVER",
+        "id": "CANOPY-COVER",
+        "title": "Canopy Cover",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// To set custom max and min values, set\n// defaultVis to false and choose your max and\n// min values. The color map will then be scaled\n// to those max and min values\nconst defaultVis = true;\nconst max = 100;\nconst min = 0;\n\nfunction setup() {\n    return {\n        input: [\"CC\", \"dataMask\"],\n        output: [\n            { id: \"default\", bands: 4 },\n            { id: \"index\", bands: 1, sampleType: \"UINT8\" },\n            { id: \"eobrowserStats\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"dataMask\", bands: 1 },\n        ],\n    };\n}\n\nfunction updateMap(max, min) {\n    const numIntervals = map.length;\n    const intervalLength = (max - min) / (numIntervals - 1);\n    for (let i = 0; i < numIntervals; i++) {\n        map[i][0] = max - intervalLength * i;\n    }\n}\n\nconst map = [\n    [100, 0x183d19],\n    [90, 0x124f24],\n    [80, 0x0e6327],\n    [70, 0x246d29],\n    [60, 0x498418],\n    [50, 0x669516],\n    [40, 0x859e25],\n    [30, 0xa4ab38],\n    [20, 0xd3c058],\n    [10, 0xddd17c],\n    [0, 0xf0f5d5],\n];\n\nif (!defaultVis) updateMap(max, min);\nconst visualizer = new ColorRampVisualizer(map);\n\nfunction evaluatePixel(sample) {\n    let val = sample.CC;\n    let imgVals = visualizer.process(val);\n\n    return {\n        default: imgVals.concat(sample.dataMask),\n        index: [val],\n        eobrowserStats: [val],\n        dataMask: [sample.dataMask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/f006c0-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-19T11:37:07.087288Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "e3d2a2-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/f006c0-YOUR-INSTANCEID-HERE/layers/CANOPY-HEIGHT",
+        "id": "CANOPY-HEIGHT",
+        "title": "Canopy Height",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// To set custom max and min values, set\n// defaultVis to false and choose your max and\n// min values. The color map will then be scaled\n// to those max and min values\nconst defaultVis = true;\nconst max = 30;\nconst min = 0;\n\nfunction setup() {\n    return {\n        input: [\"CH\", \"dataMask\"],\n        output: [\n            { id: \"default\", bands: 4 },\n            { id: \"index\", bands: 1, sampleType: \"UINT8\" },\n            { id: \"eobrowserStats\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"dataMask\", bands: 1 },\n        ],\n    };\n}\n\nfunction updateMap(max, min) {\n    const numIntervals = map.length;\n    const intervalLength = (max - min) / (numIntervals - 1);\n    for (let i = 0; i < numIntervals; i++) {\n        map[i][0] = max - intervalLength * i;\n    }\n}\n\nconst map = [\n    [30, 0x345e03],\n    [20, 0x6da20c],\n    [10, 0xbace6e],\n    [0, 0xf0f5d5],\n];\n\nif (!defaultVis) updateMap(max, min);\nconst visualizer = new ColorRampVisualizer(map);\n\nfunction evaluatePixel(sample) {\n    let val = sample.CH;\n    let imgVals = visualizer.process(val);\n\n    return {\n        default: imgVals.concat(sample.dataMask),\n        index: [val],\n        eobrowserStats: [val],\n        dataMask: [sample.dataMask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/f006c0-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-19T11:37:39.228253Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "f3312c-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

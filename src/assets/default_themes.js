@@ -40,6 +40,34 @@ const EDUCATION_THEMES = [
     ],
     pins: [
       {
+        lat: 41.96432,
+        lng: -122.38866,
+        zoom: 13,
+        title: 'Dam Removal on the Klamath River (True Color)',
+        toTime: '2024-04-11',
+        layerId: '1_TRUE_COLOR',
+        themeId: 'HIGHLIGHT',
+        datasetId: 'S2L2A',
+        evalscripturl: '',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/bd86bc-YOUR-INSTANCEID-HERE',
+        description:
+          "Many of the Earth's rivers have been altered by dams and reservoirs, providing renewable hydropower and water supply for human use. However, these dams disrupt the habitat network and have a negative effect on water quality. The world's largest dam removal project on the Klamath river in California and Oregon, USA, includes the demolition of four dams, with guided regeneration of the up-and downstream habitats. This project is reopening access for salmon and other migratory fish to more than 600 km of the river system. In addition to their importance for biodiversity, salmon are also a key element of local First Nations culture. [The Klamath River Dam Removal]( https://whitewatertours.com/klamath-river-dam-removal-project-summer-2024-update/) project paves the way for other large-scale riparian habitat restoration projects, providing an example for responsible stewardship of nature. Check out the drawdown process [here](https://sentinelshare.page.link/DCJz).",
+      },
+      {
+        lat: 19.01141,
+        lng: -98.64796,
+        zoom: 13,
+        title: 'Popocatépetl Ash Emission (True Color)',
+        toTime: '2024-03-06',
+        layerId: '1_TRUE_COLOR',
+        themeId: 'HIGHLIGHT',
+        datasetId: 'S2L2A',
+        evalscripturl: '',
+        visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/bd86bc-YOUR-INSTANCEID-HERE',
+        description:
+          "On 6 March, Mexico's most active volcano increased its ash and gas emissions, posing a threat to Mexico City. It is located around 70 kilometres south-east of the city and threatens around 25 million people. There are 1500 active volcanoes worldwide, most of them along the Pacific Rim, known as the [Ring of Fire](https://en.wikipedia.org/wiki/Ring_of_Fire), of which around 50 erupt every year. Timely detection of dangerous volcanoes is crucial for over 500 million people living nearby. Space monitoring detects subtle changes, assesses the risks and supports response measures. EO Browser offers several preset band combinations, such as [True Color Composite](https://custom-scripts.sentinel-hub.com/sentinel-2/true_color/), which uses the visible light bands - red, green, and blue - in the corresponding red, green and blue color channels, resulting in a naturally coloured output that depicts the Earth as humans would naturally see it.",
+      },
+      {
         lat: 64.92239,
         lng: 22.28622,
         zoom: 9,
@@ -51,7 +79,7 @@ const EDUCATION_THEMES = [
         evalscripturl: '',
         visualizationUrl: 'https://services.sentinel-hub.com/ogc/wms/f2068f-YOUR-INSTANCEID-HERE',
         description:
-          'In 2024, the Bothnian Sea froze about a month earlier than usual. This Sentinel-1 image shows the variety of ice patterns. Open water is red, land is yellow to green, ice is yellow when it is very rough, blue or dark red when its surface is flat. Under such conditions, the shipping lanes have to be maintained by a special icebreaker fleet. These images - which are regularly available despite long polar nights and cloudy weather - are crucial for optimizing icebreaking activities and maintaining maritime transport networks in winter.',
+          'This winter, the Bothnian Sea froze about a month earlier than usual. This Sentinel-1 image shows the variety of ice patterns. Open water is red, land is yellow to green, ice is yellow when it is very rough, blue or dark red when its surface is flat. Under such conditions, the shipping lanes have to be maintained by a special icebreaker fleet. These images - which are regularly available despite long polar nights and cloudy weather - are crucial for optimizing icebreaking activities and maintaining maritime transport networks in winter.',
       },
       {
         title: 'Winter Flooding in the UK (Custom)',
@@ -2747,11 +2775,13 @@ const EDUCATION_THEMES = [
   },
 ];
 
+export const DEFAULT_THEME_ID = 'DEFAULT-THEME';
+export const NORMAL_MODE_SUFFIX = '-NORMAL-MODE';
+
 const educationThemesDefaultMode = EDUCATION_THEMES.map((t) => {
-  const normalModePostfix = '-NORMAL-MODE';
-  const eduThemeNormalMode = { ...t, id: `${t.id}${normalModePostfix}` };
+  const eduThemeNormalMode = { ...t, id: `${t.id}${NORMAL_MODE_SUFFIX}` };
   if (t.pins) {
-    eduThemeNormalMode.pins = t.pins.map((p) => ({ ...p, themeId: `${p.themeId}${normalModePostfix}` }));
+    eduThemeNormalMode.pins = t.pins.map((p) => ({ ...p, themeId: `${p.themeId}${NORMAL_MODE_SUFFIX}` }));
   }
   return eduThemeNormalMode;
 });
@@ -2759,7 +2789,7 @@ const educationThemesDefaultMode = EDUCATION_THEMES.map((t) => {
 export const DEFAULT_THEMES = [
   {
     name: () => t`Default`,
-    id: 'DEFAULT-THEME',
+    id: DEFAULT_THEME_ID,
     content: [
       {
         name: 'Landsat 1-5 MSS L1',

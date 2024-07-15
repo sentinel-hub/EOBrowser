@@ -11,6 +11,8 @@ import {
   PlanetSupportedPVIds,
   PlanetSupportedProductBundles,
   TPDICollections,
+  PlanetARPSType,
+  PlanetARPSId,
 } from '@sentinel-hub/sentinelhub-js';
 
 import { SelectInput } from './SelectInput';
@@ -20,10 +22,10 @@ import { createSelectOptions } from '../commercialData.utils';
 import { Link } from './Link';
 import { TextInput } from './TextInput';
 
+import { GEOCENTO_EARTHIMAGES } from '../const.js';
+
 export const minDateRange = moment.utc('1982-01-01');
 export const maxDateRange = moment.utc().add(10, 'years').endOf('year');
-
-export const GEOCENTO_EARTHIMAGES = 'GEOCENTO_EARTHIMAGES';
 
 export const providerSpecificSearchParameters = {
   [TPDICollections.PLANET_SCOPE]: [
@@ -86,6 +88,20 @@ export const providerSpecificSearchParameters = {
       render: TextInput,
       placeholder: t`Your Planet API key`,
       trialAccount: true,
+    },
+  ],
+  [TPDICollections.PLANET_ARPS]: [
+    {
+      id: 'itemType',
+      label: () => t`Source Type`,
+      render: SelectInput,
+      options: createSelectOptions(PlanetARPSType),
+    },
+    {
+      id: 'id',
+      label: () => t`Source ID`,
+      render: SelectInput,
+      options: createSelectOptions(PlanetARPSId),
     },
   ],
   [TPDICollections.PLANETARY_VARIABLES]: [

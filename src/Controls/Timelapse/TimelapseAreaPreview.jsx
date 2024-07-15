@@ -18,17 +18,35 @@ class TimelapseAreaPreview extends Component {
     mapBounds: this.props.mapBounds,
   };
 
+  // Close the timelapse area preview when clicking on controls buttons or user menu
+  handleGlobalClick = (event) => {
+    let closeOnParentClasses = [
+      'user-panel',
+      'fa-power-off',
+      'aoi-wrapper',
+      'loi-wrapper',
+      'poi-wrapper',
+      'measure-wrapper',
+      'img-download-btn-wrapper',
+      'histogram-wrapper',
+    ];
+    let foundElement = closeOnParentClasses.some((className) => event.target.closest(`.${className}`));
+    if (foundElement) {
+      store.dispatch(timelapseSlice.actions.setTimelapseAreaPreview(false));
+    }
+  };
+
   componentDidMount() {
     this.props.leaflet.map.on('move', this.setMovingMapValues);
+    document.addEventListener('click', this.handleGlobalClick);
   }
 
   componentWillUnmount() {
     this.props.leaflet.map.off('move', this.setMovingMapValues);
-    store.dispatch(timelapseSlice.actions.setTimelapseAreaPreview(false));
+    document.removeEventListener('click', this.handleGlobalClick);
   }
 
   startTimelapse = () => {
-    store.dispatch(timelapseSlice.actions.setTimelapseAreaPreview(false));
     store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TIMELAPSE }));
     handleFathomTrackEvent(FATHOM_TRACK_EVENT_LIST.START_TIMELAPSE);
   };

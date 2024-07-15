@@ -22,7 +22,7 @@ export default class AnonymousAuth extends React.Component {
     this.props.setAnonToken(anonToken?.access_token);
 
     if (anonToken) {
-      scheduleTokenRefresh(
+      anonTokenRefreshTimeout = scheduleTokenRefresh(
         getTokenExpiration(anonToken),
         UPDATE_BEFORE_EXPIRY_ANON_TOKEN,
         anonTokenRefreshTimeout,

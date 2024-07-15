@@ -1,0 +1,64 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/968dcd-YOUR-INSTANCEID-HERE/layers/DISCRETE-CLASSIFICATION-MAP",
+        "id": "DISCRETE-CLASSIFICATION-MAP",
+        "title": "Discrete Classification Map",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n// This custom script visualises land cover discrete classification map from global land  cover data\n\nfunction setup() {\n  return {\n    input: [\"Discrete_Classification_map\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\n\nconst map = [\n  [0, 0x282828],   // No input data available\n  [20, 0xffbb22],  // Shrubs\n  [30, 0xffff4c],  // Herbaceous vegetation\n  [40, 0xf096ff],  // Cultivated and managed vegetation/agriculture (cropland)\n  [50, 0xfa0000],  // Urban / built up\n  [60, 0xb4b4b4],  // Bare / sparse vegetation\n  [70, 0xf0f0f0],  // Snow and Ice\n  [80, 0x0032c8],  // Permanent water bodies\n  [90, 0x0096a0],  // Herbaceous wetland\n  [100, 0xfae6a0], // Moss and lichen\n  [111, 0x58481f], // Closed forest, evergreen needle leaf\n  [112, 0x009900], // Closed forest, evergreen, broad leaf\n  [113, 0x70663e], // Closed forest, deciduous needle leaf\n  [114, 0x00cc00], // Closed forest, deciduous broad leaf\n  [115, 0x4e751f], // Closed forest, mixed\n  [116, 0x007800], // Closed forest, unknown\n  [121, 0x666000], // Open forest, evergreen needle leafs\n  [122, 0x8db400], // Open forest, evergreen broad leaf\n  [123, 0x8d7400], // Open forest, deciduous needle leaf\n  [124, 0xa0dc00], // Open forest, deciduous broad leaf\n  [125, 0x929900], // Open forest, mixed\n  [126, 0x648c00], // Open forest, unknown\n  [200, 0x000080]  // Open sea    \n  ];\n\nconst visualizer = new ColorMapVisualizer(map);\n\nfunction evaluatePixel(sample) {\n  return [visualizer.process(sample.Discrete_Classification_map)[0], visualizer.process(sample.Discrete_Classification_map)[1], visualizer.process(sample.Discrete_Classification_map)[2], sample.Discrete_Classification_map !=255];\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/968dcd-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-03-17T13:51:05.503406Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "f0a976-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/968dcd-YOUR-INSTANCEID-HERE/layers/FOREST-TYPE",
+        "id": "FOREST-TYPE",
+        "title": "Forest Type",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// This custom script visualises forest type land cover from global land cover data\n\nfunction setup() {\n  return {\n    input: [\"Forest_Type_layer\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\n\nconst map = [\n  [0, 0xffffff],  // Not a forest\n  [1, 0x58481f],  // Evergreen niddle leaf\n  [2, 0x009900],  // Evergreen broad leaf\n  [3, 0x70663e],  // Deciduous needle leaf\n  [4, 0x00cc00],  // Deciduous broad leaf\n  [5, 0x4e751f],  // Mix of forest type  \n  ];\n\nconst visualizer = new ColorMapVisualizer(map);\n\nfunction evaluatePixel(sample) {\n  return [visualizer.process(sample.Forest_Type_layer)[0], \n          visualizer.process(sample.Forest_Type_layer)[1], \n          visualizer.process(sample.Forest_Type_layer)[2], \n          sample.Forest_Type_layer !=255];\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/968dcd-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-03-17T13:51:51.248010Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "f0a976-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

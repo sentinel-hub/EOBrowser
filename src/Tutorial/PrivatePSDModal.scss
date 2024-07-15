@@ -1,0 +1,39 @@
+@import '../variables.scss';
+
+.private-psd-modal {
+  margin-left: 40px;
+  margin-right: 40px;
+  color: $textCol;
+
+  .text {
+    font-size: 18px;
+
+    p {
+      margin-top: 0;
+    }
+
+    a {
+      color: $primaryCol;
+    }
+  }
+
+  .ok-btn {
+    width: 60px;
+    text-align: center;
+    font-weight: $fontWeightBold;
+    margin-top: 25px;
+  }
+
+  .login-text {
+    margin-top: 1em;
+    display: flex;
+    font-size: 18px;
+
+    .login-link {
+      margin-left: 4px;
+      text-decoration: underline;
+      color: $primaryCol;
+      cursor: pointer;
+    }
+  }
+}

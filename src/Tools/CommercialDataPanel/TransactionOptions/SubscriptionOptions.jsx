@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TPDICollections } from '@sentinel-hub/sentinelhub-js';
 import { EOBButton } from '../../../junk/EOBCommon/EOBButton/EOBButton';
 import { NotificationPanel } from '../../../Notification/NotificationPanel';
@@ -25,6 +25,8 @@ const SubscriptionOptions = ({
   handleSearchParamChange,
   userAccountInfo,
 }) => {
+  const [planetApiKeyHidden, setPlanetApiKeyHidden] = useState(true);
+
   const validateInputs = () => {
     // name must be entered
     const { name, planetApiKey } = transactionOptions;
@@ -34,9 +36,11 @@ const SubscriptionOptions = ({
 
     if (
       searchParams &&
-      [TPDICollections.PLANET_SCOPE, TPDICollections.PLANETARY_VARIABLES].includes(
-        searchParams.dataProvider,
-      ) &&
+      [
+        TPDICollections.PLANET_SCOPE,
+        TPDICollections.PLANETARY_VARIABLES,
+        TPDICollections.PLANET_ARPS,
+      ].includes(searchParams.dataProvider) &&
       !planetApiKey
     ) {
       return false;
@@ -97,6 +101,8 @@ const SubscriptionOptions = ({
           transactionOptions: transactionOptions,
           searchParams: searchParams,
           setTransactionOptions: setTransactionOptions,
+          planetApiKeyHidden: planetApiKeyHidden,
+          setPlanetApiKeyHidden: setPlanetApiKeyHidden,
         })}
 
       <div className="actions">

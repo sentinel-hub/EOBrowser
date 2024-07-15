@@ -14,12 +14,18 @@ import NProgress from 'nprogress';
 import ReactLeafletGoogleLayer from './plugins/ReactLeafletGoogleLayer';
 import 'nprogress/nprogress.css';
 
-import store, { commercialDataSlice, mainMapSlice, themesSlice, visualizationSlice } from '../store';
+import store, {
+  commercialDataSlice,
+  mainMapSlice,
+  themesSlice,
+  visualizationSlice,
+  modalSlice,
+} from '../store';
 import 'leaflet/dist/leaflet.css';
 import './Map.scss';
 import L from 'leaflet';
 import moment from 'moment';
-import { EDUCATION_MODE, FATHOM_TRACK_EVENT_LIST, MODES, SEARCH_PANEL_TABS, TABS } from '../const';
+import { EDUCATION_MODE, FATHOM_TRACK_EVENT_LIST, MODES, SEARCH_PANEL_TABS, TABS, ModalId } from '../const';
 import Controls from '../Controls/Controls';
 import PreviewLayer from '../Tools/Results/PreviewLayer';
 import LeafletControls from './LeafletControls/LeafletControls';
@@ -45,6 +51,9 @@ import MaptilerLogo from './maptiler-logo-adaptive.svg';
 import { SpeckleFilterType } from '@sentinel-hub/sentinelhub-js';
 import { isRectangle } from '../utils/geojson.utils';
 import EOBModeSelection from '../junk/EOBModeSelection/EOBModeSelection';
+import { getBounds } from '../utils/coords';
+import turfCenter from '@turf/center';
+import { doesUserHaveAccessToPlanetSandboxDataCollections } from '../ThemesProvider/ThemesProvider.utils';
 
 const BASE_PANE_ID = 'baseMapPane';
 const BASE_PANE_ZINDEX = 5;
@@ -68,23 +77,83 @@ class Map extends React.Component {
     parent: `#map`,
   });
   state = {
-    accountInfo: {
-      payingAccount: false,
-      quotasEnabled: false,
-    },
+    accountHasGoogleMapsAccess: false,
+    resolutionError: null,
+  };
+
+  updateHasGoogleMapsAccessState = async () => {
+    const { hasGoogleMapsAccess } = await checkUserAccount(this.props.auth.user);
+    this.setState({ accountHasGoogleMapsAccess: hasGoogleMapsAccess });
   };
 
   async componentDidMount() {
-    const accountInfo = await checkUserAccount(this.props.auth.user);
-    this.setState({ accountInfo: accountInfo });
+    await this.updateHasGoogleMapsAccessState();
+    this.displayEducationModePopupIfNeeded();
   }
 
   async componentDidUpdate(prevProps) {
     if (prevProps.auth !== this.props.auth) {
-      const accountInfo = await checkUserAccount(this.props.auth.user);
-      this.setState({ accountInfo: accountInfo });
+      await this.updateHasGoogleMapsAccessState();
+    }
+
+    if (this.props.selectedTile) {
+      this.autoZoomOnBYOCCollection();
+    }
+
+    if (prevProps.selectedModeId !== this.props.selectedModeId) {
+      this.displayEducationModePopupIfNeeded();
     }
   }
+
+  displayEducationModePopupIfNeeded = () => {
+    // display popup if education mode is on and if the popup is not already displayed
+    const { selectedModeId, modalId } = this.props;
+    if (selectedModeId === EDUCATION_MODE.id && modalId !== ModalId.EDUCATION_MODE_REDIRECT) {
+      store.dispatch(modalSlice.actions.addModal({ modal: ModalId.EDUCATION_MODE_REDIRECT }));
+    }
+  };
+
+  autoZoomOnBYOCCollection = () => {
+    // Auto zoom on resolution error
+    if (this.state.resolutionError) {
+      const bounds = getBounds(this.props.selectedTile.geometry);
+      if (bounds) {
+        this.mapRef.leafletElement.fitBounds(bounds, {
+          padding: [20, 20],
+          duration: 1,
+          easeLinearity: 0.5,
+          animate: true,
+        });
+
+        // Reset tile with delay while the map is still zooming
+        // This is done to prevent showing the error message while the map is still zooming
+        setTimeout(() => {
+          store.dispatch(visualizationSlice.actions.setVisualizationParams({ selectedTile: null }));
+        }, 200);
+      } else {
+        visualizationSlice.actions.setErrorAndErrorCode({ error: this.state.resolutionError });
+      }
+      this.setState({ resolutionError: null });
+      return;
+    }
+
+    // Auto zoom on known collections
+    const dsh = getDataSourceHandler(this.props.datasetId);
+    if (dsh) {
+      const zoomConfiguration = dsh.getLeafletZoomConfig(this.props.datasetId);
+      const zoomError = zoomConfiguration && zoomConfiguration.min && this.props.zoom < zoomConfiguration.min;
+
+      if (zoomError && this.props.datasetId && this.props.selectedTile) {
+        const center = turfCenter(this.props.selectedTile.geometry);
+        this.mapRef.leafletElement.setView(
+          [center.geometry.coordinates[1], center.geometry.coordinates[0]],
+          zoomConfiguration.min,
+          { animation: true },
+        );
+        store.dispatch(visualizationSlice.actions.setVisualizationParams({ selectedTile: null }));
+      }
+    }
+  };
 
   updateViewport = (viewport) => {
     if (viewport?.center) {
@@ -115,20 +184,30 @@ class Map extends React.Component {
   };
 
   onTileError = async (error) => {
-    const message = await constructErrorMessage(error);
-    store.dispatch(visualizationSlice.actions.setError(message));
+    const { message, code } = await constructErrorMessage(error);
+
+    if (this.props.selectedTile && code === 'RENDERER_EXCEPTION') {
+      this.setState({
+        resolutionError: message,
+      });
+      return;
+    }
+    store.dispatch(visualizationSlice.actions.setErrorAndErrorCode({ error: message, errorCode: code }));
   };
 
   onTileLoad = () => {
     const { error } = this.props;
     if (error) {
-      store.dispatch(visualizationSlice.actions.setError(null));
+      store.dispatch(visualizationSlice.actions.setErrorAndErrorCode({ error: null, errorCode: null }));
     }
   };
 
-  onSelectMode = (modeId) => {
+  onSelectMode = async (modeId) => {
+    const { access_token } = this.props.auth.user;
+    const userHasAccess = await doesUserHaveAccessToPlanetSandboxDataCollections(access_token);
+
     store.dispatch(visualizationSlice.actions.reset());
-    store.dispatch(themesSlice.actions.setSelectedModeIdAndDefaultTheme(modeId));
+    store.dispatch(themesSlice.actions.setSelectedModeIdAndDefaultTheme({ modeId, userHasAccess }));
     if (modeId === EDUCATION_MODE.id) {
       handleFathomTrackEvent(FATHOM_TRACK_EVENT_LIST.EDUCATION_MODE_SELECTED);
     }
@@ -187,7 +266,7 @@ class Map extends React.Component {
     const zoomConfig = getZoomConfiguration(datasetId);
 
     const shownBaseLayers =
-      this.state.accountInfo.payingAccount && googleAPI
+      this.state.accountHasGoogleMapsAccess && googleAPI
         ? baseLayers
         : baseLayers.filter((baseLayer) => baseLayer.access === LAYER_ACCESS.PUBLIC);
 
@@ -196,6 +275,7 @@ class Map extends React.Component {
     if (dsh && !dsh.canApplySpeckleFilter(datasetId, this.props.zoom)) {
       speckleFilterProp = { type: SpeckleFilterType.NONE };
     }
+
     return (
       <LeafletMap
         ref={(el) => (this.mapRef = el)}
@@ -272,8 +352,8 @@ class Map extends React.Component {
                   url={visualizationUrl}
                   layers={visualizationLayerId}
                   format="PNG"
-                  fromTime={fromTime ? fromTime.toDate() : null}
-                  toTime={toTime.toDate()}
+                  fromTime={fromTime?.isValid() ? fromTime.toDate() : null}
+                  toTime={toTime?.isValid() ? toTime.toDate() : null}
                   customSelected={customSelected}
                   evalscript={evalscript}
                   evalscripturl={evalscripturl}
@@ -589,6 +669,7 @@ const mapStoreToProps = (store) => {
     orthorectification: store.visualization.orthorectification,
     backscatterCoeff: store.visualization.backscatterCoeff,
     error: store.visualization.error,
+    errorCode: store.visualization.errorCode,
     comparedLayers: store.compare.comparedLayers,
     comparedOpacity: store.compare.comparedOpacity,
     comparedClipping: store.compare.comparedClipping,
@@ -600,7 +681,9 @@ const mapStoreToProps = (store) => {
     selectedTabSearchPanelIndex: store.tabs.selectedTabSearchPanelIndex,
     is3D: store.mainMap.is3D,
     selectedModeId: store.themes.selectedModeId,
+    selectedTile: store.visualization.selectedTile,
     elevationProfileHighlightedPoint: store.elevationProfile.highlightedPoint,
+    modalId: store.modal.id,
   };
 };
 

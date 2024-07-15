@@ -1,0 +1,842 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_AER_AI_340_AND_380_VISUALIZED",
+        "id": "__FIS_AER_AI_340_AND_380_VISUALIZED",
+        "title": "__FIS_AER_AI_340_AND_380_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(AER_AI_340_380)) {\n  return [NaN];\n}\nreturn[AER_AI_340_380];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.154458Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_AER_AI_354_AND_388_VISUALIZED",
+        "id": "__FIS_AER_AI_354_AND_388_VISUALIZED",
+        "title": "__FIS_AER_AI_354_AND_388_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(AER_AI_354_388)) {\n  return [NaN];\n}\nreturn[AER_AI_354_388];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.158991Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_CH4_VISUALIZED",
+        "id": "__FIS_CH4_VISUALIZED",
+        "title": "__FIS_CH4_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(CH4)) {\n  return [NaN];\n}\nreturn [CH4];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.164926Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_CLOUD_BASE_HEIGHT_VISUALIZED",
+        "id": "__FIS_CLOUD_BASE_HEIGHT_VISUALIZED",
+        "title": "__FIS_CLOUD_BASE_HEIGHT_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(CLOUD_BASE_HEIGHT)) {\n  return [NaN];\n}\nreturn[CLOUD_BASE_HEIGHT];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.184305Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_CLOUD_BASE_PRESSURE_VISUALIZED",
+        "id": "__FIS_CLOUD_BASE_PRESSURE_VISUALIZED",
+        "title": "__FIS_CLOUD_BASE_PRESSURE_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(CLOUD_BASE_PRESSURE)) {\n  return [NaN];\n}\nreturn[CLOUD_BASE_PRESSURE];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.191554Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_CLOUD_FRACTION_VISUALIZED",
+        "id": "__FIS_CLOUD_FRACTION_VISUALIZED",
+        "title": "__FIS_CLOUD_FRACTION_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(CLOUD_FRACTION)) {\n  return [NaN];\n}\nreturn[CLOUD_FRACTION];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.206735Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_CLOUD_OPTICAL_THICKNESS_VISUALIZED",
+        "id": "__FIS_CLOUD_OPTICAL_THICKNESS_VISUALIZED",
+        "title": "__FIS_CLOUD_OPTICAL_THICKNESS_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(CLOUD_OPTICAL_THICKNESS)) {\n  return [NaN];\n}\nreturn[CLOUD_OPTICAL_THICKNESS]"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.217497Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_CLOUD_TOP_HEIGHT_VISUALIZED",
+        "id": "__FIS_CLOUD_TOP_HEIGHT_VISUALIZED",
+        "title": "__FIS_CLOUD_TOP_HEIGHT_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(CLOUD_TOP_HEIGHT)) {\n  return [NaN];\n}\nreturn[CLOUD_TOP_HEIGHT];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.225727Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_CLOUD_TOP_PRESSURE_VISUALIZED",
+        "id": "__FIS_CLOUD_TOP_PRESSURE_VISUALIZED",
+        "title": "__FIS_CLOUD_TOP_PRESSURE_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(CLOUD_TOP_PRESSURE)) {\n  return [NaN];\n}\nreturn[CLOUD_TOP_PRESSURE];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.228490Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_CO_VISUALIZED",
+        "id": "__FIS_CO_VISUALIZED",
+        "title": "__FIS_CO_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(CO)) {\n  return [NaN];\n}\nif (!isFinite(CO)) {\n  return [NaN];\n}\nreturn [CO]"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.231108Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_HCHO_VISUALIZED",
+        "id": "__FIS_HCHO_VISUALIZED",
+        "title": "__FIS_HCHO_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(HCHO)) {\n  return [NaN];\n}\nreturn[HCHO];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.234577Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_NO2_VISUALIZED",
+        "id": "__FIS_NO2_VISUALIZED",
+        "title": "__FIS_NO2_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(NO2)) {\n  return [NaN];\n}\nreturn [NO2];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.242354Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_O3_VISUALIZED",
+        "id": "__FIS_O3_VISUALIZED",
+        "title": "__FIS_O3_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(O3)) {\n  return [NaN];\n}\nreturn [O3];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.245971Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/__FIS_SO2_VISUALIZED",
+        "id": "__FIS_SO2_VISUALIZED",
+        "title": "__FIS_SO2_VISUALIZED",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nif (!isFinite(SO2)) {\n  return [NaN];\n}\nreturn [SO2];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-03-09T14:32:02.248698Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/AER_AI_340_AND_380_VISUALIZED",
+        "id": "AER_AI_340_AND_380_VISUALIZED",
+        "title": "AER AI 340 and 380",
+        "description": "UV Aerosol Index from 380 and 340 nm",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = -1.0;\nvar maxVal = 5.0;\nvar diff = maxVal - minVal;\nconst map = [\n  [minVal, 0x00007f],\n  [minVal + 0.125 * diff, 0x0000ff],\n  [minVal + 0.375 * diff, 0x00ffff],\n  [minVal + 0.625 * diff, 0xffff00],\n  [minVal + 0.875 * diff, 0xff0000],\n  [maxVal, 0x7f0000],\n];\n\nconst visualizer = new ColorRampVisualizer(map);\n\nfunction setup() {\n  return {\n    input: [\"AER_AI_340_380\", \"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n  const statsVal = isFinite(samples.AER_AI_340_380) ? samples.AER_AI_340_380 : NaN;\n\n  return {\n    default: [...visualizer.process(samples.AER_AI_340_380), samples.dataMask],\n    eobrowserStats:[statsVal],\n    dataMask: [samples.dataMask],\n  };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:19:12.483582Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/AER_AI_354_AND_388_VISUALIZED",
+        "id": "AER_AI_354_AND_388_VISUALIZED",
+        "title": "AER AI 354 and 388",
+        "description": "UV Aerosol Index from 388 and 354 nm",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = -1.0;\nvar maxVal = 5.0;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"AER_AI_354_388\",\"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const statsVal = isFinite(samples.AER_AI_354_388) ? samples.AER_AI_354_388 : NaN;\n   const [r, g, b] = visualizer.process(samples.AER_AI_354_388);\n   return {\n      default: [r, g, b, samples.dataMask],\n      eobrowserStats: [statsVal],\n      dataMask: [samples.dataMask],\n    };\n  \n  \n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:19:30.033989Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/CH4_VISUALIZED",
+        "id": "CH4_VISUALIZED",
+        "title": "Methane",
+        "description": "Column averaged dry air mixing ratio of methane",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 1600.0;\nvar maxVal = 2000.0;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"CH4\",\"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples. CH4);\n   const statsVal = isFinite(samples.CH4) ? samples.CH4 : NaN;\n   return {\n        default: [r, g, b, samples.dataMask],\n        eobrowserStats: [statsVal],\n        dataMask: [samples.dataMask],\n      };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:22:00.847752Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/CLOUD_BASE_HEIGHT_VISUALIZED",
+        "id": "CLOUD_BASE_HEIGHT_VISUALIZED",
+        "title": "Base Height",
+        "description": "Cloud base height",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 0.0;\nvar maxVal = 20000.0;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"CLOUD_BASE_HEIGHT\",\"dataMask\"],\n\toutput: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const statsVal = isFinite(samples.CLOUD_BASE_HEIGHT) ? samples.CLOUD_BASE_HEIGHT : NaN;\n\n   const [r, g, b] = visualizer.process(samples.CLOUD_BASE_HEIGHT);\n   return {\n            default: [r, g, b, samples.dataMask],\n            eobrowserStats: [statsVal],\n            dataMask: [samples.dataMask],\n   };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:19:44.382887Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/CLOUD_BASE_PRESSURE_VISUALIZED",
+        "id": "CLOUD_BASE_PRESSURE_VISUALIZED",
+        "title": "Base pressure",
+        "description": "Cloud base pressure",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 10000.0;\nvar maxVal = 110000.0;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"CLOUD_BASE_PRESSURE\",\"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples.CLOUD_BASE_PRESSURE);\n   const statsVal = isFinite(samples.CLOUD_BASE_PRESSURE) ? samples.CLOUD_BASE_PRESSURE : NaN;\n   return {\n            default: [r, g, b, samples.dataMask],\n            eobrowserStats: [statsVal],\n            dataMask: [samples.dataMask],\n          };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:19:58.697966Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/CLOUD_FRACTION_VISUALIZED",
+        "id": "CLOUD_FRACTION_VISUALIZED",
+        "title": "Effective radiometric cloud fraction",
+        "description": "Effective radiometric cloud fraction",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 0.0;\nvar maxVal = 1.0;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"CLOUD_FRACTION\",\"dataMask\"],\n\toutput: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples.CLOUD_FRACTION);\n   const statsVal = isFinite(samples.CLOUD_FRACTION) ? samples.CLOUD_FRACTION : NaN;\n   return {\n        default: [r, g, b, samples.dataMask],\n        eobrowserStats: [statsVal],\n        dataMask: [samples.dataMask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:20:25.616651Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/CLOUD_OPTICAL_THICKNESS_VISUALIZED",
+        "id": "CLOUD_OPTICAL_THICKNESS_VISUALIZED",
+        "title": "Optical thickness",
+        "description": "Cloud optical thickness",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 0.0;\nvar maxVal = 250.0;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"CLOUD_OPTICAL_THICKNESS\",\"dataMask\"],\n\toutput: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples.CLOUD_OPTICAL_THICKNESS);\n   const statsVal = isFinite(samples.CLOUD_OPTICAL_THICKNESS) ? samples.CLOUD_OPTICAL_THICKNESS : NaN;\n   return {\n        default: [r, g, b, samples.dataMask],\n        eobrowserStats: [statsVal],\n        dataMask: [samples.dataMask],\n    };\n\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:22:29.008228Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/CLOUD_TOP_HEIGHT_VISUALIZED",
+        "id": "CLOUD_TOP_HEIGHT_VISUALIZED",
+        "title": "Top height",
+        "description": "Cloud top height",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 0.0;\nvar maxVal = 20000.0;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"CLOUD_TOP_HEIGHT\",\"dataMask\"],\n \toutput: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples.CLOUD_TOP_HEIGHT);\n   const statsVal = isFinite(samples.CLOUD_TOP_HEIGHT) ? samples.CLOUD_TOP_HEIGHT : NaN;\n   return {\n        default: [r, g, b, samples.dataMask],\n        eobrowserStats: [statsVal],\n        dataMask: [samples.dataMask],\n      };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:23:05.190869Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/CLOUD_TOP_PRESSURE_VISUALIZED",
+        "id": "CLOUD_TOP_PRESSURE_VISUALIZED",
+        "title": "Top pressure",
+        "description": "Cloud top pressure",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 10000.0;\nvar maxVal = 110000.0;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"CLOUD_TOP_PRESSURE\",\"dataMask\"],\n     output: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples.CLOUD_TOP_PRESSURE);\n   const statsVal = isFinite(samples.CLOUD_TOP_PRESSURE) ? samples.CLOUD_TOP_PRESSURE : NaN;\n   return {\n        default: [r, g, b, samples.dataMask],\n        eobrowserStats: [statsVal],\n        dataMask: [samples.dataMask],\n      };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:23:16.781191Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/CO_VISUALIZED",
+        "id": "CO_VISUALIZED",
+        "title": "Carbon Monoxide",
+        "description": "Carbon Monoxide total column",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 0.0;\nvar maxVal = 0.1;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"CO\",\"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples.CO);\n   const statsVal = isFinite(samples.CO) ? samples.CO : NaN;\n   return {\n        default: [r, g, b, samples.dataMask],\n        eobrowserStats: [statsVal],\n        dataMask: [samples.dataMask],\n      };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:20:12.721983Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/HCHO_VISUALIZED",
+        "id": "HCHO_VISUALIZED",
+        "title": "Formaldehyde",
+        "description": "Formaldehyde troposheric vertical column",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 0.0;\nvar maxVal = 0.001;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"HCHO\",\"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples.HCHO);\n   const statsVal = isFinite(samples.HCHO) ? samples.HCHO : NaN;\n   return {\n        default: [r, g, b, samples.dataMask],\n        eobrowserStats: [statsVal],\n        dataMask: [samples.dataMask],\n      };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:20:42.112586Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/NO2_VISUALIZED",
+        "id": "NO2_VISUALIZED",
+        "title": "Nitrogen Dioxide",
+        "description": "Nitrogen Dioxide tropospheric column",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 0.0;\nvar maxVal = 0.0001;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"NO2\",\"dataMask\"],\n\toutput: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples.NO2);\n   const statsVal = isFinite(samples.NO2) ? samples.NO2 : NaN;\n   return {\n        default: [r, g, b, samples.dataMask],\n        eobrowserStats: [statsVal],\n        dataMask: [samples.dataMask],\n      };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:22:14.978261Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/O3_VISUALIZED",
+        "id": "O3_VISUALIZED",
+        "title": "Ozone",
+        "description": "Ozone total column",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 0.0;\nvar maxVal = 0.36;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"O3\",\"dataMask\"],\n\toutput: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples.O3);\n   const statsVal = isFinite(samples.O3) ? samples.O3 : NaN;\n   return {\n        default: [r, g, b, samples.dataMask],\n        eobrowserStats: [statsVal],\n        dataMask: [samples.dataMask],\n      };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:22:40.668620Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE/layers/SO2_VISUALIZED",
+        "id": "SO2_VISUALIZED",
+        "title": "Sulfur Dioxide",
+        "description": "Sulfur Dioxide total column",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nvar minVal = 0.0;\nvar maxVal = 0.01;\nvar diff = maxVal - minVal;\nconst map = [\n\t[minVal, 0x00007f], \n\t[minVal + 0.125 * diff, 0x0000ff],\n\t[minVal + 0.375 * diff, 0x00ffff],\n\t[minVal + 0.625 * diff, 0xffff00],\n\t[minVal + 0.875 * diff, 0xff0000],\n\t[maxVal, 0x7f0000]\n]; \n\nconst visualizer = new ColorRampVisualizer(map)\nfunction setup() {\n   return {\n    input: [\"SO2\",\"dataMask\"],\n\toutput: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 1 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n   const [r, g, b] = visualizer.process(samples.SO2);\n   const statsVal = isFinite(samples.SO2) ? samples.SO2 : NaN;\n   return {\n        default: [r, g, b, samples.dataMask],\n        eobrowserStats: [statsVal],\n        dataMask: [samples.dataMask],\n      };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2c5dc5-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-06-13T06:22:52.213784Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S5PL2/sources/7"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "type": "S5PL2"
+        }
+    }
+]

@@ -1,0 +1,62 @@
+@import "../variables.scss";
+
+.white-background {
+  background-color: $tutorialBackgroundColor;
+  color: $tutorialTextColor;
+}
+
+.educationmode-redirect-content {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  padding-top: 10px;
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    padding: 0 40px;
+    gap: 25px;
+
+    h2,
+    p {
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    a {
+      color: #b6bf00;
+      cursor: pointer;
+    }
+  }
+
+  .preview-image {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
+  }
+
+  .buttons {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+
+    .dark-background-for-btn {
+      background-color: $mainDark;
+      width: fit-content;
+
+      .eob-btn {
+        text-align: center;
+        min-width: 175px;
+        box-shadow: none;
+      }
+    }
+  }
+}

@@ -2,16 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
 import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
+import { t } from 'ttag';
 
 import { checkAllMandatoryOutputsExist } from '../utils/parseEvalscript';
-import { FATHOM_TRACK_EVENT_LIST, reqConfigMemoryCache, STATISTICS_MANDATORY_OUTPUTS } from '../const';
+import {
+  FATHOM_TRACK_EVENT_LIST,
+  reqConfigMemoryCache,
+  STATISTICS_MANDATORY_OUTPUTS,
+  STATISTICS_MANDATORY_OUTPUTS_POI,
+} from '../const';
 import {
   getStatisticalInfoMsg,
   getLayerNotSelectedMsg,
   getNotAvailableForErrorMsg,
   getLoggedInErrorMsg,
+  getHowToConfigLayersStatInfoMsg,
 } from '../junk/ConstMessages';
 import { handleFathomTrackEvent } from '../utils';
+import { POI_STRING } from '../Controls/controls.utils';
 
 const FisChartLink = (props) => {
   const [statisticalApiSupported, setStatisticalApiSupported] = useState(
@@ -34,6 +42,7 @@ const FisChartLink = (props) => {
 
         if (selectedResult.isCustomSelected) {
           evalscript = selectedResult.evalscript;
+          layerName = t`Custom`;
         } else {
           if (selectedResult.layerId) {
             const layer = await LayersFactory.makeLayer(
@@ -50,23 +59,44 @@ const FisChartLink = (props) => {
           }
         }
         if (evalscript) {
-          statApiSupported[idx] = checkAllMandatoryOutputsExist(evalscript, STATISTICS_MANDATORY_OUTPUTS);
+          // if POI: evalscript can have eobrowserStats or eobrowserStatsPOI (statinfo disabled for AOI)
+          if (props.aoiOrPoi === POI_STRING) {
+            const checkEobStatsOutput = checkAllMandatoryOutputsExist(
+              evalscript,
+              STATISTICS_MANDATORY_OUTPUTS,
+            );
+            const checkEobStatsOutputPoi = checkAllMandatoryOutputsExist(
+              evalscript,
+              STATISTICS_MANDATORY_OUTPUTS_POI,
+            );
+            statApiSupported[idx] = checkEobStatsOutput || checkEobStatsOutputPoi;
+          } else {
+            statApiSupported[idx] = checkAllMandatoryOutputsExist(evalscript, STATISTICS_MANDATORY_OUTPUTS);
+          }
         }
         setLayerName(layerName);
       }
       setStatisticalApiSupported(statApiSupported);
     };
     fetchEvalscript();
-  }, [props.selectedResults]);
+  }, [props.selectedResults, props.aoiOrPoi]);
 
   const isSelectedResult = props.selectedResults.some((selectedResult) => selectedResult !== null);
 
-  const isStatAvailableOnDatasource = !!(
-    props.selectedResults.some((selectedResult) => selectedResult !== null && selectedResult.baseUrls.FIS) ||
-    statisticalApiSupported.some((supported) => supported)
-  );
+  const isStatAvailableOnDatasource =
+    isSelectedResult && statisticalApiSupported.some((supported) => supported);
 
   const isLoggedIn = !!props.user.userdata;
+
+  const getTitleBasedOnStatus = (errorMessage) => {
+    if (!isLoggedIn) {
+      return errorMessage;
+    }
+
+    return `${getStatisticalInfoMsg()} (${
+      !isSelectedResult ? getLayerNotSelectedMsg() : getNotAvailableForErrorMsg(layerName)
+    }).`;
+  };
 
   const statsEnabled = () => (
     // jsx-a11y/anchor-is-valid
@@ -84,17 +114,15 @@ const FisChartLink = (props) => {
   );
 
   const statsError = (errorMessage) => {
-    const errorMsgWithTitle = `${getStatisticalInfoMsg()} - ${errorMessage}`;
-
     return (
       // jsx-a11y/anchor-is-valid
       // eslint-disable-next-line
       <a
         onClick={(e) => {
           e.preventDefault();
-          props.onErrorMessage(errorMsgWithTitle);
+          props.onErrorMessage(errorMessage);
         }}
-        title={errorMsgWithTitle}
+        title={getTitleBasedOnStatus(errorMessage)}
         className="disabled"
       >
         <i className={`fa fa-bar-chart`} />
@@ -107,7 +135,13 @@ const FisChartLink = (props) => {
   }
 
   if (!isStatAvailableOnDatasource) {
-    return statsError(!isSelectedResult ? getLayerNotSelectedMsg() : getNotAvailableForErrorMsg(layerName));
+    const statisticalInfoMsg = getStatisticalInfoMsg();
+    const additionalErrorMsg = !isSelectedResult
+      ? `(${getLayerNotSelectedMsg()})`
+      : `(${getNotAvailableForErrorMsg(layerName)}). ${getHowToConfigLayersStatInfoMsg()}`;
+    const combinedStatErrorMsg = `${statisticalInfoMsg} ${additionalErrorMsg}`;
+
+    return statsError(combinedStatErrorMsg);
   }
 
   return statsEnabled();

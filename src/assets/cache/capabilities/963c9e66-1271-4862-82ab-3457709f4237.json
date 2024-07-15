@@ -1,0 +1,13 @@
+{
+    "title": "IO 10m Annual Land Use Land Cover (9-class)",
+    "layers": [
+        {
+            "id": "IO-LAND-USE-LAND-COVER-MAP",
+            "name": "IO Land Use Land Cover Map (9-class)",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

@@ -1,0 +1,20 @@
+{
+    "title": "Water Bodies",
+    "layers": [
+        {
+            "id": "WATER-BODIES",
+            "name": "Water Bodies ",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "WATER-BODIES-OCCURENCE",
+            "name": "Water Bodies Occurrence",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

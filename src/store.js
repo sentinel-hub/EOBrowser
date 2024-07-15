@@ -12,8 +12,10 @@ import {
   EXPORT_FORMAT,
   SEARCH_PANEL_TABS,
 } from './const';
+import { PLANET_SANDBOX_THEME } from './assets/protected_themes';
 import { DEMInstanceType } from '@sentinel-hub/sentinelhub-js';
-import { COMPARE_SPLIT } from './Tools/ComparePanel/ComparePanel';
+import { COMPARE_SPLIT } from './Tools/ComparePanel/compareConstants';
+import { mergeAndReorderThemes } from './utils';
 
 export const aoiSlice = createSlice({
   name: 'aoi',
@@ -23,6 +25,10 @@ export const aoiSlice = createSlice({
       state.geometry = action.payload.geometry;
       state.bounds = action.payload.bounds;
       state.lastEdited = new Date().toISOString();
+      state.isPlacingVertex = action.payload.isPlacingVertex;
+    },
+    setisPlacingVertex: (state, action) => {
+      state.isPlacingVertex = action.payload;
     },
     reset: (state) => {
       state.geometry = null;
@@ -30,10 +36,12 @@ export const aoiSlice = createSlice({
       state.lastEdited = new Date().toISOString();
       state.isDrawing = false;
       state.shape = null;
+      state.isPlacingVertex = false;
     },
     startDrawing: (state, action) => {
       state.isDrawing = action.payload.isDrawing;
       state.shape = action.payload.shape;
+      state.isPlacingVertex = true;
     },
     clearMap: (state, action) => {
       state.clearMap = action.payload;
@@ -166,6 +174,12 @@ export const authSlice = createSlice({
       token_expiration: null,
       access_token: null,
       terms_privacy_accepted: false,
+      tokenRefreshInProgress: false,
+    },
+    impersonatedUser: {
+      userId: null,
+      accountId: null,
+      name: null,
     },
     anonToken: null,
     kc_idp_hint: null,
@@ -184,11 +198,28 @@ export const authSlice = createSlice({
     setAnonToken: (state, action) => {
       state.anonToken = action.payload;
     },
+    setImpersonatedName: (state, action) => {
+      state.impersonatedUser.name = action.payload;
+    },
+    setImpersonatedIds: (state, action) => {
+      const { impersonatedAccountId, impersonatedUserId } = action.payload;
+
+      if (impersonatedAccountId) {
+        state.impersonatedUser.accountId = impersonatedAccountId;
+      }
+
+      if (impersonatedUserId) {
+        state.impersonatedUser.userId = impersonatedUserId;
+      }
+    },
     setTermsPrivacyAccepted: (state, action) => {
       state.terms_privacy_accepted = action.payload;
     },
     setKcIdpHint: (state, action) => {
       state.kc_idp_hint = action.payload;
+    },
+    setUserTokenRefreshInProgress: (state, action) => {
+      state.user.tokenRefreshInProgress = action.payload;
     },
   },
 });
@@ -213,9 +244,16 @@ export const themesSlice = createSlice({
       state.selectedModeId = action.payload;
     },
     setSelectedModeIdAndDefaultTheme: (state, action) => {
-      state.selectedModeId = action.payload;
+      const { modeId, userHasAccess } = action.payload;
+
+      state.selectedModeId = modeId;
       const modeThemes = MODES.find((mode) => mode.id === state.selectedModeId).themes;
-      state.themesLists[MODE_THEMES_LIST] = modeThemes;
+
+      if (userHasAccess && modeId !== EDUCATION_MODE.id) {
+        state.themesLists[MODE_THEMES_LIST] = mergeAndReorderThemes(modeThemes, PLANET_SANDBOX_THEME);
+      } else {
+        state.themesLists[MODE_THEMES_LIST] = modeThemes;
+      }
 
       if (state.selectedModeId === EDUCATION_MODE.id) {
         state.selectedThemeId = null;
@@ -347,6 +385,8 @@ export const visualizationSlice = createSlice({
     backscatterCoeff: undefined,
     demSource3D: DEMInstanceType.MAPZEN,
     error: undefined,
+    errorCode: undefined,
+    selectedTile: undefined,
   },
   reducers: {
     setVisualizationTime: (state, action) => {
@@ -435,6 +475,9 @@ export const visualizationSlice = createSlice({
     setDemSource3D: (state, action) => {
       state.demSource3D = action.payload;
     },
+    setSelectedTile: (state, action) => {
+      state.selectedTile = action.payload;
+    },
     setEffects: (state, action) => {
       if (action.payload.gainEffect !== undefined) {
         state.gainEffect = action.payload.gainEffect;
@@ -481,6 +524,13 @@ export const visualizationSlice = createSlice({
     },
     setError: (state, action) => {
       state.error = action.payload;
+    },
+    setErrorCode: (state, action) => {
+      state.errorCode = action.payload;
+    },
+    setErrorAndErrorCode: (state, action) => {
+      state.error = action.payload.error;
+      state.errorCode = action.payload.errorCode;
     },
     resetEffects: (state) => {
       state.gainEffect = 1;
@@ -583,6 +633,9 @@ export const visualizationSlice = createSlice({
       if (action.payload.backscatterCoeff !== undefined) {
         state.backscatterCoeff = action.payload.backscatterCoeff;
       }
+      if (action.payload.selectedTile !== undefined) {
+        state.selectedTile = action.payload.selectedTile;
+      }
     },
     reset: (state) => {
       state.fromTime = undefined;
@@ -610,6 +663,7 @@ export const visualizationSlice = createSlice({
       state.orthorectification = undefined;
       state.backscatterCoeff = undefined;
       state.demSource3D = DEMInstanceType.MAPZEN;
+      state.selectedTile = undefined;
     },
   },
 });
@@ -627,6 +681,11 @@ export const tabsSlice = createSlice({
 
     setSelectedTabSearchPanelIndex: (state, action) => {
       state.selectedTabSearchPanelIndex = action.payload;
+    },
+
+    setTabParams: (state, action) => {
+      state.selectedTabIndex = action.payload.selectedTabIndex;
+      state.selectedTabSearchPanelIndex = action.payload.selectedTabSearchPanelIndex;
     },
   },
 });
@@ -734,7 +793,7 @@ export const languageSlice = createSlice({
   },
 });
 
-export const modeSlice = createSlice({
+const modeSlice = createSlice({
   name: 'modes',
   initialState: {
     selectedMode: undefined,
@@ -1003,6 +1062,58 @@ export const elevationProfileSlice = createSlice({
   },
 });
 
+export const tutorialSlice = createSlice({
+  name: 'tutorial',
+  initialState: {
+    id: null,
+    open: false,
+    stepIndex: 0,
+    tutorialIdToShowUrl: null,
+  },
+  reducers: {
+    setStepIndex: (state, action) => {
+      state.stepIndex = action.payload;
+    },
+
+    setOpen: (state, action) => {
+      state.open = action.payload;
+    },
+
+    setTutorialId: (state, action) => {
+      if (state.id !== action.payload) {
+        state.stepIndex = 0;
+      }
+      state.id = action.payload;
+    },
+
+    setTutorialIdToShowUrl: (state, action) => {
+      state.tutorialIdToShowUrl = action.payload;
+    },
+
+    openTutorial: (state, action) => {
+      const { id, stepIndex } = action.payload;
+
+      state.id = id;
+      state.stepIndex = stepIndex || 0;
+      state.open = true;
+    },
+
+    closeTutorial: (state) => {
+      state.id = null;
+      state.stepIndex = 0;
+      state.open = false;
+      state.tutorialIdToShowUrl = null;
+    },
+
+    reset: (state) => {
+      state.id = null;
+      state.open = false;
+      state.stepIndex = 0;
+      state.tutorialIdToShowUrl = null;
+    },
+  },
+});
+
 const reducers = combineReducers({
   aoi: aoiSlice.reducer,
   loi: loiSlice.reducer,
@@ -1024,6 +1135,7 @@ const reducers = combineReducers({
   commercialData: commercialDataSlice.reducer,
   spectralExplorer: spectralExplorerSlice.reducer,
   elevationProfile: elevationProfileSlice.reducer,
+  tutorial: tutorialSlice.reducer,
 });
 
 const store = configureStore({

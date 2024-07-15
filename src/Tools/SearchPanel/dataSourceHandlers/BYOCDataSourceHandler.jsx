@@ -1,6 +1,7 @@
 import React from 'react';
 import { BYOCLayer, DATASET_BYOC, BYOCSubTypes, CRS_EPSG4326 } from '@sentinel-hub/sentinelhub-js';
 import { t } from 'ttag';
+import moment from 'moment';
 
 import DataSourceHandler from './DataSourceHandler';
 import CopernicusServicesDataSourceHandler from './CopernicusServicesDataSourceHandler';
@@ -11,6 +12,7 @@ import { filterLayers } from './filter';
 import { constructV3Evalscript, isFunction } from '../../../utils';
 import { DATASOURCES } from '../../../const';
 import { reprojectGeometry } from '../../../utils/reproject';
+import { PLANET_SANDBOX_COLLECTIONS } from '../../../assets/protected_themes';
 
 const CRS_EPSG4326_urn = 'urn:ogc:def:crs:EPSG::4326';
 
@@ -41,7 +43,8 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
         l instanceof BYOCLayer &&
         l.collectionId &&
         !this.COPERNICUS_SERVICES_KNOWN_COLLECTIONS.includes(l.collectionId) &&
-        !this.OTHER_KNOWN_COLLECTIONS.includes(l.collectionId),
+        !this.OTHER_KNOWN_COLLECTIONS.includes(l.collectionId) &&
+        !Object.values(PLANET_SANDBOX_COLLECTIONS).includes(l.collectionId),
     );
     if (customLayers.length === 0) {
       return false;
@@ -143,7 +146,7 @@ export default class BYOCDataSourceHandler extends DataSourceHandler {
         reprojectGeometry(t.geometry, { toCrs: CRS_EPSG4326.authId });
       }
       return {
-        sensingTime: t.sensingTime,
+        sensingTime: moment(t.sensingTime).isValid() ? t.sensingTime : null,
         geometry: t.geometry,
         datasource: this.datasource,
         datasetId: datasetId,

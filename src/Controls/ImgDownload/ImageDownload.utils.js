@@ -42,8 +42,9 @@ import { WARNINGS } from './ImageDownloadWarningPanel';
 import { refetchWithDefaultToken } from '../../utils/fetching.utils';
 import { reqConfigMemoryCache, MAX_SH_IMAGE_SIZE, DISABLED_ORTHORECTIFICATION } from '../../const';
 
-import copernicus from '../../junk/EOBCommon/assets/copernicus.png';
-import SHlogo from '../../junk/EOBCommon/assets/shLogo.png';
+import copernicus from './assets/copernicus.png';
+import SHlogo from './assets/shLogo.png';
+import SHlogoLarge from './assets/shLogoLarge.png';
 import { isAuthIdUtm } from '../../utils/utm';
 import { reprojectGeometry } from '../../utils/reproject';
 import { getBboxFromCoords } from '../../utils/geojson.utils';
@@ -732,7 +733,6 @@ export async function addImageOverlays(
   if (drawAoiGeoToImg) {
     drawGeometryOnImg(ctx, aoiGeometry, bounds);
   }
-
   return await canvasToBlob(canvas, mimeType);
 }
 
@@ -1103,7 +1103,7 @@ export function getPixelCoordinates(lng, lat, mercatorBBox, imageWidth, imageHei
   };
 }
 
-export function ensureMercatorBBox(bbox) {
+function ensureMercatorBBox(bbox) {
   const minPoint = turfPoint([bbox.minX, bbox.minY]);
   const maxPoint = turfPoint([bbox.maxX, bbox.maxY]);
 
@@ -1120,14 +1120,15 @@ export function ensureMercatorBBox(bbox) {
 }
 
 async function drawLogos(ctx, logosPartitionWidth, bottomY, drawCopernicusLogo) {
-  const sentinelHubLogo = await loadImage(SHlogo);
+  const proposedWidth = Math.max(ctx.canvas.width * 0.05, 50);
+  const taglineThreshold = 125;
+  const sentinelHubLogo = await loadImage(proposedWidth >= taglineThreshold ? SHlogoLarge : SHlogo);
   let copernicusLogo;
 
   if (drawCopernicusLogo) {
     copernicusLogo = await loadImage(copernicus);
   }
 
-  const proposedWidth = Math.max(ctx.canvas.width * 0.05, 50);
   const imagePadding = 10;
   const ratio = proposedWidth / sentinelHubLogo.width;
 
@@ -1219,7 +1220,7 @@ function getWrappedLines(ctx, text, maxWidth) {
   return lines;
 }
 
-export async function loadImage(url) {
+async function loadImage(url) {
   return new Promise((resolve, reject) => {
     if (!url) {
       reject(t`Error fetching image: url is empty!`);
@@ -1235,7 +1236,7 @@ export async function loadImage(url) {
   });
 }
 
-export function drawLegendImage(ctx, legendImage, left, showCaptions) {
+function drawLegendImage(ctx, legendImage, left, showCaptions) {
   if (legendImage === null || legendImage === undefined) {
     return;
   }

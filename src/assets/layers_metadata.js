@@ -20,6 +20,18 @@ import {
   DEM_MAPZEN,
   DEM_COPERNICUS_30,
   DEM_COPERNICUS_90,
+  PLANET_SCOPE,
+  SKY_SAT,
+  ABOVEGROUND_CARBON_DENSITY,
+  CANOPY_HEIGHT,
+  CANOPY_COVER,
+  LST_100M,
+  LST_1000M,
+  SWC_100M,
+  SWC_1000M,
+  PLANET_BASEMAPS,
+  ANALYSIS_READY_PLANETSCOPE,
+  ROAD_AND_BUILDING_DETECTION,
 } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 
 import { S5O3Markdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
@@ -29,6 +41,7 @@ import { S5COMarkdown } from '../Tools/SearchPanel/dataSourceHandlers/Datasource
 import { S5HCHOMarkdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
 import { S5CH4Markdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
 import { S5AERAIMarkdown } from '../Tools/SearchPanel/dataSourceHandlers/DatasourceRenderingComponents/dataSourceTooltips/Sentinel5Tooltip';
+import { PLANET_SANDBOX_COLLECTIONS } from './protected_themes';
 
 export const PREDEFINED_LAYERS_METADATA = [
   {
@@ -4630,5 +4643,176 @@ export const PREDEFINED_LAYERS_METADATA = [
     },
     description: () =>
       t`# Sepia Visualization\n\n\n\nThis script returns a sepia visualization of a digital elevation model, assigning continuous colors to the elevation borders.\n\nIt is possible to set custom min and max values in the evalscript by setting defaultVis to false and setting the min and max variables to the desired values.\n\n\n\nMore info [here.](https://custom-scripts.sentinel-hub.com/dem/dem-sepia/)`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_SCOPE], layerId: 'TRUE-COLOR' }],
+    description: () =>
+      t`The true color product maps PlanetScope band values red, green, and blue which roughly correspond to red, green, and blue part of the spectrum, respectively, to R, G, and B components. More [info](https://custom-scripts.sentinel-hub.com/planet_scope/true_color/). `,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_SCOPE], layerId: 'FALSE-COLOR' }],
+    description: () =>
+      t`The False color infrared composite maps near-infrared spectral band nir with red and green bands to sRGB components directly. It is most commonly used to assess plant density and healht, as plants reflect near infrared and green light, while absorbing red. Since they reflect more near infrared than green, plant-covered land appears deep red. Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black. More [info](https://custom-scripts.sentinel-hub.com/planet_scope/false_color).`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_SCOPE], layerId: 'NDVI' }],
+    description: () =>
+      t`The well known and widely used NDVI is a simple, but effective index for quantifying green vegetation. It normalizes green leaf scattering in Near Infra-red wavelengths with chlorophyll absorption in red wavelengths. The value range of the NDVI is -1 to 1. Negative values of NDVI (values approaching -1) correspond to water. Values close to zero (-0.1 to 0.1) generally correspond to barren areas of rock, sand, or snow. Low, positive values represent shrub and grassland (approximately 0.2 to 0.4), while high values indicate temperate and tropical rainforests (values approaching 1). More [info](https://custom-scripts.sentinel-hub.com/planet_scope/ndvi).`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_SCOPE], layerId: 'NDWI' }],
+    description: () =>
+      t`The NDWI is useful for water body mapping, as water bodies strongly absorb light in visible to infrared electromagnetic spectrum. NDWI uses green and near infrared bands to highlight water bodies. It is sensitive to built-up land and can result in over-estimation of water bodies. Index values greater than 0.5 usually correspond to water bodies. Vegetation usually corresponds to much smaller values and built-up areas to values between zero and 0.2. More [info](https://custom-scripts.sentinel-hub.com/planet_scope/ndwi).  `,
+  },
+  {
+    match: [
+      { datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_SCOPE], layerId: 'UDM2-CLOUDSNOW-CLASSIFICATION' },
+    ],
+    description: () =>
+      t`PlanetScope has several usable data mask (UDM2) bands. The clear band gives information on whether the pixel is clear, meaning that the surface is clearly visible. If it’s not clear, that means it’s classified as either shadow, snow, light haze, heavy haze or cloud. More [info](https://custom-scripts.sentinel-hub.com/planet_scope/cloud_classification).`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[SKY_SAT], layerId: 'TRUE-COLOR' }],
+    description: () =>
+      t`The true color product combines Skysat band values red, blue, and green to create a true color image. More [info](https://custom-scripts.sentinel-hub.com/skysat/true_color). `,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[SKY_SAT], layerId: 'NDVI' }],
+    description: () =>
+      t`The well known and widely used NDVI is a simple, but effective index for quantifying green vegetation. It normalizes green leaf scattering in Near Infra-red wavelengths with chlorophyll absorption in red wavelengths. The value range of the NDVI is -1 to 1. Negative values of NDVI (values approaching -1) correspond to water. Values close to zero (-0.1 to 0.1) generally correspond to barren areas of rock, sand, or snow. Low, positive values represent shrub and grassland (approximately 0.2 to 0.4), while high values indicate temperate and tropical rainforests (values approaching 1). More [info](https://custom-scripts.sentinel-hub.com/skysat/ndvi).`,
+  },
+  {
+    match: [
+      {
+        datasourceId: PLANET_SANDBOX_COLLECTIONS[ABOVEGROUND_CARBON_DENSITY],
+        layerId: 'ABOVEGROUND-CARBON-DENSITY',
+      },
+    ],
+    description: () =>
+      t`Aboveground carbon density quantifies the expected density of carbon stored in woody biomass across the landscape, measured in mass per area (megagrams of carbon per hectare). It is not a direct estimate of the total carbon in that pixel, as the spatial resolution of each pixel is less than one hectare. To estimate total carbon in a pixel, users should normalize these values to account for the size of each pixel, or average the density values to 1 hectare in an equal area projection. More [info](https://custom-scripts.sentinel-hub.com/planetary-variables/forest-carbon-diligence/aboveground-carbon-density/).`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[CANOPY_HEIGHT], layerId: 'CANOPY-HEIGHT' }],
+    description: () =>
+      t`Canopy height quantifies the average stand height of trees within each pixel. Because this is a spatial average over a moderate resolution, the modeled height values are shorter than the tallest individual tree within a pixel. More [info](https://custom-scripts.sentinel-hub.com/planetary-variables/forest-carbon-diligence/canopy-height/). `,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[CANOPY_COVER], layerId: 'CANOPY-COVER' }],
+    description: () =>
+      t`Canopy cover quantifies the percentage of area occupied by trees within a pixel, where a tree is defined as vegetation 5 meters or taller. This metric will be most sensitive to tree clearing events like timber harvest or deforestation, but is also sensitive to seasonal leaf-on variation and to drought. More [info](https://custom-scripts.sentinel-hub.com/planetary-variables/forest-carbon-diligence/canopy-cover/).  `,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[LST_100M], layerId: 'LST-100' }],
+    description: () =>
+      t`Land Surface Temperature (LST) is the thermodynamic temperature of Earth’s surface. LST is a key variable controlling energy, and water fluxes over the land surface and atmosphere interface. In view of increasing extreme temperature events and a growing population exposed to these events, LST is increasingly relevant to sustainably manage food and water systems and urban living conditions. This product represents near real-time measurements twice a day at spatial resolutions of 100 m. More [info](https://custom-scripts.sentinel-hub.com/planetary-variables/land-surface-temperature/land-surface-temperature-visualization/).`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[LST_1000M], layerId: 'LST-1000' }],
+    description: () =>
+      t`Land Surface Temperature (LST) is the thermodynamic temperature of Earth’s surface. LST is a key variable controlling energy, and water fluxes over the land surface and atmosphere interface. In view of increasing extreme temperature events and a growing population exposed to these events, LST is increasingly relevant to sustainably manage food and water systems and urban living conditions. This product represents near real-time measurements twice a day at spatial resolutions of 1000 m. More [info](https://custom-scripts.sentinel-hub.com/planetary-variables/land-surface-temperature/land-surface-temperature-visualization/).`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[SWC_100M], layerId: 'SWC-100' }],
+    description: () =>
+      t`Soil Water Content (SWC) measures the amount of water in a unit volume of soil, which is crucial information for drought monitoring, water management, and climate risk assessment. This product provides near-daily measurements at spatial resolutions of 100 m. More [info](https://custom-scripts.sentinel-hub.com/planetary-variables/soil-water-content/soil-water-content-visualization/).`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[SWC_1000M], layerId: 'SWC-1000' }],
+    description: () =>
+      t`Soil Water Content (SWC) measures the amount of water in a unit volume of soil, which is crucial information for drought monitoring, water management, and climate risk assessment. This product provides near-daily measurements at spatial resolutions of 1000 m. More [info](https://custom-scripts.sentinel-hub.com/planetary-variables/soil-water-content/soil-water-content-visualization/).`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_BASEMAPS], layerId: 'TRUE-COLOR' }],
+    description: () => '',
+  },
+  {
+    match: [
+      {
+        datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_BASEMAPS],
+        layerId: 'TRUE-COLOR-UDM2-TRANSPARENCY',
+      },
+    ],
+    description: () => '',
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_BASEMAPS], layerId: 'FALSE-COLOR' }],
+    description: () => '',
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_BASEMAPS], layerId: 'NDVI' }],
+    description: () => '',
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_BASEMAPS], layerId: 'NDWI' }],
+    description: () => '',
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_BASEMAPS], layerId: 'PIXEL-PROVENANCE' }],
+    description: () => '',
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_BASEMAPS], layerId: 'UDM2-CONFIDENCE' }],
+    description: () => '',
+  },
+  {
+    match: [
+      { datasourceId: PLANET_SANDBOX_COLLECTIONS[PLANET_BASEMAPS], layerId: 'UDM2-MASK-CLASSIFICATION' },
+    ],
+    description: () => '',
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[ANALYSIS_READY_PLANETSCOPE], layerId: 'TRUE-COLOR' }],
+    description: () =>
+      t`The true color product maps Analysis-Ready PlanetScope band values red, green, and blue which roughly correspond to red, green, and blue part of the spectrum, respectively, to R, G, and B components.`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[ANALYSIS_READY_PLANETSCOPE], layerId: 'FALSE-COLOR' }],
+    description: () =>
+      t`The False color infrared composite maps near-infrared spectral band nir with red and green bands to sRGB components directly. It is most commonly used to assess plant density and health, as plants reflect near infrared and green light, while absorbing red. Since they reflect more near infrared than green, plant-covered land appears deep red. Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[ANALYSIS_READY_PLANETSCOPE], layerId: 'NDVI' }],
+    description: () =>
+      t`The well known and widely used NDVI is a simple, but effective index for quantifying green vegetation. It normalizes green leaf scattering in Near Infra-red wavelengths with chlorophyll absorption in red wavelengths. The value range of the NDVI is -1 to 1. Negative values of NDVI (values approaching -1) correspond to water. Values close to zero (-0.1 to 0.1) generally correspond to barren areas of rock, sand, or snow. Low, positive values represent shrub and grassland (approximately 0.2 to 0.4), while high values indicate temperate and tropical rainforests (values approaching 1).`,
+  },
+  {
+    match: [
+      {
+        datasourceId: PLANET_SANDBOX_COLLECTIONS[ANALYSIS_READY_PLANETSCOPE],
+        layerId: '0_TRUE-COLOR-CLOUDMASKED',
+      },
+    ],
+    description: () =>
+      t`The first QA Band, Cloud and shadow mask  band gives information on whether the pixel is clear, meaning that the surface is clearly visible. If it’s not clear, that means it’s classified as either bright cloud, shadow, haze, adjacent clouds, additional cloud shadow or haze, or other. The script masks out all pixels where band QA1 does not have a value of 1 or “clear”. The resulting image has values of zero set for all four surface reflectance bands where clouds, cloud contamination, shadows, snow, etc. have been detected. `,
+  },
+  {
+    match: [
+      {
+        datasourceId: PLANET_SANDBOX_COLLECTIONS[ANALYSIS_READY_PLANETSCOPE],
+        layerId: 'CLOUD-CLASSIFICATION',
+      },
+    ],
+    description: () =>
+      t`Analysis-Ready PlanetScope has several classifications within QA Band 1, “Cloud and shadow mask”. A value of 1 is clear, meaning that the surface is clearly visible. If it’s not clear, that means it’s classified as having some other type of contamination. In the script, each of the non-clear pixels in QA Band 1 are classified with a unique color, and the pixels that are clear are returned transparent.`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[ROAD_AND_BUILDING_DETECTION], layerId: 'BUILDINGS' }],
+    description: () =>
+      t`This layer adds a threshold to the pixel values surfaced in the Roads and Buildings layer so that it visualizes only pixels that have a high likelihood of being a building. The default threshold we’ve chosen is a pixel value greater than 127, but if you wish to have a more aggressive filter, you can adjust that to a higher value. If you wish to have a more lenient filter, you can decrease that value.`,
+  },
+  {
+    match: [{ datasourceId: PLANET_SANDBOX_COLLECTIONS[ROAD_AND_BUILDING_DETECTION], layerId: 'ROADS' }],
+    description: () =>
+      t`This layer adds a threshold to the pixel values surfaced in the Roads and Buildings layer so that it visualizes only pixels that have a high likelihood of being a road. The default threshold we’ve chosen is a pixel value greater than 127, but if you wish to have a more aggressive filter, you can adjust that to a higher value. If you wish to have a more lenient filter, you can decrease that value`,
+  },
+  {
+    match: [
+      {
+        datasourceId: PLANET_SANDBOX_COLLECTIONS[ROAD_AND_BUILDING_DETECTION],
+        layerId: 'ROADS-AND-BUILDINGS',
+      },
+    ],
+    description: () =>
+      t`This layer visualizes 2 bands - one for a road class in red and one for a building class in green. The greater the pixel value (and thus brighter the visualized color), the greater the probability that the pixel is classified correctly. This means bright red pixels have a high likelihood of being a road, while the more muted reds have a lesser likelihood of being a road.`,
   },
 ];

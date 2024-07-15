@@ -11,10 +11,37 @@ import { getRecommendedResolution, switchGeometryCoordinates } from '../../utils
 import { checkAllMandatoryOutputsExist } from '../../utils/parseEvalscript';
 import { reprojectGeometry } from '../../utils/reproject';
 
-function getNicename({ extension, datasetId, layerId, customSelected, fromTime, toTime }) {
-  return `${getDatasetLabel(datasetId)}-${
-    customSelected ? 'Custom' : layerId
-  }-${fromTime.toISOString()}-${toTime.toISOString()}.${extension}`;
+const CUSTOM_LAYER_ID = 'Custom';
+
+export function getLayerId(layerId, customSelected) {
+  return customSelected ? CUSTOM_LAYER_ID : layerId;
+}
+
+export function getLayerLabel(label, customSelected, customLayerCounter = 0) {
+  if (customSelected) {
+    if (customLayerCounter) {
+      return `${CUSTOM_LAYER_ID}_${customLayerCounter}`;
+    } else {
+      return CUSTOM_LAYER_ID;
+    }
+  }
+  return label;
+}
+
+function getNicename({
+  extension,
+  datasetId,
+  layerId,
+  customSelected,
+  fromTime,
+  toTime,
+  customLayerCounter = 0,
+}) {
+  return `${getDatasetLabel(datasetId)}-${getLayerLabel(
+    layerId,
+    customSelected,
+    customLayerCounter,
+  )}-${fromTime.toISOString()}-${toTime.toISOString()}.${extension}`;
 }
 
 function filterDataAfterTime(data, fromTime) {
@@ -27,15 +54,19 @@ function filterDataAfterTime(data, fromTime) {
 
 export const handleZipCSVExport = async (data, times, isCloudCoverageDataAvailable, comparedLayers) => {
   const zip = new JSZip();
+  let customLayerCounter = 0;
   for (let i = 0; i < data.length; i++) {
     const comparedLayer = comparedLayers.find((cLayer) => data[i].title.includes(cLayer.id));
+    const customSelected = !!comparedLayer.evalscript;
     const name = getCSVName({
       times: times,
       id: comparedLayer.id,
       layerId: comparedLayer.layerId,
       datasetId: comparedLayer.datasetId,
-      customSelected: !!comparedLayer.evalscript,
+      customSelected: customSelected,
+      customLayerCounter: customLayerCounter,
     });
+
     const csv = getCSVContent({
       times: times,
       id: comparedLayer.id,
@@ -44,10 +75,17 @@ export const handleZipCSVExport = async (data, times, isCloudCoverageDataAvailab
     });
 
     // swap out the id of the compared layer for the actual layerId in the column names
-    const fixedCsv = csv.replaceAll(comparedLayer.id, comparedLayer.layerId);
+    const fixedCsv = csv.replaceAll(
+      comparedLayer.id,
+      getLayerLabel(comparedLayer.layerId, customSelected, customLayerCounter),
+    );
 
     const csvBlob = new Blob([fixedCsv]);
     zip.file(name, csvBlob);
+
+    if (customSelected) {
+      customLayerCounter += 1;
+    }
   }
 
   if (Object.keys(zip.files).length > 0) {
@@ -67,14 +105,14 @@ export const handleSingleCSVExport = (
 ) => {
   const name = getCSVName({
     times: times,
-    id: layerId,
+    id: getLayerId(layerId, customSelected),
     layerId: layerId,
     datasetId: datasetId,
     customSelected: customSelected,
   });
   const csv = getCSVContent({
     times: times,
-    id: layerId,
+    id: getLayerId(layerId, customSelected),
     data: data,
     isCloudCoverageDataAvailable: isCloudCoverageDataAvailable,
   });
@@ -82,7 +120,7 @@ export const handleSingleCSVExport = (
   FileSaver.saveAs(new Blob([csv]), name);
 };
 
-export function getCSVName({ times, id, layerId, datasetId, customSelected }) {
+function getCSVName({ times, id, layerId, datasetId, customSelected, customLayerCounter = 0 }) {
   const fromTime = times.from[id];
   const toTime = times.to[id];
   const nicename = getNicename({
@@ -92,12 +130,12 @@ export function getCSVName({ times, id, layerId, datasetId, customSelected }) {
     customSelected: customSelected,
     fromTime: fromTime,
     toTime: toTime,
+    customLayerCounter: customLayerCounter,
   });
 
   return nicename;
 }
-
-export function getCSVContent({ times, id, data, isCloudCoverageDataAvailable }) {
+function getCSVContent({ times, id, data, isCloudCoverageDataAvailable }) {
   const fromTime = times.from[id];
   const filteredData = filterDataAfterTime(data, fromTime);
 
@@ -106,7 +144,21 @@ export function getCSVContent({ times, id, data, isCloudCoverageDataAvailable })
     dropColumns.push('cloudCoveragePercent');
   }
 
-  return constructCSVFromData(filteredData, dropColumns);
+  const uniqueFilteredData = {};
+
+  Object.keys(filteredData).forEach((key) => {
+    const uniqueData = filteredData[key].reduce((acc, curr) => {
+      const found = acc.find((item) => item.date.getTime() === curr.date.getTime());
+      if (!found) {
+        acc.push(curr);
+      }
+      return acc;
+    }, []);
+    uniqueData.sort((a, b) => a.date.getTime() - b.date.getTime());
+    uniqueFilteredData[key] = uniqueData;
+  });
+
+  return constructCSVFromData(uniqueFilteredData, dropColumns);
 }
 
 export function constructCSVFromData(data, dropColumns) {

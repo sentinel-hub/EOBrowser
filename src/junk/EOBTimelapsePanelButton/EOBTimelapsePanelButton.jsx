@@ -1,12 +1,15 @@
 import React from 'react';
 import { t } from 'ttag';
 
+import { MenuItem } from '../../components/SideBarMenuItem/MenuItem';
+
 import {
   getLoggedInErrorMsg,
   getLayerNotSelectedMsg,
   getCompareModeErrorMsg,
   getDatasourceNotSupportedMsg,
   zoomTooLow3DMsg,
+  getFinishDrawingMsg,
 } from '../ConstMessages';
 import store, { modalSlice, timelapseSlice } from '../../store';
 
@@ -21,48 +24,56 @@ export class EOBTimelapsePanelButton extends React.Component {
     } else if (this.props.is3D) {
       store.dispatch(modalSlice.actions.addModal({ modal: ModalId.TIMELAPSE }));
     } else {
-      store.dispatch(timelapseSlice.actions.toggleTimelapseAreaPreview());
+      store.dispatch(timelapseSlice.actions.setTimelapseAreaPreview(true));
     }
   };
 
   render() {
-    const isLayerSelected = !!this.props.selectedResult;
-    const isTimelapseSupported =
-      isLayerSelected && this.props.selectedResult.getDates && this.props.selectedResult.baseUrls.WMS;
+    const { selectedResult, isLoggedIn, selectedTabIndex, is3D, zoomTooLow, isPlacingVertex, isOpen } =
+      this.props;
+
+    const isLayerSelected = !!selectedResult;
+    const isTimelapseSupported = isLayerSelected && selectedResult.getDates && selectedResult.baseUrls.WMS;
 
     const errMsg = this.props.isCompareMode
       ? getCompareModeErrorMsg()
-      : !this.props.isLoggedIn
+      : !isLoggedIn
       ? getLoggedInErrorMsg()
-      : !isLayerSelected || this.props.selectedTabIndex !== TABS.VISUALIZE_TAB
+      : !isLayerSelected || selectedTabIndex !== TABS.VISUALIZE_TAB
       ? getLayerNotSelectedMsg()
       : !isTimelapseSupported
       ? getDatasourceNotSupportedMsg()
-      : this.props.zoomTooLow
+      : zoomTooLow
       ? zoomTooLow3DMsg()
+      : isPlacingVertex
+      ? getFinishDrawingMsg()
       : null;
     const isEnabled = errMsg === null;
-    const errorMessage = errMsg ? `(${errMsg})` : '';
+    const errorMessage = errMsg ? `\n(${errMsg})` : '';
     const title = t`Create timelapse animation` + ` ${errorMessage}`;
     return (
-      <div
-        className={`timelapsePanelButton panelButton floatItem ${this.props.is3D ? 'is3d' : ''}`}
-        title={title}
-        onClick={(ev) => {
-          if (!isEnabled) {
-            this.props.onErrorMessage(title);
-            return;
-          }
-          this.onButtonClick();
-        }}
-      >
-        {
-          // jsx-a11y/anchor-is-valid
-          // eslint-disable-next-line
-          <a className={`drawGeometry ${isEnabled ? '' : 'disabled'}`}>
-            <i className="fa fa-film" />
-          </a>
-        }
+      <div className={`timelapsePanelButton panelButton floatItem ${is3D ? 'is3d' : ''}`}>
+        {isOpen && !is3D && (
+          <MenuItem
+            iconClassName="fa fa-close"
+            title={t`Remove geometry`}
+            onClick={() => {
+              store.dispatch(timelapseSlice.actions.setTimelapseAreaPreview(false));
+            }}
+          />
+        )}
+        <MenuItem
+          className={`drawGeometry ${isEnabled ? '' : 'disabled'}`}
+          iconClassName="fa fa-film"
+          title={title}
+          onClick={() => {
+            if (!isEnabled) {
+              this.props.onErrorMessage(title);
+              return;
+            }
+            this.onButtonClick();
+          }}
+        />
       </div>
     );
   }

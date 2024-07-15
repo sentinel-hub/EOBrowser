@@ -1,0 +1,48 @@
+{
+    "title": "HLS",
+    "layers": [
+        {
+            "id": "2_FALSE-COLOR",
+            "name": "False Color",
+            "description": "Based on the combination of bands NIR narrow, red and green",
+            "dataset": "HLS",
+            "legendUrl": null
+        },
+        {
+            "id": "3_NDVI",
+            "name": "NDVI",
+            "description": "Normalized difference of bands NIR narrow and red",
+            "dataset": "HLS",
+            "legendUrl": null
+        },
+        {
+            "id": "4_MOISTURE-INDEX",
+            "name": "Moisture Index",
+            "description": "Normalized difference of bands SWIR1 and NIR narrow",
+            "dataset": "HLS",
+            "legendUrl": null
+        },
+        {
+            "id": "5_SWIR",
+            "name": "SWIR",
+            "description": "Based on the combination of bands SIWR2, NIR narrow and red",
+            "dataset": "HLS",
+            "legendUrl": null
+        },
+        {
+            "id": "6_NDWI",
+            "name": "NDWI",
+            "description": "Normalized difference of bands green and NIR narrow",
+            "dataset": "HLS",
+            "legendUrl": null
+        },
+        {
+            "id": "TRUE-COLOR",
+            "name": "True Color",
+            "description": "Based on the combination of bands blue, green and red",
+            "dataset": "HLS",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

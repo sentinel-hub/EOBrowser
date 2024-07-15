@@ -1,7 +1,7 @@
 import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
 import moment from 'moment';
 
-import { DEFAULT_THEMES } from '../../../assets/default_themes';
+import { DEFAULT_THEMES, DEFAULT_THEME_ID } from '../../../assets/default_themes';
 import { DATASOURCES, reqConfigMemoryCache } from '../../../const';
 import { YYYY_MM_REGEX } from './PlanetBasemapDataSourceHandler';
 
@@ -43,8 +43,8 @@ export function getLayersWithDate(allLayers, selectedDate) {
 
 // If NDVI layer is currently selected and date changes, we will get a new list of layers where the date macthes
 // Find the NDVI layer from the new list and select this layer as the selected layer
-export async function getSameLayerWithDifferentDate(oldLayerID, selectedDate) {
-  const defaultTheme = DEFAULT_THEMES.find((theme) => theme.id === 'DEFAULT-THEME');
+async function getSameLayerWithDifferentDate(oldLayerID, selectedDate) {
+  const defaultTheme = DEFAULT_THEMES.find((theme) => theme.id === DEFAULT_THEME_ID);
   const planetNicfiTheme = defaultTheme.content.find((theme) => theme.name === DATASOURCES.PLANET_NICFI);
   const allLayers = await LayersFactory.makeLayers(planetNicfiTheme.url, null, null, reqConfigMemoryCache);
   const layersWithDate = getLayersWithDate(allLayers, selectedDate);

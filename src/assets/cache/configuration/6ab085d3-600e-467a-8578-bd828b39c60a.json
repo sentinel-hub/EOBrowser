@@ -1,0 +1,244 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE/layers/__FIS_4_NDSI",
+        "id": "__FIS_4_NDSI",
+        "title": "__FIS_4_NDSI",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction index(x, y) {\n\treturn (x - y) / (x + y);\n}\n\nconst NGDR = index(B03, B04);\nconst bRatio = (B03 - 0.175) / (0.39 - 0.175);\n\nconst isCloud = bRatio > 1 || (bRatio > 0 && NGDR > 0);\nconst ndwi = index(B03, B11);\n//return cloud ? [Number.NaN, 1] : [ndvi, 0];\nreturn isCloud ? [ndwi, 1] : [ndwi, 0];\n\n//Reference: https://earth.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-2a/algorithm\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-21T08:18:27.260047Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/sources/1"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 100,
+            "type": "S2L1C"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE/layers/1_TRUE_COLOR",
+        "id": "1_TRUE_COLOR",
+        "title": "True color",
+        "description": "Based on bands 4, 3, 2",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nlet minVal = 0.0;\nlet maxVal = 0.4;\n\nlet viz = new HighlightCompressVisualizer(minVal, maxVal);\n\nfunction setup() {\n   return {\n    input: [\"B04\", \"B03\", \"B02\", \"dataMask\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(samples) {\n    let val = [samples.B04, samples.B03, samples.B02,samples.dataMask];\n    return viz.processList(val);\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-21T08:18:27.277224Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/sources/1"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "previewMode": "EXTENDED_PREVIEW",
+            "type": "S2L1C"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE/layers/2_FALSE_COLOR",
+        "id": "2_FALSE_COLOR",
+        "title": "False color",
+        "description": "Based on bands 8, 4, 3",
+        "styles": [
+            {
+                "name": "RGB",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nlet minVal = 0.0;\nlet maxVal = 0.4;\n\nlet viz = new HighlightCompressVisualizer(minVal, maxVal);\n\nfunction setup() {\n  return {\n    input: [\"B03\", \"B04\", \"B08\", \"dataMask\"],\n    output: { bands: 4 }\n  };\n}\n\n\nfunction evaluatePixel(samples) {\n    let val = [samples.B08, samples.B04, samples.B03, samples.dataMask];\n    return viz.processList(val);\n}"
+            }
+        ],
+        "orderHint": 1,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-21T08:18:27.299277Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/sources/1"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "previewMode": "EXTENDED_PREVIEW",
+            "type": "S2L1C"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE/layers/3_TONEMAPPED-NATURAL-COLOR",
+        "id": "3_TONEMAPPED-NATURAL-COLOR",
+        "title": "Highlight Optimized Natural Color",
+        "description": "Enhanced natural color visualization",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n   return {\n    input: [\"B04\", \"B03\", \"B02\", \"dataMask\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(samples) {\n\tvar R = samples.B04 > 0.19595917942 ? Math.cbrt(0.6 * samples.B04) : 2.5 * samples.B04;\n\tvar G = samples.B03 > 0.19595917942 ? Math.cbrt(0.6 * samples.B03) : 2.5 * samples.B03;\n\tvar B = samples.B02 > 0.19595917942 ? Math.cbrt(0.6 * samples.B02) : 2.5 * samples.B02;\n\treturn [R, G, B, samples.dataMask];\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-21T08:18:27.271960Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/sources/1"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "S2L1C"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE/layers/4_NDSI",
+        "id": "4_NDSI",
+        "title": "NDSI",
+        "description": "Based on combination of bands (B3 - B11)/(B3 + B11)",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//Reference: https://earth.esa.int/web/sentinel/technical-guides/sentinel-2-msi/level-2a/algorithm\n\nlet viz = new Identity();\n\nfunction setup() {\n  return {\n    input: [\"B03\", \"B11\", \"B04\", \"B02\", \"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n      { id: \"eobrowserStats\", bands: 2, sampleType: \"FLOAT32\" },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n  let val = index(samples.B03, samples.B11);\n  let imgVals = null;\n  // The library for tiffs works well only if there is only one channel returned.\n  // So we encode the \"no data\" as NaN here and ignore NaNs on frontend.\n  const indexVal = samples.dataMask === 1 ? val : NaN;\n\n  if (val > 0.42) imgVals = [0, 0.8, 1, samples.dataMask];\n  else\n    imgVals = [\n      2.5 * samples.B04,\n      2.5 * samples.B03,\n      2.5 * samples.B02,\n      samples.dataMask,\n    ];\n\n  const NGDR = index(samples.B03, samples.B04);\n  const bRatio = (samples.B03 - 0.175) / (0.39 - 0.175);\n\n  const isCloud = bRatio > 1 || (bRatio > 0 && NGDR > 0);\n\n  return {\n    default: imgVals,\n    index: [indexVal],\n    eobrowserStats: [val, isCloud ? 1 : 0],\n    dataMask: [samples.dataMask],\n  };\n}\n",
+                "legend": {
+                    "type": "discrete",
+                    "items": [
+                        {
+                            "color": "rgb(0%, 80%, 100%)",
+                            "label": "Snow"
+                        }
+                    ]
+                }
+            }
+        ],
+        "orderHint": 15,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-21T08:18:27.305161Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/sources/1"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 100,
+            "previewMode": "EXTENDED_PREVIEW",
+            "type": "S2L1C"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE/layers/5_SNOW-CLASSIFIER",
+        "id": "5_SNOW-CLASSIFIER",
+        "title": "Snow Classifier",
+        "description": "Based on NDSI",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup () {\n    return{\n        input:[\"B02\", \"B03\", \"B04\", \"B08\", \"B11\", \"dataMask\"],\n        output:{bands: 4}\n    }        \n}\n\nfunction evaluatePixel(sample) {\n    var NDSI = (sample.B03 - sample.B11) / (sample.B03 + sample.B11);\n    var NDVI = (sample.B08 - sample.B04) / (sample.B08 + sample.B04);\n    var gain = 2.5;\n        function si(a) {\n            return (a>=0.4) ? 1 : (Math.abs(NDVI - 0.1) <= 0.025 ? 1 : 0);\n        }\n    \n        function br(a) {\n            return a>0.3;\n        }\n    var v = si(NDSI) && br(sample.B03);\nreturn (v==1) ? [0,0.6,1, sample.dataMask] : [...[sample.B04, sample.B03, sample.B02].map(a => gain * a), sample.dataMask]\n}",
+                "legend": {
+                    "type": "discrete",
+                    "items": [
+                        {
+                            "color": "rgb(0%, 50%, 100%)",
+                            "label": "Snow"
+                        }
+                    ]
+                }
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-21T08:18:27.284258Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/sources/1"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "S2L1C"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE/layers/6_AGRICULTURE",
+        "id": "6_AGRICULTURE",
+        "title": "Agriculture",
+        "description": "Based on the combination of bands 11, 8, 2",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3 (auto-converted from 1)\n\nlet minVal = 0.0;\nlet maxVal = 0.4;\n\nlet viz = new HighlightCompressVisualizer(minVal, maxVal);\n\nfunction evaluatePixel(samples) {\n    let val = [samples.B11, samples.B08, samples.B02, samples.dataMask];\n    return viz.processList(val);\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [ \"B11\", \"B08\", \"B02\", \"dataMask\" ]\n    }],\n    output: { bands: 4 }  }\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6ab085-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-21T08:18:27.291835Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/sources/1"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "S2L1C"
+        }
+    }
+]

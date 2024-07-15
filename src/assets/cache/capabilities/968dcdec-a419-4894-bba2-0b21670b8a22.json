@@ -1,0 +1,20 @@
+{
+    "title": "Global Land Cover",
+    "layers": [
+        {
+            "id": "DISCRETE-CLASSIFICATION-MAP",
+            "name": "Discrete Classification Map",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "FOREST-TYPE",
+            "name": "Forest Type",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

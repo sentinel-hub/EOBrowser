@@ -1,0 +1,64 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6630ab-YOUR-INSTANCEID-HERE/layers/WATER-BODIES",
+        "id": "WATER-BODIES",
+        "title": "Water Bodies ",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n// This custom script visualises water bodies derived from water bodies detection layer (WB )\n\n//set up the input and output settings.\nfunction setup() {\n  return {\n    input: [\"WB\", \"dataMask\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\n\n// evaluatePixel function\nfunction evaluatePixel(sample) {\n  if (sample.WB == 70) return[0,0,1,1]; // blue\n  else return [0,0,0,0] // transparent\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6630ab-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-04-01T13:53:37.862116Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "62bf6f-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6630ab-YOUR-INSTANCEID-HERE/layers/WATER-BODIES-OCCURENCE",
+        "id": "WATER-BODIES-OCCURENCE",
+        "title": "Water Bodies Occurrence",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n// this script visualizes water bodies occurence derived from Quality layer (QUAL)\n\n// set up input and output settings\nfunction setup() {\n  return {\n    input: [\"QUAL\", \"dataMask\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\n\n// create a visualizer\nconst map = [\n    [71, 0xff0000], // Very low occurrence  // red\n    [72, 0x8e35ef], // Low occurrence       // Purple\n    [73, 0xa6a6e6], // Medium occurrence    // Magenta\n    [74, 0x00ffff], // High occurrence      // cyan\n    [74, 0x3bb9ff], // Very high occurrence  // deep sky blue\n    [76, 0x0032c8],  //Permanent occurrence   //blue\n  \t[251, 0x000000]  //No data\n  ];\n\nconst visualizer = new ColorMapVisualizer(map);\n\n//  evaluatePixel function\nfunction evaluatePixel(sample) {\n  return [visualizer.process(sample.QUAL)[0], visualizer.process(sample.QUAL)[1], visualizer.process(sample.QUAL)[2], sample.dataMask];\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/6630ab-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-04-01T13:54:53.788704Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "62bf6f-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

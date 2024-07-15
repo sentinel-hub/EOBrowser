@@ -1,0 +1,64 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/c0d9df-YOUR-INSTANCEID-HERE/layers/NDVI",
+        "id": "NDVI",
+        "title": "NDVI",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// NDVI\n\nfunction setup() {\n  return {\n    input: [\"Red\", \"NIR\", \"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n      { id: \"eobrowserStats\", bands: 2, sampleType: \"FLOAT32\" },\n      { id: \"dataMask\", bands: 1 },\n    ]\n  }\n}\nlet f = 10000\nfunction evaluatePixel(sample) {\n  let NDVI = index(sample.NIR, sample.Red)\n  const indexVal = sample.dataMask === 1 ? NDVI : NaN;\n  let id_default = valueInterpolate(NDVI,\n    [0, 0.2, 0.3, 0.4, 0.5, 1.0],\n    [\n      [1, 1, 0.88, sample.dataMask],\n      [0.57, 0.75, 0.32, sample.dataMask],\n      [0.44, 0.64, 0.25, sample.dataMask],\n      [0.31, 0.54, 0.18, sample.dataMask],\n      [0.19, 0.43, 0.11, sample.dataMask],\n      [0.06, 0.33, 0.04, sample.dataMask],\n      [0, 0.27, 0, sample.dataMask],\n    ]);\n\n  return {\n    default: id_default,\n    index: [indexVal],\n    eobrowserStats: [indexVal, sample.dataMask],\n    dataMask: [sample.dataMask],\n  };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/c0d9df-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-04-10T09:03:10.494111Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "fc7045-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/c0d9df-YOUR-INSTANCEID-HERE/layers/TRUE-COLOR",
+        "id": "TRUE-COLOR",
+        "title": "True Color",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//True Color\n\nfunction setup() {\n  return {\n    input: [\"Blue\", \"Red\", \"Green\", \"dataMask\"],\n    output: { bands: 4 }\n  }\n}\nvar f = 2.5 / 10000\nfunction evaluatePixel(sample) {\n  return [sample.Red * f, sample.Green * f, sample.Blue * f, sample.dataMask]\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/c0d9df-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-15T11:50:54.178925Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "fc7045-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

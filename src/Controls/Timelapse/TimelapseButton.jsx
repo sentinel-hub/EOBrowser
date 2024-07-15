@@ -32,7 +32,7 @@ class TimelapseButton extends Component {
   };
 
   render() {
-    const { is3D, terrainViewerSettings } = this.props;
+    const { is3D, terrainViewerSettings, displayTimelapseAreaPreview } = this.props;
     let zoomTooLow = false;
     if (is3D && terrainViewerSettings && Object.keys(terrainViewerSettings).length > 3) {
       const { z } = terrainViewerSettings;
@@ -48,6 +48,8 @@ class TimelapseButton extends Component {
           aoi={this.props.aoi}
           onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
           zoomTooLow={zoomTooLow}
+          isPlacingVertex={this.props.isPlacingVertex}
+          isOpen={displayTimelapseAreaPreview}
         />
       </div>
     );
@@ -65,6 +67,8 @@ const mapStoreToProps = (store) => ({
   is3D: store.mainMap.is3D,
   aoi: store.aoi,
   terrainViewerSettings: store.terrainViewer.settings,
+  isPlacingVertex: store.aoi.isPlacingVertex,
+  displayTimelapseAreaPreview: store.timelapse.displayTimelapseAreaPreview,
 });
 
 export default connect(mapStoreToProps, null)(TimelapseButton);

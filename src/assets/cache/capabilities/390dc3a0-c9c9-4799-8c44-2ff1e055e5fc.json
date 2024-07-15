@@ -1,0 +1,13 @@
+{
+    "title": "CORINE Land Cover Accounting Layers",
+    "layers": [
+        {
+            "id": "ACCOUNTING-LAYERS-VISUALIZATION",
+            "name": "Accounting Layers Visualization",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

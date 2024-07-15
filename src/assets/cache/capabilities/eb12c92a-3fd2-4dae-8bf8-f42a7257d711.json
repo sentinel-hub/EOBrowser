@@ -1,0 +1,27 @@
+{
+    "title": "EOB3 Urban (L8 USGS) API",
+    "layers": [
+        {
+            "id": "FALSE-COLOR-URBAN",
+            "name": "False Color Urban",
+            "description": "",
+            "dataset": "LOTL2",
+            "legendUrl": null
+        },
+        {
+            "id": "THERMAL",
+            "name": "Thermal",
+            "description": "",
+            "dataset": "LOTL2",
+            "legendUrl": null
+        },
+        {
+            "id": "TRUE-COLOR",
+            "name": "True color",
+            "description": "",
+            "dataset": "LOTL2",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

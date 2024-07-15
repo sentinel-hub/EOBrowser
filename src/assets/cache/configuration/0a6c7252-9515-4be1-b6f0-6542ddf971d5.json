@@ -1,0 +1,188 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE/layers/1_OCCURRENCE",
+        "id": "1_OCCURRENCE",
+        "title": "Global Surface Water Occurrence",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n//This custom script visualises the water occurrence dataset similar to the symbology described in the data user guide with a slightly different color stretch.\n\n//Set up input and output settings\nfunction setup() {\n  return {\n    input: [\"occurrence\"],\n    output: {\n      bands: 3,\n      sampleType: \"AUTO\"\n    }\n  }\n}\n\n//Create color ramp\nconst ramps = [\n  [1, 0xffcccc],  //1% occurrence (Light red)\n  [100, 0x0000ff] //100% occurrence (Pure blue)\n];\n\n//Create visualizer\nconst visualizer = new ColorRampVisualizer(ramps);\n\n//EvaluatePixel function\nfunction evaluatePixel(sample) {\n  if (sample.occurrence == 0){  //Not water\n    return [1, 1, 1]            //Return White\n  }else if (sample.occurrence > 100){ //No data\n    return [0.8, 0.8, 0.8]            //Return Light gray\n  }else if (sample.occurrence > 0 && sample.occurrence <= 100){ //1 - 100% occurrence\n    return [visualizer.process(sample.occurrence)[0], visualizer.process(sample.occurrence)[1], visualizer.process(sample.occurrence)[2]];  //Return color ramp values\n  }\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-04-21T08:17:16.665534Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9a525f-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE/layers/2_CHANGE-INTENSITY",
+        "id": "2_CHANGE-INTENSITY",
+        "title": "Global Surface Water Occurrence Change Intensity",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n//This script visualizes the occurrence change intensity dataset according to the data user guide.\n\n//Set up input and output settings\nfunction setup() {\n  return {\n    input: [\"change\"],\n    output: {\n      bands: 3,\n      sampleType: \"AUTO\"\n    }\n  }\n}\n\n//Create color ramp\nconst ramps = [\n  [0, 0xff0000],    //-100% loss of occurrence (Pure red)\n  [100, 0x000000],  //No change (Black)\n  [200, 0x00ff00]   //100% increase in occurrence (Pure lime green)\n];\n\n//Create visualizer\nconst visualizer = new ColorRampVisualizer(ramps);\n\n//EvaluatePixel function\nfunction evaluatePixel(sample) {\n  if (sample.change == 253){  //Not water\n    return [1, 1, 1]          //Return White\n  }else if (sample.change == 254){  //Unable to calculate a value due to no homologous months\n    return [0.533, 0.533, 0.533]    //Return Dark gray\n  }else if (sample.change == 255){  //No data\n    return [0.8, 0.8, 0.8]          //Return Light gray\n  }else if (sample.change <= 200){  //loss and increase of occurrence\n    return [visualizer.process(sample.change)[0], visualizer.process(sample.change)[1], visualizer.process(sample.change)[2]];  //Return color ramp values\n  }\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-04-21T08:17:54.440030Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9a525f-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE/layers/3_SEASONALITY",
+        "id": "3_SEASONALITY",
+        "title": "Global Surface Water Seasonality",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n//This custom script visualises the seasonality dataset according to the data user guide.\n\n//Set up input and output settings\nfunction setup() {\n  return {\n    input: [\"seasonality\"],\n    output: {\n      bands: 3,\n      sampleType: \"AUTO\"\n    }\n  }\n}\n\n//Create color ramp\nconst ramps = [\n  [1, 0x99d9ea],  //1 month of water (Very soft cyan)\n  [12, 0x0000aa]  //12 months of water - permanent water (Dark blue)\n];\n\n//Create visualizer\nconst visualizer = new ColorRampVisualizer(ramps);\n\n//EvaluatePixel function\nfunction evaluatePixel(sample) {\n  if (sample.seasonality == 0){ //Not water\n    return [1, 1, 1]            //Return White\n  }else if (sample.seasonality > 12){ //No data\n    return [0.8, 0.8, 0.8]            //Return Light gray\n  }else if (sample.seasonality > 0 && sample.seasonality <= 12){  //1 - 12 month of water\n    return [visualizer.process(sample.seasonality)[0], visualizer.process(sample.seasonality)[1], visualizer.process(sample.seasonality)[2]]; //Return color ramp values\n  }\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-04-21T08:20:53.654173Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9a525f-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE/layers/4_RECURRENCE",
+        "id": "4_RECURRENCE",
+        "title": "Global Surface Water Recurrence",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n//This custom script visualises the water recurrence dataset according to the data user guide.\n\n//Set up input and output settings\nfunction setup() {\n  return {\n    input: [\"recurrence\"],\n    output: {\n      bands: 3,\n      sampleType: \"AUTO\"\n    }\n  }\n}\n\n//Create color ramp\nconst ramps = [\n  [1, 0xff7f27],  //1% recurrence (Vivid orange)\n  [100, 0x99d9ea] //100% recurrence (Very soft cyan)\n];\n\n//Create visualizer\nconst visualizer = new ColorRampVisualizer(ramps);\n\n//EvaluatePixel function\nfunction evaluatePixel(sample) {\n  if (sample.recurrence == 0){  //Not water\n    return [1, 1, 1]            //Return White\n  }else if (sample.recurrence > 100){ //No data\n    return [0.8, 0.8, 0.8]            //Return Light gray\n  }else if (sample.recurrence > 0 && sample.recurrence <= 100){ //1 - 100% recurrence\n    return [visualizer.process(sample.recurrence)[0], visualizer.process(sample.recurrence)[1], visualizer.process(sample.recurrence)[2]];  //Return color ramp values\n  }\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-04-21T08:21:07.137342Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9a525f-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE/layers/5_TRANSITIONS",
+        "id": "5_TRANSITIONS",
+        "title": "Global Surface Water Transitions",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n//This custom script visualises the transitions dataset according to the data user guide.\n\n//Set up input and output settings\nfunction setup() {\n  return {\n    input: [\"transitions\"],\n    output: {\n      bands: 3,\n      sampleType: \"AUTO\"\n    }\n  }\n}\n\n//Create discrete color map\nconst map = [\n  [0, 0xffffff],    // Not water (White)\n  [1, 0x0000ff],    // Permanent (Pure blue)\n  [2, 0x22b14c],    // New permanent (Dark cyan - lime green)\n  [3, 0xd1102d],    // Lost permanent (Strong red)\n  [4, 0x99d9ea],    // Seasonal (Very soft cyan)\n  [5, 0xb5e61d],    // New seasonal (Vivid yellow)\n  [6, 0xe6a1aa],    // Lost seasonal (Very soft red)\n  [7, 0xff7f27],    // Seasonal to permanent (Vivid orange)\n  [8, 0xffc90e],    // Permanent to seasonal (Vivid yellow)\n  [9, 0x7f7f7f],    // Ephemeral permanent (Dark gray)\n  [10, 0xc3c3c3],   // Ephemeral seasonal (Light gray)\n  [255, 0xcccccc]   // No data (Light gray)\n];\n\n//Create visualizer\nconst visualizer = new ColorMapVisualizer(map);\n\n//EvaluatePixel function\nfunction evaluatePixel(sample) {\n  return [visualizer.process(sample.transitions)[0], visualizer.process(sample.transitions)[1], visualizer.process(sample.transitions)[2]];\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-04-21T08:21:24.093759Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9a525f-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE/layers/6_EXTENT",
+        "id": "6_EXTENT",
+        "title": "Global Surface Water Extent",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\n//This custom script visualises the maximum water extent dataset according to the data user guide.\n\n//Set up the input and output settings.\nfunction setup() {\n  return {\n    input: [\"extent\"],\n    output: {\n      bands: 3,\n      sampleType: \"AUTO\"\n    }\n  };\n}\n\n//Create discrete color map\nconst map = [\n  [0, 0xffffff],  //Not water (White)\n  [1, 0x6666ff],  //Water detected (Light blue)\n  [255, 0xcccccc] //No data (Light gray)\n];\n\n//Create visualizer\nconst visualizer = new ColorMapVisualizer(map);\n\n//EvaluatePixel function\nfunction evaluatePixel(sample) {\n  return [visualizer.process(sample.extent)[0], visualizer.process(sample.extent)[1], visualizer.process(sample.extent)[2]];\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/0a6c72-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-04-21T08:21:36.633048Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9a525f-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

@@ -39,7 +39,7 @@ class EOBModeSelection extends React.Component {
   }
 
   render() {
-    const { highlighted, modes, selectedModeId } = this.props;
+    const { highlighted, modes, selectedModeId, onSelectMode } = this.props;
 
     return (
       <div className="mode-selection" ref={(r) => (this.ref = r)}>
@@ -47,7 +47,7 @@ class EOBModeSelection extends React.Component {
           modes={modes}
           highlighted={highlighted}
           selectedModeId={selectedModeId}
-          onSelectMode={this.props.onSelectMode}
+          onSelectMode={onSelectMode}
         />
       </div>
     );

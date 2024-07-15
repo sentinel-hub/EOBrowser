@@ -1,0 +1,62 @@
+{
+    "title": "Planet Basemaps",
+    "layers": [
+        {
+            "id": "FALSE-COLOR",
+            "name": "False Color",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "NDVI",
+            "name": "NDVI",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "NDWI",
+            "name": "NDWI",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "PIXEL-PROVENANCE",
+            "name": "Pixel Provenance",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "TRUE-COLOR",
+            "name": "True Color",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "TRUE-COLOR-UDM2-TRANSPARENCY",
+            "name": "True Color UDM2 Transparency",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "UDM2-CONFIDENCE",
+            "name": "UDM2 Confidence",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "UDM2-MASK-CLASSIFICATION",
+            "name": "UDM2 Mask Classification",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

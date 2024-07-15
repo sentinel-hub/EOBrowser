@@ -130,7 +130,7 @@ class DatePicker extends Component {
 
   handleGetAndSetNextPrevDate = async (direction) => {
     let { loading } = this.state;
-    let { selectedDay, setSelectedDay, minDate, maxDate, maxCloudCover, limitMonthsSearch = 3 } = this.props;
+    let { selectedDay, setSelectedDay, minDate, maxDate, maxCloudCover } = this.props;
 
     if (loading) {
       return;
@@ -163,7 +163,6 @@ class DatePicker extends Component {
       fetchDates: this.fetchAvailableDaysInMonth,
       minDate: minDate,
       maxDate: maxDate,
-      limitMonthsSearch: limitMonthsSearch,
     });
     setSelectedDay(newSelectedDay.clone().utc());
     if (newSelectedDay.get('month') !== selectedDay.get('month')) {

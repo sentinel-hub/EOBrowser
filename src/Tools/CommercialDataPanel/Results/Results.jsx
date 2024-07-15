@@ -109,7 +109,7 @@ const Result = ({
   setPreviewLarge,
   cachedPreviews,
   setCachedPreviews,
-  userAccountInfo,
+  addingEnabled,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   const toggleDetailsLabel = showDetails ? t`Hide details` : t`Show details`;
@@ -128,12 +128,12 @@ const Result = ({
             product={product}
             cachedPreviews={cachedPreviews}
             setCachedPreviews={setCachedPreviews}
-            searchParams={searchParams}
-          ></PreviewSmall>
-          {(userAccountInfo.quotasEnabled || userAccountInfo.trialAccount) && !isSelected && (
+            planetApiKey={searchParams.planetApiKey}
+          />
+          {addingEnabled && !isSelected && (
             <EOBButton fluid onClick={() => addProduct(product.id)} text={t`add`} />
           )}
-          {(userAccountInfo.quotasEnabled || userAccountInfo.trialAccount) && isSelected && (
+          {addingEnabled && isSelected && (
             <EOBButton fluid onClick={() => removeProduct(product.id)} text={t`remove`} />
           )}
         </div>
@@ -173,7 +173,7 @@ export const Results = ({
   cachedPreviews,
   setCachedPreviews,
   displaySearchResults,
-  userAccountInfo,
+  userActionsEnabled,
 }) => {
   const [previewLarge, setPreviewLarge] = useState(null);
 
@@ -185,6 +185,7 @@ export const Results = ({
     );
   }
   const results = filterSearchResults(searchResults, provider);
+
   return (
     <div className="commercial-data-results">
       <label className="toggle-display-results">
@@ -212,7 +213,7 @@ export const Results = ({
           cachedPreviews={cachedPreviews}
           setCachedPreviews={setCachedPreviews}
           searchResults={searchResults}
-          userAccountInfo={userAccountInfo}
+          addingEnabled={userActionsEnabled}
         />
       ))}
       <div className="actions-container">
@@ -221,7 +222,7 @@ export const Results = ({
           fluid
           onClick={onCreateOrder}
           text={t`Prepare order`}
-          disabled={!(userAccountInfo.quotasEnabled || userAccountInfo.trialAccount)}
+          disabled={!userActionsEnabled}
         />
       </div>
       {!!location && (
@@ -249,7 +250,7 @@ export const Results = ({
                   cachedPreviews={cachedPreviews}
                   setCachedPreviews={setCachedPreviews}
                   searchResults={searchResults}
-                  userAccountInfo={userAccountInfo}
+                  addingEnabled={userActionsEnabled}
                 />
               ))}
             </div>

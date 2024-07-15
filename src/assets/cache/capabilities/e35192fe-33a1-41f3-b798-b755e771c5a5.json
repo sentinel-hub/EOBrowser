@@ -1,0 +1,62 @@
+{
+    "title": "EOB3 Landsat-8 L1 API",
+    "layers": [
+        {
+            "id": "__FIS_4-NDVI",
+            "name": "__FIS_4-NDVI",
+            "description": "",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_THERMAL",
+            "name": "__FIS_THERMAL",
+            "description": "",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "1_TRUE_COLOR",
+            "name": "True color",
+            "description": "Based on the combination of bands 4, 3, 2",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "2_TONEMAPPED_NATURAL_COLOR",
+            "name": "Highlight Optimized Natural Color",
+            "description": "Enhanced natural color visualization",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "2_TRUE_COLOR_PANSHARPENED",
+            "name": "True color - pansharpened",
+            "description": "Based on true color bands 4, 3, 2 and a pan band 8",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "3_FALSE_COLOR",
+            "name": "False color",
+            "description": "Based on the combination of bands 5, 4, 3",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "4-NDVI",
+            "name": "NDVI",
+            "description": "Based on the combination of bands (B05-B04)/(B05+B04)",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "THERMAL",
+            "name": "Thermal",
+            "description": "",
+            "dataset": "LOTL1",
+            "legendUrl": "https://services.sentinel-hub.com/ogc/wms/e35192-YOUR-INSTANCEID-HERE?request=GetLegendGraphic&service=WMS&layer=THERMAL&style=RED_TEMPERATURE"
+        }
+    ],
+    "datasets": []
+}

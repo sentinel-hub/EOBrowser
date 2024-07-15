@@ -9,10 +9,12 @@ export const getDatasourceNotSupportedMsg = () => t`This datasource is not suppo
 export const getNotSupportedIn3DMsg = () => t`Not supported in 3D mode.`;
 export const getOnlyBasicImgDownloadAvailableMsg = () =>
   t`Image download in compare mode is currently available only for basic image download.`;
-export const getMobileNotSupportedMsg = () => t`Creating and editing a timelapse is not supported on mobile.`;
 export const getAnalyticalExportNotSupportedMsg = () =>
   t`The current datasource doesn't support analytical exports`;
 export const zoomTooLow3DMsg = () => t`Zoom too low. Please zoom in.`;
 export const getErrorFetchingDataMsg = () => t`Error fetching data`;
+export const getFinishDrawingMsg = () => t`Please finish drawing the area of interest.`;
 export const getNotAvailableForErrorMsg = (target) => t`not available for ` + target;
-export const getStatisticalInfoMsg = () => t`Statistical Info / Feature Info Service chart`;
+export const getHowToConfigLayersStatInfoMsg = () =>
+  t`More info [here](https://www.sentinel-hub.com/faq/how-configure-your-layers-statistical-info-eo-browser/)`;
+export const getStatisticalInfoMsg = () => t`Statistical Info`;

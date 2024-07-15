@@ -1,0 +1,98 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/eb12c9-YOUR-INSTANCEID-HERE/layers/FALSE-COLOR-URBAN",
+        "id": "FALSE-COLOR-URBAN",
+        "title": "False Color Urban",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction evaluatePixel(samples) {\n    return [2.5* samples.B07, 2.5* samples.B06, 2.5* samples.B04, samples.dataMask];\n}\n\nfunction setup() {\n  return {\n    input: [\"B04\", \"B06\", \"B07\", \"dataMask\"],\n    output: { bands: 4 }\n  };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/eb12c9-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-11-09T08:52:12.187246Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL2/sources/13"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "tiers": "ALL_TIERS",
+            "type": "LOTL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/eb12c9-YOUR-INSTANCEID-HERE/layers/THERMAL",
+        "id": "THERMAL",
+        "title": "Thermal",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3 (auto-converted from 1)\n\nconst blue_red = [\n  [223, 0x003d99],\n  [253, 0x2e82ff],\n  [263, 0x80b3ff],\n  [272, 0xe0edff],\n  [273, 0xffffff],\n  [274, 0xfefce7],\n  [283, 0xfde191],\n  [293, 0xf69855],\n  [303, 0xec6927],\n  [323, 0xaa2d1d],\n  [363, 0x650401],\n  [373, 0x3d0200],\n];\n\nconst viz = new ColorRampVisualizer(blue_red);\n\nfunction setup() {\n  return {\n    input: [\"B03\", \"B04\", \"B10\", \"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 2 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n  let val = samples.B10;\n  return {\n    default: [...viz.process(val), samples.dataMask],\n    eobrowserStats: [val - 273, isCloud(samples) ? 1 : 0],\n    dataMask: [samples.dataMask],\n  };\n}\n\nfunction isCloud(samples) {\n  const NGDR = index(samples.B03, samples.B04);\n  const bRatio = (samples.B03 - 0.175) / (0.39 - 0.175);\n  return bRatio > 1 || (bRatio > 0 && NGDR > 0);\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/eb12c9-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-11-09T08:51:36.281369Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL2/sources/13"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "tiers": "ALL_TIERS",
+            "type": "LOTL2"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/eb12c9-YOUR-INSTANCEID-HERE/layers/TRUE-COLOR",
+        "id": "TRUE-COLOR",
+        "title": "True color",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nlet minVal = 0.0;\nlet maxVal = 0.4;\n\nlet viz = new HighlightCompressVisualizer(minVal, maxVal);\n\nfunction setup() {\n   return {\n    input: [\"B04\", \"B03\", \"B02\", \"dataMask\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(samples) {\n    let val = [samples.B04, samples.B03, samples.B02, samples.dataMask];\n    return viz.processList(val);\n}\n\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/eb12c9-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-11-09T08:50:32.960190Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL2"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL2/sources/13"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "tiers": "ALL_TIERS",
+            "type": "LOTL2"
+        }
+    }
+]

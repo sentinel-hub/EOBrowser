@@ -14,12 +14,7 @@ const getResamplingKernelLabel = (productKernel) => {
   return ResamplingKernelLabel[productKernel] || productKernel;
 };
 
-const renderMaxarTransactionParams = (
-  actionInProgress,
-  searchParams,
-  transactionOptions,
-  setTransactionOptions,
-) => {
+const renderMaxarTransactionParams = (actionInProgress, transactionOptions, setTransactionOptions) => {
   return (
     <div className="row">
       <label title={t`Resampling kernel`}>{t`Resampling kernel`}</label>
@@ -49,55 +44,26 @@ const renderPlanetScopeTransactionParams = (
   searchParams,
   transactionOptions,
   setTransactionOptions,
+  planetApiKeyHidden,
+  setPlanetApiKeyHidden,
 ) => {
-  if (searchParams.planetApiKey && searchParams.planetApiKey !== transactionOptions.planetApiKey) {
-    setTransactionOptions({ ...transactionOptions, planetApiKey: searchParams.planetApiKey });
-  }
-
+  const harmonizeOptions = [PlanetScopeHarmonization.NONE, defaultPlanetHarmonizeTo[searchParams.itemType]];
   return (
     <>
-      <div className="row">
-        <label title={t`Harmonize to`}>{t`Harmonize to`}</label>
-        <div>
-          <select
-            className="dropdown"
-            disabled={
-              !!actionInProgress ||
-              !isPlanetHarmonizationSupported(searchParams.itemType, searchParams.productBundle)
-            }
-            value={transactionOptions.harmonizeTo}
-            onChange={(e) => {
-              setTransactionOptions({ ...transactionOptions, harmonizeTo: e.target.value });
-            }}
-          >
-            <option key={PlanetScopeHarmonization.NONE} value={PlanetScopeHarmonization.NONE}>
-              {PlanetScopeHarmonization.NONE}
-            </option>
-
-            <option
-              key={defaultPlanetHarmonizeTo[searchParams.itemType]}
-              value={defaultPlanetHarmonizeTo[searchParams.itemType]}
-            >
-              {defaultPlanetHarmonizeTo[searchParams.itemType]}
-            </option>
-          </select>
-          <OrderInputTooltip inputId="harmonizeData" />
-        </div>
-      </div>
-
-      <div className="row">
-        <label title={t`Planet API Key`}>{t`Planet API Key`}</label>
-        <div>
-          <input
-            type="text"
-            disabled={!!actionInProgress}
-            defaultValue={transactionOptions.planetApiKey}
-            onChange={(e) => setTransactionOptions({ ...transactionOptions, planetApiKey: e.target.value })}
-            placeholder={t`Your Planet API key`}
-          ></input>
-          <OrderInputTooltip inputId="planetApiKey" />
-        </div>
-      </div>
+      {renderHarmonizeTransactionParams(
+        actionInProgress,
+        searchParams,
+        transactionOptions,
+        setTransactionOptions,
+        harmonizeOptions,
+      )}
+      {renderPlanetAPIKeyTransactionParam(
+        actionInProgress,
+        transactionOptions,
+        setTransactionOptions,
+        planetApiKeyHidden,
+        setPlanetApiKeyHidden,
+      )}
     </>
   );
 };
@@ -107,56 +73,72 @@ const renderPlanetSkySatTransactionParams = (
   searchParams,
   transactionOptions,
   setTransactionOptions,
+  planetApiKeyHidden,
+  setPlanetApiKeyHidden,
 ) => {
-  if (searchParams.planetApiKey && searchParams.planetApiKey !== transactionOptions.planetApiKey) {
-    setTransactionOptions({ ...transactionOptions, planetApiKey: searchParams.planetApiKey });
-  }
-
+  const harmonizeOptions = [PlanetScopeHarmonization.NONE];
   return (
     <>
-      <div className="row">
-        <label title={t`Harmonize to`}>{t`Harmonize to`}</label>
-        <div>
-          <select
-            className="dropdown"
-            disabled={
-              !!actionInProgress ||
-              !isPlanetHarmonizationSupported(searchParams.itemType, searchParams.productBundle)
-            }
-            value={transactionOptions.harmonizeTo}
-            onChange={(e) => {
-              setTransactionOptions({ ...transactionOptions, harmonizeTo: e.target.value });
-            }}
-          >
-            <option key={PlanetScopeHarmonization.NONE} value={PlanetScopeHarmonization.NONE}>
-              {PlanetScopeHarmonization.NONE}
-            </option>
-          </select>
-          <OrderInputTooltip inputId="harmonizeData" />
-        </div>
-      </div>
-      <div className="row">
-        <label title={t`Planet API Key`}>{t`Planet API Key`}</label>
-        <div>
-          <input
-            type="text"
-            disabled={!!actionInProgress}
-            defaultValue={transactionOptions.planetApiKey}
-            onChange={(e) => setTransactionOptions({ ...transactionOptions, planetApiKey: e.target.value })}
-            placeholder={t`Your Planet API key`}
-          ></input>
-          <OrderInputTooltip inputId="planetApiKey" />
-        </div>
-      </div>
+      {renderHarmonizeTransactionParams(
+        actionInProgress,
+        searchParams,
+        transactionOptions,
+        setTransactionOptions,
+        harmonizeOptions,
+      )}
+      {renderPlanetAPIKeyTransactionParam(
+        actionInProgress,
+        transactionOptions,
+        setTransactionOptions,
+        planetApiKeyHidden,
+        setPlanetApiKeyHidden,
+      )}
     </>
   );
 };
 
-const renderPlanetaryVariablesTransactionParams = (
+const renderHarmonizeTransactionParams = (
   actionInProgress,
   searchParams,
   transactionOptions,
   setTransactionOptions,
+  harmonizeOptions,
+) => {
+  return (
+    <div className="row">
+      <label title={t`Harmonize to`}>{t`Harmonize to`}</label>
+      <div>
+        <select
+          className="dropdown"
+          disabled={
+            !!actionInProgress ||
+            !isPlanetHarmonizationSupported(searchParams.itemType, searchParams.productBundle)
+          }
+          value={transactionOptions.harmonizeTo}
+          onChange={(e) => {
+            setTransactionOptions({ ...transactionOptions, harmonizeTo: e.target.value });
+          }}
+        >
+          {harmonizeOptions.map((harmonizeOption) => {
+            return (
+              <option key={harmonizeOption} value={harmonizeOption}>
+                {harmonizeOption}
+              </option>
+            );
+          })}
+        </select>
+        <OrderInputTooltip inputId="harmonizeData" />
+      </div>
+    </div>
+  );
+};
+
+const renderPlanetAPIKeyTransactionParam = (
+  actionInProgress,
+  transactionOptions,
+  setTransactionOptions,
+  planetApiKeyHidden,
+  setPlanetApiKeyHidden,
 ) => {
   return (
     <>
@@ -164,12 +146,18 @@ const renderPlanetaryVariablesTransactionParams = (
         <label title={t`Planet API Key`}>{t`Planet API Key`}</label>
         <div>
           <input
-            type="text"
+            type={planetApiKeyHidden ? 'password' : 'text'}
             disabled={!!actionInProgress}
             defaultValue={transactionOptions.planetApiKey}
             onChange={(e) => setTransactionOptions({ ...transactionOptions, planetApiKey: e.target.value })}
             placeholder={t`Your Planet API key`}
           ></input>
+          <span className="hide-planet-key-icon">
+            <i
+              className={planetApiKeyHidden ? 'fa fa-eye' : 'fa fa-eye-slash'}
+              onClick={() => setPlanetApiKeyHidden(!planetApiKeyHidden)}
+            />
+          </span>
           <OrderInputTooltip inputId="planetApiKey" />
         </div>
       </div>
@@ -179,15 +167,32 @@ const renderPlanetaryVariablesTransactionParams = (
 
 export const renderProviderSpecificTransactionParams = (
   dataProvider,
-  { actionInProgress, searchParams, transactionOptions, setTransactionOptions },
+  {
+    actionInProgress,
+    searchParams,
+    transactionOptions,
+    setTransactionOptions,
+    planetApiKeyHidden,
+    setPlanetApiKeyHidden,
+  },
 ) => {
   switch (dataProvider) {
+    case TPDICollections.PLANET_ARPS:
+      return renderPlanetAPIKeyTransactionParam(
+        actionInProgress,
+        transactionOptions,
+        setTransactionOptions,
+        planetApiKeyHidden,
+        setPlanetApiKeyHidden,
+      );
     case TPDICollections.PLANET_SCOPE:
       return renderPlanetScopeTransactionParams(
         actionInProgress,
         searchParams,
         transactionOptions,
         setTransactionOptions,
+        planetApiKeyHidden,
+        setPlanetApiKeyHidden,
       );
     case TPDICollections.PLANET_SKYSAT:
       return renderPlanetSkySatTransactionParams(
@@ -195,21 +200,19 @@ export const renderProviderSpecificTransactionParams = (
         searchParams,
         transactionOptions,
         setTransactionOptions,
+        planetApiKeyHidden,
+        setPlanetApiKeyHidden,
       );
     case TPDICollections.PLANETARY_VARIABLES:
-      return renderPlanetaryVariablesTransactionParams(
+      return renderPlanetAPIKeyTransactionParam(
         actionInProgress,
-        searchParams,
         transactionOptions,
         setTransactionOptions,
+        planetApiKeyHidden,
+        setPlanetApiKeyHidden,
       );
     case TPDICollections.MAXAR_WORLDVIEW:
-      return renderMaxarTransactionParams(
-        actionInProgress,
-        searchParams,
-        transactionOptions,
-        setTransactionOptions,
-      );
+      return renderMaxarTransactionParams(actionInProgress, transactionOptions, setTransactionOptions);
 
     default:
       return null;

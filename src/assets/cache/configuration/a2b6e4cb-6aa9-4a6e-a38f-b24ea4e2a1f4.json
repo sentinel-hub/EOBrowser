@@ -1,0 +1,176 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a2b6e4-YOUR-INSTANCEID-HERE/layers/__FIS_4-NDVI",
+        "id": "__FIS_4-NDVI",
+        "title": "__FIS_4-NDVI",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction index(x, y) {\n    return (x - y) / (x + y);\n}\n\nconst NGDR = index(B03, B04);\nconst bRatio = (B03 - 0.175) / (0.39 - 0.175);\n\nconst isCloud = bRatio > 1 || (bRatio > 0 && NGDR > 0);\nconst ndvi = index(B05, B04);\n\nreturn [ndvi, isCloud]"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a2b6e4-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-20T14:03:23.932184Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1/sources/12"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "type": "LOTL1"
+        },
+        "additionalData": {
+            "overlays": []
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a2b6e4-YOUR-INSTANCEID-HERE/layers/1_TRUE_COLOR",
+        "id": "1_TRUE_COLOR",
+        "title": "True color",
+        "description": "Based on the combination of bands 4, 3, 2",
+        "styles": [
+            {
+                "name": "NORMALIZED",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3 (auto-converted from 1)\n\nlet minVal = 0.0;\nlet maxVal = 0.4;\n\nlet viz = new DefaultVisualizer(minVal, maxVal);\n\nfunction evaluatePixel(samples) {\n    let val = [samples.B04, samples.B03, samples.B02, samples.dataMask];\n    return viz.processList(val);\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [ \"B02\", \"B03\", \"B04\", \"dataMask\" ]\n    }],\n    output: { bands: 4 }  }\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a2b6e4-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-20T13:23:14.450364Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1/sources/12"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "type": "LOTL1"
+        },
+        "additionalData": {
+            "overlays": []
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a2b6e4-YOUR-INSTANCEID-HERE/layers/2_TRUE_COLOR_PANSHARPENED",
+        "id": "2_TRUE_COLOR_PANSHARPENED",
+        "title": "True color - pansharpened",
+        "description": "Based on true color bands 4, 3, 2 and a pan band 8",
+        "styles": [
+            {
+                "name": "NORMALIZED",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3 (auto-converted from 1)\nlet minVal = 0.0;\nlet maxVal = 0.4;\n\nlet viz = new DefaultVisualizer(minVal, maxVal);\n\nfunction evaluatePixel(samples) {\n    let sudoPanW = (samples.B04 + samples.B03 + samples.B02 * 0.4) / 2.4;\n    let ratioW = samples.B08 / sudoPanW;\n    let val = [samples.B04 * ratioW, samples.B03 * ratioW, samples.B02 * ratioW, samples.dataMask];\n    return viz.processList(val);\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [ \"B02\", \"B03\", \"B04\", \"B08\", \"dataMask\" ]\n    }],\n    output: { bands: 4 }  }\n}"
+            }
+        ],
+        "orderHint": 1,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a2b6e4-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-20T13:23:14.457366Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1/sources/12"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "type": "LOTL1"
+        },
+        "additionalData": {
+            "overlays": []
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a2b6e4-YOUR-INSTANCEID-HERE/layers/3_FALSE_COLOR",
+        "id": "3_FALSE_COLOR",
+        "title": "False color",
+        "description": "Based on the combination of bands 5, 4, 3",
+        "styles": [
+            {
+                "name": "NORMALIZED",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3 (auto-converted from 1)\nlet minVal = 0.0;\nlet maxVal = 0.4;\n\nlet viz = new DefaultVisualizer(minVal, maxVal);\n\nfunction evaluatePixel(samples) {\n    let val = [samples.B05, samples.B04, samples.B03, samples.dataMask];\n    return viz.processList(val);\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\"B03\", \"B04\", \"B05\", \"dataMask\"]\n    }],\n    output: { bands: 4 }  }\n}\n"
+            }
+        ],
+        "orderHint": 2,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a2b6e4-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-20T13:23:14.463671Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1/sources/12"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "type": "LOTL1"
+        },
+        "additionalData": {
+            "overlays": []
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a2b6e4-YOUR-INSTANCEID-HERE/layers/4-NDVI",
+        "id": "4-NDVI",
+        "title": "NDVI",
+        "description": "Based on the combination of bands (B05-B04)/(B05+B04)",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"B03\", \"B04\", \"B05\", \"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n      { id: \"eobrowserStats\", bands: 2 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n  let val = index(samples.B05, samples.B04);\n  let imgVals = null;\n  // The library for tiffs works well only if there is only one channel returned.\n  // So we encode the \"no data\" as NaN here and ignore NaNs on frontend.\n  const indexVal = samples.dataMask === 1 && val >= -1 && val <= 1 ? val : NaN;\n\n  if (val < -1.1) imgVals = [0, 0, 0, samples.dataMask];\n  else if (val < -0.2) imgVals = [0.75, 0.75, 0.75, samples.dataMask];\n  else if (val < -0.1) imgVals = [0.86, 0.86, 0.86, samples.dataMask];\n  else if (val < 0) imgVals = [1, 1, 0.88, samples.dataMask];\n  else if (val < 0.025) imgVals = [1, 0.98, 0.8, samples.dataMask];\n  else if (val < 0.05) imgVals = [0.93, 0.91, 0.71, samples.dataMask];\n  else if (val < 0.075) imgVals = [0.87, 0.85, 0.61, samples.dataMask];\n  else if (val < 0.1) imgVals = [0.8, 0.78, 0.51, samples.dataMask];\n  else if (val < 0.125) imgVals = [0.74, 0.72, 0.42, samples.dataMask];\n  else if (val < 0.15) imgVals = [0.69, 0.76, 0.38, samples.dataMask];\n  else if (val < 0.175) imgVals = [0.64, 0.8, 0.35, samples.dataMask];\n  else if (val < 0.2) imgVals = [0.57, 0.75, 0.32, samples.dataMask];\n  else if (val < 0.25) imgVals = [0.5, 0.7, 0.28, samples.dataMask];\n  else if (val < 0.3) imgVals = [0.44, 0.64, 0.25, samples.dataMask];\n  else if (val < 0.35) imgVals = [0.38, 0.59, 0.21, samples.dataMask];\n  else if (val < 0.4) imgVals = [0.31, 0.54, 0.18, samples.dataMask];\n  else if (val < 0.45) imgVals = [0.25, 0.49, 0.14, samples.dataMask];\n  else if (val < 0.5) imgVals = [0.19, 0.43, 0.11, samples.dataMask];\n  else if (val < 0.55) imgVals = [0.13, 0.38, 0.07, samples.dataMask];\n  else if (val < 0.6) imgVals = [0.06, 0.33, 0.04, samples.dataMask];\n  else imgVals = [0, 0.27, 0, samples.dataMask];\n\n  return {\n    default: imgVals,\n    index: [indexVal],\n    eobrowserStats: [val, isCloud(samples) ? 1 : 0],\n    dataMask: [samples.dataMask],\n  };\n}\n\nfunction isCloud(samples) {\n  const NGDR = index(samples.B03, samples.B04);\n  const bRatio = (samples.B03 - 0.175) / (0.39 - 0.175);\n  return bRatio > 1 || (bRatio > 0 && NGDR > 0);\n}\n"
+            }
+        ],
+        "orderHint": 3,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a2b6e4-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-30T09:55:17.121421Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1/sources/12"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "tiers": "ALL_TIERS",
+            "type": "LOTL1"
+        },
+        "additionalData": {
+            "overlays": []
+        }
+    }
+]

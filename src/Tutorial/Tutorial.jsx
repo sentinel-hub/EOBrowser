@@ -1,239 +1,86 @@
-import React, { Component } from 'react';
-import Joyride, { ACTIONS, EVENTS } from 'react-joyride';
-import { TUTORIAL_STEPS, TUTORIAL_STEPS_MOBILE } from './TutorialContent';
-import { FATHOM_TRACK_EVENT_LIST } from '../const';
+import React, { useMemo } from 'react';
+import Joyride from 'react-joyride';
+import { FATHOM_TRACK_EVENT_LIST, PLANET_SANDBOX_THEME_ID } from '../const';
 import { handleFathomTrackEvent } from '../utils';
 import './Tutorial.scss';
 import { t } from 'ttag';
+import { useSelector } from 'react-redux';
+import store, { tutorialSlice } from '../store';
+import { getTutorialData, resetClosingTutorialAnimation } from './tutorial.utils';
+import { EOB_TUTORIAL_ID, PSD_TUTORIAL_ID } from './tutorial.const';
 
-const SHOW_TUTORIAL_LC = 'eobrowser_show_tutorial';
-
-class Tutorial extends Component {
-  static defaultProps = {
-    joyride: {},
-  };
-
-  TutorialComponent = ({
-    tooltipProps,
-    backProps,
-    closeProps,
-    index,
-    isLastStep,
-    primaryProps,
-    size,
-    skipProps,
-    step,
-  }) => (
-    <div className="tutorial-wrap" {...tooltipProps}>
-      <div className="tutorial-body">
-        <button type="button" className="close-cross" {...closeProps} title={t`Close`}>
-          <span className="rodal-close" />
-        </button>
-
-        <h4 className="tutorial-title">{step.title}</h4>
-        <div className="content-wrapper">{step.content}</div>
-
-        {(index > 0 || size === 1) && (
-          <div className="tutorial-footer">
-            <div>
-              <button type="button" className="tutorial-button" {...skipProps} title={t`Close`}>
-                {step.locale.skip()}
-              </button>
-              <button
-                type="button"
-                className="tutorial-button"
-                {...closeProps}
-                title={t`Close and don't show again`}
-              >
-                {step.locale.close()}
-              </button>
-            </div>
-
-            {size > 1 && (
-              <div>
-                <button
-                  type="button"
-                  className="tutorial-button"
-                  {...backProps}
-                  disabled={index <= 0 ? 'disabled' : ''}
-                  title={t`Previous`}
-                >
-                  {step.locale.back()}
-                </button>
-
-                <span>
-                  {' '}
-                  [ {index + 1} / {size} ]{' '}
-                </span>
-
-                {isLastStep ? (
-                  <button type="button" className="tutorial-button" {...primaryProps} title={t`End tutorial`}>
-                    {step.locale.last()}
-                  </button>
-                ) : (
-                  <button type="button" className="tutorial-button" {...primaryProps} title={t`Next`}>
-                    {step.locale.next()}
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {index === 0 && size > 1 && (
-          <div className="tutorial-firstpage-footer">
-            <button
-              type="button"
-              className="tutorial-button tutorial-firstpage-nextbutton"
-              {...primaryProps}
-              title={t`Continue with tutorial`}
-            >
-              {t`Continue with tutorial`}
-            </button>
-
-            <button
-              type="button"
-              className="tutorial-button tutorial-firstpage-closebutton"
-              title={t`Close and don't show again`}
-              onClick={this.handleCloseFirstStep}
-            >
-              {t`Don't show again`}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+const Tutorial = ({ popupDisabled }) => {
+  const { open, stepIndex, id: tutorialId } = useSelector((state) => state.tutorial);
+  const planetSandboxTheme = useSelector((state) => state.themes.themesLists.mode).find(
+    (theme) => theme.id === PLANET_SANDBOX_THEME_ID,
   );
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      run: false,
-      stepIndex: 0, // a controlled tutorial
-    };
-  }
+  const { component, steps, callback } = useMemo(
+    // if there is a theme available, then user is eligible - if theme is available is checked with `doesUserHaveAccessToPlanetSandboxDataCollections` in ThemesProvider.jsx
+    () => getTutorialData(tutorialId, !!planetSandboxTheme),
+    [tutorialId, planetSandboxTheme],
+  );
 
-  componentDidMount() {
-    const showTutorialVal = window.localStorage.getItem(SHOW_TUTORIAL_LC);
-    const showTutorialBool = showTutorialVal ? showTutorialVal === 'true' : true;
-    if (showTutorialBool && !this.props.popupDisabled) {
-      this.setState({ run: true });
-    }
-    this.setTutorialContent();
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.selectedLanguage !== prevProps.selectedLanguage) {
-      this.setTutorialContent();
-    }
-  }
-
-  setTutorialContent() {
-    this.chooseBigSmallTutorial();
-  }
-
-  chooseBigSmallTutorial() {
-    // tools are visible only above width=900px (App.js)
-    this.setState({ steps: window.innerWidth > 900 ? TUTORIAL_STEPS() : TUTORIAL_STEPS_MOBILE() });
-  }
-
-  resetClosingTutorialAnimation() {
-    document.getElementById('tutorial-animatedinfopanel-button').classList.remove('activate-close-animation');
-  }
-  executeClosingTutorialAnimation() {
-    document.getElementById('tutorial-animatedinfopanel-button').classList.add('activate-close-animation');
-  }
-
-  callback = (tour) => {
-    const { action, index, size, type } = tour;
-
-    // controlled tutorial
-    if ([EVENTS.STEP_AFTER, EVENTS.TARGET_NOT_FOUND].includes(type) && action !== ACTIONS.CLOSE) {
-      // go forward or backward
-      this.setState({ stepIndex: index + (action === ACTIONS.PREV ? -1 : 1) });
-    } else if (
-      (action === ACTIONS.CLOSE && type === EVENTS.STEP_AFTER) ||
-      (action === ACTIONS.SKIP && type === EVENTS.TOUR_END)
-    ) {
-      // [x] or 'skip' (close) clicked, stay on same step
-      this.executeClosingTutorialAnimation();
-      this.setState({ run: false });
-    } else if (action === ACTIONS.NEXT && type === EVENTS.TOUR_END) {
-      // 'end tutorial' clicked, reset to step 0
-      this.executeClosingTutorialAnimation();
-      this.setState({ run: false, stepIndex: 0 });
-    }
-
-    if (
-      ((action === ACTIONS.CLOSE && type === EVENTS.STEP_AFTER) ||
-        (action === ACTIONS.NEXT && type === EVENTS.TOUR_END)) &&
-      (index !== 0 || size === 1)
-    ) {
-      window.localStorage.setItem(SHOW_TUTORIAL_LC, false);
-    } else if (action === ACTIONS.SKIP && type === EVENTS.TOUR_END) {
-      window.localStorage.setItem(SHOW_TUTORIAL_LC, true);
-    }
-  };
-
-  handleStartTutorial = (e) => {
+  const handleStartTutorial = (e) => {
     e.preventDefault();
-    this.resetClosingTutorialAnimation();
-    this.setState({ run: true });
+    resetClosingTutorialAnimation();
+    store.dispatch(
+      tutorialSlice.actions.openTutorial({
+        id: EOB_TUTORIAL_ID,
+        stepIndex: tutorialId === EOB_TUTORIAL_ID ? stepIndex : 0,
+      }),
+    );
 
     handleFathomTrackEvent(FATHOM_TRACK_EVENT_LIST.SHOW_TUTORIAL_BUTTON);
   };
 
-  handleCloseFirstStep = (e) => {
-    e.preventDefault();
-    this.executeClosingTutorialAnimation();
-    this.setState({ run: false });
-    window.localStorage.setItem(SHOW_TUTORIAL_LC, false);
-  };
-
-  render() {
-    return (
-      <div>
-        <div
-          id="tutorial-animatedinfopanel-button"
-          className="tutorial-panel-button"
-          title={t`Show tutorial`}
-        >
-          <span>
-            <i className="fa fa-info" />
-          </span>
-        </div>
-
-        <div
-          id="infoButton"
-          className="tutorial-infopanel-button tutorial-panel-button"
-          title={t`Show tutorial`}
-          onClick={(ev) => {
-            this.handleStartTutorial(ev);
-          }}
-        >
-          <span>
-            <i className="fa fa-info" />
-          </span>
-        </div>
-
-        <Joyride
-          continuous
-          scrollToFirstStep
-          steps={this.state.steps}
-          run={this.state.run}
-          callback={this.callback}
-          stepIndex={this.state.stepIndex}
-          tooltipComponent={this.TutorialComponent}
-          floaterProps={{
-            styles: {
-              floater: { transition: 'opacity 0.4s ease-in-out' },
-              floaterWithAnimation: { transition: 'opacity 0.4s ease-in-out' },
-            },
-          }}
-        />
+  return (
+    <div>
+      <div id="tutorial-animatedinfopanel-button" className="tutorial-panel-button" title={t`Show tutorial`}>
+        <span>
+          <i className="fa fa-info" />
+        </span>
       </div>
-    );
-  }
-}
+
+      <div
+        id="infoButton"
+        className="tutorial-infopanel-button tutorial-panel-button"
+        title={t`Show tutorial`}
+        onClick={handleStartTutorial}
+      >
+        <span>
+          <i className="fa fa-info" />
+        </span>
+      </div>
+
+      {tutorialId === PSD_TUTORIAL_ID && (
+        <div id="psd-tutorial-step3-arrow-wrapper" className={`${stepIndex === 3 ? 'animate' : ''}`}>
+          <div id="psd-tutorial-step3-arrow-right" />
+        </div>
+      )}
+
+      <Joyride
+        continuous
+        scrollToFirstStep
+        steps={steps}
+        run={!!tutorialId && open && !popupDisabled}
+        callback={callback}
+        stepIndex={stepIndex}
+        tooltipComponent={component}
+        floaterProps={{
+          styles: {
+            floater: { transition: 'opacity 0.4s ease-in-out' },
+            floaterWithAnimation: { transition: 'opacity 0.4s ease-in-out' },
+            arrow: {
+              length: 32,
+              spread: 64,
+            },
+          },
+        }}
+        spotlightPadding={tutorialId === PSD_TUTORIAL_ID ? 0 : undefined}
+      />
+    </div>
+  );
+};
 
 export default Tutorial;

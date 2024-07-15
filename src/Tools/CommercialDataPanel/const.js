@@ -10,3 +10,56 @@ export const TPDI_PROVIDER_ORDER_WARNINGS = {
 };
 
 export const PLANET_SKYSAT_MIN_ORDER_SIZE = 25;
+
+export const GEOCENTO_EARTHIMAGES = 'GEOCENTO_EARTHIMAGES';
+
+export const TPDICollectionsWithLabels = [
+  {
+    value: TPDICollections.AIRBUS_PLEIADES,
+    label: 'Airbus Pleiades',
+    requiresQuotas: true,
+    requiresPlanetKey: false,
+  },
+  {
+    value: TPDICollections.AIRBUS_SPOT,
+    label: 'Airbus SPOT',
+    requiresQuotas: true,
+    requiresPlanetKey: false,
+  },
+  {
+    value: TPDICollections.MAXAR_WORLDVIEW,
+    label: 'Maxar WorldView',
+    requiresQuotas: true,
+    requiresPlanetKey: false,
+  },
+  {
+    value: TPDICollections.PLANET_ARPS,
+    label: 'Planet ARPS',
+    requiresQuotas: false,
+    requiresPlanetKey: true,
+  },
+  {
+    value: TPDICollections.PLANET_SCOPE,
+    label: 'Planet PlanetScope',
+    requiresQuotas: false,
+    requiresPlanetKey: true,
+  },
+  {
+    value: TPDICollections.PLANET_SKYSAT,
+    label: 'Planet SkySat',
+    requiresQuotas: false,
+    requiresPlanetKey: true,
+  },
+  {
+    value: TPDICollections.PLANETARY_VARIABLES,
+    label: 'Planet Planetary Variables',
+    requiresQuotas: false,
+    requiresPlanetKey: true,
+  },
+  {
+    value: GEOCENTO_EARTHIMAGES,
+    label: 'Geocento EarthImages',
+    requiresQuotas: true,
+    requiresPlanetKey: false,
+  },
+];

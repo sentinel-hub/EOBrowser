@@ -71,7 +71,7 @@ function ImageDownload(props) {
   });
   const [analyticalFormState, setAnalyticalFormState] = useState({
     imageFormat: IMAGE_FORMATS.JPG,
-    selectedCrs: hasAoi ? CRS_EPSG4326.authId : CRS_EPSG3857.authId,
+    selectedCrs: CRS_EPSG4326.authId,
     showLogo: props.allowShowLogoAnalytical,
     resolutionDivisor: 2,
     selectedResolution: RESOLUTION_OPTIONS.MEDIUM,
@@ -239,6 +239,7 @@ function ImageDownload(props) {
   async function executeDownloadBasicCompared(props, formData, baseParams) {
     const { imageFormat, cropToAoi } = formData;
     const bounds = cropToAoi ? props.aoiBounds : props.mapBounds;
+    const correctProjection = !formData.addMapOverlays ? CRS_EPSG4326.authId : CRS_EPSG3857.authId;
 
     const { finalImage, finalFileName } = await fetchAndPatchImagesFromParams(
       {
@@ -252,6 +253,7 @@ function ImageDownload(props) {
           newCLayer.toTime = cLayer.toTime ? moment(cLayer.toTime) : undefined;
           return newCLayer;
         }),
+        selectedCrs: correctProjection,
       },
       setWarnings,
       setError,
@@ -268,7 +270,12 @@ function ImageDownload(props) {
     const { imageFormat, cropToAoi } = formData;
     const bounds = cropToAoi ? props.aoiBounds : props.mapBounds;
     try {
-      image = await fetchImageFromParams({ ...props, ...formData, ...baseParams, bounds }, setWarnings);
+      const correctProjection = !formData.addMapOverlays ? CRS_EPSG4326.authId : CRS_EPSG3857.authId;
+
+      image = await fetchImageFromParams(
+        { ...props, ...formData, ...baseParams, bounds, selectedCrs: correctProjection },
+        setWarnings,
+      );
     } catch (err) {
       setError(err);
       setLoadingImages(false);

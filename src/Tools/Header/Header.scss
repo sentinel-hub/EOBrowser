@@ -16,6 +16,7 @@
 
   .app-title {
     font-size: 24px;
+    font-weight: bold;
     color: #fff;
     text-decoration: none;
     display: flex;
@@ -31,6 +32,11 @@
     align-self: flex-end;
     font-size: 12px;
     margin-top: 5px;
+
+    &-impersonated {
+      font-size: 12px;
+      color: $primaryCol;
+    }
   }
 
   .right {

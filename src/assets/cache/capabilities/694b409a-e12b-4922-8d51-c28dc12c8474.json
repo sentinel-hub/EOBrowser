@@ -1,0 +1,100 @@
+{
+    "title": "EOB3 Sentinel-1-AWS_EW_HH+HV API",
+    "layers": [
+        {
+            "id": "EW-DH-HH-DECIBEL-GAMMA0",
+            "name": "HH - decibel gamma0",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HH-DECIBEL-GAMMA0-ORTHORECTIFIED",
+            "name": "HH - decibel gamma0 - orthorectified",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HH-DECIBEL-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+            "name": "HH - decibel gamma0 - radiometric terrain corrected",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HH-LINEAR-GAMMA0",
+            "name": "HH - linear gamma0",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HH-LINEAR-GAMMA0-ORTHORECTIFIED",
+            "name": "HH - linear gamma0 - orthorectified",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HH-LINEAR-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+            "name": "HH - linear gamma0 - radiometric terrain corrected",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HV-DECIBEL-GAMMA0",
+            "name": "HV - decibel gamma0",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HV-DECIBEL-GAMMA0-ORTHORECTIFIED",
+            "name": "HV - decibel gamma0 - orthorectified",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HV-DECIBEL-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+            "name": "HV - decibel gamma0 - radiometric terrain corrected",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HV-LINEAR-GAMMA0",
+            "name": "HV - linear gamma0",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HV-LINEAR-GAMMA0-ORTHORECTIFIED",
+            "name": "HV - linear gamma0 - orthorectified",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "EW-DH-HV-LINEAR-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+            "name": "HV - linear gamma0 - radiometric terrain corrected",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        }
+    ],
+    "datasets": [
+        {
+            "name": "S1GRD",
+            "bands": [
+                "VV",
+                "VH",
+                "HH",
+                "HV"
+            ]
+        }
+    ]
+}

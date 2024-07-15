@@ -9,6 +9,9 @@ import SpectralExplorer from '../Controls/SpectralExplorer/SpectralExplorer';
 import ElevationProfile from '../Controls/ElevationProfile/ElevationProfile';
 import PrivateThemeModal from '../ThemesProvider/PrivateThemeModal';
 import RestrictedAccessNotification from '../Auth/RestrictedAccessNotification/RestrictedAccessNotification';
+import PrivatePSDModal from '../Tutorial/PrivatePSDModal';
+import PSDNonEligibleUserModal from '../Tutorial/PSDNonEligibleUserModal';
+import EducationModeRedirect from '../EducationModeRedirect/EducationModeRedirect';
 
 export const Modals = {
   [ModalId.ELEVATION_PROFILE]: () => <ElevationProfile />,
@@ -21,6 +24,9 @@ export const Modals = {
   [ModalId.TERMS_AND_PRIVACY_CONSENT]: () => <TermsAndPrivacyConsentForm />,
   [ModalId.SPECTRAL_EXPLORER]: ({ geometryType }) => <SpectralExplorer geometryType={geometryType} />,
   [ModalId.RESTRICTED_ACCESS]: () => <RestrictedAccessNotification />,
+  [ModalId.PRIVATE_PSD_LOGIN]: () => <PrivatePSDModal />,
+  [ModalId.PSD_NOT_ELIGIBLE_USER]: () => <PSDNonEligibleUserModal />,
+  [ModalId.EDUCATION_MODE_REDIRECT]: () => <EducationModeRedirect />,
 };
 
 export function propsSufficientToRender(props) {

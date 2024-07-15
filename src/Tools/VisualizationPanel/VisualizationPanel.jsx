@@ -38,6 +38,7 @@ import {
   constructErrorMessage,
   parseEvalscriptBands,
   parseIndexEvalscript,
+  isKnownTheme,
 } from '../../utils';
 import ZoomInNotification from './ZoomInNotification';
 import { getAppropriateAuthToken } from '../../App';
@@ -170,12 +171,16 @@ class VisualizationPanel extends Component {
     return datasourceHandler.generateEvalscript(bands, datasetId, config);
   }
 
-  setSelectedVisualization = (layer) => {
+  setSelectedVisualization = async (layer) => {
+    const { selectedThemeId, datasetId, selectedModeId } = this.props;
+
     const layerId = layer.duplicateLayerId ? layer.duplicateLayerId : layer.layerId;
 
     handleFathomTrackEvent(
       FATHOM_TRACK_EVENT_LIST.VISUALIZATION_LAYER_CHANGED,
-      `${layer.title} (Dataset: ${getDatasetLabel(this.props.datasetId)})`,
+      isKnownTheme(selectedThemeId, selectedModeId)
+        ? `${layer.title} (Dataset: ${getDatasetLabel(datasetId)})`
+        : FATHOM_TRACK_EVENT_LIST.PRIVATE_USER_LAYER,
     );
 
     this.setState({
@@ -397,7 +402,7 @@ class VisualizationPanel extends Component {
         visibleOnMap: false,
         visualizationUrl: null,
       };
-      const message = await constructErrorMessage(t`No layers found for date`);
+      const { message } = await constructErrorMessage(t`No layers found for date`);
       store.dispatch(visualizationSlice.actions.setError(message));
       store.dispatch(visualizationSlice.actions.setVisualizationParams(params));
       this.setState({ visualizations: [] });
@@ -913,7 +918,7 @@ class VisualizationPanel extends Component {
       <div className="header">
         <div className="dataset-info">
           <div className="title">
-            <b>{t`Dataset`}: </b>
+            <div className="dataset-label">{t`Dataset`}:</div>
             <div className="dataset-name">{`${getDatasetLabel(datasetId) || ''}`}</div>
             {siblingShortName && (
               <EOBButton
@@ -929,7 +934,7 @@ class VisualizationPanel extends Component {
           {this.state.noSiblingDataModal && this.renderNoSibling(siblingId)}
         </div>
         <div className="date-selection">
-          {this.props.mapBounds && this.state.visualizations && (
+          {this.props.mapBounds && this.state.visualizations && fromTime !== null && toTime !== null && (
             <VisualizationTimeSelect
               maxDate={maxDate}
               minDate={minDate}

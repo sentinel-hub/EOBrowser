@@ -107,7 +107,9 @@ class HistogramWrapper extends Component {
         <div className="histogram-button-wrapper" title={title}>
           <div
             className={`histogram-button ${histogramEnabled ? '' : 'disabled'}`}
-            onClick={() => this.onToggleHistogramModal(histogramEnabled, errorMessage)}
+            onClick={() => {
+              this.onToggleHistogramModal(histogramEnabled, errorMessage);
+            }}
           >
             <i className="fas fa-chart-bar" />
           </div>

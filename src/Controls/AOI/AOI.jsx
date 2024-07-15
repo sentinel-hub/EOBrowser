@@ -38,10 +38,21 @@ class AOI extends Component {
         }
 
         store.dispatch(
-          aoiSlice.actions.set({ geometry: geometry, bounds: getLeafletBoundsFromGeoJSON(geometry) }),
+          aoiSlice.actions.set({
+            geometry: geometry,
+            bounds: getLeafletBoundsFromGeoJSON(geometry),
+            isPlacingVertex: false,
+          }),
         );
         this.props.map.removeLayer(e.layer);
         this.enableEdit();
+      }
+    });
+
+    // if user starts drawing new shape while placing a vertex, we stop placing a vertex
+    map.on('pm:drawstart', (e) => {
+      if (e.shape && e.shape !== 'Polygon' && e.shape !== 'Rectangle') {
+        store.dispatch(aoiSlice.actions.setisPlacingVertex(false));
       }
     });
   }
@@ -143,6 +154,10 @@ class AOI extends Component {
     store.dispatch(modalSlice.actions.addModal({ modal: ModalId.FIS, params: { poiOrAoi: AOI_STRING } }));
   };
 
+  openUploadGeoFileDialog = () => {
+    this.setState({ uploadDialog: true });
+  };
+
   render() {
     const selectedBounds =
       this.props.mapBounds && this.state.drawingInProgress
@@ -166,12 +181,14 @@ class AOI extends Component {
             if (this.props.aoiIsDrawing) {
               this.onStartDrawingPolygon(shape);
             }
-            store.dispatch(aoiSlice.actions.startDrawing({ isDrawing: true, shape: shape }));
+            store.dispatch(
+              aoiSlice.actions.startDrawing({ isDrawing: true, shape: shape, isPlacingVertex: true }),
+            );
           }}
           resetAoi={this.onResetAoi}
           centerOnFeature={this.centerMapOnFeature}
           onErrorMessage={(msg) => store.dispatch(notificationSlice.actions.displayError(msg))}
-          openUploadGeoFileDialog={() => this.setState({ uploadDialog: true })}
+          openUploadGeoFileDialog={this.openUploadGeoFileDialog}
           openFisPopup={this.openFISPanel}
           selectedResults={generateSelectedResults({ ...this.props, poiOrAoi: AOI_STRING })}
           presetLayerName={'True color'} // TO DO

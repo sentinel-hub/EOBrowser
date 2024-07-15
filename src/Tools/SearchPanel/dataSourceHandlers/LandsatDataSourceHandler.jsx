@@ -31,8 +31,7 @@ import {
 import { getLandsatBandForDataset, getGroupedBands } from './datasourceAssets/landsatBands';
 import { IMAGE_FORMATS } from '../../../Controls/ImgDownload/consts';
 
-export const LANDSAT_COPYRIGHT_TEXT = (number) =>
-  `Landsat ${number} image courtesy of the U.S. Geological Survey`;
+const LANDSAT_COPYRIGHT_TEXT = (number) => `Landsat ${number} image courtesy of the U.S. Geological Survey`;
 
 export default class LandsatDataSourceHandler extends DataSourceHandler {
   urls = {

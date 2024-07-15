@@ -5,7 +5,7 @@ import { t } from 'ttag';
 
 import store, { mainMapSlice, compareLayersSlice } from '../../store';
 import { parsePosition } from '../../utils';
-import { COMPARE_SPLIT, COMPARE_OPACITY } from './ComparePanel';
+import { COMPARE_SPLIT, COMPARE_OPACITY } from './compareConstants';
 import PinPreviewImage from '../Pins/PinPreviewImage';
 import { constructTimespanString } from '../Pins/Pin.utils';
 import { useDragPin } from '../Pins/useDragPin';

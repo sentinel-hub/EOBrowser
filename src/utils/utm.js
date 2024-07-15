@@ -3,7 +3,12 @@ export const HEMISPHERES = {
   S: 'S',
 };
 
-export const UTM_EPSG_CODE_BASES = {
+const HEMISPHERES_NON_ABBR = {
+  [HEMISPHERES.N]: 'north',
+  [HEMISPHERES.S]: 'south',
+};
+
+const UTM_EPSG_CODE_BASES = {
   N: '326',
   S: '327',
 };
@@ -97,7 +102,7 @@ export const createUtmCrsListPerHemisphere = (hemisphere) => {
       id: `EPSG:${epsgCode}`,
       text: `UTM ${zone}${hemisphere} (EPSG:${epsgCode})`,
       url: `http://www.opengis.net/def/crs/EPSG/0/${epsgCode}`,
-      projection: `+proj=utm +zone=${zone} +datum=WGS84 +units=m +no_defs`,
+      projection: `+proj=utm +zone=${zone} +${HEMISPHERES_NON_ABBR[hemisphere]} +datum=WGS84 +units=m +no_defs`,
     };
 
     return previousValue;

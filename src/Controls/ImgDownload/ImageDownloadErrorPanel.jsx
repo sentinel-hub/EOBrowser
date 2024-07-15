@@ -10,7 +10,7 @@ function ImageDownloadErrorPanel(props) {
     if (!props.error) {
       return;
     }
-    constructErrorMessage(props.error).then((message) => setErrorMessage(message));
+    constructErrorMessage(props.error).then(({ message }) => setErrorMessage(message));
   }, [props.error]);
 
   if (!props.error || !errorMessage) {

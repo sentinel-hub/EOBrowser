@@ -6,17 +6,25 @@ import {
 } from '@sentinel-hub/sentinelhub-js';
 import moment from 'moment';
 import { t } from 'ttag';
-import { reqConfigMemoryCache, DATAMASK_OUTPUT, EOBROWSERSTATS_OUTPUT } from '../../const';
+import {
+  reqConfigMemoryCache,
+  DATAMASK_OUTPUT,
+  EOBROWSERSTATS_OUTPUT,
+  EOBROWSERSTATS_OUTPUT_POI,
+} from '../../const';
 import {
   getRecommendedResolutionForDatasetId,
   getRequestGeometry,
   getStatisticsLayer,
 } from '../FIS/FIS.utils';
 import { refetchWithDefaultToken } from '../../utils/fetching.utils';
+import { checkAllMandatoryOutputsExist } from '../../utils/parseEvalscript';
 
 const PIXEL_EXPLORER_ENABLED = true;
 const PIXEL_VALUE_OUTPUT = EOBROWSERSTATS_OUTPUT;
+const PIXEL_VALUE_OUTPUT_POI = EOBROWSERSTATS_OUTPUT_POI;
 const PIXEL_VALUE_MANDATORY_OUTPUTS = [PIXEL_VALUE_OUTPUT, DATAMASK_OUTPUT];
+const PIXEL_VALUE_MANDATORY_OUTPUTS_POI = [PIXEL_VALUE_OUTPUT_POI, DATAMASK_OUTPUT];
 
 // initialize the statistics layer that will be used to obtain pixel-related valuess
 const initializeStatisticsLayer = async ({
@@ -48,18 +56,30 @@ const initializeStatisticsLayer = async ({
     return { enabled: false, statisticsLayer: null };
   }
 
-  const { supportStatisticalApi, statisticsLayer } = await getStatisticsLayer(
-    {
-      customSelected,
-      datasetId,
-      evalscript,
-      layerId,
-      visualizationUrl,
-    },
+  const paramsForStatsLayer = {
+    customSelected,
+    datasetId,
+    evalscript,
+    layerId,
+    visualizationUrl,
+  };
+  let { supportStatisticalApi, statisticsLayer } = await getStatisticsLayer(
+    paramsForStatsLayer,
     PIXEL_VALUE_MANDATORY_OUTPUTS,
   );
 
-  if (!statisticsLayer) {
+  // check if evalscript has 'eobrowserStatsPOI' output instead of 'eobrowserStats'
+  if (!supportStatisticalApi) {
+    const { supportStatisticalApi: supportStatApiPoi, statisticsLayer: statsLayerPoi } =
+      await getStatisticsLayer(paramsForStatsLayer, PIXEL_VALUE_MANDATORY_OUTPUTS_POI);
+
+    if (supportStatApiPoi) {
+      supportStatisticalApi = supportStatApiPoi;
+      statisticsLayer = statsLayerPoi;
+    }
+  }
+
+  if (!(statisticsLayer && supportStatisticalApi)) {
     return { enabled: false, statisticsLayer: null };
   }
 
@@ -92,7 +112,19 @@ const getIndexValue = async (
   supportStatisticalApi,
   { fromTime, toTime, cancelToken, requestGeometry, crs, recommendedResolution, userToken },
 ) => {
-  const outputName = PIXEL_VALUE_OUTPUT;
+  // update layer with evalscript if needed
+  await refetchWithDefaultToken((reqConfig) => statisticsLayer.updateLayerFromServiceIfNeeded(reqConfig), {
+    ...reqConfigMemoryCache,
+    cancelToken: cancelToken,
+    ...(userToken ? { authToken: userToken } : {}),
+  });
+
+  // check if evalscript has 'eobrowserStatsPOI' output instead of 'eobrowserStats'
+  const checkEobStatsOutputPoi = checkAllMandatoryOutputsExist(
+    statisticsLayer.evalscript,
+    PIXEL_VALUE_MANDATORY_OUTPUTS_POI,
+  );
+  const outputName = checkEobStatsOutputPoi ? PIXEL_VALUE_OUTPUT_POI : PIXEL_VALUE_OUTPUT;
 
   const statsParams = {
     geometry: requestGeometry,
@@ -105,12 +137,7 @@ const getIndexValue = async (
   };
   let indexValue = null;
   const response = await refetchWithDefaultToken(
-    (reqConfig) =>
-      statisticsLayer.getStats(
-        statsParams,
-        reqConfig,
-        supportStatisticalApi ? StatisticsProviderType.STAPI : StatisticsProviderType.FIS,
-      ),
+    (reqConfig) => statisticsLayer.getStats(statsParams, reqConfig, StatisticsProviderType.STAPI),
 
     { ...reqConfigMemoryCache, cancelToken: cancelToken, ...(userToken ? { authToken: userToken } : {}) },
   );

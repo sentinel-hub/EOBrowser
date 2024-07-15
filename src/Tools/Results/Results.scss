@@ -170,6 +170,8 @@ $headerPadding: 10px;
     background-color: $mainMedium;
     padding: 0 10px 10px 10px;
     color: $textCol;
+    overflow-y: auto;
+    max-height: var(--sidebarHeight);
 
     & > .eob-btn {
       display: block;

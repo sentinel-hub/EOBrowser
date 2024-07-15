@@ -1,0 +1,20 @@
+{
+    "title": "Soil Water Content",
+    "layers": [
+        {
+            "id": "SWC-100",
+            "name": "Soil Water Content (100m)",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "SWC-1000",
+            "name": "Soil Water Content (1000m)",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

@@ -5,11 +5,9 @@ import isEqual from 'lodash.isequal';
 import { t } from 'ttag';
 import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
 
-import store, { tabsSlice } from '../../store';
-import { DEFAULT_THEMES } from '../../assets/default_themes.js';
+import { DEFAULT_THEMES, DEFAULT_THEME_ID } from '../../assets/default_themes.js';
 import { VERSION_INFO } from '../../VERSION';
 import { b64DecodeUnicode } from '../../utils/base64MDN';
-import { getUserTokenFromLocalStorage } from '../../Auth/authHelpers';
 import { getDataSourceHandler, getDatasetLabel } from '../SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
 import {
@@ -40,6 +38,7 @@ import {
   S5_OTHER,
   S5_SO2,
 } from '../SearchPanel/dataSourceHandlers/dataSourceConstants';
+import { isUserAuthenticated } from '../../Auth/authHelpers.js';
 
 const PINS_LC_NAME = 'eob-pins';
 
@@ -60,7 +59,7 @@ const convertDataSource = (pin, newPin) => {
   const { datasource } = pin;
   if (datasource) {
     const datasetId = datasourceToDatasetId[datasource];
-    const themeId = dataSourceToThemeId[datasource] ? dataSourceToThemeId[datasource] : 'DEFAULT-THEME';
+    const themeId = dataSourceToThemeId[datasource] ? dataSourceToThemeId[datasource] : DEFAULT_THEME_ID;
     const visualizationUrl = datasourceToUrl[datasource];
     newPin.datasetId = datasetId;
     newPin.themeId = themeId;
@@ -275,44 +274,49 @@ export function convertToNewFormat(pin) {
   return pin;
 }
 
-async function getPinsFromBackend(access_token) {
-  const url = `${import.meta.env.VITE_EOB_BACKEND}userpins`;
+function getRequestParams(accessToken) {
   const requestParams = {
     responseType: 'json',
     headers: {
-      Authorization: `Bearer ${access_token}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   };
+  return requestParams;
+}
+
+function getPinsUrl(userId) {
+  const url = new URL(`${import.meta.env.VITE_EOB_BACKEND}userpins`);
+  if (userId) {
+    url.searchParams.set('userId', userId);
+  }
+  return url;
+}
+
+async function getPinsFromBackend(url, requestParams) {
   const res = await axios.get(url, requestParams);
   return establishCorrectDataFusionFormatInPins(res.data);
 }
 
-export async function getPinsFromServer() {
-  const access_token = store.getState().auth.user.access_token;
-  return await getPinsFromBackend(access_token);
+export async function getPinsFromServer(accessToken, userId) {
+  const url = getPinsUrl(userId);
+  const requestParams = getRequestParams(accessToken);
+  return await getPinsFromBackend(url, requestParams);
 }
 
-async function removePinsFromBackend(ids) {
-  const access_token = store.getState().auth.user.access_token;
-  const url = `${import.meta.env.VITE_EOB_BACKEND}userpins`;
-  const requestParams = {
-    responseType: 'json',
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
-  };
-  let userPins = await getPinsFromServer();
+async function removePinsFromBackend(ids, accessToken, userId) {
+  const url = getPinsUrl(userId);
+  const requestParams = getRequestParams(accessToken);
+  let userPins = await getPinsFromBackend(url, requestParams);
   userPins = userPins.filter((p) => !ids.includes(p._id));
   await axios.put(url, { items: userPins }, requestParams);
   return userPins;
 }
 
-export async function removePinsFromServer(ids) {
-  return await removePinsFromBackend(ids);
+export async function removePinsFromServer(ids, accessToken, userId) {
+  return await removePinsFromBackend(ids, accessToken, userId);
 }
 
-async function savePinsToBackend(pins, replace = false) {
-  const access_token = store.getState().auth.user.access_token;
+async function savePinsToBackend(pins, replace = false, accessToken, userId) {
   let lastUniqueId;
   pins = pins.map((p) => {
     if (!p._id) {
@@ -323,19 +327,14 @@ async function savePinsToBackend(pins, replace = false) {
     return p;
   });
 
-  const url = `${import.meta.env.VITE_EOB_BACKEND}userpins`;
-  const requestParams = {
-    responseType: 'json',
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
-  };
+  const url = getPinsUrl(userId);
+  const requestParams = getRequestParams(accessToken);
 
   let newPins;
   if (replace) {
     newPins = [...pins];
   } else {
-    const currentPins = await getPinsFromServer();
+    const currentPins = await getPinsFromBackend(url, requestParams);
     newPins = [...pins, ...currentPins];
   }
   try {
@@ -347,8 +346,8 @@ async function savePinsToBackend(pins, replace = false) {
   }
 }
 
-export async function savePinsToServer(pins, replace = false) {
-  return await savePinsToBackend(pins, replace);
+export async function savePinsToServer(pins, replace = false, accessToken, userId) {
+  return await savePinsToBackend(pins, replace, accessToken, userId);
 }
 
 export function savePinsToSessionStorage(newPins, replace = false) {
@@ -449,10 +448,10 @@ const pinPropertiesSubset = (pin) => ({
   terrainViewerSettings: pin.terrainViewerSettings,
 });
 
-export function getPinsFromStorage(user) {
+function getPinsFromStorage(user, access_token, impersonatedUserId) {
   return new Promise((resolve, reject) => {
     if (user) {
-      getPinsFromServer().then((pins) => resolve(pins));
+      getPinsFromServer(access_token, impersonatedUserId).then((pins) => resolve(pins));
     } else {
       const pinsFromLocalStorage = getPinsFromSessionStorage();
       resolve(pinsFromLocalStorage);
@@ -460,9 +459,11 @@ export function getPinsFromStorage(user) {
   });
 }
 
-export async function importSharedPins(sharedPinsListId) {
-  const isUserLoggedIn = await getUserTokenFromLocalStorage();
-  const [existingPins] = await Promise.all([getPinsFromStorage(isUserLoggedIn)]);
+export async function importSharedPins(sharedPinsListId, setTabIndex, access_token, impersonatedUserId) {
+  const isUserLoggedIn = isUserAuthenticated();
+  const [existingPins] = await Promise.all([
+    getPinsFromStorage(isUserLoggedIn, access_token, impersonatedUserId),
+  ]);
   const sharedPins = await getSharedPins(sharedPinsListId);
 
   const N_PINS = sharedPins.items.length;
@@ -472,7 +473,7 @@ export async function importSharedPins(sharedPinsListId) {
     return [];
   }
 
-  store.dispatch(tabsSlice.actions.setTabIndex(3));
+  setTabIndex(3);
 
   //merge sharedPins with pins
   const newPins = [];
@@ -545,7 +546,7 @@ export const getVisualizationUrl = ({ visualizationUrl, datasetId }) => {
   return visualizationUrl;
 };
 
-export const isS3orS5 = (datasetId) => {
+const isS3orS5 = (datasetId) => {
   return [
     S5_O3,
     S5_NO2,

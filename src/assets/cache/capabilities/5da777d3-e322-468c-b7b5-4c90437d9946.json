@@ -1,0 +1,48 @@
+{
+    "title": "Corine Land Cover",
+    "layers": [
+        {
+            "id": "1_CORINE-LAND-COVER",
+            "name": "Corine Land Cover ",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "2_ARTIFICIAL-SURFACES",
+            "name": "Artificial Surfaces",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "3_AGRICULTURAL-AREAS",
+            "name": "Agricultural Areas",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "4_FOREST-AND-SEMINATURAL-AREAS",
+            "name": "Forest and Seminatural Areas",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "5_WETLANDS",
+            "name": "Wetlands",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "6_WATER-BODIES",
+            "name": "Water Bodies",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

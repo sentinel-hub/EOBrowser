@@ -13,6 +13,7 @@ const TransactionOptions = (props) => {
     if (
       searchParams.dataProvider !== TPDICollections.PLANET_SCOPE &&
       searchParams.dataProvider !== TPDICollections.PLANETARY_VARIABLES &&
+      searchParams.dataProvider !== TPDICollections.PLANET_ARPS &&
       transactionType === TRANSACTION_TYPE.SUBSCRIPTION
     ) {
       setTransactionType(TRANSACTION_TYPE.ORDER);
@@ -25,9 +26,11 @@ const TransactionOptions = (props) => {
         <TransactionTypeSelection transactionType={transactionType} setTransactionType={setTransactionType} />
       )}
       {(searchParams.dataProvider === TPDICollections.PLANET_SCOPE ||
+        searchParams.dataProvider === TPDICollections.PLANET_ARPS ||
         searchParams.dataProvider === TPDICollections.PLANETARY_VARIABLES) &&
         transactionType === TRANSACTION_TYPE.SUBSCRIPTION && <SubscriptionOptions {...props} />}
       {searchParams.dataProvider !== TPDICollections.PLANETARY_VARIABLES &&
+        searchParams.dataProvider !== TPDICollections.PLANET_ARPS &&
         transactionType === TRANSACTION_TYPE.ORDER && <OrderOptions {...props} />}
     </>
   );

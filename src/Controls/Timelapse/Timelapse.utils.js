@@ -15,8 +15,8 @@ import {
   checkIfCustom,
 } from '../../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 
-import SHlogo from '../../junk/EOBCommon/assets/shLogo.png';
-import copernicus from '../../junk/EOBCommon/assets/copernicus.png';
+import SHlogo from '../ImgDownload/assets/shLogo.png';
+import copernicus from '../ImgDownload/assets/copernicus.png';
 import { convertToWgs84, wgs84ToMercator } from '../../junk/EOBCommon/utils/coords';
 import { DATASOURCES, TRANSITION } from '../../const';
 import planetUtils from '../../Tools/SearchPanel/dataSourceHandlers/planetNicfi.utils';
@@ -319,7 +319,7 @@ export function addLabelsAndLogos(
   });
 }
 
-export function scalebarPixelWidthAndDistance(metersPerPixel) {
+function scalebarPixelWidthAndDistance(metersPerPixel) {
   const proposedScaleBarWidth = 50;
   const roundedMeters = roundScalebarMeters(metersPerPixel * proposedScaleBarWidth);
   const meterOrKilo = getMorKm(roundedMeters);
@@ -655,7 +655,7 @@ export const generateTimelapseWithFFMPEG = ({
   });
 };
 
-export const generateTimelapseFilename = (datasetId) => {
+const generateTimelapseFilename = (datasetId) => {
   const random = Math.round(Date.now() * Math.random() * 1000);
   return `${datasetId.replace(' ', '_')}-${random}-timelapse`;
 };

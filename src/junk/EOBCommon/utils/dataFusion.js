@@ -1,6 +1,4 @@
 import {
-  ApiType,
-  parseLegacyWmsGetMapParams,
   DATASET_AWSEU_S1GRD,
   DATASET_S2L1C,
   DATASET_S2L2A,
@@ -39,21 +37,6 @@ import {
 } from '@sentinel-hub/sentinelhub-js';
 
 import { S1_DEFAULT_PARAMS } from '../../../const';
-
-export async function getMapDataFusion(wmsParams, dataFusionSettings, effects = null) {
-  const { evalscript, evalscriptUrl, getMapParams } = parseLegacyWmsGetMapParams(wmsParams);
-  const dataFusionLayer = await constructDataFusionLayer(
-    dataFusionSettings,
-    evalscript,
-    evalscriptUrl,
-    getMapParams.fromTime,
-    getMapParams.toTime,
-  );
-  if (effects) {
-    getMapParams.effects = effects;
-  }
-  return await dataFusionLayer.getMap(getMapParams, ApiType.PROCESSING);
-}
 
 export async function constructDataFusionLayer(
   dataFusionSettings,

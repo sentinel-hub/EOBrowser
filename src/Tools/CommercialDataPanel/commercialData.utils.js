@@ -16,22 +16,29 @@ import {
   AirbusConstellation,
   PlanetItemType,
   setTPDIServiceBaseURL,
+  PlanetARPSType,
+  PlanetARPSId,
+  PlanetPVType,
+  PlanetPVId,
 } from '@sentinel-hub/sentinelhub-js';
 import { constructBBoxFromBounds } from '../../Controls/ImgDownload/ImageDownload.utils.js';
-import store, { mainMapSlice, visualizationSlice, tabsSlice, themesSlice } from '../../store';
+import store, { mainMapSlice, visualizationSlice, tabsSlice, themesSlice, authSlice } from '../../store';
 import {
   TRANSACTION_TYPE,
   USER_INSTANCES_THEMES_LIST,
   OrderType,
-  SH_PAYING_ACCOUNT_TYPES,
-  PLANETARY_VARIABLES_TYPE_CONFIGURATION_IDS,
-  PLANETARY_VARIABLES_ID_CONFIGURATION_IDS,
+  PLANETARY_VARIABLES_TYPE_CONFIGURATION,
+  PLANETARY_VARIABLES_ID_CONFIGURATION,
+  PLANET_TEMPLATE_CONFIGURATION,
+  AIRBUS_TEMPLATE_CONFIGURATION,
+  MAXAR_TEMPLATE_CONFIGURATION,
   SH_ACCOUNT_TYPE,
+  SH_TRIAL_ACCOUNT_TYPES,
 } from '../../const';
 import { getBoundsZoomLevel } from '../../utils/coords';
 import { isRectangle, isPolygon } from '../../utils/geojson.utils.js';
-import { PlanetPVType } from '@sentinel-hub/sentinelhub-js';
-import { PlanetPVId } from '@sentinel-hub/sentinelhub-js';
+
+import { TPDICollectionsWithLabels } from './const.js';
 
 const SH_SERVICES_URL = import.meta.env.VITE_SH_SERVICES_URL;
 
@@ -159,12 +166,15 @@ export const calculateAOICoverage = (aoiGeometry, productGeometry) => {
 };
 
 export const checkUserAccount = async (user) => {
+  const userAccount = {
+    trialAccount: false,
+    hasCommercialDataAccess: false,
+    hasGoogleMapsAccess: false,
+    quotas: [],
+  };
+
   if (!user || !user.access_token || !user.userdata) {
-    return {
-      payingAccount: false,
-      trialAccount: false,
-      quotasEnabled: false,
-    };
+    return userAccount;
   }
 
   const requestConfig = {
@@ -178,38 +188,115 @@ export const checkUserAccount = async (user) => {
   const shServicesAccountInfoEndpoint = `${SH_SERVICES_URL}/ims/accounts/${accountId}/account-info`;
 
   const accountInfo = await axios.get(shServicesAccountInfoEndpoint, requestConfig);
-  const isPayingAccount = accountInfo?.data?.type && SH_PAYING_ACCOUNT_TYPES.includes(accountInfo.data.type);
-  const isTrialAccount = accountInfo?.data?.type === SH_ACCOUNT_TYPE.TRIAL;
+  if (!accountInfo || !accountInfo.data) {
+    return userAccount;
+  }
+
+  const isRootAccount = accountInfo?.data?.type === SH_ACCOUNT_TYPE.ROOT;
+  if (isRootAccount) {
+    const impersonatedUserId = store.getState().auth.impersonatedUser.userId;
+    if (impersonatedUserId) {
+      const shServicesImpersonatedAccountInfoEndpoint = `${SH_SERVICES_URL}/ims/users/${impersonatedUserId}`;
+      const impersonatedAccountInfo = await axios.get(
+        shServicesImpersonatedAccountInfoEndpoint,
+        requestConfig,
+      );
+      if (impersonatedAccountInfo?.data) {
+        const { givenName, familyName } = impersonatedAccountInfo.data;
+        store.dispatch(authSlice.actions.setImpersonatedName(`${givenName} ${familyName}`));
+      }
+    }
+  }
+
+  userAccount.trialAccount = SH_TRIAL_ACCOUNT_TYPES.includes(accountInfo.data.type);
+  userAccount.hasCommercialDataAccess = !!accountInfo.data.roleAssignments.di;
+  userAccount.hasGoogleMapsAccess = !!accountInfo.data.typeInfo.properties.hasGoogleMapsAccess;
 
   const quotas = await TPDI.getQuotas({
     authToken: user.access_token,
   });
+  if (quotas) {
+    userAccount.quotas = quotas;
+  }
 
-  return {
-    payingAccount: isPayingAccount,
-    trialAccount: isTrialAccount,
-    quotasEnabled: quotas && quotas.length > 0,
-  };
+  return userAccount;
 };
 
 const getConfigurationForPVTypeAndId = (type, id) => {
-  if (PLANETARY_VARIABLES_TYPE_CONFIGURATION_IDS[type]) {
-    return PLANETARY_VARIABLES_TYPE_CONFIGURATION_IDS[type];
+  if (PLANETARY_VARIABLES_TYPE_CONFIGURATION[type]) {
+    return PLANETARY_VARIABLES_TYPE_CONFIGURATION[type];
   }
 
-  if (PLANETARY_VARIABLES_ID_CONFIGURATION_IDS[id]) {
-    return PLANETARY_VARIABLES_ID_CONFIGURATION_IDS[id];
+  if (PLANETARY_VARIABLES_ID_CONFIGURATION[id]) {
+    return PLANETARY_VARIABLES_ID_CONFIGURATION[id];
+  }
+};
+
+const getConfigurationForARPSTypeAndId = (type, id) => {
+  if (type !== PlanetARPSType.AnalysisReadyPlanetScope) {
+    return {};
+  }
+
+  switch (id) {
+    case PlanetARPSId.PS_ARD_SR_DAILY: {
+      return {
+        id: '958e82-YOUR-INSTANCEID-HERE',
+        name: 'My Analysis-Ready PlanetScope - Daily',
+      };
+    }
+    case PlanetARPSId.PS_ARD_SR_BIWEEKLY: {
+      return {
+        id: '958e82-YOUR-INSTANCEID-HERE',
+        name: 'My Analysis-Ready PlanetScope - Biweekly',
+      };
+    }
+    case PlanetARPSId.PS_ARD_SR_MONTHLY: {
+      return {
+        id: '958e82-YOUR-INSTANCEID-HERE',
+        name: 'My Analysis-Ready PlanetScope - Monthly',
+      };
+    }
+    default:
+      return {};
+  }
+};
+
+const getPlanetTemplates = (transaction) => {
+  if (isPlanetaryVariableTypeAndId(transaction.input.data[0].type, transaction.input.data[0].id)) {
+    return getConfigurationForPVTypeAndId(transaction.input?.data[0]?.type, transaction.input?.data[0]?.id);
+  }
+
+  if (isARPSTypeAndId(transaction.input.data[0].type, transaction.input.data[0].id)) {
+    return getConfigurationForARPSTypeAndId(transaction.input?.data[0]?.type, transaction.input?.data[0]?.id);
+  }
+
+  return PLANET_TEMPLATE_CONFIGURATION[transaction.input.data[0].itemType][
+    transaction.input.data[0].productBundle
+  ];
+};
+
+export const getConfigurationTemplate = (transaction) => {
+  switch (transaction.provider) {
+    case TPDProvider.PLANET:
+      return getPlanetTemplates(transaction);
+    case TPDProvider.AIRBUS:
+      return AIRBUS_TEMPLATE_CONFIGURATION[transaction.input.data[0].constellation];
+    case TPDProvider.MAXAR:
+      return MAXAR_TEMPLATE_CONFIGURATION;
+    default:
+      console.error(`${transaction.provider} not supported`);
+      return;
   }
 };
 
 export const cloneConfiguration = async (user, transaction) => {
   try {
-    const configId = getConfigurationForPVTypeAndId(
-      transaction.input?.data[0]?.type,
-      transaction.input?.data[0]?.id,
-    );
+    const configTemplate = getConfigurationTemplate(transaction);
+    if (configTemplate === undefined) {
+      return;
+    }
 
-    const shServicesCloneEndpoint = `${SH_SERVICES_URL}/configuration/v1/wms/instances/${configId}/clone`;
+    const shServicesCloneEndpoint = `${SH_SERVICES_URL}/configuration/v1/wms/instances/${configTemplate.id}/clone`;
     const config = {
       headers: {
         Authorization: `Bearer ${user.access_token}`,
@@ -217,10 +304,9 @@ export const cloneConfiguration = async (user, transaction) => {
       },
     };
 
-    const cloneResponse = await axios.post(shServicesCloneEndpoint, {}, config);
+    const cloneResponse = await axios.post(shServicesCloneEndpoint, { name: configTemplate.name }, config);
     cloneResponse?.data?.layers.forEach((layer) => {
       layer.datasourceDefaults.collectionId = transaction.collectionId;
-
       axios.put(layer['@id'], layer, config);
     });
   } catch (error) {
@@ -246,12 +332,16 @@ export const fetchTransactions = async (transactionType, user) => {
     const requestsConfig = {
       authToken: user.access_token,
     };
-    let results = await fetchingFunction(null, requestsConfig, 100, null);
+
+    const accountId = store.getState().auth.impersonatedUser.accountId;
+    let params = accountId ? { accountId } : null;
+
+    let results = await fetchingFunction(params, requestsConfig, 100, null);
     if (results && results.data) {
       allTransactions = [...results.data];
     }
     while (results && results.links && results.links.nextToken) {
-      results = await fetchingFunction(null, requestsConfig, 100, results.links.nextToken);
+      results = await fetchingFunction(params, requestsConfig, 100, results.links.nextToken);
       if (results && results.data) {
         allTransactions = [...allTransactions, ...results.data];
       }
@@ -397,14 +487,19 @@ export const getProvider = (dataProvider) => {
     case TPDICollections.PLANET_SCOPE:
     case TPDICollections.PLANET_SKYSAT:
       return TPDProvider.PLANET;
+    case TPDICollections.PLANET_ARPS:
     case TPDICollections.PLANETARY_VARIABLES:
       return TPDProvider.PLANETARY_VARIABLES;
     default:
   }
 };
 
-export function isPlanetaryVariableTypeAndId(type, id) {
+function isPlanetaryVariableTypeAndId(type, id) {
   return Object.values(PlanetPVType).includes(type) && Object.values(PlanetPVId).includes(id);
+}
+
+function isARPSTypeAndId(type, id) {
+  return Object.values(PlanetARPSType).includes(type) && Object.values(PlanetARPSId).includes(id);
 }
 
 export const getTpdiCollectionFromTransaction = (transaction) => {
@@ -431,6 +526,8 @@ export const getTpdiCollectionFromTransaction = (transaction) => {
       const id = transaction.input.data[0].id;
       if (isPlanetaryVariableTypeAndId(type, id)) {
         return TPDICollections.PLANETARY_VARIABLES;
+      } else if (isARPSTypeAndId(type, id)) {
+        return TPDICollections.PLANET_ARPS;
       } else {
         throw new Error(`${type} and ${id} not found in PlanetPVType and PlanetPVId`);
       }
@@ -552,3 +649,17 @@ export function openGeocentoLink(searchParams, geometry) {
 export function roundToNDigits(num, nFrac = 2) {
   return Math.round(num * Math.pow(10, nFrac)) / Math.pow(10, nFrac);
 }
+
+export const getTPDICollectionsWithLabels = (userAccountInfo) =>
+  TPDICollectionsWithLabels.filter((collection) => {
+    if (!collection.requiresQuotas) {
+      return !collection.requiresQuotas;
+    }
+
+    const quotaForCollection = userAccountInfo.quotas.find((q) => q.collectionId === collection.value);
+    if (!quotaForCollection) {
+      return false;
+    }
+
+    return quotaForCollection.quotaSqkm > 0;
+  });

@@ -1,0 +1,65 @@
+{
+    "title": "EOB3 Sentinel-1-AWS_IW_VV API",
+    "layers": [
+        {
+            "id": "__FIS_IW-DV-VH-LINEAR-GAMMA0-ORTHORECTIFIED",
+            "name": "FIS: VV - linear gamma0 - orthorectified",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "IW-DV-VH-DECIBEL-GAMMA0",
+            "name": "VV - decibel gamma0",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "IW-DV-VH-DECIBEL-GAMMA0-ORTHORECTIFIED",
+            "name": "VV - decibel gamma0 - orthorectified",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "IW-DV-VH-DECIBEL-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+            "name": "VV - decibel gamma0 - radiometric terrain corrected ",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "IW-DV-VH-LINEAR-GAMMA0",
+            "name": "VV - linear gamma0",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "IW-DV-VH-LINEAR-GAMMA0-ORTHORECTIFIED",
+            "name": "VV - linear gamma0 - orthorectified",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        },
+        {
+            "id": "IW-DV-VH-LINEAR-GAMMA0-RADIOMETRIC-TERRAIN-CORRECTED",
+            "name": "VV - linear gamma0 - radiometric terrain corrected",
+            "description": "",
+            "dataset": "S1GRD",
+            "legendUrl": null
+        }
+    ],
+    "datasets": [
+        {
+            "name": "S1GRD",
+            "bands": [
+                "VV",
+                "VH",
+                "HH",
+                "HV"
+            ]
+        }
+    ]
+}

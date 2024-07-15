@@ -1,0 +1,207 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/53f4f3-YOUR-INSTANCEID-HERE/layers/__FIS_THERMAL",
+        "id": "__FIS_THERMAL",
+        "title": "__FIS_THERMAL",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nreturn [B10 - 273];"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/53f4f3-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-09T11:39:19.801183Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1/sources/12"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "LOTL1"
+        },
+        "additionalData": {
+            "overlays": []
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/53f4f3-YOUR-INSTANCEID-HERE/layers/FALSE-COLOR-LAVA-FLOW",
+        "id": "FALSE-COLOR-LAVA-FLOW",
+        "title": "False Color Urban",
+        "description": "Based on bands B07, B06, B04",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction evaluatePixel(samples) {\n    return [2.5* samples.B07, 2.5* samples.B06, 2.5* samples.B04, samples.dataMask];\n}\n\nfunction setup() {\n  return {\n    input: [\"B04\", \"B06\", \"B07\", \"dataMask\"],\n    output: { bands: 4 }\n  };\n}"
+            }
+        ],
+        "orderHint": 10,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/53f4f3-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-30T10:08:59.332994Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1/sources/12"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "LOTL1"
+        },
+        "additionalData": {
+            "overlays": []
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/53f4f3-YOUR-INSTANCEID-HERE/layers/THERMAL",
+        "id": "THERMAL",
+        "title": "Thermal",
+        "description": "Based on thermal band 10",
+        "styles": [
+            {
+                "name": "RED_TEMPERATURE",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3 (auto-converted from 1)\n\nconst blue_red = [\n  [223, 0x003d99],\n  [253, 0x2e82ff],\n  [263, 0x80b3ff],\n  [272, 0xe0edff],\n  [273, 0xffffff],\n  [274, 0xfefce7],\n  [283, 0xfde191],\n  [293, 0xf69855],\n  [303, 0xec6927],\n  [323, 0xaa2d1d],\n  [363, 0x650401],\n  [373, 0x3d0200],\n];\n\nconst viz = new ColorRampVisualizer(blue_red);\n\nfunction setup() {\n  return {\n    input: [\"B03\", \"B04\", \"B10\", \"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"eobrowserStats\", bands: 2 },\n      { id: \"dataMask\", bands: 1 },\n    ],\n  };\n}\n\nfunction evaluatePixel(samples) {\n  let val = samples.B10;\n  return {\n    default: [...viz.process(val), samples.dataMask],\n    eobrowserStats: [val - 273, isCloud(samples) ? 1 : 0],\n    dataMask: [samples.dataMask],\n  };\n}\n\nfunction isCloud(samples) {\n  const NGDR = index(samples.B03, samples.B04);\n  const bRatio = (samples.B03 - 0.175) / (0.39 - 0.175);\n  return bRatio > 1 || (bRatio > 0 && NGDR > 0);\n}\n",
+                "legend": {
+                    "type": "continuous",
+                    "gradients": [
+                        {
+                            "color": "#003d99",
+                            "label": "<= -50",
+                            "position": 223
+                        },
+                        {
+                            "color": "#2e82ff",
+                            "label": "-20",
+                            "position": 253
+                        },
+                        {
+                            "color": "#80b3ff",
+                            "label": "-10",
+                            "position": 263
+                        },
+                        {
+                            "color": "#e0edff",
+                            "position": 272
+                        },
+                        {
+                            "color": "#ffffff",
+                            "label": "0",
+                            "position": 273
+                        },
+                        {
+                            "color": "#fefce7",
+                            "position": 274
+                        },
+                        {
+                            "color": "#FDE191",
+                            "label": "10",
+                            "position": 283
+                        },
+                        {
+                            "color": "#f69855",
+                            "label": "20",
+                            "position": 293
+                        },
+                        {
+                            "color": "#f66927",
+                            "label": "30",
+                            "position": 303
+                        },
+                        {
+                            "color": "#aa2d1d",
+                            "label": "50",
+                            "position": 323
+                        },
+                        {
+                            "color": "#650401",
+                            "label": "90",
+                            "position": 342
+                        },
+                        {
+                            "color": "#3d0200",
+                            "label": ">= 100 [°C]",
+                            "position": 348
+                        }
+                    ],
+                    "maxPosition": 348,
+                    "minPosition": 223
+                }
+            }
+        ],
+        "orderHint": 20,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/53f4f3-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-30T10:09:05.253207Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1/sources/12"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BILINEAR",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 20,
+            "tiers": "ALL_TIERS",
+            "type": "LOTL1"
+        },
+        "additionalData": {
+            "overlays": []
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/53f4f3-YOUR-INSTANCEID-HERE/layers/TRUE-COLOR",
+        "id": "TRUE-COLOR",
+        "title": "True color",
+        "description": "Based on the combination of bands 4, 3, 2",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nlet minVal = 0.0;\nlet maxVal = 0.4;\n\nlet viz = new HighlightCompressVisualizer(minVal, maxVal);\n\nfunction setup() {\n   return {\n    input: [\"B04\", \"B03\", \"B02\", \"dataMask\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(samples) {\n    let val = [samples.B04, samples.B03, samples.B02, samples.dataMask];\n    return viz.processList(val);\n}\n\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/53f4f3-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2020-04-30T10:09:11.162934Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/LOTL1/sources/12"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "upsampling": "BICUBIC",
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "LOTL1"
+        },
+        "additionalData": {
+            "overlays": []
+        }
+    }
+]

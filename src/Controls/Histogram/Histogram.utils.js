@@ -1,6 +1,6 @@
 import { t } from 'ttag';
 import { fromBlob } from 'geotiff';
-import { LayersFactory, ApiType, BBox } from '@sentinel-hub/sentinelhub-js';
+import { LayersFactory, ApiType, BBox, Interpolator } from '@sentinel-hub/sentinelhub-js';
 
 import {
   getMapDimensions,
@@ -12,6 +12,20 @@ import { constructErrorMessage } from '../../utils';
 import { checkIfIndexOutputInEvalscript } from '../../utils/parseEvalscript';
 import { reqConfigMemoryCache, MAX_SH_IMAGE_SIZE } from '../../const';
 import { refetchWithDefaultToken } from '../../utils/fetching.utils';
+
+import { PLANET_SANDBOX_COLLECTIONS } from '../../assets/protected_themes';
+
+function setDefaultSampling(layer, upsampling, downsampling) {
+  // this prevents requesting
+  // https://services.sentinel-hub.com/configuration/v1/wms/instances/<instance-id>/layers
+  // inside of the BYOCLayer.getMap() function
+  // which needs anonymous token in case of Planet Sandbox data
+  // but for the /process request inside BYOCLayer.getMap() function, the user token is needed
+  // We can't provide both tokens to the BYOCLayer.getMap() function
+
+  layer.upsampling = layer.upsampling ?? upsampling ?? Interpolator.NEAREST; // default
+  layer.downsampling = layer.downsampling ?? downsampling ?? Interpolator.NEAREST; // default
+}
 
 export const getMissingIndexOutputError = () =>
   t`The setup function in the evalscript does not contain the correct output. The output needs to include:` +
@@ -124,13 +138,19 @@ async function getTiffImages(layer, props, cancelToken) {
 
 export async function getDataForLayer(props, cancelToken) {
   try {
-    const { visualizationUrl, layerId } = props;
+    const { visualizationUrl, layerId, datasetId, upsampling, downsampling } = props;
     let layer = await LayersFactory.makeLayer(visualizationUrl, layerId, null, {
       cancelToken: cancelToken,
       ...reqConfigMemoryCache,
     });
     await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken, ...reqConfigMemoryCache });
     // add minQa, upsampling, downsampling, but no effects (they are only for visualization)
+
+    const planetSandboxDatasource =
+      Object.values(PLANET_SANDBOX_COLLECTIONS).find((v) => v === datasetId) !== undefined;
+    if (planetSandboxDatasource) {
+      setDefaultSampling(layer, upsampling, downsampling);
+    }
 
     const isIndexOutputPresent = checkIfIndexOutputPresent(props);
     if (!isIndexOutputPresent) {
@@ -141,15 +161,15 @@ export async function getDataForLayer(props, cancelToken) {
     const histogram = await getHistogramFromTiffs(blobs);
     return { histogram: histogram };
   } catch (e) {
-    const errMessage = await constructErrorMessage(e);
+    const { message } = await constructErrorMessage(e);
     console.error(e);
-    return { error: errMessage };
+    return { error: message };
   }
 }
 
 export async function getDataForIndex(props, cancelToken) {
   try {
-    const { visualizationUrl, datasetId, evalscript } = props;
+    const { visualizationUrl, datasetId, evalscript, upsampling, downsampling } = props;
 
     const isIndexOutputPresent = checkIfIndexOutputPresent(props);
     if (!isIndexOutputPresent) {
@@ -171,13 +191,21 @@ export async function getDataForIndex(props, cancelToken) {
     }
     // add minQa, upsampling, downsampling, but no effects (they are only for visualization)
 
+    await layer.updateLayerFromServiceIfNeeded({ cancelToken: cancelToken, ...reqConfigMemoryCache });
+
+    const planetSandboxDatasource =
+      Object.values(PLANET_SANDBOX_COLLECTIONS).find((v) => v === datasetId) !== undefined;
+    if (planetSandboxDatasource) {
+      setDefaultSampling(layer, upsampling, downsampling);
+    }
+
     const blobs = await getTiffImages(layer, props, cancelToken);
     const histogram = await getHistogramFromTiffs(blobs);
     return { histogram: histogram };
   } catch (e) {
-    const errMessage = await constructErrorMessage(e);
+    const { message } = await constructErrorMessage(e);
     console.error(e);
-    return { error: errMessage };
+    return { error: message };
   }
 }
 
@@ -246,6 +274,10 @@ export async function checkIfIndexOutputPresent(props, cancelToken) {
       ...reqConfigMemoryCache,
     });
   } catch (e) {
+    return false;
+  }
+
+  if (layer === null || layer === undefined) {
     return false;
   }
 

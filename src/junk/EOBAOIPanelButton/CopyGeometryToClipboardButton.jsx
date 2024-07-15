@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { t } from 'ttag';
 
-export const copyGeometry = (geometry, cb) => {
+const copyGeometry = (geometry, cb) => {
   let textField = document.createElement('textarea');
   textField.innerText = JSON.stringify(geometry);
   document.body.appendChild(textField);

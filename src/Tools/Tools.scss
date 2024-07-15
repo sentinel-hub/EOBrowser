@@ -104,11 +104,6 @@ $searchBorderColour: #6d7300;
   &.bottom {
     margin-top: 20px;
   }
-
-  .configurations-settings {
-    margin-left: 10px;
-    color: $primaryCol;
-  }
 }
 
 .search-panel {
@@ -156,6 +151,23 @@ $searchBorderColour: #6d7300;
     font-size: 0.8em;
   }
 
+  .theme-select-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    color: #b5bdcc;
+
+    .dashboard-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: normal;
+      color: $primaryCol;
+      text-decoration: none;
+    }
+  }
+
   div.clear {
     clear: both;
   }
@@ -201,6 +213,7 @@ $searchBorderColour: #6d7300;
     padding: 10px;
     font: $textColor;
     overflow-y: auto;
+    max-height: var(--sidebarHeight);
 
     .hidden {
       display: hidden;

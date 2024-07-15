@@ -359,6 +359,10 @@ class SentinelHubLayer extends L.TileLayer {
       backscatterCoeff,
     } = options;
     let layer = await LayersFactory.makeLayer(url, layerId, null, reqConfigMemoryCache);
+    if (layer === null || layer === undefined) {
+      return;
+    }
+
     await layer.updateLayerFromServiceIfNeeded(reqConfigMemoryCache);
 
     if (layer.maxCloudCoverPercent !== undefined) {
@@ -639,7 +643,7 @@ class SentinelHubLayer extends L.TileLayer {
             : layer.collectionId === collectionId
         ) {
           layer.evalscript = evalscript;
-          layer.evalscripturl = evalscripturl;
+          layer.evalscriptUrl = evalscripturl;
           if (upsampling) {
             layer.upsampling = upsampling;
           } else if (!layer.upsampling) {
@@ -663,7 +667,7 @@ class SentinelHubLayer extends L.TileLayer {
     return LayersFactory.makeLayers(url, null, null, reqConfigMemoryCache).then((layers) => {
       let layer = layers[0];
       layer.evalscript = evalscript;
-      layer.evalscripturl = evalscripturl;
+      layer.evalscriptUrl = evalscripturl;
       layer.upsampling = upsampling;
       layer.downsampling = downsampling;
       layer.maxCloudCoverPercent = 100;

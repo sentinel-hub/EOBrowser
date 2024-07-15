@@ -23,6 +23,7 @@ import {
   PROBAV_S5,
 } from '../src/Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
 import { DATASOURCES } from '../src/const';
+import { PLANET_SANDBOX_THEME } from '../src/assets/protected_themes';
 const fs = require('fs');
 
 dotenv.config({ path: './.env' });
@@ -33,6 +34,10 @@ const interestingBBoxes = [
   new BBox(CRS_EPSG4326, -69, 66.9, -69 + BBOX_SIZE, 66.9 + BBOX_SIZE), // S-1 GRD EW
   new BBox(CRS_EPSG4326, -62, -58.6, -62 + BBOX_SIZE, -58.6 + BBOX_SIZE), // S-1 GRD EW HH
   new BBox(CRS_EPSG4326, 123, 10.5, 123 + BBOX_SIZE, 10.5 + BBOX_SIZE), // S-1 GRD IW VV
+  new BBox(CRS_EPSG4326, 31.448107, 30.038932, 31.448107 + BBOX_SIZE, 30.038932 + BBOX_SIZE), // Planet Sandbox data - Cairo
+  new BBox(CRS_EPSG4326, -0.744324, 44.741856, -0.744324 + BBOX_SIZE, 44.741856 + BBOX_SIZE), // Planet Sandbox data - Bordeaux
+  new BBox(CRS_EPSG4326, 115.996571, -32.124817, 115.996571 + BBOX_SIZE, -32.124817 + BBOX_SIZE), // Planet Sandbox data - Perth
+  new BBox(CRS_EPSG4326, -96.606216, 40.807573, -96.606216 + BBOX_SIZE, 40.807573 + BBOX_SIZE), // Planet Sandbox data - Nebraska
 ];
 const forceBBoxForDataset = {
   [DATASET_S5PL2.id]: new BBox(CRS_EPSG4326, 4, 47.5, 4.4, 47.9), // CH4
@@ -128,7 +133,7 @@ async function updatePreviews(previewsDir, previewsIndexFile) {
   // fetch new previews:
   let previews = [];
 
-  for (let themes of [DEFAULT_THEMES, EDUCATION_THEMES]) {
+  for (let themes of [DEFAULT_THEMES, EDUCATION_THEMES, PLANET_SANDBOX_THEME]) {
     for (let theme of themes) {
       const themeId = theme.id;
       for (let contentPart of theme.content) {

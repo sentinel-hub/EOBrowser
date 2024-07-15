@@ -2,25 +2,11 @@ import paper from 'paper';
 
 import { NUMBER_OF_RGB_VALUES, CURVE_EDITOR_CANVAS_SIZE, MAX_COLOR_VALUE } from '../AdvancedRgbEffects';
 
-export function capToRange(val, min, max) {
+function capToRange(val, min, max) {
   return Math.min(Math.max(val, min), max);
 }
 
-export function transformCurvePoints(points, canvasSize, maxColorValue) {
-  const curvePoints = points.map((p) => {
-    let x = capToRange(p.position.x, 0, canvasSize);
-    x = (x * maxColorValue) / canvasSize;
-
-    let y = capToRange(p.position.y, 0, canvasSize);
-    y = ((canvasSize - y) * maxColorValue) / canvasSize;
-
-    return { x, y };
-  });
-
-  return curvePoints;
-}
-
-export function computeIntersections(values, originalPath, canvasSize, maxColorValue) {
+function computeIntersections(values, originalPath, canvasSize, maxColorValue) {
   const filledValues = values.map((v, i) => {
     if (v !== null && v !== undefined) {
       return v;
@@ -53,7 +39,7 @@ export function computeIntersections(values, originalPath, canvasSize, maxColorV
   return filledValues;
 }
 
-export function computeNewValuesFromPaths(paths, canvasSize, maxColorValue) {
+function computeNewValuesFromPaths(paths, canvasSize, maxColorValue) {
   const { startPath, innerPath, endPath } = paths;
   // assumption that images are PNG or JPG: length = 256 (includes all possible R / G / B values)
   // should be improved in the future to allow for other formats

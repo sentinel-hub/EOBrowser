@@ -192,7 +192,7 @@ function TerrainViewer(props) {
   }
 
   async function onTileError(error) {
-    const message = await constructErrorMessage(error);
+    const { message } = await constructErrorMessage(error);
     store.dispatch(visualizationSlice.actions.setError(message));
   }
 

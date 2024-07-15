@@ -1,0 +1,221 @@
+{
+    "title": "EOB3 Sentinel-5 API",
+    "layers": [
+        {
+            "id": "__FIS_AER_AI_340_AND_380_VISUALIZED",
+            "name": "__FIS_AER_AI_340_AND_380_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_AER_AI_354_AND_388_VISUALIZED",
+            "name": "__FIS_AER_AI_354_AND_388_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_CH4_VISUALIZED",
+            "name": "__FIS_CH4_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_CLOUD_BASE_HEIGHT_VISUALIZED",
+            "name": "__FIS_CLOUD_BASE_HEIGHT_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_CLOUD_BASE_PRESSURE_VISUALIZED",
+            "name": "__FIS_CLOUD_BASE_PRESSURE_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_CLOUD_FRACTION_VISUALIZED",
+            "name": "__FIS_CLOUD_FRACTION_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_CLOUD_OPTICAL_THICKNESS_VISUALIZED",
+            "name": "__FIS_CLOUD_OPTICAL_THICKNESS_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_CLOUD_TOP_HEIGHT_VISUALIZED",
+            "name": "__FIS_CLOUD_TOP_HEIGHT_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_CLOUD_TOP_PRESSURE_VISUALIZED",
+            "name": "__FIS_CLOUD_TOP_PRESSURE_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_CO_VISUALIZED",
+            "name": "__FIS_CO_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_HCHO_VISUALIZED",
+            "name": "__FIS_HCHO_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_NO2_VISUALIZED",
+            "name": "__FIS_NO2_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_O3_VISUALIZED",
+            "name": "__FIS_O3_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_SO2_VISUALIZED",
+            "name": "__FIS_SO2_VISUALIZED",
+            "description": "",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "AER_AI_340_AND_380_VISUALIZED",
+            "name": "AER AI 340 and 380",
+            "description": "UV Aerosol Index from 380 and 340 nm",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "AER_AI_354_AND_388_VISUALIZED",
+            "name": "AER AI 354 and 388",
+            "description": "UV Aerosol Index from 388 and 354 nm",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "CH4_VISUALIZED",
+            "name": "Methane",
+            "description": "Column averaged dry air mixing ratio of methane",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "CLOUD_BASE_HEIGHT_VISUALIZED",
+            "name": "Base Height",
+            "description": "Cloud base height",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "CLOUD_BASE_PRESSURE_VISUALIZED",
+            "name": "Base pressure",
+            "description": "Cloud base pressure",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "CLOUD_FRACTION_VISUALIZED",
+            "name": "Effective radiometric cloud fraction",
+            "description": "Effective radiometric cloud fraction",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "CLOUD_OPTICAL_THICKNESS_VISUALIZED",
+            "name": "Optical thickness",
+            "description": "Cloud optical thickness",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "CLOUD_TOP_HEIGHT_VISUALIZED",
+            "name": "Top height",
+            "description": "Cloud top height",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "CLOUD_TOP_PRESSURE_VISUALIZED",
+            "name": "Top pressure",
+            "description": "Cloud top pressure",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "CO_VISUALIZED",
+            "name": "Carbon Monoxide",
+            "description": "Carbon Monoxide total column",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "HCHO_VISUALIZED",
+            "name": "Formaldehyde",
+            "description": "Formaldehyde troposheric vertical column",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "NO2_VISUALIZED",
+            "name": "Nitrogen Dioxide",
+            "description": "Nitrogen Dioxide tropospheric column",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "O3_VISUALIZED",
+            "name": "Ozone",
+            "description": "Ozone total column",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        },
+        {
+            "id": "SO2_VISUALIZED",
+            "name": "Sulfur Dioxide",
+            "description": "Sulfur Dioxide total column",
+            "dataset": "S5PL2",
+            "legendUrl": null
+        }
+    ],
+    "datasets": [
+        {
+            "name": "S5PL2",
+            "bands": [
+                "NO2",
+                "SO2",
+                "CO",
+                "CH4",
+                "HCHO",
+                "AER_AI_340_380",
+                "AER_AI_354_388",
+                "CLOUD_FRACTION",
+                "CLOUD_BASE_HEIGHT",
+                "CLOUD_BASE_PRESSURE",
+                "CLOUD_OPTICAL_THICKNESS",
+                "CLOUD_TOP_HEIGHT",
+                "CLOUD_TOP_PRESSURE"
+            ]
+        }
+    ]
+}

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { t } from 'ttag';
 
-import store, { mainMapSlice, notificationSlice } from '../store';
+import store, { mainMapSlice, notificationSlice, timelapseSlice } from '../store';
 
 import Icon2D from './icons/icon-2D.svg?react';
 import Icon3D from './icons/icon-3D.svg?react';
@@ -31,19 +31,26 @@ class TerrainViewerButton extends Component {
     return { isDisabled: false, errorMessage: null };
   };
 
+  handleTerrainViewerButtonClick = () => {
+    const { is3D } = this.props;
+    const { isDisabled, errorMessage } = this.checkIfDisabled();
+    if (isDisabled) {
+      store.dispatch(notificationSlice.actions.displayError(errorMessage));
+      return;
+    }
+    store.dispatch(mainMapSlice.actions.setIs3D(!is3D));
+    store.dispatch(timelapseSlice.actions.setTimelapseAreaPreview(false));
+  };
+
   render() {
     const { is3D } = this.props;
     const { isDisabled, errorMessage } = this.checkIfDisabled();
     return (
       <div
         className={`terrain-viewer-button ${isDisabled ? 'disabled' : ''} ${is3D ? 'is3d' : ''}`}
-        onClick={() =>
-          isDisabled
-            ? store.dispatch(notificationSlice.actions.displayError(errorMessage))
-            : store.dispatch(mainMapSlice.actions.setIs3D(!is3D))
-        }
+        onClick={this.handleTerrainViewerButtonClick}
         title={
-          is3D ? t`2D map view` : t`Visualize terrain in 3D` + (errorMessage ? ` (${errorMessage})` : '')
+          is3D ? t`2D map view` : t`Visualize terrain in 3D` + (errorMessage ? ` \n(${errorMessage})` : '')
         }
       >
         {is3D ? (

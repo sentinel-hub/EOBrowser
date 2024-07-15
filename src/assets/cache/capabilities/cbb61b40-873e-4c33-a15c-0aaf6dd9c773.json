@@ -1,0 +1,27 @@
+{
+    "title": "CNES Land Cover Map",
+    "layers": [
+        {
+            "id": "CNES-LAND-COVER-CLASSIFICATION",
+            "name": "CNES Land Cover Classification",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "CNES-LAND-COVER-CLASSIFIER-CONFIDENCE",
+            "name": "CNES Land Cover Classifier Confidence",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "CNES-LAND-COVER-VALIDITY",
+            "name": "CNES Land Cover Validity",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

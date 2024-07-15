@@ -1,0 +1,48 @@
+{
+    "title": "Global Surface Water",
+    "layers": [
+        {
+            "id": "1_OCCURRENCE",
+            "name": "Global Surface Water Occurrence",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "2_CHANGE-INTENSITY",
+            "name": "Global Surface Water Occurrence Change Intensity",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "3_SEASONALITY",
+            "name": "Global Surface Water Seasonality",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "4_RECURRENCE",
+            "name": "Global Surface Water Recurrence",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "5_TRANSITIONS",
+            "name": "Global Surface Water Transitions",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "6_EXTENT",
+            "name": "Global Surface Water Extent",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

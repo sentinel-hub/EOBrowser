@@ -1,0 +1,33 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/dae04f-YOUR-INSTANCEID-HERE/layers/GHS-BUILT-S2",
+        "id": "GHS-BUILT-S2",
+        "title": "GHS-BUILT-S2",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "     //VERSION=3\nfunction setup() {\n    return {\n      input: [\"PROB\", \"dataMask\"],\n      output: { bands: 3 , sampleType: \"AUTO\"},\n      mosaicking: Mosaicking.TILE\n    };\n  }\n  \n  //Create color ramp\n  const ramps = [\n    [0, 0x000000],\n    [100, 0xffffff]\n  ];\n  \n  //Create visualizer\n  const visualizer = new ColorRampVisualizer(ramps);\n  \n  //EvaluatePixel function\n  function evaluatePixel(samples, scenes) {\n    for (let i = 0; i < samples.length; i++) {\n      let sample = samples[i];\n      if (sample.dataMask == 1) {\n        return [visualizer.process(sample.PROB)[0], visualizer.process(sample.PROB)[1], visualizer.process(sample.PROB)[2]];\n      }\n    }\n  }\n  "
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/dae04f-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-01-14T12:03:21.211459Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "3dbeea-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

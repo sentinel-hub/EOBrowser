@@ -28,4 +28,4 @@ const WorldCoverTooltip = () => (
   </div>
 );
 
-export { WorldCoverMarkdown, WorldCoverTooltip };
+export { WorldCoverTooltip };

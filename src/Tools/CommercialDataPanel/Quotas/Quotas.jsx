@@ -46,7 +46,8 @@ function renderQuotas(quotas) {
           })}
         </tbody>
       </table>
-      {quotas && quotas.length === 0 && <NotificationPanel msg={t`No quotas available`} type="info" />}
+      {/* We should not display planet quota, but then this message is displayed, which is wrong / inaccurate */}
+      {/* {quotas && quotas.length === 0 && <NotificationPanel msg={t`No quotas available`} type="info" />} */}
     </>
   );
 }

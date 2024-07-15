@@ -87,12 +87,13 @@ class PinPanel extends Component {
   }
 
   deleteUserPins = async (pinIds) => {
+    const { access_token, impersonatedUserId } = this.props;
     this.setState({
       updatingPins: true,
       updatingPinsError: null,
     });
     try {
-      await removePinsFromServer(pinIds);
+      await removePinsFromServer(pinIds, access_token, impersonatedUserId);
     } catch (e) {
       this.setState({
         updatingPinsError: e.message,
@@ -106,12 +107,13 @@ class PinPanel extends Component {
   };
 
   fetchUserPins = async () => {
+    const { access_token, impersonatedUserId } = this.props;
     this.setState({
       updatingPins: true,
       updatingPinsError: null,
     });
     try {
-      const pins = await getPinsFromServer();
+      const pins = await getPinsFromServer(access_token, impersonatedUserId);
       const formattedPins = formatDeprecatedPins(pins);
       return formattedPins;
     } catch (e) {
@@ -147,12 +149,13 @@ class PinPanel extends Component {
   };
 
   savePins = async (pins, replace) => {
+    const { access_token, impersonatedUserId } = this.props;
     this.setState({
       updatingPins: true,
       updatingPinsError: null,
     });
     try {
-      await savePinsToServer(pins, replace);
+      await savePinsToServer(pins, replace, access_token, impersonatedUserId);
       return pins;
     } catch (e) {
       this.setState({
@@ -711,6 +714,8 @@ class PinPanel extends Component {
               cancelSharePins={this.cancelSharePins}
               onAnimateClick={this.openAnimatePanel}
               pinsStoryBuilderEnabled={!is3D}
+              accessToken={this.props.access_token}
+              impersonatedUserId={this.props.impersonatedUserId}
             />
           </div>
           {operation === OPERATION_SHARE && (
@@ -811,6 +816,7 @@ class PinPanel extends Component {
 
 const mapStoreToProps = (store) => ({
   user: store.auth.user.userdata,
+  impersonatedUserId: store.auth.impersonatedUser.userId,
   access_token: store.auth.user.access_token,
   bounds: store.mainMap.bounds,
   selectedModeId: store.themes.selectedModeId,

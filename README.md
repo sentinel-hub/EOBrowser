@@ -39,6 +39,7 @@ Your language is missing and you want to help to translate it? Contact us at inf
 - German: ESERO Austria/ESERO Germany
 - Greek: [GET](https://www.getmap.eu/?lang=en)
 - Latvian: Valters Žeižis
+- Lithuanian: [National Paying Agency](https://nma.lrv.lt/en/) (Ministry of Agriculture)
 - Polish: [ESERO Poland](https://esero.kopernik.org.pl/)/[Copernicus Science Centre](https://www.kopernik.org.pl/)
 - Portuguese: [ESERO Portugal](https://www.esero.pt/)
 - Slovenian: Krištof Oštir ([Faculty of Civil and Geodetic Engineering](https://www.en.fgg.uni-lj.si/), University of Ljubljana) with financial support from the Slovenian Research Agency research core funding No. P2-0406 Earth observation and geoinformatics

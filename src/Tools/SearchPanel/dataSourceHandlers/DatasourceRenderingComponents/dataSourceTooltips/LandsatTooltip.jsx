@@ -81,8 +81,6 @@ The **Landsat 8-9** collection contains imagery from the two most recently launc
 **Common usage:** Vegetation monitoring, land use, land cover maps, change monitoring, etc.
 `;
 
-const getLandsatEOCloud_Markdown = getLandsat_Markdown;
-
 const AWS_LOTL1_Markdown = () =>
   t`**Level-1** data (from **Landsat Collection 2**) provides global top of the atmosphere reflectance and top of the atmosphere brightness temperature products. 
   
@@ -204,14 +202,6 @@ export const Landsat89AWSTooltip = () => {
       </div>
     </div>
   );
-};
-
-export const LandsatEOCloudTooltip = () => {
-  return renderTooltip({
-    source: getLandsatEOCloud_Markdown(),
-    credits: 'USGS',
-    creditsLink: 'https://www.usgs.gov/core-science-systems/nli/landsat/landsat-satellite-missions',
-  });
 };
 
 export default LandsatTooltip;

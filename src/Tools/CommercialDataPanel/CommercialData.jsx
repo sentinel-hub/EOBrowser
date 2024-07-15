@@ -10,9 +10,8 @@ import { getSignUpUrl } from '../../Auth/authHelpers';
 import './CommercialData.scss';
 
 const highResImgUrl = `${import.meta.env.VITE_ROOT_URL}commercial-data-previews/high-res-image-example.png`;
-const signUpUrl = getSignUpUrl();
 
-const getCommercialDataDescription = () => t`
+const getCommercialDataDescription = (signUpUrl) => t`
 	
 Browse, visualise and analyze Very High Resolution (VHR) data directly in EO Browser, tapping into global archives of Planet [PlanetScope](https://docs.sentinel-hub.com/api/latest/data/planet-scope/) and [SkySat](https://docs.sentinel-hub.com/api/latest/data/planet/skysat/), Airbus [Pleiades](https://docs.sentinel-hub.com/api/latest/data/airbus/pleiades/) and [SPOT](https://docs.sentinel-hub.com/api/latest/data/airbus/spot/) as well as [Maxar WorldView](https://docs.sentinel-hub.com/api/latest/data/maxar/world-view/).  
 
@@ -32,8 +31,9 @@ const CommercialData = ({ user, displayVideo }) => {
   useEffect(() => {
     const fetchUserAccountInfo = async () => {
       let accountInfo = {
-        payingAccount: false,
-        quotasEnabled: false,
+        trialAccount: false,
+        hasCommercialDataAccess: false,
+        quotas: [],
       };
       try {
         accountInfo = await checkUserAccount(user);
@@ -46,9 +46,9 @@ const CommercialData = ({ user, displayVideo }) => {
     fetchUserAccountInfo();
   }, [user, user.access_token, setUserAccountInfo]);
 
-  const { payingAccount, trialAccount } = userAccountInfo;
+  const { hasCommercialDataAccess } = userAccountInfo;
 
-  if (user && user.access_token && (payingAccount || trialAccount)) {
+  if (user && user.access_token && hasCommercialDataAccess) {
     return <CommercialDataPanel userAccountInfo={userAccountInfo} />;
   }
 
@@ -66,7 +66,7 @@ const CommercialData = ({ user, displayVideo }) => {
           allowFullScreen
         ></iframe>
       )}
-      <ReactMarkdown children={getCommercialDataDescription()} linkTarget="_blank" />
+      <ReactMarkdown children={getCommercialDataDescription(getSignUpUrl())} linkTarget="_blank" />
     </div>
   );
 };

@@ -46,7 +46,7 @@ export function getLegendDefinitionFromMetadata(metadata) {
 returns min and max position for continuous legend
 */
 
-export function getMinMaxPosition(legend) {
+function getMinMaxPosition(legend) {
   let minPosition = legend.minPosition || 0.0;
   let maxPosition = legend.maxPosition || 1.0;
   legend.gradients.forEach((el) => {

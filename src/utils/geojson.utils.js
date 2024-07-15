@@ -1,23 +1,6 @@
-import bboxPolygon from '@turf/bbox-polygon';
 import bbox from '@turf/bbox';
 import area from '@turf/area';
 import L from 'leaflet';
-
-export const getLatLngFromBbox = (bbox) => {
-  const [minX, minY, maxX, maxY] = bbox;
-  return [
-    [minY, minX],
-    [maxY, maxX],
-  ];
-};
-
-export const getCoordsFromBbox = (bbox) => {
-  if (bbox.length !== 4) {
-    throw Error('Not valid bbox');
-  }
-  const polygonFromBbox = bboxPolygon(bbox);
-  return polygonFromBbox.geometry.coordinates;
-};
 
 export const getBboxFromCoords = (coords) => {
   const actualCoords = coords[0];

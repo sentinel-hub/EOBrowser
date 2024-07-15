@@ -12,7 +12,13 @@ import PinPanel from './Pins/PinPanel';
 import ComparePanel from './ComparePanel/ComparePanel';
 import { Tabs, Tab } from '../junk/Tabs/Tabs';
 import ToolsFooter from './ToolsFooter/ToolsFooter';
-import store, { notificationSlice, visualizationSlice, tabsSlice, compareLayersSlice } from '../store';
+import store, {
+  notificationSlice,
+  visualizationSlice,
+  tabsSlice,
+  compareLayersSlice,
+  modalSlice,
+} from '../store';
 import { savePinsToServer, savePinsToSessionStorage, constructPinFromProps } from './Pins/Pin.utils';
 import { checkIfCustom } from './SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { getNotSupportedIn3DMsg } from '../junk/ConstMessages';
@@ -23,6 +29,11 @@ import { TABS } from '../const';
 import { handleFathomTrackEvent } from '../utils';
 
 class Tools extends Component {
+  constructor(props) {
+    super(props);
+    this.wrapperDivRef = React.createRef();
+  }
+
   state = {
     toolsOpen: !isMobile,
     resultsAvailable: false,
@@ -41,6 +52,50 @@ class Tools extends Component {
   setShowEffects = (showEffects) => {
     this.setState({ showEffects: showEffects });
   };
+
+  componentDidMount() {
+    const sidebarMutation = () => {
+      let clonedDiv = this.wrapperDivRef.current.cloneNode(true);
+      let elementsToHide = Array.from(clonedDiv.querySelectorAll('.discover-tab, .results-panel'));
+      elementsToHide.forEach((el) => {
+        el.style.display = 'none';
+      });
+
+      clonedDiv.style.visibility = 'hidden';
+      clonedDiv.style.position = 'absolute';
+      clonedDiv.style.left = '0';
+      clonedDiv.style.top = '0';
+
+      document.body.appendChild(clonedDiv);
+
+      // Delay measurement to ensure styles are recalculated
+      setTimeout(() => {
+        const clonedSize = clonedDiv.clientHeight;
+        const toolBarPositionOffset = 20;
+        const discoverTabPadding = 20;
+
+        const sizeToSubtract = toolBarPositionOffset + discoverTabPadding + clonedSize;
+        document.documentElement.style.cssText = `--sidebarHeight: calc(100vh - ${sizeToSubtract}px)`;
+
+        // Clean up
+        document.body.removeChild(clonedDiv);
+      }, 100);
+    };
+
+    this.observer = new MutationObserver(sidebarMutation);
+    this.observer.observe(this.wrapperDivRef.current, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+
+  componentWillUnmount() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
 
   componentDidUpdate(prevProps) {
     if (!prevProps.datasetId && this.props.datasetId) {
@@ -84,6 +139,7 @@ class Tools extends Component {
     store.dispatch(
       visualizationSlice.actions.setVisualizationParams({
         datasetId: tile.datasetId,
+        selectedTile: tile,
       }),
     );
     this.setState({
@@ -96,15 +152,17 @@ class Tools extends Component {
   };
 
   setSelectedDate = (date) => {
-    const fromTime = moment(date).utc().startOf('day');
-    const toTime = moment(date).utc().endOf('day');
+    if (date !== null) {
+      const fromTime = moment(date).utc().startOf('day');
+      const toTime = moment(date).utc().endOf('day');
 
-    store.dispatch(
-      visualizationSlice.actions.setVisualizationTime({
-        fromTime: fromTime,
-        toTime: toTime,
-      }),
-    );
+      store.dispatch(
+        visualizationSlice.actions.setVisualizationTime({
+          fromTime: fromTime,
+          toTime: toTime,
+        }),
+      );
+    }
   };
 
   setActiveTabIndex = (index) => {
@@ -113,6 +171,10 @@ class Tools extends Component {
     if (index === TABS.COMPARE_TAB) {
       //Reset the counter badge
       store.dispatch(compareLayersSlice.actions.setNewCompareLayersCount(0));
+    }
+
+    if (index !== TABS.VISUALIZE_TAB) {
+      store.dispatch(modalSlice.actions.removeModal());
     }
   };
 
@@ -125,6 +187,8 @@ class Tools extends Component {
       evalscripturl,
       customSelected,
       selectedThemeId,
+      access_token,
+      impersonatedUserId,
     } = this.props;
     if (!import.meta.env.VITE_EOB_BACKEND) {
       store.dispatch(notificationSlice.actions.displayError(FUNCTIONALITY_TEMPORARILY_UNAVAILABLE_MSG));
@@ -142,7 +206,7 @@ class Tools extends Component {
     }
     let pin = await constructPinFromProps(this.props);
     if (this.props.user) {
-      const { uniqueId } = await savePinsToServer([pin]);
+      const { uniqueId } = await savePinsToServer([pin], false, access_token, impersonatedUserId);
       this.setLastAddedPin(uniqueId);
     } else {
       const uniqueId = savePinsToSessionStorage([pin]);
@@ -154,7 +218,8 @@ class Tools extends Component {
   };
 
   saveLocalPinsOnLogin = async (pins) => {
-    return await savePinsToServer(pins);
+    const { access_token, impersonatedUserId } = this.props;
+    return await savePinsToServer(pins, false, access_token, impersonatedUserId);
   };
 
   setLastAddedPin = (id) => {
@@ -202,7 +267,7 @@ class Tools extends Component {
     const { is3D } = this.props;
 
     return (
-      <div className="tools-wrapper">
+      <div ref={this.wrapperDivRef} className="tools-wrapper">
         <div
           className="open-tools"
           onClick={this.toggleTools}
@@ -282,6 +347,7 @@ class Tools extends Component {
 const mapStoreToProps = (store) => ({
   user: store.auth.user.userdata,
   access_token: store.auth.user.access_token,
+  impersonatedUserId: store.auth.impersonatedUser.userId,
   zoom: store.mainMap.zoom,
   lat: store.mainMap.lat,
   lng: store.mainMap.lng,

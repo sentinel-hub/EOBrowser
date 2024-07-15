@@ -1,0 +1,27 @@
+{
+    "title": "Road and Building Detection",
+    "layers": [
+        {
+            "id": "0-ROADS-AND-BUILDINGS",
+            "name": "Roads and Buildings",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "BUILDINGS",
+            "name": "Buildings",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "ROADS",
+            "name": "Roads",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

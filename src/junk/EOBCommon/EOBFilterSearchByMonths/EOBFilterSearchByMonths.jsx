@@ -1,8 +1,8 @@
 import React from 'react';
-import range from 'lodash/range';
+import range from 'lodash.range';
 import { t } from 'ttag';
 
-import { getShortMonth } from '../EOBDatePicker/MomentLocaleUtils';
+import { getShortMonth } from '../../../components/DatePicker/MomentLocaleUtils';
 
 import './EOBFilterSearchByMonths.scss';
 

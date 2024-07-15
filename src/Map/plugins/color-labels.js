@@ -1,5 +1,4 @@
 import L from 'leaflet';
-import { GridLayer, withLeaflet } from 'react-leaflet';
 
 L.TileLayer.MakeLabelsReadable = L.TileLayer.extend({
   initialize: function (url, options) {
@@ -48,10 +47,3 @@ L.TileLayer.MakeLabelsReadable = L.TileLayer.extend({
 L.tileLayer.makeLabelsReadable = function (url, options) {
   return new L.TileLayer.MakeLabelsReadable(url, options);
 };
-
-class MakeLabelsReadable extends GridLayer {
-  createLeafletElement(props) {
-    return new L.TileLayer.MakeLabelsReadable(props.url, this.getOptions(props));
-  }
-}
-export default withLeaflet(MakeLabelsReadable);

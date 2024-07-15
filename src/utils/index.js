@@ -17,23 +17,21 @@ import {
 import { b64EncodeUnicode } from './base64MDN';
 import { getDataSourceHandler } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceHandlers';
 import { BAND_UNIT } from '../Tools/SearchPanel/dataSourceHandlers/dataSourceConstants';
-import { TABS } from '../const';
-import { ModalId } from '../const';
+import { ModalId, MODES, PLANET_SANDBOX_THEME_ID, DEFAULT_MODE, TABS } from '../const';
 import { replaceDeprecatedDatasetWithNew } from './handleOldUrls';
+import { encrypt } from './encrypt';
+
+export function removeURLParameter(url, parameter) {
+  const urlObj = new URL(url);
+  urlObj.searchParams.delete(parameter);
+  return urlObj.toString();
+}
 
 export function getUrlParams() {
   const urlParamString =
     window.location.search.length > 0 ? window.location.search : window.location.hash.substring(1);
   const searchParams = new URLSearchParams(urlParamString);
   return Object.fromEntries(searchParams.entries());
-}
-
-export function userCanAccessLockedFunctionality(user, selectedTheme) {
-  if (selectedTheme && selectedTheme.type && selectedTheme.type === 'EDUCATION') {
-    return true;
-  }
-
-  return !!user;
 }
 
 /*
@@ -115,6 +113,8 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
     modalId,
     timelapse,
     kc_idp_hint,
+    tutorialIdToShow,
+    impersonatedUser,
   } = props;
   currentLat = Math.round(100000 * currentLat) / 100000;
   currentLng = Math.round(100000 * currentLng) / 100000;
@@ -133,7 +133,7 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
   }
 
   if (visualizationUrl) {
-    params.visualizationUrl = visualizationUrl;
+    params.visualizationUrl = encrypt(visualizationUrl);
   }
   if (customSelected && evalscript && !evalscripturl) {
     params.evalscript = b64EncodeUnicode(evalscript);
@@ -155,6 +155,17 @@ export function updatePath(props, shouldPushToHistoryStack = true) {
   }
   if (kc_idp_hint) {
     params.kc_idp_hint = kc_idp_hint;
+  }
+  if (tutorialIdToShow) {
+    params.tutorialIdToShow = tutorialIdToShow;
+  }
+
+  if (impersonatedUser.accountId) {
+    params.impersonatedAccountId = impersonatedUser.accountId;
+  }
+
+  if (impersonatedUser.userId) {
+    params.impersonatedUserId = impersonatedUser.userId;
   }
 
   if (selectedTabIndex === TABS.VISUALIZE_TAB) {
@@ -266,7 +277,9 @@ function setup() {
     input: ["${[...new Set(Object.values(bands))].join('","')}", "dataMask"],
     output: [
       { id:"default", bands: 4 },
-      { id: "index", bands: 1, sampleType: 'FLOAT32' }
+      { id: "index", bands: 1, sampleType: 'FLOAT32' },
+      { id: "eobrowserStats", bands: 2, sampleType: 'FLOAT32' },
+      { id: "dataMask", bands: 1 }
     ]
   };
 }
@@ -288,7 +301,12 @@ function evaluatePixel(samples) {
   // So here we encode "no data" as NaN and ignore NaNs on the frontend.  
   const indexVal = samples.dataMask === 1 ? index : NaN;
 
-  return { default: visVal, index: [indexVal] };
+  return { 
+    default: visVal,
+    index: [indexVal],
+    eobrowserStats: [indexVal,samples.dataMask],
+    dataMask: [samples.dataMask]
+  };
 }`;
   }
 
@@ -321,28 +339,6 @@ function bandUnitIsKelvin(band, bandsWithUnits) {
 
   let bandWithUnits = bandsWithUnits.find((b) => b.name === band);
   return bandWithUnits.unit === BAND_UNIT.KELVIN;
-}
-
-export function constructBasicEvalscript(bands, config, bandsWithUnits) {
-  // custom config used for index feature
-  if (config) {
-    const { equation, colorRamp, values } = config;
-
-    const indexEquation = [...equation]
-      .map((item) => (item === 'B' && `${bands.b}`) || (item === 'A' && `${bands.a}`) || item)
-      .join('');
-
-    return `var index = ${indexEquation};
-return colorBlend(
-  index,
-    [${values.map((value) => value)}],
-    [${colorRamp.map((color) => hexToRgb(color.replace('#', '0x')))}]
-);`;
-  }
-  // NOTE: changing the format will likely break parseEvalscriptBands method.
-  return `return [${Object.values(bands)
-    .map((band) => (bandUnitIsKelvin(band, bandsWithUnits) ? '' : '2.5*') + band)
-    .join(',')}];`;
 }
 
 export function parseEvalscriptBands(evalscript) {
@@ -428,6 +424,11 @@ export function isDataFusionEnabled(dataFusionOptions) {
 export async function constructErrorMessage(error) {
   const DEFAULT_ERROR = JSON.stringify(error);
 
+  const constructedError = {
+    message: error.message ? error.message : DEFAULT_ERROR,
+    code: null,
+  };
+
   if (error.response && error.response.data) {
     let errorObj;
 
@@ -435,7 +436,7 @@ export async function constructErrorMessage(error) {
       const errorJson = await readBlob(error.response.data);
       errorObj = errorJson.error;
       if (!errorObj) {
-        return DEFAULT_ERROR;
+        return constructedError;
       }
     } else {
       errorObj = error.response.data.error;
@@ -452,13 +453,13 @@ export async function constructErrorMessage(error) {
     } else {
       errorMsg = errorObj.message;
     }
-    return errorMsg;
-  } else {
-    return error.message ? error.message : DEFAULT_ERROR;
+    constructedError.message = errorMsg;
+    constructedError.code = errorObj.code;
   }
+  return constructedError;
 }
 
-export function readBlob(blob) {
+function readBlob(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -583,3 +584,18 @@ export function handleFathomTrackEvent(event, value) {
     console.error('Fathom is not properly initialized or trackEvent method is not available.');
   }
 }
+
+export function mergeAndReorderThemes(themes, additionalTheme) {
+  return [themes[0], ...additionalTheme, ...themes.slice(1)];
+}
+
+export const isKnownTheme = (selectedThemeId, selectedModeId) => {
+  const whichMode = MODES.find((mode) => selectedModeId === mode.id);
+
+  const allThemesIncludingPSD =
+    selectedModeId === DEFAULT_MODE.id
+      ? [...whichMode.themes.map((theme) => theme.id), PLANET_SANDBOX_THEME_ID]
+      : whichMode.themes.map((theme) => theme.id);
+
+  return allThemesIncludingPSD.includes(selectedThemeId);
+};

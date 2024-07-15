@@ -1,0 +1,13 @@
+{
+    "title": "Global Human Settlement",
+    "layers": [
+        {
+            "id": "GHS-BUILT-S2",
+            "name": "GHS-BUILT-S2",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

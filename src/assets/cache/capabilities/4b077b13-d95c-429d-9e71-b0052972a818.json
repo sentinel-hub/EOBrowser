@@ -1,0 +1,41 @@
+{
+    "title": "EOB3 Vegetation (L8 USGS) API",
+    "layers": [
+        {
+            "id": "__FIS_4-NDVI",
+            "name": "__FIS_4-NDVI",
+            "description": "",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "1_TRUE_COLOR",
+            "name": "True color",
+            "description": "Based on the combination of bands 4, 3, 2",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "2_TRUE_COLOR_PANSHARPENED",
+            "name": "True color - pansharpened",
+            "description": "Based on true color bands 4, 3, 2 and a pan band 8",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "3_FALSE_COLOR",
+            "name": "False color",
+            "description": "Based on the combination of bands 5, 4, 3",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "4-NDVI",
+            "name": "NDVI",
+            "description": "Based on the combination of bands (B05-B04)/(B05+B04)",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

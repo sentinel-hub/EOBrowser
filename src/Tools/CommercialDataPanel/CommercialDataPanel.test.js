@@ -1,5 +1,10 @@
 import { isPlanetHarmonizationSupported } from './CommercialDataPanel';
-import { formatNumberAsRoundedUnit, getProductsOrderSize, roundToNDigits } from './commercialData.utils';
+import {
+  formatNumberAsRoundedUnit,
+  getConfigurationTemplate,
+  getProductsOrderSize,
+  roundToNDigits,
+} from './commercialData.utils';
 import { PlanetItemType, PlanetProductBundle, TPDProvider } from '@sentinel-hub/sentinelhub-js';
 import geo_area from '@mapbox/geojson-area';
 
@@ -299,3 +304,101 @@ describe('getProductsOrderSize', () => {
     },
   );
 });
+
+const psSceneTransaction = [
+  {
+    input: {
+      provider: 'PLANET',
+      input: {
+        data: [
+          {
+            type: 'catalog',
+            itemType: 'PSScene',
+            productBundle: 'analytic_udm2',
+            itemIds: ['20240403_080011_26_242d'],
+            harmonizeTo: 'NONE',
+          },
+        ],
+      },
+    },
+    expectedResult: 'e72f1c-YOUR-INSTANCEID-HERE',
+  },
+];
+
+const planetVarTransaction = [
+  {
+    input: {
+      provider: 'PLANET',
+      input: {
+        data: [
+          {
+            dataFilter: {
+              timeRange: {
+                from: '2024-01-29T00:00:00Z',
+                to: '2024-04-29T23:59:59.999Z',
+              },
+              maxCloudCoverage: 100,
+            },
+            type: 'biomass_proxy',
+            id: 'BIOMASS-PROXY_V3.0_10',
+          },
+        ],
+      },
+    },
+    expectedResult: 'd8cd73-YOUR-INSTANCEID-HERE',
+  },
+];
+
+const airbusSpotTransaction = [
+  {
+    input: {
+      provider: 'AIRBUS',
+      input: {
+        data: [
+          {
+            dataFilter: {
+              timeRange: {
+                from: '2024-01-29T00:00:00Z',
+                to: '2024-04-29T23:59:59.999Z',
+              },
+              maxCloudCoverage: 100,
+            },
+            constellation: 'SPOT',
+            id: '',
+          },
+        ],
+      },
+    },
+    expectedResult: 'ddb295-YOUR-INSTANCEID-HERE',
+  },
+];
+
+const maxarSpotTransaction = [
+  {
+    input: {
+      provider: 'MAXAR',
+      input: {
+        data: [
+          {
+            dataFilter: {
+              timeRange: {
+                from: '2024-01-29T00:00:00Z',
+                to: '2024-04-29T23:59:59.999Z',
+              },
+              maxCloudCoverage: 100,
+            },
+            id: '',
+          },
+        ],
+      },
+    },
+    expectedResult: '268131-YOUR-INSTANCEID-HERE',
+  },
+];
+
+test.each([psSceneTransaction, planetVarTransaction, airbusSpotTransaction, maxarSpotTransaction])(
+  'Test getConfigurationTemplateId method',
+  (fixture) => {
+    expect(getConfigurationTemplate(fixture.input).id).toEqual(fixture.expectedResult);
+  },
+);

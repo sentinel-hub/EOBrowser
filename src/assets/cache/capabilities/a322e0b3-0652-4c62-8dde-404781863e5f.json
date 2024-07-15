@@ -1,0 +1,61 @@
+{
+    "title": "EOB3 MODIS API",
+    "layers": [
+        {
+            "id": "__FIS_3-NDVI",
+            "name": "__FIS_3-NDVI",
+            "description": "",
+            "dataset": "MODIS",
+            "legendUrl": null
+        },
+        {
+            "id": "1-TRUE-COLOR",
+            "name": "True color",
+            "description": "Based on bands 1, 4, 3",
+            "dataset": "MODIS",
+            "legendUrl": null
+        },
+        {
+            "id": "2-FALSE-COLOR",
+            "name": "False Color",
+            "description": "Based on bands 2, 1, 4",
+            "dataset": "MODIS",
+            "legendUrl": null
+        },
+        {
+            "id": "3-NDVI",
+            "name": "NDVI",
+            "description": "Normalized difference vegetation index: (B02 - B01)/(B02 + B01)",
+            "dataset": "MODIS",
+            "legendUrl": "https://services.sentinel-hub.com/ogc/wms/a322e0-YOUR-INSTANCEID-HERE?request=GetLegendGraphic&service=WMS&layer=3-NDVI&style=default"
+        },
+        {
+            "id": "NDWI",
+            "name": "NDWI",
+            "description": "Normalized difference water index: (B04 - B02)/(B04 + B02)",
+            "dataset": "MODIS",
+            "legendUrl": "https://services.sentinel-hub.com/ogc/wms/a322e0-YOUR-INSTANCEID-HERE?request=GetLegendGraphic&service=WMS&layer=NDWI&style=default"
+        },
+        {
+            "id": "SALINITY-INDEX",
+            "name": "Normalized Difference Salinity Index",
+            "description": "Normalized Difference Salinity Index: (B06 - B07)/(B06 + B07)",
+            "dataset": "MODIS",
+            "legendUrl": "https://services.sentinel-hub.com/ogc/wms/a322e0-YOUR-INSTANCEID-HERE?request=GetLegendGraphic&service=WMS&layer=SALINITY-INDEX&style=default"
+        }
+    ],
+    "datasets": [
+        {
+            "name": "MODIS",
+            "bands": [
+                "B01",
+                "B02",
+                "B03",
+                "B04",
+                "B05",
+                "B06",
+                "B07"
+            ]
+        }
+    ]
+}

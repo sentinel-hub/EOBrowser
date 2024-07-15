@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
-import ExternalLink from '../../ExternalLink/ExternalLink';
 import { connect } from 'react-redux';
 import { t } from 'ttag';
 
 import UserAuth from '../../Auth/UserAuth';
 import LanguageSelector from '../../LanguageSelector/LanguageSelector';
-import sgLogo from './sgLogo.png';
 import './Header.scss';
 
 class HeaderWithLogin extends Component {
   render() {
     const user = this.props.user;
+    const impersonatedName = this.props.impersonatedName;
     return (
       <header id="logo-header">
         <div className="left">
@@ -18,9 +17,6 @@ class HeaderWithLogin extends Component {
             <i className="fa fa-chevron-left" />
           </div>
           <div className="app-title">
-            <ExternalLink className="sgLogo" href="https://www.sentinel-hub.com/">
-              <img src={sgLogo} alt="Sentinel Hub" />
-            </ExternalLink>
             <span>
               EO Browser
               {import.meta.env.VITE_REPLACE_SERVICES_HOSTNAME && (
@@ -37,11 +33,15 @@ class HeaderWithLogin extends Component {
             <LanguageSelector />
             <UserAuth user={user} />
           </div>
-          {user && (
+          {impersonatedName ? (
+            <div className="user-hello user-hello-impersonated">
+              {t`Managing - `} <b>{impersonatedName}</b>
+            </div>
+          ) : user ? (
             <div className="user-hello">
               {t`Hello,`} <b>{user.name && user.name.trim() ? user.name : user.email}</b>
             </div>
-          )}
+          ) : null}
         </div>
       </header>
     );
@@ -51,6 +51,7 @@ class HeaderWithLogin extends Component {
 const mapStoreToProps = (store) => ({
   user: store.auth.user.userdata,
   selectedLanguage: store.language.selectedLanguage,
+  impersonatedName: store.auth.impersonatedUser.name,
 });
 
 export default connect(mapStoreToProps, null)(HeaderWithLogin);

@@ -16,7 +16,7 @@ class EOBPOIPanelButton extends React.Component {
   renderMarkerIcon = () => {
     const errMsg = this.props.disabled ? getLoggedInErrorMsg() : null;
     const isEnabled = errMsg === null;
-    const errorMessage = errMsg ? `(${errMsg})` : '';
+    const errorMessage = errMsg ? `\n(${errMsg})` : '';
     const title = t`Mark point of interest` + ` ${errorMessage}`;
     return (
       <span

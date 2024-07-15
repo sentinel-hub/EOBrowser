@@ -224,7 +224,6 @@ export {
   SPECTRAL_EXPLORER_ENABLED,
   isSpectralExplorerSupported,
   spectralExplorerLabels,
-  createEvalscriptForDataset,
   getBandsValues,
   getTitleForGeometryType,
   createSeriesId,

@@ -22,9 +22,11 @@ import {
   getStatisticsLayer,
   handleZipCSVExport,
   handleSingleCSVExport,
+  getLayerId,
+  getLayerLabel,
 } from './FIS.utils';
 import { DraggableDialogBox } from '../../components/DraggableDialogBox/DraggableDialogBox';
-import { STATISTICS_MANDATORY_OUTPUTS, TABS } from '../../const';
+import { STATISTICS_MANDATORY_OUTPUTS, STATISTICS_MANDATORY_OUTPUTS_POI, TABS } from '../../const';
 
 import './FIS.scss';
 import { getErrorFetchingDataMsg } from '../../junk/ConstMessages';
@@ -103,7 +105,7 @@ class FIS extends Component {
       }));
     }
 
-    const singleLayerId = customSelected ? 'Custom' : layerId;
+    const singleLayerId = getLayerId(layerId, customSelected);
     return [
       {
         id: singleLayerId,
@@ -215,13 +217,31 @@ class FIS extends Component {
 
     const { aoiGeometry, poiGeometry, poiOrAoi, selectedTab } = this.props;
 
-    const { supportStatisticalApi, statisticsLayer } = await getStatisticsLayer({
+    const paramsForStatsLayer = {
       customSelected,
       datasetId,
       evalscript,
       layerId,
       visualizationUrl,
-    });
+    };
+
+    let requiredOutputs = STATISTICS_MANDATORY_OUTPUTS;
+    let { supportStatisticalApi, statisticsLayer } = await getStatisticsLayer(
+      paramsForStatsLayer,
+      requiredOutputs,
+    );
+
+    // if it's POI, check if evalscript has 'eobrowserStatsPOI' output in evalscript
+    if (poiOrAoi === POI_STRING && !supportStatisticalApi) {
+      const { supportStatisticalApi: supportStatApiPoi, statisticsLayer: statsLayerPoi } =
+        await getStatisticsLayer(paramsForStatsLayer, STATISTICS_MANDATORY_OUTPUTS_POI);
+
+      if (supportStatApiPoi) {
+        requiredOutputs = STATISTICS_MANDATORY_OUTPUTS_POI;
+        supportStatisticalApi = supportStatApiPoi;
+        statisticsLayer = statsLayerPoi;
+      }
+    }
 
     if (statisticsLayer === undefined) {
       this.setState({
@@ -261,12 +281,10 @@ class FIS extends Component {
       };
 
       if (supportStatisticalApi) {
-        statsParams['output'] = STATISTICS_MANDATORY_OUTPUTS[0];
+        statsParams['output'] = requiredOutputs[0];
       }
 
-      const statisticsProvider = supportStatisticalApi
-        ? StatisticsProviderType.STAPI
-        : StatisticsProviderType.FIS;
+      const statisticsProvider = StatisticsProviderType.STAPI;
 
       let data;
       try {
@@ -285,7 +303,7 @@ class FIS extends Component {
         break;
       }
 
-      if (statisticsProvider === StatisticsProviderType.STAPI && data.status !== 'OK') {
+      if (data.status !== 'OK') {
         const errors = new Set();
         //try to get error message from response
         try {
@@ -302,9 +320,7 @@ class FIS extends Component {
         break;
       }
 
-      if (statisticsProvider === StatisticsProviderType.STAPI) {
-        data = StatisticsUtils.convertToFISResponse(data.data, STATISTICS_MANDATORY_OUTPUTS[0]);
-      }
+      data = StatisticsUtils.convertToFISResponse(data.data, requiredOutputs[0]);
 
       // if there are more than 2 channels in the data, we are dealing with a custom layer
       // which would mean we also have to display a legend for that layer and it is
@@ -541,7 +557,7 @@ class FIS extends Component {
   }
 
   renderIntervalButtons() {
-    const { selectedTimeIntervalIndex } = this.state;
+    const { selectedTimeIntervalIndex, fetchingInProgress, fetchingBatches } = this.state;
     return (
       <div className="interval-buttons">
         {this.TIME_INTERVALS.map((interval, index) => {
@@ -559,6 +575,7 @@ class FIS extends Component {
               onClick={() => {
                 this.onIntervalChange(index);
               }}
+              disabled={fetchingInProgress || fetchingBatches}
             />
           );
         })}
@@ -887,7 +904,7 @@ class FIS extends Component {
         title={
           selectedTab === TABS.COMPARE_TAB
             ? t`Multiple layers`
-            : `${getDatasetLabel(datasetId)} - ${customSelected ? 'Custom' : layerId}`
+            : `${getDatasetLabel(datasetId)} - ${getLayerLabel(layerId, customSelected)}`
         }
         modal={true}
       >

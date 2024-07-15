@@ -1,0 +1,126 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/e5216a-YOUR-INSTANCEID-HERE/layers/LST-100",
+        "id": "LST-100",
+        "title": "Land Surface Temperature (100m) - Day Time",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// To set custom max and min values, set\n// defaultVis to false and choose your max and\n// min values. The color map will then be scaled\n// to those max and min values\n\n// LST has two observations per days: 1h30 and 13h30 solar local time\n\nconst defaultVis = true; // true or false\nconst color_min = 263; // default min: 263\nconst color_max = 340; // default max: 340\nconst sensing_time = \"1330\"; // \"0130\" or \"1330\" or \"\"\n\n//set the data for map and timeserie\nfunction setup() {\n    return {\n        input: [\"LST\", \"dataMask\"],\n        output: [\n            { id: \"default\", bands: 4 },\n            { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"eobrowserStats\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"dataMask\", bands: 1 },\n        ],\n        mosaicking: \"TILE\",\n    };\n}\n\n//Select files based on sensing time (0130 or 1330)\nfunction preProcessScenes(collections) {\n    collections.scenes.tiles = collections.scenes.tiles.filter(function (tile) {\n        return tile.dataPath.includes(\"T\" + sensing_time);\n    });\n    return collections;\n}\n\n//Create color ramp 263 - 340 (full range)\nconst cmap = [\n    [263, 0x000004],\n    [266, 0x06051a],\n    [270, 0x140e36],\n    [274, 0x251255],\n    [278, 0x3b0f70],\n    [282, 0x51127c],\n    [286, 0x641a80],\n    [289, 0x782281],\n    [293, 0x8c2981],\n    [297, 0xa1307e],\n    [301, 0xb73779],\n    [305, 0xca3e72],\n    [309, 0xde4968],\n    [313, 0xed5a5f],\n    [316, 0xf7705c],\n    [320, 0xfc8961],\n    [324, 0xfe9f6d],\n    [328, 0xfeb77e],\n    [332, 0xfecf92],\n    [336, 0xfde7a9],\n    [340, 0xfcfdbf],\n];\n\n//updated color ramp based on color_min and color_max\nfunction updateCMap(min, max) {\n    const numIntervals = cmap.length;\n    const intervalLength = (max - min) / (numIntervals - 1);\n    for (let i = 0; i < numIntervals; i++) {\n        cmap[i][0] = min + intervalLength * i;\n    }\n}\n\n// update the min max of color bar if defaultVis set to false\nif (!defaultVis) updateCMap(color_min, color_max);\n\n//initialize the ColorRamp\nconst visualizer = new ColorRampVisualizer(cmap);\n\nfunction evaluatePixel(samples) {\n    // LST scale factor\n    const scaleFactor = 100;\n\n    // use the first sample with a datamask of 1\n    let datamask = 0;\n    let val = NaN;\n    for (var i = 0; i < samples.length; i++) {\n        datamask = samples[i].dataMask;\n        if (datamask == 1) {\n            val = samples[i].LST / scaleFactor;\n            break;\n        }\n    }\n\n    return {\n        default: [...visualizer.process(val), datamask],\n        index: [val],\n        eobrowserStats: [val, datamask],\n        dataMask: [datamask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/e5216a-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-27T11:48:25.227535Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "8d9770-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/e5216a-YOUR-INSTANCEID-HERE/layers/LST-100-NIGHT-TIME",
+        "id": "LST-100-NIGHT-TIME",
+        "title": "Land Surface Temperature (100m) - Night Time",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// To set custom max and min values, set\n// defaultVis to false and choose your max and\n// min values. The color map will then be scaled\n// to those max and min values\n\n// LST has two observations per days: 1h30 and 13h30 solar local time\n\nconst defaultVis = true; // true or false\nconst color_min = 263; // default min: 263\nconst color_max = 340; // default max: 340\nconst sensing_time = \"0130\"; // \"0130\" or \"1330\" or \"\"\n\n//set the data for map and timeserie\nfunction setup() {\n    return {\n        input: [\"LST\", \"dataMask\"],\n        output: [\n            { id: \"default\", bands: 4 },\n            { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"eobrowserStats\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"dataMask\", bands: 1 },\n        ],\n        mosaicking: \"TILE\",\n    };\n}\n\n//Select files based on sensing time (0130 or 1330)\nfunction preProcessScenes(collections) {\n    collections.scenes.tiles = collections.scenes.tiles.filter(function (tile) {\n        return tile.dataPath.includes(\"T\" + sensing_time);\n    });\n    return collections;\n}\n\n//Create color ramp 263 - 340 (full range)\nconst cmap = [\n    [263, 0x000004],\n    [266, 0x06051a],\n    [270, 0x140e36],\n    [274, 0x251255],\n    [278, 0x3b0f70],\n    [282, 0x51127c],\n    [286, 0x641a80],\n    [289, 0x782281],\n    [293, 0x8c2981],\n    [297, 0xa1307e],\n    [301, 0xb73779],\n    [305, 0xca3e72],\n    [309, 0xde4968],\n    [313, 0xed5a5f],\n    [316, 0xf7705c],\n    [320, 0xfc8961],\n    [324, 0xfe9f6d],\n    [328, 0xfeb77e],\n    [332, 0xfecf92],\n    [336, 0xfde7a9],\n    [340, 0xfcfdbf],\n];\n\n//updated color ramp based on color_min and color_max\nfunction updateCMap(min, max) {\n    const numIntervals = cmap.length;\n    const intervalLength = (max - min) / (numIntervals - 1);\n    for (let i = 0; i < numIntervals; i++) {\n        cmap[i][0] = min + intervalLength * i;\n    }\n}\n\n// update the min max of color bar if defaultVis set to false\nif (!defaultVis) updateCMap(color_min, color_max);\n\n//initialize the ColorRamp\nconst visualizer = new ColorRampVisualizer(cmap);\n\nfunction evaluatePixel(samples) {\n    // LST scale factor\n    const scaleFactor = 100;\n\n    // use the first sample with a datamask of 1\n    let datamask = 0;\n    let val = NaN;\n    for (var i = 0; i < samples.length; i++) {\n        datamask = samples[i].dataMask;\n        if (datamask == 1) {\n            val = samples[i].LST / scaleFactor;\n            break;\n        }\n    }\n\n    return {\n        default: [...visualizer.process(val), datamask],\n        index: [val],\n        eobrowserStats: [val, datamask],\n        dataMask: [datamask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/e5216a-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-27T11:47:51.467097Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "8d9770-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/e5216a-YOUR-INSTANCEID-HERE/layers/LST-1000",
+        "id": "LST-1000",
+        "title": "Land Surface Temperature (1000m) - Day Time",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// To set custom max and min values, set\n// defaultVis to false and choose your max and\n// min values. The color map will then be scaled\n// to those max and min values\n\n// LST has two observations per days: 1h30 and 13h30 solar local time\n\nconst defaultVis = true; // true or false\nconst color_min = 263; // default min: 263\nconst color_max = 340; // default max: 340\nconst sensing_time = \"1330\"; // \"0130\" or \"1330\" or \"\"\n\n//set the data for map and timeserie\nfunction setup() {\n    return {\n        input: [\"LST\", \"dataMask\"],\n        output: [\n            { id: \"default\", bands: 4 },\n            { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"eobrowserStats\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"dataMask\", bands: 1 },\n        ],\n        mosaicking: \"TILE\",\n    };\n}\n\n//Select files based on sensing time (0130 or 1330)\nfunction preProcessScenes(collections) {\n    collections.scenes.tiles = collections.scenes.tiles.filter(function (tile) {\n        return tile.dataPath.includes(\"T\" + sensing_time);\n    });\n    return collections;\n}\n\n//Create color ramp 263 - 340 (full range)\nconst cmap = [\n    [263, 0x000004],\n    [266, 0x06051a],\n    [270, 0x140e36],\n    [274, 0x251255],\n    [278, 0x3b0f70],\n    [282, 0x51127c],\n    [286, 0x641a80],\n    [289, 0x782281],\n    [293, 0x8c2981],\n    [297, 0xa1307e],\n    [301, 0xb73779],\n    [305, 0xca3e72],\n    [309, 0xde4968],\n    [313, 0xed5a5f],\n    [316, 0xf7705c],\n    [320, 0xfc8961],\n    [324, 0xfe9f6d],\n    [328, 0xfeb77e],\n    [332, 0xfecf92],\n    [336, 0xfde7a9],\n    [340, 0xfcfdbf],\n];\n\n//updated color ramp based on color_min and color_max\nfunction updateCMap(min, max) {\n    const numIntervals = cmap.length;\n    const intervalLength = (max - min) / (numIntervals - 1);\n    for (let i = 0; i < numIntervals; i++) {\n        cmap[i][0] = min + intervalLength * i;\n    }\n}\n\n// update the min max of color bar if defaultVis set to false\nif (!defaultVis) updateCMap(color_min, color_max);\n\n//initialize the ColorRamp\nconst visualizer = new ColorRampVisualizer(cmap);\n\nfunction evaluatePixel(samples) {\n    // LST scale factor\n    const scaleFactor = 100;\n\n    // use the first sample with a datamask of 1\n    let datamask = 0;\n    let val = NaN;\n    for (var i = 0; i < samples.length; i++) {\n        datamask = samples[i].dataMask;\n        if (datamask == 1) {\n            val = samples[i].LST / scaleFactor;\n            break;\n        }\n    }\n\n    return {\n        default: [...visualizer.process(val), datamask],\n        index: [val],\n        eobrowserStats: [val, datamask],\n        dataMask: [datamask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/e5216a-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-27T11:48:11.730870Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "6b613b-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/e5216a-YOUR-INSTANCEID-HERE/layers/LST-1000-NIGHT-TIME",
+        "id": "LST-1000-NIGHT-TIME",
+        "title": "Land Surface Temperature (1000m) - Night Time",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// To set custom max and min values, set\n// defaultVis to false and choose your max and\n// min values. The color map will then be scaled\n// to those max and min values\n\n// LST has two observations per days: 1h30 and 13h30 solar local time\n\nconst defaultVis = true; // true or false\nconst color_min = 263; // default min: 263\nconst color_max = 340; // default max: 340\nconst sensing_time = \"0130\"; // \"0130\" or \"1330\" or \"\"\n\n//set the data for map and timeserie\nfunction setup() {\n    return {\n        input: [\"LST\", \"dataMask\"],\n        output: [\n            { id: \"default\", bands: 4 },\n            { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"eobrowserStats\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"dataMask\", bands: 1 },\n        ],\n        mosaicking: \"TILE\",\n    };\n}\n\n//Select files based on sensing time (0130 or 1330)\nfunction preProcessScenes(collections) {\n    collections.scenes.tiles = collections.scenes.tiles.filter(function (tile) {\n        return tile.dataPath.includes(\"T\" + sensing_time);\n    });\n    return collections;\n}\n\n//Create color ramp 263 - 340 (full range)\nconst cmap = [\n    [263, 0x000004],\n    [266, 0x06051a],\n    [270, 0x140e36],\n    [274, 0x251255],\n    [278, 0x3b0f70],\n    [282, 0x51127c],\n    [286, 0x641a80],\n    [289, 0x782281],\n    [293, 0x8c2981],\n    [297, 0xa1307e],\n    [301, 0xb73779],\n    [305, 0xca3e72],\n    [309, 0xde4968],\n    [313, 0xed5a5f],\n    [316, 0xf7705c],\n    [320, 0xfc8961],\n    [324, 0xfe9f6d],\n    [328, 0xfeb77e],\n    [332, 0xfecf92],\n    [336, 0xfde7a9],\n    [340, 0xfcfdbf],\n];\n\n//updated color ramp based on color_min and color_max\nfunction updateCMap(min, max) {\n    const numIntervals = cmap.length;\n    const intervalLength = (max - min) / (numIntervals - 1);\n    for (let i = 0; i < numIntervals; i++) {\n        cmap[i][0] = min + intervalLength * i;\n    }\n}\n\n// update the min max of color bar if defaultVis set to false\nif (!defaultVis) updateCMap(color_min, color_max);\n\n//initialize the ColorRamp\nconst visualizer = new ColorRampVisualizer(cmap);\n\nfunction evaluatePixel(samples) {\n    // LST scale factor\n    const scaleFactor = 100;\n\n    // use the first sample with a datamask of 1\n    let datamask = 0;\n    let val = NaN;\n    for (var i = 0; i < samples.length; i++) {\n        datamask = samples[i].dataMask;\n        if (datamask == 1) {\n            val = samples[i].LST / scaleFactor;\n            break;\n        }\n    }\n\n    return {\n        default: [...visualizer.process(val), datamask],\n        index: [val],\n        eobrowserStats: [val, datamask],\n        dataMask: [datamask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/e5216a-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-27T11:48:02.870045Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "6b613b-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

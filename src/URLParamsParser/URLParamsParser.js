@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import { connect } from 'react-redux';
 
 import { getUrlParams, parsePosition, parseDataFusion } from '../utils';
 import {
@@ -20,6 +21,7 @@ import store, {
   compareLayersSlice,
   tabsSlice,
   authSlice,
+  tutorialSlice,
 } from '../store';
 import { b64DecodeUnicode } from '../utils/base64MDN';
 
@@ -27,6 +29,7 @@ import { computeNewValuesFromPoints } from '../junk/EOBEffectsPanel/AdvancedRgbE
 import { DEFAULT_LAT_LNG } from '../const';
 import { ModalId } from '../const';
 import { getSharedPins } from '../Tools/Pins/Pin.utils';
+import { decrypt } from '../utils/encrypt';
 
 class URLParamsParser extends React.Component {
   state = {
@@ -183,6 +186,7 @@ class URLParamsParser extends React.Component {
       comparedOpacity,
       comparedClipping,
       kc_idp_hint,
+      tutorialIdToShow,
     } = params;
 
     let { lat: parsedLat, lng: parsedLng, zoom: parsedZoom } = parsePosition(lat, lng, zoom);
@@ -200,7 +204,10 @@ class URLParamsParser extends React.Component {
       datasetId: datasetId,
       fromTime: fromTime ? moment.utc(fromTime) : null,
       toTime: moment.utc(toTime),
-      visualizationUrl: visualizationUrl,
+      visualizationUrl:
+        visualizationUrl && !visualizationUrl.startsWith('https')
+          ? decrypt(visualizationUrl)
+          : visualizationUrl,
       layerId,
       evalscript: evalscript && !evalscripturl ? b64DecodeUnicode(evalscript) : undefined,
       customSelected: evalscript || evalscripturl ? true : undefined,
@@ -297,6 +304,10 @@ class URLParamsParser extends React.Component {
     if (kc_idp_hint) {
       store.dispatch(authSlice.actions.setKcIdpHint(kc_idp_hint));
     }
+
+    if (tutorialIdToShow) {
+      store.dispatch(tutorialSlice.actions.setTutorialIdToShowUrl(tutorialIdToShow));
+    }
   };
 
   render() {
@@ -308,4 +319,7 @@ class URLParamsParser extends React.Component {
   }
 }
 
-export default URLParamsParser;
+const mapStoreToProps = (store) => ({
+  user: store.auth.user,
+});
+export default connect(mapStoreToProps)(URLParamsParser);

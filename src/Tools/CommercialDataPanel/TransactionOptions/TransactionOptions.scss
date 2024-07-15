@@ -1,7 +1,16 @@
-@import '../../../variables';
+@import "../../../variables";
 
 .commercial-data-order-options,
 .commercial-data-subscription-options {
+  .hide-planet-key-icon {
+    padding-top: 2px;
+    padding-left: 5px;
+
+    i {
+      cursor: pointer;
+    }
+  }
+
   .row {
     display: flex;
     align-items: center;

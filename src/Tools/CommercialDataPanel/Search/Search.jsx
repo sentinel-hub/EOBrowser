@@ -2,28 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { t } from 'ttag';
 
-import { TPDICollections } from '@sentinel-hub/sentinelhub-js';
 import { EOBButton } from '../../../junk/EOBCommon/EOBButton/EOBButton';
 import { NotificationPanel } from '../../../Notification/NotificationPanel';
 
 import './Search.scss';
 import SearchForm from './SearchForm';
-import { GEOCENTO_EARTHIMAGES } from './config';
-
-const TPDICollectionsWithLabels = [
-  { value: TPDICollections.AIRBUS_PLEIADES, label: 'Airbus Pleiades', requiresQuotas: true },
-  { value: TPDICollections.AIRBUS_SPOT, label: 'Airbus SPOT', requiresQuotas: true },
-  { value: TPDICollections.MAXAR_WORLDVIEW, label: 'Maxar WorldView', requiresQuotas: true },
-  { value: TPDICollections.PLANET_SCOPE, label: 'Planet PlanetScope', requiresQuotas: false },
-  { value: TPDICollections.PLANET_SKYSAT, label: 'Planet SkySat', requiresQuotas: false },
-  { value: TPDICollections.PLANETARY_VARIABLES, label: 'Planet Planetary Variables', requiresQuotas: false },
-  { value: GEOCENTO_EARTHIMAGES, label: 'Geocento EarthImages', requiresQuotas: true },
-];
-
-export const getTPDICollectionsWithLabels = (userAccountInfo) =>
-  TPDICollectionsWithLabels.filter(
-    (collection) => userAccountInfo.quotasEnabled || !collection.requiresQuotas,
-  );
 
 const Search = ({
   onSearch,

@@ -1,0 +1,34 @@
+{
+    "title": "Land Surface Temperature",
+    "layers": [
+        {
+            "id": "LST-100",
+            "name": "Land Surface Temperature (100m) - Day Time",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "LST-100-NIGHT-TIME",
+            "name": "Land Surface Temperature (100m) - Night Time",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "LST-1000",
+            "name": "Land Surface Temperature (1000m) - Day Time",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "LST-1000-NIGHT-TIME",
+            "name": "Land Surface Temperature (1000m) - Night Time",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

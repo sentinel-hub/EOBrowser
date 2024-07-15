@@ -72,7 +72,7 @@ const reprojectArrayOfCoordinates = (coords, fromProj, toProj) => {
   ];
 };
 
-export const reprojectPolygon = (polygonToTransform, fromProj, toProj) => {
+const reprojectPolygon = (polygonToTransform, fromProj, toProj) => {
   const transformedCoords = reprojectArrayOfCoordinates(polygonToTransform.coordinates, fromProj, toProj);
   const polygon = {
     type: 'Polygon',
@@ -93,7 +93,7 @@ const reprojectMultiPolygon = (multiPolygon, fromProj, toProj) => {
   return resultMultiPolygon;
 };
 
-export const reprojectLine = (lineToTransform, fromProj, toProj) => {
+const reprojectLine = (lineToTransform, fromProj, toProj) => {
   const transformedCoords = lineToTransform.coordinates.map(([first, second]) =>
     reprojectCoordPoint([first, second], fromProj, toProj),
   );
@@ -104,7 +104,7 @@ export const reprojectLine = (lineToTransform, fromProj, toProj) => {
   };
 };
 
-export const reprojectMultiLine = (lineToTransform, fromProj, toProj) => {
+const reprojectMultiLine = (lineToTransform, fromProj, toProj) => {
   const transformedCoords = lineToTransform.coordinates.map((line) =>
     reprojectLine({ coordinates: line }, fromProj, toProj),
   );

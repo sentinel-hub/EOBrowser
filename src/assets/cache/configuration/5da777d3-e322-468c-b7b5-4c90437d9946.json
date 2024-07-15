@@ -1,0 +1,188 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE/layers/1_CORINE-LAND-COVER",
+        "id": "1_CORINE-LAND-COVER",
+        "title": "Corine Land Cover ",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"CLC\", \"dataMask\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\n\nconst map = [\n    [1, 0xe6004d],  //111 - Continuous urban fabric\n    [2, 0xff0000],  //112 - Discontinuous urban fabric\n    [3, 0xcc4df2],  //121 - Industrial or commercial units\n    [4, 0xcc0000],  //122 - Road and rail networks and associated land\n    [5, 0xe6cccc],  //123 - Port areas\n    [6, 0xe6cce6],  //124 - Airports\n    [7, 0xa600cc],  //131 - Mineral extraction sites\n    [8, 0xa64d00],  //132 - Dump sites\n    [9, 0xff4dff],  //133 - Construction sites\n    [10, 0xffa6ff], //141 - Green urban areas\n    [11, 0xffe6ff], //142 - Sport and leisure facilities\n    [12, 0xffffa8], //211 - Non-irrigated arable land\n    [13, 0xffff00], //212 - Permanently irrigated land\n    [14, 0xe6e600], //213 - Rice fields\n    [15, 0xe68000], //221 - Vineyards\n    [16, 0xf2a64d], //222 - Fruit trees and berry plantations\n    [17, 0xe6a600], //223 - Olive groves\n    [18, 0xe6e64d], //231 - Pastures\n    [19, 0xffe6a6], //241 - Annual crops associated with permanent crops\n    [20, 0xffe64d], //242 - Complex cultivation patterns\n    [21, 0xe6cc4d], //243 - Land principally occupied by agriculture with significant areas of natural vegetation\n    [22, 0xf2cca6], //244 - Agro-forestry areas\n    [23, 0x80ff00], //311 - Broad-leaved forest\n    [24, 0x00a600], //312 - Coniferous forest\n    [25, 0x4dff00], //313 - Mixed forest\n    [26, 0xccf24d], //321 - Natural grasslands\n    [27, 0xa6ff80], //322 - Moors and heathland\n    [28, 0xa6e64d], //323 - Sclerophyllous vegetation\n    [29, 0xa6f200], //324 - Transitional woodland-shrub\n    [30, 0xe6e6e6], //331 - Beaches - dunes - sands\n    [31, 0xcccccc], //332 - Bare rocks\n    [32, 0xccffcc], //333 - Sparsely vegetated areas\n    [33, 0x000000], //334 - Burnt areas\n    [34, 0xa6e6cc], //335 - Glaciers and perpetual snow\n    [35, 0xa6a6ff], //411 - Inland marshes\n    [36, 0x4d4dff], //412 - Peat bogs\n    [37, 0xccccff], //421 - Salt marshes\n    [38, 0xe6e6ff], //422 - Salines\n    [39, 0xa6a6e6], //423 - Intertidal flats\n    [40, 0x00ccf2], //511 - Water courses\n    [41, 0x80f2e6], //512 - Water bodies\n    [42, 0x00ffa6], //521 - Coastal lagoons\n    [43, 0xa6ffe6], //522 - Estuaries\n    [44, 0xe6f2ff], //523 - Sea and ocean\n    [48, 0xffffff]  //999 - NODATA\n  ];\n\nconst visualizer = new ColorMapVisualizer(map);\n\nfunction evaluatePixel(sample) {\n  return [visualizer.process(sample.CLC)[0], visualizer.process(sample.CLC)[1], visualizer.process(sample.CLC)[2], sample.dataMask];\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-03-26T14:54:31.316320Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "cbdba8-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE/layers/2_ARTIFICIAL-SURFACES",
+        "id": "2_ARTIFICIAL-SURFACES",
+        "title": "Artificial Surfaces",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"CLC\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\nfunction evaluatePixel(sample) {\n\nif (sample.CLC === 1){\n  return [230/255,0/255,77/255,1] //111 - Continuous urban fabric\n}\nelse if (sample.CLC === 2){\n  return [255/255,0/255,0/255,1] //112 - Discontinuous urban fabric\n}\nelse if (sample.CLC === 3){\n  return [204/255,77/255,242/255,1] //121 - Industrial or commercial units\n}\nelse if (sample.CLC === 4){\n  return [204/255,0/255,0/255,1] //122 - Road and rail networks and associated land\n}\nelse if (sample.CLC === 5){\n  return [230/255,204/255,204/255,1] //123 - Port areas\n}\nelse if (sample.CLC === 6){\n  return [230/255,204/255,230/255,1] //124 - Airports\n}\nelse if (sample.CLC === 7){\n  return [166/255,0/255,204/255,1] //131 - Mineral extraction sites\n}\nelse if (sample.CLC === 8){\n  return [166/255,77/255,0/255,1] //132 - Dump sites\n}\nelse if (sample.CLC === 9){\n  return [255/255,77/255,255/255,1] //133 - Construction sites\n}\nelse if (sample.CLC === 10){\n  return [255/255,166/255,255/255,1] //141 - Green urban areas\n}\nelse if (sample.CLC === 11){\n  return [255/255,230/255,255/255,1] //142 - Sport and leisure facilities\n}\nelse{\n  return[0,0,0,0]\n}\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-03-26T14:54:39.412800Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "cbdba8-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE/layers/3_AGRICULTURAL-AREAS",
+        "id": "3_AGRICULTURAL-AREAS",
+        "title": "Agricultural Areas",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"CLC\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\nfunction evaluatePixel(sample) {\nif (sample.CLC === 12){\n  return [255/255,255/255,168/255,1] //211 - Non-irrigated arable land\n}\nif (sample.CLC === 13){\n  return [255/255,255/255,0/255,1] //212 - Permanently irrigated land\n}\nif (sample.CLC === 14){\n  return [230/255,230/255,0/255,1] //213 - Rice fields\n}\nif (sample.CLC === 15){\n  return [230/255,128/255,0/255,1] //221 - Vineyards\n}\nif (sample.CLC === 16){\n  return [242/255,166/255,77/255,1] //222 - Fruit trees and berry plantations\n}\nif (sample.CLC === 17){\n  return [230/255,166/255,0/255,1] //223 - Olive groves\n}\nif (sample.CLC === 18){\n  return [230/255,230/255,77/255,1] //231 - Pastures\n}\nif (sample.CLC === 19){\n  return [255/255,230/255,166/255,1] //241 - Annual crops associated with permanent crops\n}\nif (sample.CLC === 20){\n  return [255/255,230/255,77/255,1] //242 - Complex cultivation patterns\n}\nif (sample.CLC === 21){\n  return [230/255,204/255,77/255,1] //243 - Land principally occupied by agriculture with significant areas of natural vegetation\n}\nif (sample.CLC === 22){\n  return [242/255,204/255,166/255,1] //244 - Agro-forestry areas\n}\nelse{\n  return [0,0,0,0]\n}\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-03-26T14:54:46.657486Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "cbdba8-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE/layers/4_FOREST-AND-SEMINATURAL-AREAS",
+        "id": "4_FOREST-AND-SEMINATURAL-AREAS",
+        "title": "Forest and Seminatural Areas",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"CLC\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\nfunction evaluatePixel(sample) {\n  \nif (sample.CLC === 23){\n  return [128/255,255/255,0/255,1] //311 - Broad-leaved forest\n}\nif (sample.CLC === 24){\n  return [0/255,166/255,0/255,1] //312 - Coniferous forest\n}\nif (sample.CLC === 25){\n  return [77/255,255/255,0/255,1] //313 - Mixed forest\n}\nif (sample.CLC === 26){\n  return [204/255,242/255,77/255,1] //321 - Natural grasslands\n}\nif (sample.CLC === 27){\n  return [166/255,255/255,128/255,1] //322 - Moors and heathland\n}\nif (sample.CLC === 28){\n  return [166/255,230/255,77/255,1] //323 - Sclerophyllous vegetation\n}\nif (sample.CLC === 29){\n  return [166/255,242/255,0/255,1] //324 - Transitional woodland-shrub\n}\nif (sample.CLC === 30){\n  return [230/255,230/255,230/255,1] //331 - Beaches - dunes - sands\n}\nif (sample.CLC === 31){\n  return [204/255,204/255,204/255,1] //332 - Bare rocks\n}\nif (sample.CLC === 32){\n  return [204/255,255/255,204/255,1] //333 - Sparsely vegetated areas\n}\nif (sample.CLC === 33){\n  return [0/255,0/255,0/255,1] //334 - Burnt areas\n}\nif (sample.CLC === 34){\n  return [166/255,230/255,204/255,1] //335 - Glaciers and perpetual snow\n}\nelse{\n  return [0,0,0,0]\n}\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-03-26T14:54:55.278566Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "cbdba8-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE/layers/5_WETLANDS",
+        "id": "5_WETLANDS",
+        "title": "Wetlands",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"CLC\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\nfunction evaluatePixel(sample) {\n  \nif (sample.CLC === 35){\n  return [166/255, 166/255, 255/255,1] //411 - Inland marshes\n}\nif (sample.CLC === 36){\n  return [77/255, 77/255, 255/255,1] //412 - Peat bogs\n}\nif (sample.CLC === 37){\n  return [204/255, 204/255, 255/255,1] //421 - Salt marshes\n}\nif (sample.CLC === 38){\n  return [230/255, 230/255, 255/255,1] //422 - Salines\n}\nif (sample.CLC === 39){\n  return [166/255, 166/255, 230/255,1] //423 - Intertidal flats\n}\nelse{\n  return [0,0,0,0]\n}\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-03-26T14:55:04.285015Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "cbdba8-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE/layers/6_WATER-BODIES",
+        "id": "6_WATER-BODIES",
+        "title": "Water Bodies",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"CLC\"],\n    output: { \n      bands: 4, \n      sampleType: \"AUTO\"\n    }\n  }\n}\nfunction evaluatePixel(sample) {\n    \nif (sample.CLC === 40){\n  return [0/255, 204/255, 242/255,1] //511 - Water courses\n}\nif (sample.CLC === 41){\n  return [128/255, 242/255, 230/255,1] //512 - Water bodies\n}\nif (sample.CLC === 42){\n  return [0/255, 255/255, 166/255,1] //521 - Coastal lagoons\n}\nif (sample.CLC === 43){\n  return [166/255, 255/255, 230/255,1] //522 - Estuaries\n}\nif (sample.CLC === 44){\n  return [230/255, 242/255, 255/255,1] //523 - Sea and ocean\n}\nelse{\n  return [0,0,0,0]\n}\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/5da777-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-03-26T14:55:10.610316Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "cbdba8-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

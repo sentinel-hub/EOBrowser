@@ -23,7 +23,7 @@
         text-align: left;
         font-size: 15px;
 
-        b {
+        .dataset-label {
           color: $textColor;
           text-transform: none;
           padding-top: 5px;
@@ -31,7 +31,7 @@
 
         .dataset-name {
           margin-left: 5px;
-          padding-top: 8px;
+          padding-top: 5px;
         }
       }
     }

@@ -10,7 +10,7 @@ function VisualizationErrorPanel(props) {
   const { error } = props;
 
   useEffect(() => {
-    store.dispatch(visualizationSlice.actions.setError(null));
+    store.dispatch(visualizationSlice.actions.setErrorAndErrorCode({ error: null, errorCode: null }));
   }, [props.selectedMode, props.selectedTabIndex]);
 
   if (!error) {

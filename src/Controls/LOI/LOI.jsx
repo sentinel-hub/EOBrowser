@@ -13,6 +13,7 @@ import { useLoi } from './useLoi';
 import LoiIcon from './loi-icon.svg?react';
 import { FATHOM_TRACK_EVENT_LIST, ModalId } from '../../const';
 import { handleFathomTrackEvent } from '../../utils';
+import { MenuItem } from '../../components/SideBarMenuItem/MenuItem';
 
 const LOIPanelWrapper = ({ setMenuExpanded, className, shouldClose, children }) => {
   const closeTimeout = useRef(null);
@@ -39,16 +40,6 @@ const LOIPanelWrapper = ({ setMenuExpanded, className, shouldClose, children }) 
         {children}
       </div>
     </div>
-  );
-};
-
-const MenuItem = ({ title, className, onClick, iconClassName }) => {
-  return (
-    // jsx-a11y/anchor-is-valid
-    // eslint-disable-next-line
-    <a title={title} onClick={onClick} className={className}>
-      <i className={iconClassName} />
-    </a>
   );
 };
 
@@ -116,7 +107,7 @@ const LOI = ({ className, map, loiBounds, loiGeometry }) => {
       render: () => (
         <MenuItem
           iconClassName="fa fa-area-chart"
-          title={`Elevation profile`}
+          title={t`Elevation profile`}
           onClick={() => {
             store.dispatch(modalSlice.actions.addModal({ modal: ModalId.ELEVATION_PROFILE }));
             handleFathomTrackEvent(FATHOM_TRACK_EVENT_LIST.ELEVATION_PROFILE_CHART_ICON_CLICKED);

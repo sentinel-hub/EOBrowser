@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { VERSION_INFO } from '../../VERSION.js';
 import ExternalLink from '../../ExternalLink/ExternalLink';
 import Banner from './Banner';
-import esaLogo from './esa.png';
 import { t } from 'ttag';
 import { getSignUpUrl } from '../../Auth/authHelpers.js';
 
@@ -14,32 +13,30 @@ class ToolsFooter extends Component {
   render() {
     return (
       <div className="tools-footer">
+        {!this.props.user && (
+          <p className="free-signup">
+            <ExternalLink href={getSignUpUrl()}>{t`Free sign up`}</ExternalLink> {t`for all features`}
+          </p>
+        )}
         <div className="footer-info">
-          {!this.props.user && (
-            <p className="free-signup">
-              <ExternalLink href={getSignUpUrl()}>{t`Free sign up`}</ExternalLink> {t`for all features`}
-            </p>
-          )}
-          {t`Powered by`} <ExternalLink href="https://www.sentinel-hub.com/">Sentinel Hub</ExternalLink>{' '}
-          {t`with contributions by`} <ExternalLink href="https://www.esa.int/">ESA</ExternalLink>
-          <br />
-          <ExternalLink className="esa-logo" href="https://www.esa.int/">
-            <img src={esaLogo} alt="ESA" />
-          </ExternalLink>
+          <div className="footer-attribution">
+            {t`Powered by`}{' '}
+            <ExternalLink href="https://www.planet.com/products/">Planet Insights Platform</ExternalLink>
+          </div>
+          <div className="footer-version">
+            {VERSION_INFO.tag ? (
+              VERSION_INFO.tag
+            ) : VERSION_INFO.commit ? (
+              <span>
+                {VERSION_INFO.branch ? ` ${VERSION_INFO.branch}` : null}
+                {VERSION_INFO.commit ? ` [${VERSION_INFO.commit.substring(0, 8)}]` : null}
+              </span>
+            ) : (
+              <span>Local build</span>
+            )}
+          </div>
         </div>
-        <div className="footer-version">
-          {VERSION_INFO.tag ? (
-            VERSION_INFO.tag
-          ) : VERSION_INFO.commit ? (
-            <span>
-              {VERSION_INFO.branch ? ` ${VERSION_INFO.branch}` : null}
-              {VERSION_INFO.commit ? ` [${VERSION_INFO.commit.substring(0, 8)}]` : null}
-            </span>
-          ) : (
-            <span>Local build</span>
-          )}
-        </div>
-        <Banner />
+        <Banner isUserLoggedIn={this.props.user !== null} />
       </div>
     );
   }

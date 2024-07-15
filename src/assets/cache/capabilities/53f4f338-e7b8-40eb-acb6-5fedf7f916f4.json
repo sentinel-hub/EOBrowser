@@ -1,0 +1,34 @@
+{
+    "title": "EOB3 Volcanoes (L8 USGS) API",
+    "layers": [
+        {
+            "id": "__FIS_THERMAL",
+            "name": "__FIS_THERMAL",
+            "description": "",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "FALSE-COLOR-LAVA-FLOW",
+            "name": "False Color Urban",
+            "description": "Based on bands B07, B06, B04",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        },
+        {
+            "id": "THERMAL",
+            "name": "Thermal",
+            "description": "Based on thermal band 10",
+            "dataset": "LOTL1",
+            "legendUrl": "https://services.sentinel-hub.com/ogc/wms/53f4f3-YOUR-INSTANCEID-HERE?request=GetLegendGraphic&service=WMS&layer=THERMAL&style=RED_TEMPERATURE"
+        },
+        {
+            "id": "TRUE-COLOR",
+            "name": "True color",
+            "description": "Based on the combination of bands 4, 3, 2",
+            "dataset": "LOTL1",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

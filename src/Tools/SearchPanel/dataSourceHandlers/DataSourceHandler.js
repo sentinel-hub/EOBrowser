@@ -12,7 +12,7 @@ import { DEFAULT_TILES_SIZE_CONFIG, DEFAULT_ZOOM_CONFIGURATION } from './helper'
 // - returning search results corresponding to search input
 // - ...
 
-export const SENTINEL_COPYRIGHT_TEXT = `Credit: European Union, contains modified Copernicus Sentinel data ${moment
+const SENTINEL_COPYRIGHT_TEXT = `Credit: European Union, contains modified Copernicus Sentinel data ${moment
   .utc()
   .format('YYYY')}, processed with EO Browser`;
 

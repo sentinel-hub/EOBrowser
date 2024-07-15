@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 import './NotificationPanel.scss';
 
@@ -19,11 +20,11 @@ export const NotificationPanel = ({ type, msg, className, children }) => {
   }
 
   const paragraphs = msg && msg.split('\n');
-
   return (
     <div className={`notification-panel ${className || ''}`}>
       {icon && <i className={`fas fa-${icon}`} />}
-      {paragraphs && paragraphs.map((item, i) => <p key={i}>{item}</p>)}
+      {paragraphs &&
+        paragraphs.map((item, i) => <ReactMarkdown key={i} children={item} linkTarget="_blank" />)}
       {children && <p>{children}</p>}
     </div>
   );

@@ -32,7 +32,7 @@ function parseISO8601TimeIntervalFormat(ISO8601string) {
   return { start, end, period };
 }
 
-export const GIBS_COPYRIGHT_TEXT =
+const GIBS_COPYRIGHT_TEXT =
   "We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Observing System Data and Information System (EOSDIS).";
 
 export default class GibsDataSourceHandler extends DataSourceHandler {

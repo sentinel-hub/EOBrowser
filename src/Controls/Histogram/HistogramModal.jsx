@@ -193,6 +193,8 @@ const mapStoreToProps = (store) => ({
   evalscript: store.visualization.evalscript,
   selectedTabIndex: store.tabs.selectedTabIndex,
   userToken: store.auth.user.access_token,
+  upsampling: store.visualization.upsampling,
+  downsampling: store.visualization.downsampling,
 });
 
 export default connect(mapStoreToProps, null)(HistogramModal);

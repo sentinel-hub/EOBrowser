@@ -70,7 +70,7 @@ function getNextMonthDay(day, direction, nMonths) {
   }
 }
 
-export async function getNextBestDate({ selectedDay, direction, maxCC, fetchDates, limitMonths = 3 }) {
+export async function getNextBestDate({ selectedDay, direction, maxCC, fetchDates, limitMonths = 12 }) {
   let bestDay;
   let availableDays;
 

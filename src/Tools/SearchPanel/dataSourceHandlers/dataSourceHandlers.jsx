@@ -99,8 +99,24 @@ import {
   PROBAV_S10,
   CUSTOM,
   PLANET_NICFI,
+  PLANET_SCOPE,
+  SKY_SAT,
+  FOREST_CARBON_DILIGENCE,
+  LAND_SURFACE_TEMPERATURE,
+  SOIL_WATER_CONTENT,
+  ABOVEGROUND_CARBON_DENSITY,
+  SWC_1000M,
+  SWC_100M,
+  LST_1000M,
+  LST_100M,
+  CANOPY_COVER,
+  CANOPY_HEIGHT,
+  ANALYSIS_READY_PLANETSCOPE,
+  ROAD_AND_BUILDING_DETECTION,
 } from './dataSourceConstants';
 import HLSAWSDataSourceHandler from './HLSAWSDataSourceHandler';
+import PlanetSandboxDatasourceHandler from './PlanetSandboxDatasourceHandler';
+import { getThemeName } from '../../../utils';
 
 export let dataSourceHandlers;
 initializeDataSourceHandlers();
@@ -124,10 +140,11 @@ export function initializeDataSourceHandlers() {
     new BYOCDataSourceHandler(),
     new PlanetBasemapDataSourceHandler(),
     new OthersDataSourceHandler(),
+    new PlanetSandboxDatasourceHandler(),
   ];
 }
 
-export function registerHandlers(service, url, name, configs, preselected) {
+function registerHandlers(service, url, name, configs, preselected) {
   const handledBy = dataSourceHandlers.filter((dsHandler) =>
     dsHandler.willHandle(service, url, name, configs, preselected),
   );
@@ -147,7 +164,7 @@ collectionId and only way to get it is to query service.
 */
 const collectionTitles = {};
 
-async function updateLayersFromServiceIfNeeded(layers) {
+async function updateLayersFromServiceIfNeeded(layers, authToken) {
   const updateLayersFromService = layers.filter(
     (l) => l instanceof BYOCLayer || l instanceof S1GRDAWSEULayer || l instanceof DEMLayer,
   );
@@ -157,6 +174,7 @@ async function updateLayersFromServiceIfNeeded(layers) {
       try {
         await l.updateLayerFromServiceIfNeeded({
           timeout: 30000,
+          authToken,
           cache: {
             expiresIn: Number.POSITIVE_INFINITY,
             targets: [CacheTarget.MEMORY],
@@ -270,17 +288,20 @@ export async function prepareDataSourceHandlers(theme) {
         'https://services-uswest2.sentinel-hub.com/',
         'https://services.sentinel-hub.com/',
       );
-
+      let authToken = dataSource.fetchLayersFromAnonymousAccount
+        ? store.getState().auth.anonToken
+        : undefined;
       try {
         const layers = await LayersFactory.makeLayers(dataSourceUrl, null, null, {
           timeout: 30000,
+          authToken,
           responseType: 'text',
           cache: {
             expiresIn: Number.POSITIVE_INFINITY,
             targets: [CacheTarget.MEMORY],
           },
         });
-        await updateLayersFromServiceIfNeeded(layers);
+        await updateLayersFromServiceIfNeeded(layers, authToken);
         return layers;
       } catch (e) {
         if (e?.response?.status === 403 && e?.response?.headers['content-type'] === 'application/xml') {
@@ -302,7 +323,13 @@ export async function prepareDataSourceHandlers(theme) {
       failedThemeParts.push(name);
       return;
     }
-    const isHandled = registerHandlers(service, url, name ? name : theme.name, allLayers[i], preselected);
+    const isHandled = registerHandlers(
+      service,
+      url,
+      name ? name : getThemeName(theme),
+      allLayers[i],
+      preselected,
+    );
     if (!isHandled) {
       console.error(
         `Ignoring entry, unsupported service: ${service} (only 'WMS' and 'WMTS' are currently supported) or url: ${url}`,
@@ -397,6 +424,21 @@ export function datasourceForDatasetId(datasetId) {
     case IO_LULC_10M_ANNUAL:
     case GLOBAL_HUMAN_SETTLEMENT:
       return DATASOURCES.OTHER;
+    case SKY_SAT:
+    case PLANET_SCOPE:
+    case FOREST_CARBON_DILIGENCE:
+    case LAND_SURFACE_TEMPERATURE:
+    case SOIL_WATER_CONTENT:
+    case ABOVEGROUND_CARBON_DENSITY:
+    case CANOPY_HEIGHT:
+    case CANOPY_COVER:
+    case LST_100M:
+    case LST_1000M:
+    case SWC_100M:
+    case SWC_1000M:
+    case ANALYSIS_READY_PLANETSCOPE:
+    case ROAD_AND_BUILDING_DETECTION:
+      return DATASOURCES.PLANET_SANDBOX_DATA;
     default:
       return null;
   }
@@ -411,11 +453,20 @@ export function getDataSourceHandler(datasetId) {
   }
 }
 
-export function checkIfCustom(datasetId) {
-  const dsh = dataSourceHandlers.find((d) => d.datasource === DATASOURCES.CUSTOM);
+const checkBYOCDatasourceHandler = (datasetId, datasource) => {
+  let dsh = dataSourceHandlers.find((d) => d.datasource === datasource);
   if (dsh && dsh.datasets) {
     const isCustomDataset = dsh.datasets.includes(datasetId);
     if (isCustomDataset) {
+      return dsh;
+    }
+  }
+};
+
+export function checkIfCustom(datasetId) {
+  for (let datasource of [DATASOURCES.CUSTOM, DATASOURCES.PLANET_SANDBOX_DATA]) {
+    const dsh = checkBYOCDatasourceHandler(datasetId, datasource);
+    if (dsh) {
       return dsh;
     }
   }
@@ -499,42 +550,6 @@ export function getDatasetLabel(datasetId) {
     datasetLabel = dataSourceHandler.getDatasetLabel(datasetId);
   }
   return datasetLabel;
-}
-
-export function getEvalsource(datasetId) {
-  switch (datasetId) {
-    case S1_AWS_IW_VVVH:
-    case S1_AWS_IW_VV:
-    case S1_AWS_EW_HHHV:
-    case S1_AWS_EW_HH:
-      return 'S1GRD';
-    case S2L1C:
-      return 'S2';
-    case S2L2A:
-      return 'S2L2A';
-    case S3SLSTR:
-      return 'S3SLSTR';
-    case S3OLCI:
-      return 'S3OLCI';
-    case S5_O3:
-    case S5_NO2:
-    case S5_SO2:
-    case S5_CO:
-    case S5_HCHO:
-    case S5_CH4:
-    case S5_AER_AI:
-    case S5_CLOUD:
-    case S5_OTHER:
-      return 'S5P_L2';
-    case AWS_L8L1C:
-    case AWS_LOTL1:
-    case AWS_LOTL2:
-      return 'L8';
-    case MODIS:
-      return 'Modis';
-    default:
-      return null;
-  }
 }
 
 export function supportsFIS(visualizationUrl, datasetId, layerId, isCustom) {

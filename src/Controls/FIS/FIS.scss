@@ -128,6 +128,10 @@
     a.eob-btn.selected {
       border-bottom: 3px solid #b6bf00;
     }
+
+    a.eob-btn.disabled {
+      background: none;
+    }
   }
 
   div.fetching-small {

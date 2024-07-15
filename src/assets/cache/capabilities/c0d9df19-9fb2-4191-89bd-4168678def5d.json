@@ -1,0 +1,20 @@
+{
+    "title": "SkySat (Planet Sandbox Data)",
+    "layers": [
+        {
+            "id": "NDVI",
+            "name": "NDVI",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "TRUE-COLOR",
+            "name": "True Color",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

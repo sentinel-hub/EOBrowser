@@ -13,7 +13,6 @@ import {
   showDataOnMap,
   getTpdiCollectionFromTransaction,
   cloneConfiguration,
-  isPlanetaryVariableTypeAndId,
 } from '../commercialData.utils';
 import TransactionTypeSelection from '../TransactionOptions/TransactionTypeSelection';
 import store, { commercialDataSlice, mainMapSlice } from '../../../store';
@@ -261,9 +260,9 @@ const TransactionDetails = ({ transaction, setAction, layer, transactionType }) 
         transaction.provider === TPDProvider.PLANET &&
         transaction.status === TPDITransactionStatus.CREATED && (
           <NotificationPanel>
-            {t`Note that it is technically possible to order more PlanetScope data than your purchased quota. Make sure your order is in line with the Hectares under Management (HUM) model to avoid overage fees.` +
+            {t`Note that it is technically possible to order more PlanetScope data than your purchased quota. Make sure your order is in line with the Acres under Management (AUM) model to avoid overage fees.` +
               ` `}
-            <ExternalLink href="https://www.sentinel-hub.com/faq/#how-the-planetscope-hectares-under-management-works">
+            <ExternalLink href="https://www.sentinel-hub.com/faq/how-the-planetscope-area-under-management-work/">
               {t`More information`}
             </ExternalLink>
           </NotificationPanel>
@@ -386,7 +385,7 @@ const TransactionsByStatus = ({
   );
 };
 
-export const Transactions = ({
+const Transactions = ({
   activeItemId,
   setActiveItemId,
   setConfirmAction,
@@ -424,19 +423,6 @@ export const Transactions = ({
     fetchData(transactionType, user, themesLists);
   }, [user, themesLists, transactionType]);
 
-  const createPVConfiguration = (transaction) => {
-    if (
-      transaction.provider !== TPDProvider.PLANET ||
-      !transaction.input?.data[0]?.type ||
-      !transaction.input?.data[0]?.id ||
-      !isPlanetaryVariableTypeAndId(transaction.input.data[0].type, transaction.input.data[0].id)
-    ) {
-      return;
-    }
-
-    cloneConfiguration(user, transaction);
-  };
-
   const confirmTransactionAction = async (transactionType, transaction) => {
     try {
       const requestsConfig = {
@@ -444,8 +430,9 @@ export const Transactions = ({
       };
       const confirmFunction = transactionTypeProperties[transactionType].confirmAction;
       const confirmedTransaction = await confirmFunction(transaction.id, requestsConfig);
+
       if (confirmedTransaction.collectionId !== transaction.collectionId) {
-        createPVConfiguration(confirmedTransaction);
+        cloneConfiguration(user, confirmedTransaction);
       }
       setActiveItemId(transaction.id);
       setTransactions([...transactions.filter((o) => o.id !== transaction.id), { ...confirmedTransaction }]);

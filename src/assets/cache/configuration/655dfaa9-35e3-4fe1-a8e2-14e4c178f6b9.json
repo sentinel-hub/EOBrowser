@@ -1,0 +1,95 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/655dfa-YOUR-INSTANCEID-HERE/layers/0-ROADS-AND-BUILDINGS",
+        "id": "0-ROADS-AND-BUILDINGS",
+        "title": "Roads and Buildings",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// Display both roads and buildings\n\nfunction setup() {\n  return {\n    input: [\"roads\", \"buildings\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(sample) {\n  let background = (sample.roads >= 127 | sample.buildings >= 127) ? 1.0 : 0.0;\n  return [sample.roads / 255, \n          sample.buildings / 255, \n          0.0,\n          background];\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/655dfa-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-06-28T07:34:34.218196Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9ff30a-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/655dfa-YOUR-INSTANCEID-HERE/layers/BUILDINGS",
+        "id": "BUILDINGS",
+        "title": "Buildings",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//Buildings detection only\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\"buildings\", \"dataMask\"]\n    }],\n    output: [\n      { id: \"default\", bands: 4 }, \n      { id: \"eobrowserStatsPOI\", bands: 1, sampleType: 'FLOAT32' }, \n      { id: \"dataMask\", bands: 1 }\n    ]\n  }\n}\n\nfunction evaluatePixel(samples) {\n  let imgVals = null;\n  const indexVal = samples.dataMask === 1 ? samples.buildings : NaN;\n\n  if (samples.buildings > 127) {\n    imgVals = [0, 255, 0, samples.buildings];\n  } else {\n    imgVals = [0, 0, 0, 0];\n  }\n\n  return {\n      default: imgVals, \n      eobrowserStatsPOI: [indexVal, samples.dataMask],\n      dataMask: [samples.dataMask]\n    };\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/655dfa-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-06-24T12:17:00.765343Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9ff30a-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/655dfa-YOUR-INSTANCEID-HERE/layers/ROADS",
+        "id": "ROADS",
+        "title": "Roads",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n//Roads detection only\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\"roads\", \"dataMask\"]\n    }],\n    output: [\n      { id: \"default\", bands: 4 }, \n      { id: \"eobrowserStatsPOI\", bands: 1, sampleType: 'FLOAT32' }, \n      { id: \"dataMask\", bands: 1 }\n    ]\n  }\n}\n\nfunction evaluatePixel(samples) {\n  let imgVals = null;\n  const indexVal = samples.dataMask === 1 ? samples.roads : NaN;\n\n\n  if (samples.roads > 127) {\n    imgVals = [255, 0, 0, samples.roads];\n  } else {\n    imgVals = [0, 0, 0, 0];\n  }\n\n  return {\n      default: imgVals, \n      eobrowserStatsPOI: [indexVal],\n      dataMask: [samples.dataMask]\n    };\n}\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/655dfa-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-06-10T09:26:16.735551Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "9ff30a-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

@@ -11,5 +11,3 @@ export function setTerrainViewerId(terrainViewerId) {
 }
 
 export const TIMELAPSE_3D_MIN_EYE_HEIGHT = 50000;
-
-export const DEFAULT_TERRAIN_VIEWER_TEXTURE_SIZE = 512;

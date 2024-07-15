@@ -99,5 +99,4 @@ export {
   S5HCHOMarkdown,
   S5CH4Markdown,
   S5AERAIMarkdown,
-  S5CloudMarkdown,
 };

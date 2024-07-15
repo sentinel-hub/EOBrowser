@@ -6,7 +6,7 @@ import { AOISelection } from './AOISelection';
 import DateInput from './DateInput';
 import { SelectInput } from './SelectInput';
 import { providerSpecificSearchParameters, minDateRange, maxDateRange } from './config';
-import { getTPDICollectionsWithLabels } from './Search';
+import { getTPDICollectionsWithLabels } from '../commercialData.utils';
 
 const SearchForm = ({
   searchParams,

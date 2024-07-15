@@ -1,0 +1,62 @@
+{
+    "title": "EOB3 Landsat 4-5 TM  L1 API",
+    "layers": [
+        {
+            "id": "__FIS_4_NDVI",
+            "name": "__FIS_4_NDVI",
+            "description": "",
+            "dataset": "LTML1",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_5_NDWI",
+            "name": "__FIS_5_NDWI",
+            "description": "",
+            "dataset": "LTML1",
+            "legendUrl": null
+        },
+        {
+            "id": "__FIS_THERMAL",
+            "name": "__FIS_THERMAL",
+            "description": "",
+            "dataset": "LTML1",
+            "legendUrl": null
+        },
+        {
+            "id": "1_TRUE_COLOR",
+            "name": "True color",
+            "description": "Based on the combination of bands 3, 2, 1",
+            "dataset": "LTML1",
+            "legendUrl": null
+        },
+        {
+            "id": "3_FALSE_COLOR",
+            "name": "False color",
+            "description": "Based on the combination of bands 4, 3, 2",
+            "dataset": "LTML1",
+            "legendUrl": null
+        },
+        {
+            "id": "4_NDVI",
+            "name": "NDVI",
+            "description": "Based on the combination of bands (B04-B03)/(B04+B03)",
+            "dataset": "LTML1",
+            "legendUrl": null
+        },
+        {
+            "id": "5_NDWI",
+            "name": "NDWI",
+            "description": "Based on the combination of bands (B02-B04)/(B02+B04)",
+            "dataset": "LTML1",
+            "legendUrl": null
+        },
+        {
+            "id": "THERMAL",
+            "name": "THERMAL",
+            "description": "",
+            "dataset": "LTML1",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

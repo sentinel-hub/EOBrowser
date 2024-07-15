@@ -1,10 +1,87 @@
 @import '../variables.scss';
 
+// stylelint-disable selector-class-pattern
+.__floater__open:has(> .__floater__body > #psd-tutorial-wrap) {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+
+  .__floater__arrow {
+    @media screen and (max-width: $breakpoint-940) {
+      display: none;
+    }
+  }
+}
+
+#psd-tutorial-step3-arrow-wrapper {
+  position: absolute;
+  background: transparent;
+  top: 35%;
+  right: calc(50vw - 440px);
+  transform: translateY(-50%);
+  z-index: 10150;
+  display: none;
+
+  &.animate {
+    display: block;
+    animation: animateArrow 0.5s ease-in-out 0s 1 normal forwards;
+
+    @media screen and (max-width: $breakpoint-940) {
+      display: none;
+    }
+
+    #psd-tutorial-step3-arrow-right {
+      width: 0;
+      height: 0;
+      border-top: 32px solid transparent;
+      border-bottom: 32px solid transparent;
+      border-left: 40px solid #fff;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+      animation: shakeArrow 1s ease-in-out 0.6s infinite alternate;
+    }
+  }
+}
+
+@keyframes animateArrow {
+  0% {
+    top: 35%;
+    right: calc(50vw - 440px);
+  }
+
+  100% {
+    top: 330px;
+    right: 60px;
+  }
+}
+
+@keyframes shakeArrow {
+  0% {
+    transform: rotateZ(0deg);
+  }
+
+  6% {
+    transform: rotateZ(7deg);
+  }
+
+  12% {
+    transform: rotateZ(0deg);
+  }
+
+  18% {
+    transform: rotateZ(-7deg);
+  }
+
+  25% {
+    transform: rotateZ(0deg);
+  }
+}
+// stylelint-enable selector-class-pattern
+
 .tutorial-wrap {
-  background-color: rgb(255, 255, 255);
+  background-color: $tutorialBackgroundColor;
   border-radius: 5px;
   box-sizing: border-box;
-  color: rgb(51, 51, 51);
+  color: $tutorialTextColor;
   font-size: 16px;
   max-width: 100%;
   padding: 15px;
@@ -18,7 +95,7 @@
   text-align: center;
 
   a {
-    color: #b6bf00;
+    color: $primaryCol;
     cursor: pointer;
   }
 }
@@ -68,58 +145,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: 15px;
-}
-
-.tutorial-button {
-  background-color: rgb(182, 191, 0);
-  border: 0;
-  border-radius: 4px;
-  color: $mainMedium;
-  cursor: pointer;
-  line-height: 1;
-  padding: 8px;
-  -webkit-appearance: none;
-  font-size: 14px;
-  margin: 2px;
-}
-
-.tutorial-button:disabled {
-  background-color: rgb(145, 145, 145);
-}
-
-.content-div-style {
-  text-align: left;
-  max-height: 60vh;
-  overflow-y: auto;
-}
-
-.tutorial-title {
-  font-size: 20px;
-  margin: 0 0 10px;
-}
-
-.content-wrapper {
   padding: 0 10px;
-}
-
-.tutorial-firstpage-nextbutton {
-  margin-right: 20px;
-  padding-left: 30px;
-  padding-right: 30px;
-  border: 1px solid rgb(182, 191, 0);
-}
-
-.tutorial-firstpage-closebutton {
-  margin-left: 20px;
-  padding-left: 30px;
-  padding-right: 30px;
-  color: rgb(182, 191, 0);
-  background: rgb(255, 255, 255);
-  border: 1px solid rgb(182, 191, 0);
-}
-
-.tutorial-firstpage-footer {
-  padding-bottom: 40px;
 }
 
 .tutorial-panel-button {
@@ -159,7 +185,7 @@
   }
 
   a {
-    color: #b6bf00;
+    color: $primaryCol;
     background: none;
     display: inline-block;
     width: 40px;
@@ -169,4 +195,144 @@
   a.disabled {
     opacity: 0.5;
   }
+}
+
+.tutorial-button {
+  background-color: $primaryCol;
+  border: 0;
+  border-radius: 4px;
+  color: $mainMedium;
+  cursor: pointer;
+  line-height: 1;
+  padding: 8px;
+  -webkit-appearance: none;
+  font-size: 14px;
+  margin: 2px;
+
+  &.step {
+    color: $textColor;
+    width: 60px;
+    padding: 7px;
+    margin: 2px 4px;
+
+    i {
+      font-size: 18px;
+    }
+  }
+}
+
+.tutorial-page-index {
+  opacity: 0.5;
+  margin-right: 8px;
+  font-size: 0.9rem;
+}
+
+.tutorial-button:disabled {
+  background-color: $primaryCol;
+  opacity: 0.5;
+  cursor: default;
+}
+
+.content-div-style {
+  text-align: left;
+  max-height: 60vh;
+  overflow-y: auto;
+
+  &.first-step {
+    text-align: center;
+    padding-bottom: 40px;
+  }
+
+  .links {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .link {
+    text-decoration: underline;
+    color: $primaryCol;
+    cursor: pointer;
+    padding: 5px;
+  }
+
+  .step4-image {
+    width: 179px;
+  }
+
+  .preview {
+    width: 100%;
+  }
+}
+
+#psd-tutorial-wrap {
+  .content-div-style.first-step {
+    padding-bottom: 0;
+    max-height: 55vh;
+
+    @media screen and (max-width: $breakpoint-450) {
+      max-height: 40vh;
+    }
+  }
+
+  @media screen and (max-width: $breakpoint-600) {
+    .tutorial-body {
+      .tutorial-title {
+        margin-top: 15px;
+      }
+    }
+
+    .content-div-style {
+      .third-step {
+        flex-direction: column;
+      }
+
+      .fourth-step {
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+
+    .tutorial-footer {
+      &.step0 {
+        flex-direction: column;
+        align-items: flex-end;
+
+        .tutorial-big-buttons-wrapper {
+          align-self: flex-start;
+          margin-bottom: 10px;
+
+          .tutorial-button {
+            padding-left: 15px;
+            padding-right: 15px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.tutorial-title {
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+
+.content-wrapper {
+  padding: 0 10px;
+
+  .logo {
+    display: flex;
+  }
+}
+
+.tutorial-closebutton {
+  margin: 2px 8px 2px 0;
+  padding-left: 30px;
+  padding-right: 30px;
+  color: $primaryCol;
+  background: $tutorialBackgroundColor;
+  border: 1px solid $primaryCol;
+}
+
+.tutorial-firstpage-footer {
+  padding-bottom: 40px;
 }

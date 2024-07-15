@@ -1,0 +1,188 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE/layers/2_FALSE-COLOR",
+        "id": "2_FALSE-COLOR",
+        "title": "False Color",
+        "description": "Based on the combination of bands NIR narrow, red and green",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\nfunction setup() {\n  return {\n    input: [\"NIR_Narrow\", \"Red\", \"Green\", \"dataMask\"],\n    output: { bands: 3 }\n  };\n}\n\nfunction evaluatePixel(sample) {\n  return [2.5 * sample.NIR_Narrow, 2.5 * sample.Red, 2.5 * sample.Green, sample.dataMask];\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-10-21T08:49:25.466333Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS/sources/21"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "HLS"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE/layers/3_NDVI",
+        "id": "3_NDVI",
+        "title": "NDVI",
+        "description": "Normalized difference of bands NIR narrow and red",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\nfunction setup() {\n  return {\n    input: [\"NIR_Narrow\", \"Red\", \"dataMask\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(sample) {\n  var ndvi = (sample.NIR_Narrow - sample.Red) / (sample.NIR_Narrow + sample.Red)\n\n  if (ndvi<-1.1) return [0,0,0, sample.dataMask];\nelse if (ndvi<-0.2) return [0.75,0.75,0.75, sample.dataMask];\nelse if (ndvi<-0.1) return [0.86,0.86,0.86, sample.dataMask];\nelse if (ndvi<0) return [1,1,0.88, sample.dataMask];\nelse if (ndvi<0.025) return [1,0.98,0.8, sample.dataMask];\nelse if (ndvi<0.05) return [0.93,0.91,0.71, sample.dataMask];\nelse if (ndvi<0.075) return [0.87,0.85,0.61, sample.dataMask];\nelse if (ndvi<0.1) return [0.8,0.78,0.51, sample.dataMask];\nelse if (ndvi<0.125) return [0.74,0.72,0.42, sample.dataMask];\nelse if (ndvi<0.15) return [0.69,0.76,0.38, sample.dataMask];\nelse if (ndvi<0.175) return [0.64,0.8,0.35, sample.dataMask];\nelse if (ndvi<0.2) return [0.57,0.75,0.32, sample.dataMask];\nelse if (ndvi<0.25) return [0.5,0.7,0.28, sample.dataMask];\nelse if (ndvi<0.3) return [0.44,0.64,0.25, sample.dataMask];\nelse if (ndvi<0.35) return [0.38,0.59,0.21, sample.dataMask];\nelse if (ndvi<0.4) return [0.31,0.54,0.18, sample.dataMask];\nelse if (ndvi<0.45) return [0.25,0.49,0.14, sample.dataMask];\nelse if (ndvi<0.5) return [0.19,0.43,0.11, sample.dataMask];\nelse if (ndvi<0.55) return [0.13,0.38,0.07, sample.dataMask];\nelse if (ndvi<0.6) return [0.06,0.33,0.04, sample.dataMask];\nelse return [0,0.27,0, sample.dataMask];\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-10-21T08:41:03.273491Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS/sources/21"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "HLS"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE/layers/4_MOISTURE-INDEX",
+        "id": "4_MOISTURE-INDEX",
+        "title": "Moisture Index",
+        "description": "Normalized difference of bands SWIR1 and NIR narrow",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nconst moistureRamps = [\n        [-0.8, 0x800000],\n        [-0.24, 0xff0000],\n        [-0.032, 0xffff00],\n        [0.032, 0x00ffff],\n        [0.24, 0x0000ff],\n        [0.8, 0x000080]\n      ];\n\nconst viz = new ColorRampVisualizer(moistureRamps);\n\nfunction setup() {\n  return {\n    input: [\"NIR_Narrow\", \"SWIR1\",\"dataMask\"],\n    output: [\n      { id: \"default\", bands: 4 },\n      { id: \"index\", bands: 1, sampleType: \"FLOAT32\" }\n    ]\n  };\n}\n\nfunction evaluatePixel(samples) {\n  let val = index(samples.NIR_Narrow, samples.SWIR1); \n  const indexVal = samples.dataMask === 1 ? val : NaN;\n  return {\n    default: [...viz.process(val),samples.dataMask],\n    index: [indexVal] \n  };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-10-21T08:50:42.944295Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS/sources/21"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "HLS"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE/layers/5_SWIR",
+        "id": "5_SWIR",
+        "title": "SWIR",
+        "description": "Based on the combination of bands SIWR2, NIR narrow and red",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\nfunction setup() {\n  return {\n    input: [\"SWIR2\", \"NIR_Narrow\", \"Red\", \"dataMask\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(sample) {\n  return [2.5 * sample.SWIR2, 2.5 * sample.NIR_Narrow, 2.5 * sample.Red, sample.dataMask];\n}\n\n"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-10-21T08:50:56.567428Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS/sources/21"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "HLS"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE/layers/6_NDWI",
+        "id": "6_NDWI",
+        "title": "NDWI",
+        "description": "Normalized difference of bands green and NIR narrow",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "\n\n      //VERSION=3\n//ndwi\nconst colorRamp1 = [\n  \t[0, 0xFFFFFF],\n  \t[1, 0x008000]\n  ];\nconst colorRamp2 = [\n  \t[0, 0xFFFFFF],\n  \t[1, 0x0000CC]\n  ];\n\nlet viz1 = new ColorRampVisualizer(colorRamp1);\nlet viz2 = new ColorRampVisualizer(colorRamp2);\n\nfunction setup() {\n  return {\n    input: [\"Green\", \"NIR_Narrow\", \"dataMask\"],\n    output: [\n\t\t{ id:\"default\", bands: 4 },\n        { id: \"index\", bands: 1, sampleType: \"FLOAT32\" }\n\t]\n  };\n}\n\nfunction evaluatePixel(samples) {\n  let val = index(samples.Green, samples.NIR_Narrow);\n  let imgVals = null;\n  const indexVal = samples.dataMask === 1 ? val : NaN;\n  \n  if (val < -0) {\n    imgVals = [...viz1.process(-val), samples.dataMask];\n  } else {\n    imgVals = [...viz2.process(Math.sqrt(Math.sqrt(val))), samples.dataMask];\n  }\n  return {\n    default: imgVals,\n    index: [indexVal]\n  };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-10-21T08:51:12.952781Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS/sources/21"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "HLS"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE/layers/TRUE-COLOR",
+        "id": "TRUE-COLOR",
+        "title": "True Color",
+        "description": "Based on the combination of bands blue, green and red",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\nfunction setup() {\n  return {\n    input: [\"Blue\",\"Green\",\"Red\", \"dataMask\"],\n    output: { bands: 4 }\n  };\n}\n\nfunction evaluatePixel(sample) {\n  \n  return [2.5 * sample.Red, 2.5 * sample.Green, 2.5 * sample.Blue, sample.dataMask];\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/a10a16-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2022-10-20T12:13:47.086567Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/HLS/sources/21"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "maxCloudCoverage": 50,
+            "type": "HLS"
+        }
+    }
+]

@@ -8,7 +8,7 @@ import {
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/css/v4-shims.css';
 
-import store, { notificationSlice } from './store';
+import store, { notificationSlice, tabsSlice } from './store';
 import Map from './Map/Map';
 import Notification from './Notification/Notification';
 import Tools from './Tools/Tools';
@@ -39,10 +39,15 @@ class App extends Component {
   };
 
   async componentDidMount() {
-    const { sharedPinsListIdFromUrlParams } = this.props;
+    const { sharedPinsListIdFromUrlParams, access_token, impersonatedUserId } = this.props;
     if (sharedPinsListIdFromUrlParams) {
       if (import.meta.env.VITE_EOB_BACKEND) {
-        const pins = await importSharedPins(sharedPinsListIdFromUrlParams);
+        const pins = await importSharedPins(
+          sharedPinsListIdFromUrlParams,
+          this.setTabIndex,
+          access_token,
+          impersonatedUserId,
+        );
         if (pins) {
           this.setLastAddedPin(pins.uniqueId);
         }
@@ -103,6 +108,10 @@ class App extends Component {
       handleFathomTrackEvent(FATHOM_TRACK_EVENT_LIST['3D_MODE_WIDGET']);
     }
   }
+
+  setTabIndex = (index) => {
+    store.dispatch(tabsSlice.actions.setTabIndex(index));
+  };
 
   setQuery = (query) => {
     this.setState({
@@ -233,6 +242,7 @@ const mapStoreToProps = (store) => ({
   authToken: getAppropriateAuthToken(store.auth, store.themes.selectedThemeId),
   user: store.auth.user.userdata,
   access_token: store.auth.user.access_token,
+  impersonatedUserId: store.auth.impersonatedUser.userId,
   selectedTabIndex: store.tabs.selectedTabIndex,
   selectedLanguage: store.language.selectedLanguage,
   mode: store.modes.selectedMode,
@@ -260,6 +270,8 @@ const mapStoreToProps = (store) => ({
   timelapseSharePreviewMode: store.timelapse.timelapseSharePreviewMode,
   termsPrivacyAccepted: store.auth.terms_privacy_accepted,
   kc_idp_hint: store.auth.kc_idp_hint,
+  tutorialIdToShow: store.tutorial.tutorialIdToShowUrl,
+  impersonatedUser: store.auth.impersonatedUser,
 });
 
 export default connect(mapStoreToProps, null)(App);

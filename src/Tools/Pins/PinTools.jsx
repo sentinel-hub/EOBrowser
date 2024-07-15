@@ -95,7 +95,8 @@ class PinTools extends Component {
       const replaceExisting = !this.state.keepExisting;
       let uniqueId;
       if (this.props.isUserLoggedIn) {
-        const res = await savePinsToServer(pins, replaceExisting);
+        const { accessToken, impersonatedUserId } = this.props;
+        const res = await savePinsToServer(pins, replaceExisting, accessToken, impersonatedUserId);
         uniqueId = res.uniqueId;
       } else {
         uniqueId = savePinsToSessionStorage(pins, replaceExisting);
@@ -217,8 +218,8 @@ class PinTools extends Component {
     const { isUserLoggedIn, pins, pinsStoryBuilderEnabled } = this.props;
     const pinsDataURI = this.getPinsDataURI(pins);
     const notLoggedInMsg = getLoggedInErrorMsg();
-    const sharePinsTitle = t`Share pins` + (!isUserLoggedIn ? ` (${notLoggedInMsg})` : '');
-    const animatePinsTitle = t`Create a story from pins` + (!isUserLoggedIn ? ` (${notLoggedInMsg})` : '');
+    const sharePinsTitle = t`Share pins` + (!isUserLoggedIn ? ` \n(${notLoggedInMsg})` : '');
+    const animatePinsTitle = t`Create a story from pins` + (!isUserLoggedIn ? ` \n(${notLoggedInMsg})` : '');
     const exportPinsTitle = t`Export pins to the computer`;
     const importPinsTitle = t`Import pins from a saved file`;
     const clearPinsTitle = t`Delete all pins`;

@@ -61,7 +61,7 @@ const getCustomEffectsFunctionCacheKey = ({ redCurveEffect, blueCurveEffect, gre
     greenCurveEffect: greenCurveEffect,
   });
 
-export const createCustomEffectFunction = ({ redCurveEffect, greenCurveEffect, blueCurveEffect }) => {
+const createCustomEffectFunction = ({ redCurveEffect, greenCurveEffect, blueCurveEffect }) => {
   let customEffectsFunction;
   if (
     (redCurveEffect && redCurveEffect.values) ||

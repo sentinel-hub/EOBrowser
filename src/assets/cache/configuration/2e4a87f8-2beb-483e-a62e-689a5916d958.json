@@ -1,0 +1,64 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2e4a87-YOUR-INSTANCEID-HERE/layers/SWC-100",
+        "id": "SWC-100",
+        "title": "Soil Water Content (100m)",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// To set custom max and min values, set\n// defaultVis to false and choose your max and\n// min values. The color map will then be scaled\n// to those max and min values\nconst vmin = 0;\nconst vmax = 0.4;\n\nfunction setup() {\n    return {\n        input: [\"SWC\", \"dataMask\"],\n        output: [\n            { id: \"default\", bands: 4 },\n            { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"eobrowserStats\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"dataMask\", bands: 1 },\n        ],\n    };\n}\n\nfunction updateColormap(vmin, vmax) {\n    const numIntervals = cmap.length;\n    const intervalLength = (vmax - vmin) / (numIntervals - 1);\n    for (let i = 0; i < numIntervals; i++) {\n        cmap[i][0] = vmin + intervalLength * i;\n    }\n}\n\nconst cmap = [\n    [0.0, 0xfff7ea],\n    [0.05, 0xfaedda],\n    [0.1, 0xede4cb],\n    [0.15, 0xdedcbd],\n    [0.2, 0xced3af],\n    [0.25, 0xbdcba3],\n    [0.3, 0xaac398],\n    [0.35, 0x96bc90],\n    [0.4, 0x80b48a],\n    [0.45, 0x68ac86],\n    [0.5, 0x4da484],\n    [0.55, 0x269c83],\n    [0.6, 0x009383],\n    [0.65, 0x008a85],\n    [0.7, 0x008186],\n    [0.75, 0x007788],\n    [0.8, 0x006d8a],\n    [0.85, 0x00618c],\n    [0.9, 0x00558d],\n    [0.95, 0x00478f],\n    [1.0, 0x003492],\n];\n\nupdateColormap(vmin, vmax);\nconst visualizer = new ColorRampVisualizer(cmap);\n\nfunction evaluatePixel(sample) {\n    let scaleFactor = 1000;\n    let val = sample.SWC / scaleFactor;\n\n    let imgVals = visualizer.process(val);\n    return {\n        default: [...imgVals, sample.dataMask],\n        index: [val],\n        eobrowserStats: [val],\n        dataMask: [sample.dataMask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2e4a87-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-27T11:43:34.256401Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "65f7e4-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    },
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2e4a87-YOUR-INSTANCEID-HERE/layers/SWC-1000",
+        "id": "SWC-1000",
+        "title": "Soil Water Content (1000m)",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// To set custom max and min values, set\n// defaultVis to false and choose your max and\n// min values. The color map will then be scaled\n// to those max and min values\nconst vmin = 0;\nconst vmax = 0.4;\n\nfunction setup() {\n    return {\n        input: [\"SWC\", \"dataMask\"],\n        output: [\n            { id: \"default\", bands: 4 },\n            { id: \"index\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"eobrowserStats\", bands: 1, sampleType: \"FLOAT32\" },\n            { id: \"dataMask\", bands: 1 },\n        ],\n    };\n}\n\nfunction updateColormap(vmin, vmax) {\n    const numIntervals = cmap.length;\n    const intervalLength = (vmax - vmin) / (numIntervals - 1);\n    for (let i = 0; i < numIntervals; i++) {\n        cmap[i][0] = vmin + intervalLength * i;\n    }\n}\n\nconst cmap = [\n    [0.0, 0xfff7ea],\n    [0.05, 0xfaedda],\n    [0.1, 0xede4cb],\n    [0.15, 0xdedcbd],\n    [0.2, 0xced3af],\n    [0.25, 0xbdcba3],\n    [0.3, 0xaac398],\n    [0.35, 0x96bc90],\n    [0.4, 0x80b48a],\n    [0.45, 0x68ac86],\n    [0.5, 0x4da484],\n    [0.55, 0x269c83],\n    [0.6, 0x009383],\n    [0.65, 0x008a85],\n    [0.7, 0x008186],\n    [0.75, 0x007788],\n    [0.8, 0x006d8a],\n    [0.85, 0x00618c],\n    [0.9, 0x00558d],\n    [0.95, 0x00478f],\n    [1.0, 0x003492],\n];\n\nupdateColormap(vmin, vmax);\nconst visualizer = new ColorRampVisualizer(cmap);\n\nfunction evaluatePixel(sample) {\n    let scaleFactor = 1000;\n    let val = sample.SWC / scaleFactor;\n\n    let imgVals = visualizer.process(val);\n    return {\n        default: [...imgVals, sample.dataMask],\n        index: [val],\n        eobrowserStats: [val],\n        dataMask: [sample.dataMask],\n    };\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/2e4a87-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2024-03-27T11:43:39.342701Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "858254-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

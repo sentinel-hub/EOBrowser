@@ -1,0 +1,33 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/963c9e-YOUR-INSTANCEID-HERE/layers/IO-LAND-USE-LAND-COVER-MAP",
+        "id": "IO-LAND-USE-LAND-COVER-MAP",
+        "title": "IO Land Use Land Cover Map (9-class)",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n\nconst colormap = [\n  [1, 0x419bdf],\n  [2, 0x397d49],\n  [4, 0x7a87c6],\n  [5, 0xe49635],\n  [7, 0xc4281b],\n  [8, 0xa59b8f],\n  [9, 0xa8ebff],\n  [10, 0x616161],\n  [11, 0xe3e2c3]\n]\n\nconst visualizer = new ColorMapVisualizer(colormap);\n\nfunction evaluatePixel(samples) {\n  let tile_sample = NaN;\n  let tile_dataMask = 0;\n  for (let i = 0; i < samples.length; i++) {\n    if (samples[i].dataMask === 1) {\n      tile_sample = samples[i].lulc;\n      tile_dataMask = 1;\n    }\n  }\n  let rgbVis = visualizer.process(tile_sample);\n  return rgbVis.concat(tile_dataMask);\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\n        \"lulc\", \"dataMask\"\n      ]\n    }],\n    output: {\n      bands: 4,\n    },\n    mosaicking: \"TILE\"\n  }\n}"
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/963c9e-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2023-03-03T10:49:24.053514Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "0ed263-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

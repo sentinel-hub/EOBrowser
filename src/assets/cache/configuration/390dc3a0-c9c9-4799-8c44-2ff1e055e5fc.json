@@ -1,0 +1,33 @@
+[
+    {
+        "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/390dc3-YOUR-INSTANCEID-HERE/layers/ACCOUNTING-LAYERS-VISUALIZATION",
+        "id": "ACCOUNTING-LAYERS-VISUALIZATION",
+        "title": "Accounting Layers Visualization",
+        "description": "",
+        "styles": [
+            {
+                "name": "default",
+                "description": "Default layer style",
+                "evalScript": "//VERSION=3\n// This script visualises Corine Land Cover Accounting Layers\nfunction setup() {\n  return {\n    input: [\"CLC_ACC\", \"dataMask\"],\n    output: {bands: 4}\n        }\n                  }\n\nconst map = [\n    [111, 0xe6004d],  //111 - Continuous urban fabric\n    [112, 0xff0000],  //112 - Discontinuous urban fabric\n    [121, 0xcc4df2],  //121 - Industrial or commercial units\n    [122, 0xcc0000],  //122 - Road and rail networks and associated land\n    [123, 0xe6cccc],  //123 - Port areas\n    [124, 0xe6cce6],  //124 - Airports\n    [131, 0xa600cc],  //131 - Mineral extraction sites\n    [132, 0xa64d00],  //132 - Dump sites\n    [133, 0xff4dff],  //133 - Construction sites\n    [141, 0xffa6ff], //141 - Green urban areas\n    [142, 0xffe6ff], //142 - Sport and leisure facilities\n    [211, 0xffffa8], //211 - Non-irrigated arable land\n    [212, 0xffff00], //212 - Permanently irrigated land\n    [213, 0xe6e600], //213 - Rice fields\n    [221, 0xe68000], //221 - Vineyards\n    [222, 0xf2a64d], //222 - Fruit trees and berry plantations\n    [223, 0xe6a600], //223 - Olive groves\n    [231, 0xe6e64d], //231 - Pastures\n    [241, 0xffe6a6], //241 - Annual crops associated with permanent crops\n    [242, 0xffe64d], //242 - Complex cultivation patterns\n    [243, 0xe6cc4d], //243 - Land principally occupied by agriculture with significant areas of natural vegetation\n    [244, 0xf2cca6], //244 - Agro-forestry areas\n    [311, 0x80ff00], //311 - Broad-leaved forest\n    [312, 0x00a600], //312 - Coniferous forest\n    [313, 0x4dff00], //313 - Mixed forest\n    [321, 0xccf24d], //321 - Natural grasslands\n    [322, 0xa6ff80], //322 - Moors and heathland\n    [323, 0xa6e64d], //323 - Sclerophyllous vegetation\n    [324, 0xa6f200], //324 - Transitional woodland-shrub\n    [331, 0xe6e6e6], //331 - Beaches - dunes - sands\n    [332, 0xcccccc], //332 - Bare rocks\n    [333, 0xccffcc], //333 - Sparsely vegetated areas\n    [334, 0x000000], //334 - Burnt areas\n    [335, 0xa6e6cc], //335 - Glaciers and perpetual snow\n    [411, 0xa6a6ff], //411 - Inland marshes\n    [412, 0x4d4dff], //412 - Peat bogs\n    [421, 0xccccff], //421 - Salt marshes\n    [422, 0xe6e6ff], //422 - Salines\n    [423, 0xa6a6e6], //423 - Intertidal flats\n    [511, 0x00ccf2], //511 - Water courses\n    [512, 0x80f2e6], //512 - Water bodies\n    [521, 0x00ffa6], //521 - Coastal lagoons\n    [522, 0xa6ffe6], //522 - Estuaries\n    [523, 0xe6f2ff], //523 - Sea and ocean\n    [999, 0xffffff]  //999 - NODATA\n  ];\n\nconst visualizer = new ColorMapVisualizer(map);\n\nfunction evaluatePixel(sample) {\n  return [visualizer.process(sample.CLC_ACC)[0], visualizer.process(sample.CLC_ACC)[1], visualizer.process(sample.CLC_ACC)[2], sample.dataMask];\n}\n   "
+            }
+        ],
+        "orderHint": 0,
+        "instance": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/wms/instances/390dc3-YOUR-INSTANCEID-HERE"
+        },
+        "lastUpdated": "2021-10-20T09:07:59.396376Z",
+        "dataset": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM"
+        },
+        "datasetSource": {
+            "@id": "https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10"
+        },
+        "defaultStyleName": "default",
+        "datasourceDefaults": {
+            "mosaickingOrder": "mostRecent",
+            "temporal": false,
+            "collectionId": "4c5441-YOUR-INSTANCEID-HERE",
+            "type": "CUSTOM"
+        }
+    }
+]

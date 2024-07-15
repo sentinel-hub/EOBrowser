@@ -12,23 +12,23 @@ import { handleFathomTrackEvent } from '../../utils';
 
 const checkButtonDisabled = ({ datasetId, geometry, fromTime, toTime, user }) => {
   if (!user.userdata) {
-    return `${spectralExplorerLabels.title()} - ${spectralExplorerLabels.errorLogIn()}`;
+    return `${spectralExplorerLabels.title()}\n(${spectralExplorerLabels.errorLogIn()})`;
   }
 
   if (!datasetId) {
-    return `${spectralExplorerLabels.title()} - ${spectralExplorerLabels.errorDatasetNotSet()}`;
+    return `${spectralExplorerLabels.title()}\n(${spectralExplorerLabels.errorDatasetNotSet()})`;
   }
 
   if (!isSpectralExplorerSupported(datasetId)) {
-    return `${spectralExplorerLabels.title()} - ${spectralExplorerLabels.errorNotSupported()}`;
+    return `${spectralExplorerLabels.title()}\n(${spectralExplorerLabels.errorNotSupported()})`;
   }
 
   if (!geometry) {
-    return `${spectralExplorerLabels.title()} - ${spectralExplorerLabels.errorGeometryNotSet()}`;
+    return `${spectralExplorerLabels.title()}\n(${spectralExplorerLabels.errorGeometryNotSet()})`;
   }
 
   if (!fromTime || !toTime) {
-    return `${spectralExplorerLabels.title()} - ${spectralExplorerLabels.errorDateNotSet()}`;
+    return `${spectralExplorerLabels.title()}\n(${spectralExplorerLabels.errorDateNotSet()})`;
   }
   return null;
 };
@@ -77,7 +77,9 @@ const SpectralExplorerButton = ({
     // jsx-a11y/anchor-is-valid
     // eslint-disable-next-line
     <a
-      onClick={() => handleOnClick({ errorMessage, onErrorMessage, geometryType, datasetId, selectedSeries })}
+      onClick={() => {
+        handleOnClick({ errorMessage, onErrorMessage, geometryType, datasetId, selectedSeries });
+      }}
       title={errorMessage ? errorMessage : spectralExplorerLabels.title()}
       className={errorMessage ? 'disabled' : ''}
     >

@@ -1,0 +1,13 @@
+{
+    "title": "WorldCover ",
+    "layers": [
+        {
+            "id": "WORLDCOVER-MAP",
+            "name": "ESA WorldCover Map",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

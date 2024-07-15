@@ -14,30 +14,36 @@ import AuthProvider from './Auth/AuthProvider';
 import URLParamsParser from './URLParamsParser/URLParamsParser';
 import ThemesProvider from './ThemesProvider/ThemesProvider';
 import GoogleAPIProvider from './GoogleAPIProvider/GoogleAPIProvider';
+import MetadataCacheProvider from './MetadataCacheProvider/MetadataCacheProvider';
 
 import './index.scss';
+import { TutorialProvider } from './Tutorial/TutorialProvider';
 
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
-      <LanguageProvider>
-        <DndProvider options={HTML5toTouch}>
-          <AuthProvider>
-            <URLParamsParser>
-              {(themeId, sharedPinsListId) => (
-                <ThemesProvider themeIdFromUrlParams={themeId}>
-                  <GoogleAPIProvider>
-                    {({ googleAPI }) => (
-                      <App sharedPinsListIdFromUrlParams={sharedPinsListId} googleAPI={googleAPI} />
-                    )}
-                  </GoogleAPIProvider>
-                </ThemesProvider>
-              )}
-            </URLParamsParser>
-            <EnsureTermsPrivacy></EnsureTermsPrivacy>
-          </AuthProvider>
-        </DndProvider>
-      </LanguageProvider>
+      <MetadataCacheProvider>
+        <LanguageProvider>
+          <DndProvider options={HTML5toTouch}>
+            <AuthProvider>
+              <URLParamsParser>
+                {(themeId, sharedPinsListId) => (
+                  <ThemesProvider themeIdFromUrlParams={themeId}>
+                    <TutorialProvider themeIdFromUrlParams={themeId}>
+                      <GoogleAPIProvider>
+                        {({ googleAPI }) => (
+                          <App sharedPinsListIdFromUrlParams={sharedPinsListId} googleAPI={googleAPI} />
+                        )}
+                      </GoogleAPIProvider>
+                    </TutorialProvider>
+                  </ThemesProvider>
+                )}
+              </URLParamsParser>
+              <EnsureTermsPrivacy></EnsureTermsPrivacy>
+            </AuthProvider>
+          </DndProvider>
+        </LanguageProvider>
+      </MetadataCacheProvider>
     </BrowserRouter>
   </Provider>,
   document.getElementById('root'),

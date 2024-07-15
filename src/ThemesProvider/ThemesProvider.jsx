@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { t } from 'ttag';
 
-import { ModalId } from '../const';
+import { ModalId, PLANET_SANDBOX_THEME_ID } from '../const';
 import store, { notificationSlice, themesSlice, visualizationSlice, modalSlice } from '../store';
 import {
   prepareDataSourceHandlers,
@@ -20,7 +20,10 @@ import {
   getSelectedThemeId,
   getModifiedUserInstances,
   fetchThemesFromUrl,
+  doesUserHaveAccessToPlanetSandboxDataCollections,
 } from './ThemesProvider.utils';
+import { PLANET_SANDBOX_THEME } from '../assets/protected_themes';
+import { mergeAndReorderThemes } from '../utils';
 
 class ThemesProvider extends React.Component {
   async componentDidMount() {
@@ -35,9 +38,10 @@ class ThemesProvider extends React.Component {
     if (!termsPrivacyAccepted) {
       return;
     }
+    let additionalThemes = [];
     if (user && user.access_token) {
       // User is an object by default, so if(user) is truthy (probably should be changed)
-      await this.fetchUserInstances();
+      additionalThemes = await this.fetchUserInstances();
     }
     if (themesUrl) {
       const { themes: themesFromUrl, error: fetchThemesError } = await fetchThemesFromUrl(themesUrl);
@@ -55,7 +59,7 @@ class ThemesProvider extends React.Component {
 
     // if themeId in URL and not logged in and themeId not in "default" mode theme list
     const selectedMode = guessMode(themeIdFromUrlParams, userInstancesThemesList, urlThemesList);
-    this.setMode(selectedMode);
+    this.setMode(selectedMode, additionalThemes);
     this.setSelectedThemeIdFromMode(selectedMode);
     const isThemeIdInModeThemesList = !!selectedMode.themes.find((t) => t.id === themeIdFromUrlParams);
 
@@ -67,7 +71,10 @@ class ThemesProvider extends React.Component {
     ) {
       store.dispatch(
         modalSlice.actions.addModal({
-          modal: ModalId.PRIVATE_THEMEID_LOGIN,
+          modal:
+            themeIdFromUrlParams === PLANET_SANDBOX_THEME_ID
+              ? ModalId.PRIVATE_PSD_LOGIN
+              : ModalId.PRIVATE_THEMEID_LOGIN,
           params: {
             handlePrivateThemeDecision: (shouldExecuteLogin) =>
               this.handlePrivateThemeDecision(selectedMode, shouldExecuteLogin),
@@ -78,6 +85,17 @@ class ThemesProvider extends React.Component {
   }
 
   async componentDidUpdate(prevProps) {
+    if (this.props.user !== prevProps.user) {
+      if (this.props.user.access_token) {
+        // User logged in
+        let additionalThemes = await this.fetchUserInstances();
+        this.setThemesWithDefaultFirst(this.props.modeThemesList, additionalThemes);
+      } else {
+        // User logged out
+        this.setThemesOnLogout();
+      }
+    }
+
     // whenever selectedThemeId changes, we also update the datasourceHandlers:
     if (
       prevProps.selectedThemeId !== this.props.selectedThemeId ||
@@ -85,24 +103,24 @@ class ThemesProvider extends React.Component {
     ) {
       await this.updateDataSourceHandlers(this.props.selectedThemeId);
     }
-
-    if (this.props.user !== prevProps.user) {
-      if (this.props.user.access_token) {
-        // User logged in
-        await this.fetchUserInstances();
-      } else {
-        // User logged out
-        this.setThemesOnLogout();
-      }
-    }
   }
 
   setThemesOnLogout = () => {
     const { selectedThemesListId, modeThemesList } = this.props;
-    if (selectedThemesListId === USER_INSTANCES_THEMES_LIST) {
+    const haveUserThemes = selectedThemesListId === USER_INSTANCES_THEMES_LIST;
+    const haveProtectedThemes = modeThemesList.find((t) => t.id === PLANET_SANDBOX_THEME_ID);
+
+    if (haveUserThemes || haveProtectedThemes) {
+      let themes = modeThemesList;
+
+      if (haveProtectedThemes) {
+        themes = modeThemesList.filter((t) => t.id !== PLANET_SANDBOX_THEME_ID);
+        store.dispatch(themesSlice.actions.setModeThemesList(themes));
+      }
+
       store.dispatch(
         themesSlice.actions.setSelectedThemeId({
-          selectedThemeId: modeThemesList[0].id,
+          selectedThemeId: themes[0].id,
           selectedThemesListId: MODE_THEMES_LIST,
         }),
       );
@@ -112,12 +130,30 @@ class ThemesProvider extends React.Component {
     store.dispatch(notificationSlice.actions.displayPanelError(null));
   };
 
+  setThemesWithDefaultFirst = (newThemes, additionalThemes = []) => {
+    let themes = newThemes?.filter((t) => !additionalThemes.includes(t));
+    if (themes?.length > 0) {
+      store.dispatch(themesSlice.actions.setModeThemesList(mergeAndReorderThemes(themes, additionalThemes)));
+    } else {
+      store.dispatch(themesSlice.actions.setModeThemesList(additionalThemes));
+    }
+  };
+
   async fetchUserInstances() {
-    const { access_token } = this.props.user;
+    const {
+      user: { access_token },
+      impersonatedAccountId,
+    } = this.props;
     try {
-      const modifiedUserInstances = await getModifiedUserInstances(access_token);
+      const modifiedUserInstances = await getModifiedUserInstances(access_token, impersonatedAccountId);
+
       store.dispatch(themesSlice.actions.setUserInstancesThemesList(modifiedUserInstances));
       store.dispatch(notificationSlice.actions.displayPanelError(null));
+
+      const userHasAccess = await doesUserHaveAccessToPlanetSandboxDataCollections(access_token);
+      if (userHasAccess) {
+        return PLANET_SANDBOX_THEME;
+      }
     } catch (error) {
       if (error.response && error.response.status === 403) {
         const account_expired_instance = [
@@ -128,7 +164,7 @@ class ThemesProvider extends React.Component {
           },
         ];
         store.dispatch(themesSlice.actions.setUserInstancesThemesList(account_expired_instance));
-        return;
+        return [];
       }
       let errorMessage =
         t`There was a problem downloading your instances` +
@@ -136,11 +172,12 @@ class ThemesProvider extends React.Component {
       let errorLink = null;
       store.dispatch(notificationSlice.actions.displayPanelError({ message: errorMessage, link: errorLink }));
     }
+    return [];
   }
 
-  setMode = (selectedMode) => {
+  setMode = (selectedMode, additionalThemes) => {
     store.dispatch(themesSlice.actions.setSelectedModeId(selectedMode.id));
-    store.dispatch(themesSlice.actions.setModeThemesList(selectedMode.themes));
+    this.setThemesWithDefaultFirst(selectedMode.themes, additionalThemes);
   };
 
   setSelectedThemeIdFromMode = (selectedMode) => {
@@ -178,8 +215,8 @@ class ThemesProvider extends React.Component {
   async handlePrivateThemeDecision(selectedMode, shouldExecuteLogin) {
     if (shouldExecuteLogin) {
       await doLogin();
-      await this.fetchUserInstances();
-      this.setMode(selectedMode);
+      let additionalThemes = await this.fetchUserInstances();
+      this.setMode(selectedMode, additionalThemes);
       this.setSelectedThemeIdFromMode(selectedMode);
     } else {
       store.dispatch(visualizationSlice.actions.reset());
@@ -205,5 +242,6 @@ const mapStoreToProps = (store) => ({
   selectedModeId: store.themes.selectedModeId,
   selectedThemesListId: store.themes.selectedThemesListId,
   themesLists: store.themes.themesLists,
+  impersonatedAccountId: store.auth.impersonatedUser.accountId,
 });
 export default connect(mapStoreToProps)(ThemesProvider);

@@ -3,7 +3,9 @@ import { connect } from 'react-redux';
 
 import AnonymousAuth from './AnonymousAuth';
 import store, { authSlice } from '../store';
-import { decodeToken, getUserTokenFromLocalStorage } from './authHelpers';
+import { doLogin, initKeycloak } from './authHelpers';
+import UserTokenRefresh from './UserTokenRefresh';
+import { getUrlParams } from '../utils';
 
 class AuthProvider extends React.Component {
   state = {
@@ -15,20 +17,21 @@ class AuthProvider extends React.Component {
   }
 
   signInOnLoad = async () => {
+    const { kc_idp_hint, impersonatedAccountId, impersonatedUserId } = getUrlParams();
+
+    if (impersonatedAccountId || impersonatedUserId) {
+      store.dispatch(authSlice.actions.setImpersonatedIds({ impersonatedAccountId, impersonatedUserId }));
+    }
+
     try {
-      const token = await getUserTokenFromLocalStorage();
-      if (token) {
-        store.dispatch(
-          authSlice.actions.setUser({
-            userdata: decodeToken(token),
-            token_expiration: token.expires_in,
-            access_token: token.access_token,
-          }),
-        );
+      const isUserAuthenticated = await initKeycloak();
+      if (!isUserAuthenticated && kc_idp_hint !== undefined) {
+        await doLogin(kc_idp_hint);
       }
     } catch (err) {
       console.error(err);
     }
+
     this.setState({
       userAuthCompleted: true,
     });
@@ -45,7 +48,7 @@ class AuthProvider extends React.Component {
       <>
         {termsPrivacyAccepted && <AnonymousAuth setAnonToken={this.setAnonToken} />}
         {userAuthCompleted && (termsPrivacyAccepted ? anonToken : true) ? (
-          this.props.children
+          <UserTokenRefresh>{this.props.children}</UserTokenRefresh>
         ) : (
           <div className="initial-loader">
             <i className="fa fa-cog fa-spin fa-3x fa-fw" />
@@ -59,5 +62,6 @@ class AuthProvider extends React.Component {
 const mapStoreToProps = (store) => ({
   anonToken: store.auth.anonToken,
   termsPrivacyAccepted: store.auth.terms_privacy_accepted,
+  kc_idp_hint: store.auth.kc_idp_hint,
 });
 export default connect(mapStoreToProps)(AuthProvider);

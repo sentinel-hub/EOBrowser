@@ -1,0 +1,41 @@
+{
+    "title": "Analysis-Ready PlanetScope",
+    "layers": [
+        {
+            "id": "0_TRUE-COLOR-CLOUDMASKED",
+            "name": "True Color, Cloud Masked",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "CLOUD-CLASSIFICATION",
+            "name": "Cloud Classification",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "FALSE-COLOR",
+            "name": "False Color",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "NDVI",
+            "name": "NDVI",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "TRUE-COLOR",
+            "name": "True Color",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}

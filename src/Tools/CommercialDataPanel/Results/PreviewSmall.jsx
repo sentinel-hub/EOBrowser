@@ -12,7 +12,7 @@ const PreviewSmall = ({
   onClick,
   cachedPreviews,
   setCachedPreviews,
-  searchParams,
+  planetApiKey,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -23,7 +23,7 @@ const PreviewSmall = ({
 
     try {
       setIsLoading(true);
-      const imageBlob = await TPDI.getThumbnail(collectionId, product.id, searchParams.planetApiKey, {
+      const imageBlob = await TPDI.getThumbnail(collectionId, product.id, planetApiKey, {
         cancelToken: cancelToken,
         authToken: user.access_token,
         cache: {

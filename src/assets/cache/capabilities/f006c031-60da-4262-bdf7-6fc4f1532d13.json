@@ -1,0 +1,27 @@
+{
+    "title": "Forest Carbon Diligence",
+    "layers": [
+        {
+            "id": "ABOVEGROUND-CARBON-DENSITY",
+            "name": "Aboveground Carbon Density",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "CANOPY-COVER",
+            "name": "Canopy Cover",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        },
+        {
+            "id": "CANOPY-HEIGHT",
+            "name": "Canopy Height",
+            "description": "",
+            "dataset": "CUSTOM",
+            "legendUrl": null
+        }
+    ],
+    "datasets": []
+}
